@@ -5,6 +5,7 @@ import {
   countHomeBoard,
   homeTaskTab,
   orderHomeAgents,
+  planHomeWrapUp,
   sortHomeTasks,
   type HomeAgent,
   type HomeTask
@@ -21,7 +22,13 @@ const task = (id: string, patch: Partial<HomeTask> = {}): HomeTask => ({
   detail: '',
   ...patch
 })
-const labels = { resumed: 'resumed', addedDue: 'today', addedDetail: 'mine' }
+const labels = {
+  resumed: 'resumed',
+  addedDue: 'today',
+  addedDetail: 'mine',
+  addedAgent: 'agent',
+  doneReport: 'I finished it'
+}
 const tasks = [
   task('copy', { who: 'waiting', agentId: 'writer', question: 'A or B?' }),
   task('offer', { who: 'waiting', agentId: 'meeting', meetingId: 'weekly' }),
@@ -32,7 +39,7 @@ const followUps = [task('follow-1', { due: 'tomorrow' }), task('follow-2', { due
 describe('home board', () => {
   it('counts what waits on me and what is late', () => {
     expect(countHomeBoard(tasks)).toEqual({
-      open: 2,
+      open: 3,
       dueToday: 1,
       waiting: 2,
       waitingAgents: 1,
@@ -40,7 +47,7 @@ describe('home board', () => {
       late: 1
     })
     expect(homeTaskTab(tasks[2])).toEqual(['today', 'late'])
-    expect(homeTaskTab(tasks[1])).toEqual(['waiting'])
+    expect(homeTaskTab(tasks[1])).toEqual(['today', 'waiting'])
     expect(sortHomeTasks(tasks).map((entry) => entry.id)).toEqual(['copy', 'offer', 'notice'])
   })
 
@@ -88,5 +95,27 @@ describe('home board', () => {
       labels
     )
     expect(orderHomeAgents(agents, answered, false, agentLabels)[0].state).toBe('working')
+  })
+
+  it('reports a day record only under the task I linked it to, and never an unanswered one', () => {
+    const board = [task('research', { report: 'two of three done' }), task('review'), task('other')]
+    const records = [{ id: 'pages' }, { id: 'app' }, { id: 'chat' }]
+    const plan = planHomeWrapUp(board, records, { pages: { taskId: 'review' }, chat: 'notWork' })
+    expect(plan.items.map((item) => [item.task.id, item.linkedRecords])).toEqual([
+      ['research', 0],
+      ['review', 1]
+    ])
+    expect(plan.unanswered).toEqual([{ id: 'app' }])
+    // Linking the unanswered record moves it under its task and empties the list.
+    const linked = planHomeWrapUp(board, records, {
+      pages: { taskId: 'review' },
+      chat: 'notWork',
+      app: { taskId: 'research' }
+    })
+    expect(linked.items.map((item) => [item.task.id, item.linkedRecords])).toEqual([
+      ['research', 1],
+      ['review', 1]
+    ])
+    expect(linked.unanswered).toEqual([])
   })
 })

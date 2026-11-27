@@ -38,3 +38,39 @@ export function formatHomeDuration(
     .filter(Boolean)
     .join(' ')
 }
+
+const DAY_MS = 86_400_000
+
+/** `count` working days after (or before, when negative) the day that starts at `dayStart`. */
+export function addWorkdays(dayStart: number, count: number): number {
+  const day = new Date(dayStart)
+  const step = count < 0 ? -1 : 1
+  for (let left = Math.abs(count); left > 0;) {
+    day.setDate(day.getDate() + step)
+    if (day.getDay() !== 0 && day.getDay() !== 6) {
+      left -= 1
+    }
+  }
+  return day.getTime()
+}
+
+/** Whole calendar days from `from` to `to`; both are day starts. */
+export function calendarDaysBetween(from: number, to: number): number {
+  return Math.round((to - from) / DAY_MS)
+}
+
+/** Monday-based: do both day starts fall in one week? */
+export function inSameWeek(a: number, b: number): boolean {
+  const monday = (dayStart: number): number => {
+    const day = new Date(dayStart)
+    day.setDate(day.getDate() - ((day.getDay() + 6) % 7))
+    return day.getTime()
+  }
+  return monday(a) === monday(b)
+}
+
+/** 24-hour clock for minutes from midnight: one format for every time on the page. */
+export function formatHomeClock(minutes: number): string {
+  const pad = (value: number): string => String(value).padStart(2, '0')
+  return `${pad(Math.floor(minutes / 60))}:${pad(minutes % 60)}`
+}

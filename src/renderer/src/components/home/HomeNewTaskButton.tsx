@@ -1,26 +1,38 @@
 import React, { useId, useState } from 'react'
 import { useTranslate } from '@/i18n/use-translate'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { HOME_META_CLASS } from './HomeCard'
 
-/** Adds a task of mine to the sample board. One field: a title. */
+/**
+ * Adds a task of mine to the sample board: a title, and whether an agent takes it. The header shows it twice,
+ * once plain and once with the hand-off already switched on.
+ */
 export function HomeNewTaskButton({
+  label,
+  primary = false,
+  handOff = false,
   disabled,
-  onAdd
+  onAdd,
+  ...props
 }: {
+  label: string
+  primary?: boolean
+  /** Opens with "Hand to an agent" switched on. */
+  handOff?: boolean
   disabled: boolean
-  onAdd: (title: string) => void
-}): React.JSX.Element {
+  onAdd: (title: string, agent: boolean) => void
+} & Record<`data-${string}`, string>): React.JSX.Element {
   const t = useTranslate()
   const inputId = useId()
   const errorId = useId()
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState('')
+  const [agent, setAgent] = useState(handOff)
   const [error, setError] = useState(false)
-  const errorText = t('home.newTask.error', 'Type a title for the task, then press Add.')
 
   return (
     <Popover
@@ -29,12 +41,19 @@ export function HomeNewTaskButton({
         setOpen(next)
         if (!next) {
           setError(false)
+          setAgent(handOff)
         }
       }}
     >
       <PopoverTrigger asChild>
-        <Button type="button" variant="outline" size="sm" disabled={disabled}>
-          {t('home.header.newTask', 'New task')}
+        <Button
+          type="button"
+          variant={primary ? 'default' : 'outline'}
+          size="sm"
+          disabled={disabled}
+          {...props}
+        >
+          {label}
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-80">
@@ -48,7 +67,7 @@ export function HomeNewTaskButton({
               setError(true)
               return
             }
-            onAdd(trimmed)
+            onAdd(trimmed, agent)
             setTitle('')
             setOpen(false)
           }}
@@ -72,13 +91,26 @@ export function HomeNewTaskButton({
           />
           {error ? (
             <p id={errorId} role="alert" className="text-xs text-destructive">
-              {errorText}
+              {t('home.newTask.error', 'Type a title for the task, then press Add.')}
             </p>
-          ) : (
-            <p className={HOME_META_CLASS}>
-              {t('home.newTask.hint', 'It is added to My work, due today, in the sample board.')}
-            </p>
-          )}
+          ) : null}
+          {/* Why min-h-6: the label is the 24px target for its 16px box. */}
+          <Label variant="control" className="min-h-6">
+            <Checkbox
+              checked={agent}
+              data-home-new-task-agent=""
+              onCheckedChange={(checked) => setAgent(checked === true)}
+            />
+            {t('home.header.handOff', 'Hand to an agent')}
+          </Label>
+          <p className={HOME_META_CLASS}>
+            {agent
+              ? t(
+                  'home.newTask.hintAgent',
+                  'Sample: the task joins My work as “Agent working”. No real agent starts.'
+                )
+              : t('home.newTask.hint', 'It is added to My work, due today, in the sample board.')}
+          </p>
           <Button type="submit" size="sm" className="self-end">
             {t('home.newTask.add', 'Add')}
           </Button>

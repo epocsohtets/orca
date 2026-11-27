@@ -1,15 +1,19 @@
 import type { Translate } from '@/i18n/use-translate'
 import type { HomeProjectId } from './home-board'
-import type { HomePhase } from './home-day'
+import {
+  addWorkdays,
+  calendarDaysBetween,
+  formatHomeClock,
+  inSameWeek,
+  type HomePhase
+} from './home-day'
 
 const at = (hour: number, minute = 0): number => hour * 60 + minute
 
-export type HomeUpcomingGroup = 'today' | 'tomorrow' | 'week'
+export type HomeUpcomingGroup = 'today' | 'tomorrow' | 'week' | 'nextWeek'
 export type HomeUpcoming = {
   id: string
   group: HomeUpcomingGroup
-  /** Minutes from midnight for today's items; later days sort as listed. */
-  at?: number
   when: string
   title: string
   project: HomeProjectId
@@ -18,26 +22,38 @@ export type HomeUpcoming = {
   taskId?: string
 }
 
+type UpcomingSeed = Omit<HomeUpcoming, 'group' | 'when'> & {
+  /** Working days from the sample day. */
+  workdays: number
+  /** Minutes from midnight, or a word such as "end of day". */
+  time: number | string
+}
+
+/** The group and the time label follow the real calendar: a Friday's next working day is next week's Monday. */
 export function buildHomeUpcoming(
   t: Translate,
-  minutes: number,
-  offerOpen: boolean
+  args: {
+    sampleDay: number
+    minutes: number
+    offerOpen: boolean
+    /** Short weekday name of a day start. */
+    weekday: (dayStart: number) => string
+  }
 ): HomeUpcoming[] {
-  const weeklyOver = minutes >= at(9, 30)
-  const items: HomeUpcoming[] = [
+  const weeklyOver = args.minutes >= at(9, 30)
+  const seeds: UpcomingSeed[] = [
     {
       id: 'weekly',
-      group: 'today',
-      at: at(9),
-      when: '09:00',
-      title: t('home.upcoming.weekly', 'Spring campaign weekly meeting'),
+      workdays: 0,
+      time: at(9),
+      title: t('home.upcoming.weekly', 'Campaign weekly meeting'),
       project: 'campaign',
       meeting: weeklyOver
         ? {
             note: t('home.upcoming.weeklyMinutes', 'Minutes arrived · 2 items for me'),
             detail: t(
               'home.upcoming.weeklyMinutesDetail',
-              'Decided: launch on 21 March. Kim Jiwoo approves the headline; you choose it first.'
+              'Decided: launch on the 5th of next month. Kim Jiwoo approves the headline; you choose it first.'
             )
           }
         : {
@@ -50,9 +66,8 @@ export function buildHomeUpcoming(
     },
     {
       id: 'draft-review',
-      group: 'today',
-      at: at(15),
-      when: '15:00',
+      workdays: 0,
+      time: at(15),
       title: t('home.upcoming.draftReview', 'Brand renewal draft review'),
       project: 'brand',
       meeting: {
@@ -65,17 +80,16 @@ export function buildHomeUpcoming(
     },
     {
       id: 'due-copy',
-      group: 'today',
-      at: at(17),
-      when: '17:00',
-      title: t('home.task.copy', 'Settle the landing page headline'),
+      workdays: 0,
+      time: at(17),
+      title: t('home.task.copy', 'Settle the launch page headline'),
       project: 'campaign',
       taskId: 'copy'
     },
     {
       id: 'ops-weekly',
-      group: 'tomorrow',
-      when: '11:00',
+      workdays: 1,
+      time: at(11),
       title: t('home.upcoming.opsWeekly', 'Operations weekly check'),
       project: 'support',
       meeting: {
@@ -88,132 +102,67 @@ export function buildHomeUpcoming(
     },
     {
       id: 'due-inquiries',
-      group: 'tomorrow',
-      when: t('home.upcoming.endOfDay', 'End of day'),
-      title: t('home.task.inquiries', 'Sort March customer inquiries by type'),
+      workdays: 1,
+      time: t('home.upcoming.endOfDay', 'End of day'),
+      title: t('home.task.inquiries', 'Sort this month’s customer inquiries by type'),
       project: 'support',
       taskId: 'inquiries'
     },
     {
       id: 'mid-check',
-      group: 'week',
-      when: t('home.upcoming.friday14', 'Fri 14:00'),
-      title: t('home.upcoming.midCheck', 'Spring campaign mid-point check'),
+      workdays: 3,
+      time: at(14),
+      title: t('home.upcoming.midCheck', 'Campaign mid-point check'),
       project: 'campaign',
       meeting: {
         note: t('home.upcoming.noPrep', 'No prep yet'),
         detail: t(
           'home.upcoming.midCheckDetail',
-          'The meeting bot prepares the agenda on Thursday.'
+          'The meeting bot prepares the agenda the day before.'
         )
       }
     }
   ]
-  // A finished meeting stays only while it still has something for me.
-  return items.filter(
-    (item) =>
-      item.at === undefined ||
-      item.at > minutes ||
-      (item.id === 'weekly' && weeklyOver && offerOpen)
-  )
-}
-
-export type HomeActivity = {
-  id: string
-  at: number
-  who: string
-  text: string
-  byAgent: boolean
-  taskId?: string
-  agentId?: string
-}
-
-export function buildHomeActivity(t: Translate): HomeActivity[] {
-  const research = t('home.agent.research', 'Research agent')
-  const writer = t('home.agent.writer', 'Writing agent')
-  const triage = t('home.agent.triage', 'Inquiry agent')
-  const meeting = t('home.agent.meeting', 'Meeting bot')
-  return [
-    {
-      id: 'inquiries-draft',
-      at: at(8, 50),
-      who: triage,
-      text: t('home.activity.inquiriesDraft', 'drafted “Sort March customer inquiries by type”'),
-      byAgent: true,
-      taskId: 'inquiries'
-    },
-    {
-      id: 'research-start',
-      at: at(9, 5),
-      who: research,
-      text: t('home.activity.researchStart', 'started “Survey competitors’ spring promotions”'),
-      byAgent: true,
-      taskId: 'research'
-    },
-    {
-      id: 'copy-draft',
-      at: at(9, 40),
-      who: writer,
-      text: t(
-        'home.activity.copyDraft',
-        'drafted two landing page headlines and asked me to choose'
-      ),
-      byAgent: true,
-      taskId: 'copy'
-    },
-    {
-      id: 'minutes',
-      at: at(9, 35),
-      who: meeting,
-      text: t('home.activity.minutes', 'wrote the weekly meeting minutes · 2 items for me'),
-      byAgent: true,
-      agentId: 'meeting'
-    },
-    {
-      id: 'drafts-up',
-      at: at(11, 40),
-      who: t('home.person.seoyeon', 'Park Seoyeon'),
-      text: t('home.activity.draftsUp', 'uploaded two brand guide drafts'),
-      byAgent: false,
-      taskId: 'review'
-    },
-    {
-      id: 'notice-stop',
-      at: at(8, 55),
-      who: triage,
-      text: t(
-        'home.activity.noticeStop',
-        'stopped “Revise the delivery delay notice”: no reply from logistics'
-      ),
-      byAgent: true,
-      taskId: 'notice'
-    },
-    {
-      id: 'research-table',
-      at: at(13, 20),
-      who: research,
-      text: t('home.activity.researchTable', 'put two competitors’ promotions into a table'),
-      byAgent: true,
-      taskId: 'research'
-    },
-    {
-      id: 'review-minutes',
-      at: at(16, 10),
-      who: meeting,
-      text: t('home.activity.reviewMinutes', 'wrote the draft review minutes'),
-      byAgent: true,
-      agentId: 'meeting'
+  return seeds.flatMap(({ workdays, time, ...item }) => {
+    if (workdays === 0 && typeof time === 'number' && time <= args.minutes) {
+      // A finished meeting stays only while it still has something for me.
+      if (!(item.id === 'weekly' && weeklyOver && args.offerOpen)) {
+        return []
+      }
     }
-  ]
+    const day = addWorkdays(args.sampleDay, workdays)
+    const away = calendarDaysBetween(args.sampleDay, day)
+    const group: HomeUpcomingGroup =
+      away === 0
+        ? 'today'
+        : away === 1
+          ? 'tomorrow'
+          : inSameWeek(args.sampleDay, day)
+            ? 'week'
+            : 'nextWeek'
+    const clock = typeof time === 'number' ? formatHomeClock(time) : time
+    return [
+      {
+        ...item,
+        group,
+        when: group === 'today' || group === 'tomorrow' ? clock : `${args.weekday(day)} ${clock}`
+      }
+    ]
+  })
+}
+
+/** When the research agent began its current step, for "working · n min". */
+export function homeResearchWorkingSince(phase: HomePhase): number {
+  return phase === 'morning' ? at(9, 5) : at(13, 20)
 }
 
 export type HomeDaySegment = { id: 'app' | 'browser' | 'meeting'; label: string; minutes: number }
 export type HomeDayRecord = { id: string; text: string; suggestTaskId: string }
 
 const DAY_MINUTES: Record<HomePhase, [number, number, number]> = {
-  morning: [10, 5, 0],
-  day: [80, 45, 60],
-  evening: [150, 70, 110]
+  morning: [10, 5, 30],
+  day: [80, 45, 30],
+  evening: [150, 70, 90]
 }
 
 /** `app` is the first app registered in Settings > My apps; no app block without one. */
@@ -228,20 +177,32 @@ export function buildHomeDay(
     { id: 'browser', label: t('home.day.browser', 'Browser'), minutes: browser },
     { id: 'meeting', label: t('home.day.meetings', 'Meetings'), minutes: meeting }
   ]
+  // A record is worded by its clock range, never by what I was doing around it.
+  const range = (from: number, to: number): string =>
+    `${formatHomeClock(from)}–${formatHomeClock(to)}`
   const records: HomeDayRecord[] =
     phase === 'morning'
       ? []
       : [
           {
             id: 'competitor-pages',
-            text: t('home.day.recordBrowser', 'Browser · 3 competitor promotion pages · 20 min'),
+            text: t(
+              'home.day.recordBrowser',
+              'Browser · 3 competitor promotion pages · {{range}}',
+              {
+                range: range(at(10, 20), at(10, 40))
+              }
+            ),
             suggestTaskId: 'research'
           },
           ...(app
             ? [
                 {
                   id: 'app-block',
-                  text: t('home.day.recordApp', '{{app}} · 25 min after lunch', { app }),
+                  text: t('home.day.recordApp', '{{app}} · {{range}}', {
+                    app,
+                    range: range(at(13, 10), at(13, 35))
+                  }),
                   suggestTaskId: 'review'
                 }
               ]

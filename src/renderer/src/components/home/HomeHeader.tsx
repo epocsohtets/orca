@@ -42,13 +42,13 @@ export type HomeTileId = 'tasks' | 'waiting' | 'agentDone' | 'late'
 /** Four big numbers. Each one is a button that shows the rows behind its number. */
 export function HomeTiles({
   counts,
-  agentDone,
-  confirmedByMe,
+  agentFinished,
+  agentConfirmed,
   onSelect
 }: {
   counts: HomeBoardCounts
-  agentDone: number
-  confirmedByMe: number
+  agentFinished: number
+  agentConfirmed: number
   onSelect: (tile: HomeTileId) => void
 }): React.JSX.Element {
   const t = useTranslate()
@@ -71,14 +71,15 @@ export function HomeTiles({
     {
       id: 'agentDone',
       label: t('home.tiles.agentDone', 'Finished by agents'),
-      value: agentDone,
-      sub: t('home.tiles.agentDoneSub', 'This week · {{count}} confirmed by me', {
-        count: confirmedByMe
+      value: agentFinished,
+      sub: t('home.tiles.agentDoneSub', 'This week · {{confirmed}} of {{total}} confirmed by me', {
+        confirmed: agentConfirmed,
+        total: agentFinished
       })
     },
     {
       id: 'late',
-      label: t('home.tiles.late', 'Blocked · late'),
+      label: t('home.tiles.late', 'Late · awaiting others'),
       value: counts.late,
       sub:
         counts.late > 0
@@ -95,10 +96,15 @@ export function HomeTiles({
             <button
               type="button"
               data-home-tile={tile.id}
-              className={`${HOME_FOCUS_RING_CLASS} flex w-full flex-col gap-1 rounded-md px-4 py-1 text-left transition-colors motion-reduce:transition-none hover:bg-accent`}
+              className={`${HOME_FOCUS_RING_CLASS} group/home-tile flex w-full flex-col gap-1 rounded-md px-4 py-1 text-left`}
               onClick={() => onSelect(tile.id)}
             >
-              <span className={HOME_META_CLASS}>{tile.label}</span>
+              {/* Why no hover fill: a filled tile reads as the selected one. The label underlines instead. */}
+              <span
+                className={`${HOME_META_CLASS} underline-offset-4 group-hover/home-tile:underline`}
+              >
+                {tile.label}
+              </span>
               <span
                 className={`text-2xl leading-8 font-semibold tabular-nums ${tile.alert ? 'text-destructive' : 'text-foreground'}`}
               >
@@ -128,12 +134,9 @@ export function HomeFirstSteps({ steps }: { steps: HomeStep[] }): React.JSX.Elem
   const t = useTranslate()
   return (
     <Card size="sm" data-home-card="first-run">
-      <section
-        aria-label={t('home.firstRun.title', 'Start in three steps')}
-        className="flex flex-col"
-      >
+      <section aria-label={t('home.firstRun.title', 'Start here')} className="flex flex-col">
         <h2 className="px-4 pb-2 text-sm font-semibold text-foreground">
-          {t('home.firstRun.title', 'Start in three steps')}
+          {t('home.firstRun.title', 'Start here')}
         </h2>
         <ol className="divide-y divide-border border-t border-border">
           {steps.map((step, index) => (

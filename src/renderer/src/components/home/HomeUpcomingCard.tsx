@@ -14,7 +14,7 @@ import type { HomeProjectId } from './home-board'
 import type { HomeProject } from './home-board-mock'
 import type { HomeUpcoming, HomeUpcomingGroup } from './home-board-day-mock'
 
-const GROUPS: HomeUpcomingGroup[] = ['today', 'tomorrow', 'week']
+const GROUPS: HomeUpcomingGroup[] = ['today', 'tomorrow', 'week', 'nextWeek']
 
 /** Deadlines and meetings together. A deadline jumps to its task; a meeting opens what is ready for it. */
 export function HomeUpcomingCard({
@@ -31,7 +31,8 @@ export function HomeUpcomingCard({
   const groupLabels: Record<HomeUpcomingGroup, string> = {
     today: t('home.upcoming.today', 'Today'),
     tomorrow: t('home.upcoming.tomorrow', 'Tomorrow'),
-    week: t('home.upcoming.week', 'This week')
+    week: t('home.upcoming.week', 'This week'),
+    nextWeek: t('home.upcoming.nextWeek', 'Next week')
   }
 
   return (

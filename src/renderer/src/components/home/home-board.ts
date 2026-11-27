@@ -48,7 +48,7 @@ export type HomeBoardState = {
   /** Task id to the choice I gave. */
   answers: Record<string, string>
   records: Record<string, HomeRecordAnswer>
-  addedTasks: { id: string; title: string }[]
+  addedTasks: { id: string; title: string; agent?: boolean }[]
   doneTaskIds: string[]
   meetingStartedAt: number | null
   wrapUp: { count: number } | null
@@ -73,7 +73,13 @@ export function applyHomeBoardState(
   tasks: readonly HomeTask[],
   followUps: readonly HomeTask[],
   state: HomeBoardState,
-  labels: { resumed: string; addedDue: string; addedDetail: string }
+  labels: {
+    resumed: string
+    addedDue: string
+    addedDetail: string
+    addedAgent: string
+    doneReport: string
+  }
 ): HomeTask[] {
   const next: HomeTask[] = []
   for (const task of tasks) {
@@ -101,18 +107,24 @@ export function applyHomeBoardState(
       due: 'today',
       dueLabel: labels.addedDue,
       done: false,
-      who: null,
+      who: added.agent ? 'agentWorking' : null,
+      whoLabel: added.agent ? labels.addedAgent : undefined,
       detail: labels.addedDetail
     })
   }
-  return next.map((task) => (state.doneTaskIds.includes(task.id) ? { ...task, done: true } : task))
+  // A task I finished today reports that I did, in my own words.
+  return next.map((task) =>
+    state.doneTaskIds.includes(task.id) ? { ...task, done: true, report: labels.doneReport } : task
+  )
 }
 
 const DUE_ORDER: Record<HomeDue, number> = { today: 0, overdue: 1, tomorrow: 2, week: 3 }
 
-/** Due today first, then what is late, then later days. */
+/** What waits on me first, then due today, then what is late, then later days. */
 export function sortHomeTasks(tasks: readonly HomeTask[]): HomeTask[] {
-  return [...tasks].sort((a, b) => DUE_ORDER[a.due] - DUE_ORDER[b.due])
+  const rank = (task: HomeTask): number =>
+    (task.who === 'waiting' && !task.done ? 0 : 10) + DUE_ORDER[task.due]
+  return [...tasks].sort((a, b) => rank(a) - rank(b))
 }
 
 export function homeTaskTab(task: HomeTask): HomeTaskTab[] {
@@ -120,10 +132,8 @@ export function homeTaskTab(task: HomeTask): HomeTaskTab[] {
     return ['done']
   }
   const tabs: HomeTaskTab[] = []
-  // "Today" is everything open on my plate, so its count is the My work tile's number.
-  if (!task.meetingId) {
-    tabs.push('today')
-  }
+  // "Today" is everything open on my plate, a meeting's offer included, so its count is the My work tile's number.
+  tabs.push('today')
   if (task.who === 'waiting') {
     tabs.push('waiting')
   }
@@ -146,7 +156,7 @@ export function countHomeBoard(tasks: readonly HomeTask[]): HomeBoardCounts {
   const open = tasks.filter((task) => !task.done)
   const waiting = open.filter((task) => task.who === 'waiting')
   return {
-    open: open.filter((task) => !task.meetingId).length,
+    open: open.length,
     dueToday: open.filter((task) => task.due === 'today' && !task.meetingId).length,
     waiting: waiting.length,
     waitingAgents: waiting.filter((task) => !task.meetingId).length,
@@ -183,4 +193,38 @@ export function orderHomeAgents(
         : agent
     })
     .sort((a, b) => AGENT_ORDER[a.state] - AGENT_ORDER[b.state])
+}
+
+export type HomeWrapUpPlan<DayRecord> = {
+  /** One update per task: tasks with a written update, and tasks I linked a day record to. */
+  items: { task: HomeTask; linkedRecords: number }[]
+  /** Records I have not answered. They are never part of the report. */
+  unanswered: DayRecord[]
+}
+
+/**
+ * What Wrap up today may report. A day record reaches the report only through the task I linked it to, and only
+ * as a count beside that task's update; a record I ruled out or never answered is not in it.
+ */
+export function planHomeWrapUp<DayRecord extends { id: string }>(
+  tasks: readonly HomeTask[],
+  records: readonly DayRecord[],
+  answers: Readonly<Record<string, HomeRecordAnswer | undefined>>
+): HomeWrapUpPlan<DayRecord> {
+  const linked = new Map<string, number>()
+  const unanswered: DayRecord[] = []
+  for (const record of records) {
+    const answer = answers[record.id]
+    if (answer === undefined) {
+      unanswered.push(record)
+    } else if (answer !== 'notWork') {
+      linked.set(answer.taskId, (linked.get(answer.taskId) ?? 0) + 1)
+    }
+  }
+  return {
+    items: tasks
+      .filter((task) => !task.meetingId && (task.report !== undefined || linked.has(task.id)))
+      .map((task) => ({ task, linkedRecords: linked.get(task.id) ?? 0 })),
+    unanswered
+  }
 }

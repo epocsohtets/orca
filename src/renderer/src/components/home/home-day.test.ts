@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { formatHomeDuration, homePhaseForMinutes, homeSampleDay } from './home-day'
+import {
+  addWorkdays,
+  calendarDaysBetween,
+  formatHomeClock,
+  formatHomeDuration,
+  homePhaseForMinutes,
+  homeSampleDay,
+  inSameWeek
+} from './home-day'
 
 describe('home day', () => {
   it('switches phase at 11:00 and 17:00', () => {
@@ -27,5 +35,16 @@ describe('home day', () => {
       '1h',
       '1h 20m'
     ])
+  })
+
+  it('steps over weekends and knows what is still this week', () => {
+    const friday = new Date(2026, 10, 27).getTime()
+    const monday = addWorkdays(friday, 1)
+    expect(new Date(monday).getDate()).toBe(30)
+    expect(calendarDaysBetween(friday, monday)).toBe(3)
+    expect(inSameWeek(friday, monday)).toBe(false)
+    expect(inSameWeek(friday, addWorkdays(friday, -4))).toBe(true)
+    expect(new Date(addWorkdays(monday, -1)).getDate()).toBe(27)
+    expect([545, 60, 1090].map(formatHomeClock)).toEqual(['09:05', '01:00', '18:10'])
   })
 })

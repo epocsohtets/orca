@@ -1,34 +1,39 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useTranslate } from '@/i18n/use-translate'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { HOME_META_CLASS, HOME_ROW_BUTTON_CLASS, HomeAvatar, HomeCard } from './HomeCard'
-import type { HomeActivity } from './home-board-day-mock'
+import type { HomeActivityRow } from './home-board-view'
 
 const SHORT = 5
 
-/** The day's log, newest first. A line jumps to the task or agent it is about. */
+export type HomeActivityFilter = 'all' | 'finished'
+
+/** This week's log, newest first. A line jumps to the task or agent it is about. */
 export function HomeActivityCard({
   entries,
   filter,
   onFilterChange,
-  clock,
+  showAll,
+  onShowAllChange,
   onReveal
 }: {
-  entries: readonly HomeActivity[]
-  filter: 'all' | 'agents'
-  onFilterChange: (filter: 'all' | 'agents') => void
-  clock: (at: number) => string
-  onReveal: (entry: HomeActivity) => void
+  entries: readonly HomeActivityRow[]
+  filter: HomeActivityFilter
+  onFilterChange: (filter: HomeActivityFilter) => void
+  showAll: boolean
+  onShowAllChange: (showAll: boolean) => void
+  onReveal: (entry: HomeActivityRow) => void
 }): React.JSX.Element {
   const t = useTranslate()
-  const [showAll, setShowAll] = useState(false)
-  const filtered = filter === 'agents' ? entries.filter((entry) => entry.byAgent) : entries
+  const finished = entries.filter((entry) => entry.finished)
+  const filtered = filter === 'finished' ? finished : entries
   const shown = showAll ? filtered : filtered.slice(0, SHORT)
 
   return (
     <HomeCard
       title={t('home.activity.title', 'Recent activity')}
+      aside={t('home.activity.aside', 'This week')}
       data-home-card="activity"
       action={
         filtered.length > SHORT ? (
@@ -37,7 +42,8 @@ export function HomeActivityCard({
             variant="ghost-muted"
             size="xs"
             aria-expanded={showAll}
-            onClick={() => setShowAll((all) => !all)}
+            data-home-activity-all=""
+            onClick={() => onShowAllChange(!showAll)}
           >
             {showAll
               ? t('home.activity.less', 'Show fewer')
@@ -49,32 +55,43 @@ export function HomeActivityCard({
       <div className="px-4 pb-2">
         <Tabs
           value={filter}
-          onValueChange={(value) => onFilterChange(value === 'agents' ? 'agents' : 'all')}
+          onValueChange={(value) => onFilterChange(value === 'finished' ? 'finished' : 'all')}
         >
-          <TabsList aria-label={t('home.activity.filter', 'Whose activity')}>
-            <TabsTrigger value="all">{t('home.activity.filterAll', 'Everyone')}</TabsTrigger>
-            <TabsTrigger value="agents" data-home-activity-filter="agents">
-              {t('home.activity.filterAgents', 'Agents')}
+          <TabsList aria-label={t('home.activity.filter', 'Which activity')}>
+            <TabsTrigger value="all">
+              {t('home.activity.filterAll', 'Everything')}
+              <span className="tabular-nums">{entries.length}</span>
+            </TabsTrigger>
+            <TabsTrigger value="finished" data-home-activity-filter="finished">
+              {t('home.activity.filterFinished', 'Finished by agents')}
+              <span className="tabular-nums">{finished.length}</span>
             </TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
       {shown.length === 0 ? (
         <p className={`px-4 py-3 ${HOME_META_CLASS}`}>
-          {t('home.activity.empty', 'Nothing has happened yet today.')}
+          {t('home.activity.empty', 'Nothing has happened yet this week.')}
         </p>
       ) : (
-        <ol className="border-t border-border">
+        <ol className="border-t border-border" data-home-activity-list="">
           {shown.map((entry) => {
             const body = (
               <>
                 <HomeAvatar name={entry.who} />
-                <span className="min-w-0 flex-1 text-xs text-foreground">
-                  <span className="font-medium">{entry.who}</span> {entry.text}
+                <span className="flex min-w-0 flex-1 flex-col gap-1 text-xs text-foreground">
+                  <span>
+                    <span className="font-medium">{entry.who}</span> {entry.text}
+                  </span>
+                  {entry.finished ? (
+                    <span className={HOME_META_CLASS}>
+                      {entry.confirmed
+                        ? t('home.activity.confirmed', 'Confirmed by me')
+                        : t('home.activity.unconfirmed', 'Not confirmed by me yet')}
+                    </span>
+                  ) : null}
                 </span>
-                <span className={`shrink-0 tabular-nums ${HOME_META_CLASS}`}>
-                  {clock(entry.at)}
-                </span>
+                <span className={`shrink-0 tabular-nums ${HOME_META_CLASS}`}>{entry.when}</span>
               </>
             )
             return (

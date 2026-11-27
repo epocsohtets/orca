@@ -48,7 +48,10 @@ export function HomeAgentsCard({
   return (
     <HomeCard
       title={t('home.agents.title', 'Agents and bots')}
-      aside={t('home.agents.aside', 'What each one is doing for me right now')}
+      aside={t(
+        'home.agents.aside',
+        'An agent takes a task and works on it. A bot does one set job each time it comes up.'
+      )}
       data-home-card="agents"
     >
       <div className="scrollbar-sleek overflow-x-auto border-t border-border">

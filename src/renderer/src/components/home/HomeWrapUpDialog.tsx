@@ -13,95 +13,111 @@ import {
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { HOME_META_CLASS } from './HomeCard'
+import { HomeRecordRow } from './HomeRecordRow'
+import type { HomeRecordAnswer, HomeTask } from './home-board'
+import type { HomeDayRecord } from './home-board-day-mock'
+import type { HomeWrapUpUpdate } from './home-board-view'
 
-export type HomeWrapUpItem = {
-  id: string
-  /** The task the update goes to. */
-  title: string
-  text: string
-  included: boolean
-  /** Why an item starts unchecked. */
-  note?: string
-}
-
-type Item = HomeWrapUpItem & { error: boolean }
+/** What I changed in the preview: an edited text, or an update I left out. */
+type Edit = { text?: string; excluded?: boolean; error?: boolean }
 
 function WrapUpField({
-  item,
+  update,
+  edit,
   disabled,
   onChange
 }: {
-  item: Item
+  update: HomeWrapUpUpdate
+  edit: Edit
   disabled: boolean
-  onChange: (patch: Partial<Item>) => void
+  onChange: (patch: Edit) => void
 }): React.JSX.Element {
   const t = useTranslate()
   const textId = useId()
   const errorId = useId()
+  const text = edit.text ?? update.text
+  const included = !edit.excluded
   return (
-    <li className="flex flex-col gap-2">
-      <Label htmlFor={textId}>{item.title}</Label>
+    <li className="flex flex-col gap-2" data-home-wrap-up-update={update.id}>
+      <Label htmlFor={textId}>{update.title}</Label>
       <Textarea
         id={textId}
-        value={item.text}
-        disabled={disabled || !item.included}
-        aria-invalid={item.error ? true : undefined}
-        aria-describedby={item.error ? errorId : undefined}
+        value={text}
+        disabled={disabled || !included}
+        aria-invalid={edit.error ? true : undefined}
+        aria-describedby={edit.error ? errorId : undefined}
         onChange={(event) =>
-          onChange({ text: event.target.value, error: item.error && !event.target.value.trim() })
+          onChange({ text: event.target.value, error: edit.error && !event.target.value.trim() })
         }
-        onBlur={() => onChange({ error: item.included && !item.text.trim() })}
+        onBlur={() => onChange({ error: included && !text.trim() })}
       />
-      {item.error ? (
+      {edit.error ? (
         <p id={errorId} role="alert" className="text-xs text-destructive">
           {t('home.wrapUp.errorEmpty', 'Write the update, or clear “Report this” to leave it out.')}
+        </p>
+      ) : null}
+      {update.linkedRecords > 0 ? (
+        <p className={HOME_META_CLASS}>
+          {t(
+            'home.wrapUp.linkedRecords',
+            '{{count}} record(s) from My day are linked to this task. The records themselves are not reported.',
+            { count: update.linkedRecords }
+          )}
         </p>
       ) : null}
       {/* Why min-h-6: the label is the 24px target for its 16px box. */}
       <Label variant="control" className="min-h-6">
         <Checkbox
-          checked={item.included}
+          checked={included}
           disabled={disabled}
-          onCheckedChange={(checked) => onChange({ included: checked === true, error: false })}
+          onCheckedChange={(checked) => onChange({ excluded: checked !== true, error: false })}
         />
         {t('home.wrapUp.include', 'Report this')}
       </Label>
-      {item.note ? <p className={HOME_META_CLASS}>{item.note}</p> : null}
     </li>
   )
 }
 
-/** The trust step: everything that would be reported, where it goes and who sees it, before any of it goes. */
+/** The trust step: every update that would be reported, where it goes and who sees it, before any of it goes. */
 export function HomeWrapUpDialog({
-  items: initial,
+  updates,
+  unanswered,
+  tasks,
+  onAnswerRecord,
   open,
   onOpenChange,
   onConfirmed
 }: {
-  items: readonly HomeWrapUpItem[]
+  updates: readonly HomeWrapUpUpdate[]
+  /** Day records I have not answered: never reported, answerable here. */
+  unanswered: readonly HomeDayRecord[]
+  tasks: readonly HomeTask[]
+  onAnswerRecord: (recordId: string, answer: HomeRecordAnswer | null) => void
   open: boolean
   onOpenChange: (open: boolean) => void
   onConfirmed: (count: number) => void
 }): React.JSX.Element {
   const t = useTranslate()
-  const [items, setItems] = useState<Item[]>(() =>
-    initial.map((item) => ({ ...item, error: false }))
-  )
+  const [edits, setEdits] = useState<Record<string, Edit>>({})
   const [sending, setSending] = useState(false)
-  const [done, setDone] = useState<number | null>(null)
-  const included = items.filter((item) => item.included)
+  const [done, setDone] = useState<{ title: string; text: string }[] | null>(null)
+  const textOf = (update: HomeWrapUpUpdate): string => edits[update.id]?.text ?? update.text
+  const included = updates.filter((update) => !edits[update.id]?.excluded)
+  const patch = (id: string, change: Edit): void =>
+    setEdits((current) => ({ ...current, [id]: { ...current[id], ...change } }))
   const confirm = (): void => {
-    const checked = items.map((item) => ({ ...item, error: item.included && !item.text.trim() }))
-    setItems(checked)
-    if (checked.some((item) => item.error)) {
+    const empty = included.filter((update) => !textOf(update).trim())
+    if (empty.length > 0) {
+      empty.forEach((update) => patch(update.id, { error: true }))
       return
     }
     setSending(true)
+    const report = included.map((update) => ({ title: update.title, text: textOf(update) }))
     // shortcut: nothing is sent; the short wait stands in for the report call.
     window.setTimeout(() => {
       setSending(false)
-      setDone(included.length)
-      onConfirmed(included.length)
+      setDone(report)
+      onConfirmed(report.length)
     }, 600)
   }
 
@@ -114,34 +130,65 @@ export function HomeWrapUpDialog({
             {done === null
               ? t(
                   'home.wrapUp.destination',
-                  'Each checked update becomes a comment on its task in inAX. The project’s members and Kim Jiwoo (team lead) see it. Unchecked items go nowhere.'
+                  'Each checked update becomes a comment on its task in inAX (the team’s work tracker). The project’s members and Kim Jiwoo (team lead) see it. Unchecked updates go nowhere.'
                 )
               : t(
                   'home.wrapUp.done',
                   '{{count}} updates confirmed. In this sample nothing is sent to inAX.',
-                  { count: done }
+                  { count: done.length }
                 )}
           </DialogDescription>
         </DialogHeader>
         {done === null ? (
-          <ul className="flex flex-col gap-6">
-            {items.map((item, index) => (
-              <WrapUpField
-                key={item.id}
-                item={item}
-                disabled={sending}
-                onChange={(patch) =>
-                  setItems((current) =>
-                    current.map((entry, at) => (at === index ? { ...entry, ...patch } : entry))
-                  )
-                }
-              />
-            ))}
-          </ul>
+          <>
+            <ul className="flex flex-col gap-6">
+              {updates.map((update) => (
+                <WrapUpField
+                  key={update.id}
+                  update={update}
+                  edit={edits[update.id] ?? {}}
+                  disabled={sending}
+                  onChange={(change) => patch(update.id, change)}
+                />
+              ))}
+            </ul>
+            {unanswered.length > 0 ? (
+              <section
+                aria-label={t('home.wrapUp.unanswered', 'Records not checked yet')}
+                className="flex flex-col gap-1 border-t border-border pt-3"
+                data-home-wrap-up-unanswered=""
+              >
+                <h3 className="text-[13px] font-medium text-foreground">
+                  {t(
+                    'home.wrapUp.unansweredTitle',
+                    '{{count}} record(s) not checked yet · not reported',
+                    { count: unanswered.length }
+                  )}
+                </h3>
+                <p className={HOME_META_CLASS}>
+                  {t(
+                    'home.wrapUp.unansweredHint',
+                    'Link one to a task and it counts toward that task’s update; say “Not work” and it is dropped.'
+                  )}
+                </p>
+                <ul>
+                  {unanswered.map((record) => (
+                    <HomeRecordRow
+                      key={record.id}
+                      record={record}
+                      answer={undefined}
+                      tasks={tasks}
+                      onAnswer={(answer) => onAnswerRecord(record.id, answer)}
+                    />
+                  ))}
+                </ul>
+              </section>
+            ) : null}
+          </>
         ) : (
           <ul className="flex flex-col gap-3">
-            {included.map((item) => (
-              <li key={item.id} className="flex flex-col gap-1">
+            {done.map((item) => (
+              <li key={item.title} className="flex flex-col gap-1">
                 <span className="text-[13px] font-medium text-foreground">{item.title}</span>
                 <span className={HOME_META_CLASS}>{item.text}</span>
               </li>
