@@ -31398,6 +31398,116 @@
     "account": "Account",
     "signIn": "Sign in"
   },
+  "meetings": {
+    "recorder": {
+      "idle": "Not recorded",
+      "recording": "Recording",
+      "transcribing": "Transcribing…",
+      "writing": "Writing minutes…",
+      "stopped": "Recorded",
+      "ready": "Recorded, minutes ready",
+      "duration": "Length {{duration}}",
+      "start": "Start recording",
+      "stop": "Stop",
+      "createMinutes": "Create minutes",
+      "otherRecording": "Stop the meeting that is recording to start this one.",
+      "pocNote": "PoC: no audio is captured and the microphone is not used."
+    },
+    "new": {
+      "button": "New meeting",
+      "titleTooLong": "Use {{max}} characters or fewer.",
+      "untitled": "Untitled meeting",
+      "description": "Starts now, with no calendar entry and no linked task. You can link a task later.",
+      "titleLabel": "Title",
+      "titleHelp": "Optional."
+    },
+    "cancel": "Cancel",
+    "title": "Meetings",
+    "close": "Close Meetings",
+    "pocShowEmpty": "PoC: show the page with no meetings",
+    "empty": {
+      "noMeetingsTitle": "No meetings yet",
+      "noMeetingsDetail": "Start a meeting to record it. Its transcript, minutes and follow-ups stay here, and the follow-ups feed the next meeting.",
+      "processingTitle": "Processing the recording",
+      "processingDetail": "The transcript, minutes and follow-ups appear here when processing finishes. Prep stays available.",
+      "stoppedTitle": "Recorded, minutes not created",
+      "stoppedDetail": "Select Create minutes above to get the transcript, summary and follow-ups.",
+      "recordingTitle": "Recording in progress",
+      "recordingDetail": "Stop the recording, then create minutes to get the transcript, summary and follow-ups.",
+      "idleTitle": "Not recorded yet",
+      "idleDetail": "Start recording above. The transcript, minutes and follow-ups appear here after the meeting.",
+      "noFollowUpsTitle": "No follow-ups",
+      "noFollowUpsDetail": "This meeting produced no actions."
+    },
+    "detailRegion": "Meeting",
+    "selectOne": "Select a meeting from the list.",
+    "openTask": "Open {{id}} in Tasks",
+    "prep": {
+      "note": "Prep note",
+      "noteSource": "Written by an agent from the linked tasks and the last meeting.",
+      "noNote": "No prep note. Link a task and an agent has something to write one from.",
+      "carried": "Open from the last meeting ({{day}})",
+      "noTaskYet": "No task yet",
+      "nothingCarried": "Nothing is open from the last meeting.",
+      "linkedTasks": "Linked tasks",
+      "linkTask": "Link task",
+      "noLinkedTasks": "No linked tasks. This meeting works without one.",
+      "schedule": "Schedule",
+      "when": "When",
+      "where": "Where",
+      "attendees": "Attendees",
+      "noCalendar": "No calendar entry. This meeting was started in the app at {{time}}."
+    },
+    "due": "Due {{date}}",
+    "backToList": "Back to the meeting list",
+    "noCalendarEntry": "No calendar entry",
+    "attendeeCount": "Attendees {{count}}",
+    "tab": {
+      "prep": "Prep",
+      "transcript": "Transcript",
+      "minutes": "Minutes",
+      "followUps": "Follow-ups"
+    },
+    "followUps": {
+      "titleRequired": "Enter what needs to be done.",
+      "ownerRequired": "Enter the name of the person who owns this.",
+      "fieldTitle": "Action",
+      "fieldOwner": "Owner",
+      "fieldDue": "Due date",
+      "dueHelp": "Optional.",
+      "save": "Save",
+      "caption": "Suggested {{suggested}} · Linked to a task {{created}} · Dismissed {{dismissed}}",
+      "createTask": "Create task",
+      "dismiss": "Dismiss",
+      "edit": "Edit “{{title}}”",
+      "linked": "Task",
+      "dismissed": "Dismissed",
+      "restore": "Restore"
+    },
+    "noDue": "No due date",
+    "transcript": {
+      "caption": "{{count}} turns. Speakers are matched to the attendees."
+    },
+    "minutes": {
+      "summary": "Summary",
+      "decisions": "Decisions",
+      "minutes": "Minutes"
+    },
+    "state": {
+      "notRecorded": "Not recorded",
+      "recording": "Recording",
+      "recorded": "Recorded",
+      "processing": "Processing",
+      "minutesReady": "Minutes ready",
+      "scheduled": "Scheduled"
+    },
+    "group": {
+      "today": "Today",
+      "upcoming": "Upcoming",
+      "past": "Past"
+    },
+    "openFollowUpCount": "Open follow-ups {{count}}"
+  },
   "chats": {
     "delete": {
       "updateHost": "Update {{host}} to delete chats",

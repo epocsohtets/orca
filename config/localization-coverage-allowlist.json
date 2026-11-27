@@ -454,6 +454,10 @@
     "reason": "Agent mail for item asks."
   },
   {
+    "filePath": "src/renderer/src/components/meetings/meetings-mock-meetings.ts",
+    "reason": "PoC mock meeting data, shown as sample content."
+  },
+  {
     "filePath": "src/renderer/src/components/task-page/inax/inax-mock-tasks.ts",
     "kind": "object-property:title",
     "text": "Add SSO login to the tenant admin console",

@@ -36,6 +36,7 @@ import {
   type AppRailDestinationId
 } from './app-rail-destinations'
 import { getTitlebarSidebarToggle } from '@/app-shell/chrome/titlebar-sidebar-toggle-ref'
+import { MeetingsRailIcon } from '@/components/meetings/meetings-rail-icon'
 
 /** Icon-only app navigation below the left titlebar; one tab stop, arrow keys move within it. */
 export function AppRail({
@@ -191,6 +192,8 @@ export function AppRail({
     switch (id) {
       case 'tasks':
         return t('auto.components.sidebar.SidebarNav.fee535205b', 'Tasks')
+      case 'meetings':
+        return t('meetings.title', 'Meetings')
       case 'automations':
         return t('auto.components.sidebar.SidebarNav.f323383e9a', 'Automations')
       case 'artifacts':
@@ -211,6 +214,8 @@ export function AppRail({
     switch (id) {
       case 'tasks':
         return <List {...props} />
+      case 'meetings':
+        return <MeetingsRailIcon {...props} />
       case 'automations':
         return <CalendarClock {...props} />
       case 'artifacts':

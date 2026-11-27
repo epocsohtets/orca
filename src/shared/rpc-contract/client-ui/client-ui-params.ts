@@ -102,6 +102,7 @@ export const TopLevelViewSchema = lazyZodSchema(() =>
       'terminal',
       'settings',
       'tasks',
+      'meetings',
       'activity',
       'automations',
       'space',

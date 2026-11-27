@@ -29024,6 +29024,116 @@
     "account": "계정",
     "signIn": "로그인"
   },
+  "meetings": {
+    "recorder": {
+      "idle": "녹음 안 함",
+      "recording": "녹음 중",
+      "transcribing": "대화록 작성 중…",
+      "writing": "회의록 작성 중…",
+      "stopped": "녹음 완료",
+      "ready": "녹음 완료, 회의록 준비됨",
+      "duration": "길이 {{duration}}",
+      "start": "녹음 시작",
+      "stop": "중지",
+      "createMinutes": "회의록 만들기",
+      "otherRecording": "이 회의를 시작하려면 녹음 중인 회의를 먼저 중지하세요.",
+      "pocNote": "PoC: 오디오를 저장하지 않으며 마이크를 사용하지 않습니다."
+    },
+    "new": {
+      "button": "새 회의",
+      "titleTooLong": "{{max}}자 이하로 입력하세요.",
+      "untitled": "제목 없는 회의",
+      "description": "캘린더 일정과 연결된 작업 없이 지금 시작합니다. 작업은 나중에 연결할 수 있습니다.",
+      "titleLabel": "제목",
+      "titleHelp": "선택 사항입니다."
+    },
+    "cancel": "취소",
+    "title": "회의",
+    "close": "회의 닫기",
+    "pocShowEmpty": "PoC: 회의가 없는 화면 보기",
+    "empty": {
+      "noMeetingsTitle": "아직 회의가 없습니다",
+      "noMeetingsDetail": "회의를 시작하면 녹음합니다. 대화록, 회의록, 후속 조치가 여기에 남고, 후속 조치는 다음 회의 준비에 반영됩니다.",
+      "processingTitle": "녹음을 처리하는 중",
+      "processingDetail": "처리가 끝나면 대화록, 회의록, 후속 조치가 여기에 표시됩니다. 준비 탭은 계속 볼 수 있습니다.",
+      "stoppedTitle": "녹음 완료, 회의록 없음",
+      "stoppedDetail": "위의 회의록 만들기를 선택하면 대화록, 요약, 후속 조치를 볼 수 있습니다.",
+      "recordingTitle": "녹음하는 중",
+      "recordingDetail": "녹음을 중지한 다음 회의록을 만들면 대화록, 요약, 후속 조치를 볼 수 있습니다.",
+      "idleTitle": "아직 녹음하지 않았습니다",
+      "idleDetail": "위에서 녹음을 시작하세요. 회의가 끝나면 대화록, 회의록, 후속 조치가 여기에 표시됩니다.",
+      "noFollowUpsTitle": "후속 조치 없음",
+      "noFollowUpsDetail": "이 회의에서 나온 조치가 없습니다."
+    },
+    "detailRegion": "회의",
+    "selectOne": "목록에서 회의를 선택하세요.",
+    "openTask": "작업에서 {{id}} 열기",
+    "prep": {
+      "note": "준비 노트",
+      "noteSource": "에이전트가 연결된 작업과 지난 회의를 바탕으로 작성했습니다.",
+      "noNote": "준비 노트가 없습니다. 작업을 연결하면 에이전트가 노트를 작성할 근거가 생깁니다.",
+      "carried": "지난 회의({{day}})의 미완료 항목",
+      "noTaskYet": "작업 없음",
+      "nothingCarried": "지난 회의에서 넘어온 미완료 항목이 없습니다.",
+      "linkedTasks": "연결된 작업",
+      "linkTask": "작업 연결",
+      "noLinkedTasks": "연결된 작업이 없습니다. 작업 없이도 회의를 진행할 수 있습니다.",
+      "schedule": "일정",
+      "when": "일시",
+      "where": "장소",
+      "attendees": "참석자",
+      "noCalendar": "캘린더 일정이 없습니다. 이 회의는 {{time}}에 앱에서 시작했습니다."
+    },
+    "due": "기한 {{date}}",
+    "backToList": "회의 목록으로 돌아가기",
+    "noCalendarEntry": "캘린더 일정 없음",
+    "attendeeCount": "참석자 {{count}}명",
+    "tab": {
+      "prep": "준비",
+      "transcript": "대화록",
+      "minutes": "회의록",
+      "followUps": "후속 조치"
+    },
+    "followUps": {
+      "titleRequired": "해야 할 일을 입력하세요.",
+      "ownerRequired": "담당자 이름을 입력하세요.",
+      "fieldTitle": "조치",
+      "fieldOwner": "담당자",
+      "fieldDue": "기한",
+      "dueHelp": "선택 사항입니다.",
+      "save": "저장",
+      "caption": "제안 {{suggested}}건 · 작업 연결 {{created}}건 · 무시 {{dismissed}}건",
+      "createTask": "작업 만들기",
+      "dismiss": "무시",
+      "edit": "“{{title}}” 편집",
+      "linked": "작업",
+      "dismissed": "무시함",
+      "restore": "복원"
+    },
+    "noDue": "기한 없음",
+    "transcript": {
+      "caption": "발언 {{count}}개. 화자는 참석자와 대조해 이름을 붙였습니다."
+    },
+    "minutes": {
+      "summary": "요약",
+      "decisions": "결정 사항",
+      "minutes": "회의록"
+    },
+    "state": {
+      "notRecorded": "녹음 안 함",
+      "recording": "녹음 중",
+      "recorded": "녹음 완료",
+      "processing": "처리 중",
+      "minutesReady": "회의록 준비됨",
+      "scheduled": "예정"
+    },
+    "group": {
+      "today": "오늘",
+      "upcoming": "예정",
+      "past": "지난 회의"
+    },
+    "openFollowUpCount": "미완료 후속 조치 {{count}}건"
+  },
   "chats": {
     "delete": {
       "updateHost": "채팅을 삭제하려면 {{host}}을(를) 업데이트하세요",

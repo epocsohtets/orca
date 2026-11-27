@@ -45,6 +45,9 @@ type DesktopWindowSettings = {
   linuxTilingWindowMode?: boolean
 }
 
+/** Only toggles the Meetings rail button (PoC); absent means shown. */
+type MeetingsRailSettings = { showMeetingsButton?: boolean }
+
 /** Settings groups owned by their feature modules and composed into GlobalSettings. */
 export type GlobalSettingsBase = AntigravityChatAuthSettings &
   EmulatorOpeningSettings &
@@ -71,6 +74,7 @@ export type GlobalSettingsBase = AntigravityChatAuthSettings &
   DesktopWindowSettings &
   EditorSaveSettings &
   BotsGlobalSettings &
+  MeetingsRailSettings &
   BrowserPasswordsGlobalSettings &
   BrowserMemorySaverGlobalSettings &
   PerfNoticeGlobalSettings &

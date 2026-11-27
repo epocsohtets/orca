@@ -10,6 +10,7 @@ export const APP_RAIL_ICON_STROKE_WIDTH = 1.75
 const APP_RAIL_ITEM_IDS = [
   'workspaces',
   'tasks',
+  'meetings',
   'automations',
   'artifacts',
   'skills',
