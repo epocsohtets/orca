@@ -4,7 +4,6 @@ import { useAppStore } from '@/store'
 import { useIntlLocale, useTranslate } from '@/i18n/use-translate'
 import { uiDateTimeFormat } from '@/i18n/ui-intl-formatters'
 import { formatUiRelativeTime } from '@/i18n/relative-time-format'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { RailPage, RailPageScroll } from '@/components/rail-page/RailPage'
 import { RailPageBand } from '@/components/rail-page/RailPageHeader'
@@ -21,45 +20,85 @@ import { openBotHome, useBots } from '@/lib/bot-catalog'
 import { HOME_MOCK_LAST_UPDATE_BY, HOME_MOCK_ME, selectMyWork } from './home-my-work'
 
 const DATE_OPTIONS: Intl.DateTimeFormatOptions = { weekday: 'long', month: 'long', day: 'numeric' }
-const ROW_CLASS = 'flex min-h-11 w-full min-w-0 items-center gap-3 px-3 py-2 text-left'
-const ROW_LINK_CLASS = `${ROW_CLASS} outline-none transition-colors hover:bg-accent focus-visible:bg-accent`
 
+// This page's whole scale. Spacing: 1, 2, 3, 6, 12, 24. Type: 14/600 title and primary heading, 13/500 primary row,
+// 13/400 secondary row, 12/400 detail, 11/600 uppercase label. Color: background, foreground, muted-foreground,
+// border, accent.
+const PRIMARY_ROW_CLASS = 'flex w-full min-w-0 items-center gap-3 p-3 text-left'
+const SECONDARY_ROW_CLASS = 'flex w-full min-w-0 items-center gap-3 py-2 text-left'
+const ROW_HOVER_CLASS = 'outline-none transition-colors hover:bg-accent focus-visible:bg-accent'
+const META_CLASS = 'shrink-0 text-xs text-muted-foreground'
+
+/** `primary` is the area the page is for: a heading and a bordered list. Secondary is a quiet label over bare rows. */
 function HomeSection({
   title,
+  count,
+  primary = false,
   action,
   children
 }: {
   title: string
+  count?: number
+  primary?: boolean
   action?: React.ReactNode
   children: React.ReactNode
 }): React.JSX.Element {
   return (
-    <section className="min-w-0">
-      <div className="mb-2 flex h-6 items-center justify-between gap-2">
-        <h2 className="truncate text-2xs font-semibold uppercase tracking-wider text-muted-foreground">
-          {title}
+    <section className="flex min-w-0 flex-col gap-2">
+      <div className="flex items-center justify-between gap-2">
+        <h2
+          className={
+            primary
+              ? 'flex min-w-0 items-baseline gap-2 text-sm font-semibold text-foreground'
+              : 'min-w-0 truncate text-2xs font-semibold uppercase tracking-wider text-muted-foreground'
+          }
+        >
+          <span className="truncate">{title}</span>
+          {typeof count === 'number' ? (
+            <span className="text-xs font-normal tabular-nums text-muted-foreground">{count}</span>
+          ) : null}
         </h2>
         {action}
       </div>
-      <div className="divide-y divide-border overflow-hidden rounded-md border border-border">
+      <div
+        className={
+          primary
+            ? 'divide-y divide-border overflow-hidden rounded-md border border-border'
+            : 'divide-y divide-border border-t border-border'
+        }
+      >
         {children}
       </div>
     </section>
   )
 }
 
-function RowText({ title, detail }: { title: string; detail?: string }): React.JSX.Element {
+function RowText({
+  title,
+  detail,
+  primary = false
+}: {
+  title: string
+  detail?: string
+  primary?: boolean
+}): React.JSX.Element {
   return (
-    <span className="flex min-w-0 flex-1 flex-col">
-      <span className="truncate text-[13px] font-medium text-foreground">{title}</span>
-      {detail ? <span className="truncate text-xs text-muted-foreground">{detail}</span> : null}
+    <span className="flex min-w-0 flex-1 flex-col gap-1">
+      <span
+        className={
+          primary
+            ? 'line-clamp-2 text-[13px] font-medium text-foreground'
+            : 'truncate text-[13px] text-foreground'
+        }
+      >
+        {title}
+      </span>
+      {detail ? (
+        <span className={`${primary ? 'line-clamp-2' : 'truncate'} text-xs text-muted-foreground`}>
+          {detail}
+        </span>
+      ) : null}
     </span>
-  )
-}
-
-function EmptyRow({ children }: { children: React.ReactNode }): React.JSX.Element {
-  return (
-    <div className={`${ROW_CLASS} justify-between text-xs text-muted-foreground`}>{children}</div>
   )
 }
 
@@ -171,7 +210,7 @@ export default function HomePage(): React.JSX.Element {
   return (
     <RailPage as="main" data-home-page="">
       <RailPageBand>
-        <h1 className="shrink-0 truncate text-[15px] font-semibold tracking-tight">
+        <h1 className="shrink-0 truncate text-sm font-semibold text-foreground">
           {uiDateTimeFormat(DATE_OPTIONS, intlLocale).format(now)}
         </h1>
         <span className="min-w-0 truncate text-xs text-muted-foreground" data-home-summary="">
@@ -179,104 +218,129 @@ export default function HomePage(): React.JSX.Element {
         </span>
       </RailPageBand>
       <RailPageScroll className="scrollbar-sleek min-h-0 flex-1 overflow-y-auto">
-        <div className="rail-page-row-gutter mx-auto grid max-w-5xl gap-x-8 gap-y-6 py-6 @min-[56rem]/rail-page:grid-cols-2">
-          <HomeSection title={t('home.myWork.title', 'My work today')}>
-            {!signedIn ? (
-              <EmptyRow>
-                <span className="min-w-0 truncate">
-                  {t(
-                    'auto.components.TaskPage.inaxSignedOut',
-                    'Sign in with inAX to see your tasks'
-                  )}
-                </span>
-                <Button
-                  type="button"
-                  size="xs"
-                  onClick={() => openSettings('integrations', INAX_INTEGRATION_SECTION_ID)}
-                >
-                  {t('auto.components.settings.inaxAccount.signIn', 'Sign in with inAX')}
-                </Button>
-              </EmptyRow>
-            ) : myWork.length === 0 ? (
-              <EmptyRow>{t('home.myWork.empty', 'No tasks assigned to you')}</EmptyRow>
-            ) : (
-              myWork.map((task) => (
-                <button key={task.id} type="button" className={ROW_LINK_CLASS} onClick={openTasks}>
-                  <RowText
-                    title={task.title}
-                    detail={`${task.id} · ${t('home.myWork.lastUpdate', 'Last update by {{name}}', {
-                      name: HOME_MOCK_LAST_UPDATE_BY[task.id] ?? task.author
-                    })} · ${ago(Date.parse(task.updatedAt))}`}
-                  />
-                  <Badge variant="outline" className="shrink-0">
-                    {statusLabels[task.status]}
-                  </Badge>
-                </button>
-              ))
-            )}
-          </HomeSection>
-
-          <HomeSection title={t('home.needsYou.title', 'Needs you')}>
-            {needs.map((item) => (
-              <div key={item.id} className={ROW_CLASS}>
-                <RowText title={item.title} detail={item.detail} />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="xs"
-                  className="shrink-0"
-                  onClick={item.run}
-                >
-                  {item.action}
-                </Button>
-              </div>
-            ))}
-          </HomeSection>
-
-          <HomeSection title={t('home.agents.title', 'What agents did')}>
-            {activity.map((item) => (
-              <button key={item.id} type="button" className={ROW_LINK_CLASS} onClick={openActivity}>
-                <RowText title={item.title} detail={item.detail} />
-              </button>
-            ))}
-          </HomeSection>
-
-          <HomeSection
-            title={t('home.apps.title', 'Apps today')}
-            action={
-              <Button
-                type="button"
-                variant="ghost-muted"
-                size="xs"
-                onClick={() => openSettings('my-apps')}
-              >
-                {t('home.apps.manage', 'Manage')}
-              </Button>
-            }
-          >
-            {myApps?.length ? (
-              myApps.map((app) => (
-                <div key={app.path} className={ROW_CLASS}>
-                  <AppWindow className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-                  <RowText title={app.name} />
-                  {app.paused ? (
-                    <Badge variant="outline" className="shrink-0">
-                      {t('settings.myApps.paused', 'Paused')}
-                    </Badge>
-                  ) : null}
-                  {/* Usage recording is a separate PoC. */}
-                  <span
-                    className="shrink-0 text-xs tabular-nums text-muted-foreground"
-                    title={t('home.apps.usageUnknown', 'Usage time is not recorded yet')}
+        {/* Why pb-24: the last row scrolls clear of the floating panel toggle. */}
+        <div className="rail-page-row-gutter mx-auto grid max-w-4xl gap-x-12 gap-y-6 pt-6 pb-24 @min-[56rem]/rail-page:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+          <div className="flex min-w-0 flex-col gap-6">
+            <HomeSection primary title={t('home.needsYou.title', 'Needs you')} count={needs.length}>
+              {needs.map((item) => (
+                <div key={item.id} className={PRIMARY_ROW_CLASS}>
+                  <RowText primary title={item.title} detail={item.detail} />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="xs"
+                    className="shrink-0"
+                    onClick={item.run}
                   >
-                    —
-                  </span>
+                    {item.action}
+                  </Button>
                 </div>
-              ))
-            ) : (
-              <EmptyRow>{t('settings.myApps.emptyTitle', 'No apps registered')}</EmptyRow>
-            )}
-          </HomeSection>
+              ))}
+            </HomeSection>
+
+            <HomeSection
+              primary
+              title={t('home.myWork.title', 'My work today')}
+              count={signedIn ? myWork.length : undefined}
+            >
+              {!signedIn ? (
+                <div className={`${PRIMARY_ROW_CLASS} flex-wrap justify-between`}>
+                  <span className="min-w-0 text-xs text-muted-foreground">
+                    {t(
+                      'auto.components.TaskPage.inaxSignedOut',
+                      'Sign in with inAX to see your tasks'
+                    )}
+                  </span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="xs"
+                    onClick={() => openSettings('integrations', INAX_INTEGRATION_SECTION_ID)}
+                  >
+                    {t('auto.components.settings.inaxAccount.signIn', 'Sign in with inAX')}
+                  </Button>
+                </div>
+              ) : myWork.length === 0 ? (
+                <div className={`${PRIMARY_ROW_CLASS} text-xs text-muted-foreground`}>
+                  {t('home.myWork.empty', 'No tasks assigned to you')}
+                </div>
+              ) : (
+                myWork.map((task) => (
+                  <button
+                    key={task.id}
+                    type="button"
+                    className={`${PRIMARY_ROW_CLASS} ${ROW_HOVER_CLASS}`}
+                    onClick={openTasks}
+                  >
+                    <RowText
+                      primary
+                      title={task.title}
+                      detail={`${task.id} · ${t(
+                        'home.myWork.lastUpdate',
+                        'Last update by {{name}}',
+                        { name: HOME_MOCK_LAST_UPDATE_BY[task.id] ?? task.author }
+                      )} · ${ago(Date.parse(task.updatedAt))}`}
+                    />
+                    <span className={META_CLASS}>{statusLabels[task.status]}</span>
+                  </button>
+                ))
+              )}
+            </HomeSection>
+          </div>
+
+          <div className="flex min-w-0 flex-col gap-6">
+            <HomeSection title={t('home.agents.title', 'What agents did')}>
+              {activity.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={`${SECONDARY_ROW_CLASS} ${ROW_HOVER_CLASS}`}
+                  onClick={openActivity}
+                >
+                  <RowText title={item.title} detail={item.detail} />
+                </button>
+              ))}
+            </HomeSection>
+
+            <HomeSection
+              title={t('home.apps.title', 'Apps today')}
+              action={
+                <Button
+                  type="button"
+                  variant="ghost-muted"
+                  size="xs"
+                  // Why -mr-2: the label lines up with the rows' right edge.
+                  className="-mr-2"
+                  onClick={() => openSettings('my-apps')}
+                >
+                  {t('home.apps.manage', 'Manage')}
+                </Button>
+              }
+            >
+              {myApps?.length ? (
+                myApps.map((app) => (
+                  <div key={app.path} className={SECONDARY_ROW_CLASS}>
+                    <AppWindow className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+                    <RowText title={app.name} />
+                    {app.paused ? (
+                      <span className={META_CLASS}>{t('settings.myApps.paused', 'Paused')}</span>
+                    ) : null}
+                    {/* Usage recording is a separate PoC. */}
+                    <span
+                      className={`${META_CLASS} tabular-nums`}
+                      title={t('home.apps.usageUnknown', 'Usage time is not recorded yet')}
+                    >
+                      —
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div className={`${SECONDARY_ROW_CLASS} text-xs text-muted-foreground`}>
+                  {t('settings.myApps.emptyTitle', 'No apps registered')}
+                </div>
+              )}
+            </HomeSection>
+          </div>
         </div>
       </RailPageScroll>
     </RailPage>
