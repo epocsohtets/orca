@@ -10,36 +10,31 @@ export function homePhaseForMinutes(minutes: number): HomePhase {
 
 /** The clock each preview phase pretends it is. */
 export const HOME_PREVIEW_MINUTES: Record<HomePhase, number> = {
-  morning: 9 * 60 + 10,
-  day: 14 * 60 + 20,
-  evening: 18 * 60 + 40
+  morning: 9 * 60 + 50,
+  day: 13 * 60 + 40,
+  evening: 18 * 60 + 10
 }
 
-export type HomeTimelineEntry = {
-  id: string
-  /** Minutes from today's midnight; negative is yesterday evening. */
-  at: number
-  text: string
-  /** Who or what did it: an agent, a bot, an app, or me. */
-  actor: string
-  task?: string
-  /** Set when the app is unsure the entry is work: the task it would link to. */
-  suggestTask?: string
+/** The sample day is a working day: a weekend shows the Friday before it. */
+export function homeSampleDay(now: number): number {
+  const day = new Date(now)
+  day.setHours(0, 0, 0, 0)
+  const weekday = day.getDay()
+  if (weekday === 6) {
+    day.setDate(day.getDate() - 1)
+  } else if (weekday === 0) {
+    day.setDate(day.getDate() - 2)
+  }
+  return day.getTime()
 }
 
-export type HomeEntryAnswer = 'linked' | 'notWork'
-
-/** The day so far: nothing later than `minutes`, newest first. */
-export function visibleTimeline(
-  entries: readonly HomeTimelineEntry[],
-  minutes: number
-): HomeTimelineEntry[] {
-  return entries.filter((entry) => entry.at <= minutes).sort((a, b) => b.at - a.at)
-}
-
-export function unansweredEntries(
-  entries: readonly HomeTimelineEntry[],
-  answers: Readonly<Record<string, HomeEntryAnswer>>
-): HomeTimelineEntry[] {
-  return entries.filter((entry) => entry.suggestTask && !answers[entry.id])
+export function formatHomeDuration(
+  minutes: number,
+  labels: { hours: (count: number) => string; minutes: (count: number) => string }
+): string {
+  const hours = Math.floor(minutes / 60)
+  const rest = minutes % 60
+  return [hours > 0 ? labels.hours(hours) : '', rest > 0 ? labels.minutes(rest) : '']
+    .filter(Boolean)
+    .join(' ')
 }

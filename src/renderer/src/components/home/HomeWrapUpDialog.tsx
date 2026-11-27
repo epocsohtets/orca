@@ -12,10 +12,19 @@ import {
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { HOME_META_CLASS } from './HomeSection'
-import type { HomeWrapUpDraft } from './home-day-mock'
+import { HOME_META_CLASS } from './HomeCard'
 
-type Item = HomeWrapUpDraft & { included: boolean; error: boolean }
+export type HomeWrapUpItem = {
+  id: string
+  /** The task the update goes to. */
+  title: string
+  text: string
+  included: boolean
+  /** Why an item starts unchecked. */
+  note?: string
+}
+
+type Item = HomeWrapUpItem & { error: boolean }
 
 function WrapUpField({
   item,
@@ -31,10 +40,7 @@ function WrapUpField({
   const errorId = useId()
   return (
     <li className="flex flex-col gap-2">
-      <Label htmlFor={textId}>
-        <span className="tabular-nums">{item.task}</span>
-        <span className="truncate font-normal text-muted-foreground">{item.title}</span>
-      </Label>
+      <Label htmlFor={textId}>{item.title}</Label>
       <Textarea
         id={textId}
         value={item.text}
@@ -48,10 +54,7 @@ function WrapUpField({
       />
       {item.error ? (
         <p id={errorId} role="alert" className="text-xs text-destructive">
-          {t(
-            'home.wrapUp.errorEmpty',
-            'Write the update, or clear “Include” to leave this task out.'
-          )}
+          {t('home.wrapUp.errorEmpty', 'Write the update, or clear “Report this” to leave it out.')}
         </p>
       ) : null}
       {/* Why min-h-6: the label is the 24px target for its 16px box. */}
@@ -61,27 +64,28 @@ function WrapUpField({
           disabled={disabled}
           onCheckedChange={(checked) => onChange({ included: checked === true, error: false })}
         />
-        {t('home.wrapUp.include', 'Include this update')}
+        {t('home.wrapUp.include', 'Report this')}
       </Label>
+      {item.note ? <p className={HOME_META_CLASS}>{item.note}</p> : null}
     </li>
   )
 }
 
-/** The trust step: every update an agent drafted from today's record, shown before anyone else sees it. */
+/** The trust step: everything that would be reported, where it goes and who sees it, before any of it goes. */
 export function HomeWrapUpDialog({
-  drafts,
+  items: initial,
   open,
   onOpenChange,
   onConfirmed
 }: {
-  drafts: readonly HomeWrapUpDraft[]
+  items: readonly HomeWrapUpItem[]
   open: boolean
   onOpenChange: (open: boolean) => void
   onConfirmed: (count: number) => void
 }): React.JSX.Element {
   const t = useTranslate()
   const [items, setItems] = useState<Item[]>(() =>
-    drafts.map((draft) => ({ ...draft, included: true, error: false }))
+    initial.map((item) => ({ ...item, error: false }))
   )
   const [sending, setSending] = useState(false)
   const [done, setDone] = useState<number | null>(null)
@@ -109,19 +113,21 @@ export function HomeWrapUpDialog({
           <DialogDescription>
             {done === null
               ? t(
-                  'home.wrapUp.audience',
-                  'This is what your PM and team will see. Nothing is shared until you confirm.'
+                  'home.wrapUp.destination',
+                  'Each checked update becomes a comment on its task in inAX. The project’s members and Kim Jiwoo (team lead) see it. Unchecked items go nowhere.'
                 )
-              : t('home.wrapUp.done', '{{count}} updates confirmed. This PoC sends nothing.', {
-                  count: done
-                })}
+              : t(
+                  'home.wrapUp.done',
+                  '{{count}} updates confirmed. In this sample nothing is sent to inAX.',
+                  { count: done }
+                )}
           </DialogDescription>
         </DialogHeader>
         {done === null ? (
           <ul className="flex flex-col gap-6">
             {items.map((item, index) => (
               <WrapUpField
-                key={item.task}
+                key={item.id}
                 item={item}
                 disabled={sending}
                 onChange={(patch) =>
@@ -135,8 +141,8 @@ export function HomeWrapUpDialog({
         ) : (
           <ul className="flex flex-col gap-3">
             {included.map((item) => (
-              <li key={item.task} className="flex flex-col gap-1">
-                <span className="text-[13px] font-medium text-foreground">{item.task}</span>
+              <li key={item.id} className="flex flex-col gap-1">
+                <span className="text-[13px] font-medium text-foreground">{item.title}</span>
                 <span className={HOME_META_CLASS}>{item.text}</span>
               </li>
             ))}
@@ -159,7 +165,7 @@ export function HomeWrapUpDialog({
                 aria-busy={sending || undefined}
                 onClick={confirm}
               >
-                {t('home.wrapUp.confirm', 'Confirm {{count}} updates', { count: included.length })}
+                {t('home.wrapUp.confirm', 'Report {{count}} updates', { count: included.length })}
               </Button>
             </>
           ) : (

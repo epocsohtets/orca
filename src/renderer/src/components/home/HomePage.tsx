@@ -1,410 +1,399 @@
-import React, { useRef, useState } from 'react'
+import React, { useState, useSyncExternalStore } from 'react'
 import { useAppStore } from '@/store'
 import { useIntlLocale, useTranslate } from '@/i18n/use-translate'
 import { uiDateTimeFormat } from '@/i18n/ui-intl-formatters'
+import { formatUiRelativeTime } from '@/i18n/relative-time-format'
+import { motionSafeScrollBehavior } from '@/hooks/theme/usePrefersReducedMotion'
 import { Button } from '@/components/ui/button'
-import {
-  DropdownMenuCheckboxItem,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator
-} from '@/components/ui/dropdown-menu'
 import { RailPage, RailPageScroll } from '@/components/rail-page/RailPage'
-import { RailPageBand, RailPageMoreMenu } from '@/components/rail-page/RailPageHeader'
 import { INAX_INTEGRATION_SECTION_ID } from '@/components/integrations/task-trackers/task-provider-integration-section-ids'
-import { INAX_MOCK_TASKS } from '@/components/task-page/inax/inax-mock-tasks'
 import { useInaxSourceSelection } from '@/components/task-page/inax/inax-source-selection'
 import { useAllAgentPaneThreads } from '@/components/activity/threads/use-agent-pane-threads'
-import { activityThreadRowCopy } from '@/components/activity/threads/activity-thread-presentation'
 import { useInaxMockAccount } from '@/lib/inax-mock-account'
-import { openBotHome, useBots } from '@/lib/bot-catalog'
-import { HOME_MOCK_ME, selectMyWork } from './home-my-work'
+import { openBotHomeTab, useBots } from '@/lib/bot-catalog'
+import {
+  applyHomeBoardState,
+  countHomeBoard,
+  homeTaskTab,
+  orderHomeAgents,
+  type HomeTaskTab
+} from './home-board'
+import { useHomeBoardStore } from './home-board-store'
+import {
+  buildHomeAgents,
+  buildHomeFollowUps,
+  buildHomeProjects,
+  buildHomeTasks
+} from './home-board-mock'
+import { buildHomeActivity, buildHomeDay, buildHomeUpcoming } from './home-board-day-mock'
 import {
   HOME_PREVIEW_MINUTES,
+  formatHomeDuration,
   homePhaseForMinutes,
-  unansweredEntries,
-  visibleTimeline,
-  type HomeEntryAnswer,
-  type HomePhase,
-  type HomeTimelineEntry
+  homeSampleDay,
+  type HomePhase
 } from './home-day'
-import { buildHomeNeeds, buildHomeNext, buildHomeTimeline, buildHomeWrapUp } from './home-day-mock'
-import {
-  HOME_LABEL_CLASS,
-  HOME_META_CLASS,
-  HOME_ROW_CLASS,
-  HomeActionRows,
-  HomeRowText,
-  HomeSection,
-  type HomeRow
-} from './HomeSection'
-import { HomeStartBar } from './HomeStartBar'
-import { HomeTimeline } from './HomeTimeline'
-import { HomeWrapUpDialog } from './HomeWrapUpDialog'
+import { buildHomeMyActivity } from './home-board-my-activity'
+import { HomeCard, HOME_META_CLASS } from './HomeCard'
+import { HomeFirstSteps, HomeGreeting, HomeTiles, type HomeTileId } from './HomeHeader'
+import { HomeTasksCard } from './HomeTasksCard'
+import { HomeUpcomingCard } from './HomeUpcomingCard'
+import { HomeAgentsCard } from './HomeAgentsCard'
+import { HomeActivityCard } from './HomeActivityCard'
+import { HomeMyDayCard } from './HomeMyDayCard'
+import { HomeNewTaskButton } from './HomeNewTaskButton'
+import { HomePreviewMenu } from './HomePreviewMenu'
+import { HomeWrapUpDialog, type HomeWrapUpItem } from './HomeWrapUpDialog'
 
 const DATE_OPTIONS: Intl.DateTimeFormatOptions = { weekday: 'long', month: 'long', day: 'numeric' }
 const CLOCK_OPTIONS: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit' }
-const NEEDS_CAP = 3
+const TILE_TAB: Partial<Record<HomeTileId, HomeTaskTab>> = {
+  tasks: 'today',
+  waiting: 'waiting',
+  late: 'late'
+}
 
-/** My day, kept by my agents: start anything, see what is happening, answer what needs me, check the record. */
+/** Scroll a row into view and put the keyboard on it, once the click that revealed it has rendered. */
+function focusRow(selector: string): void {
+  requestAnimationFrame(() => {
+    const row = document.querySelector<HTMLElement>(`[data-home-page] ${selector}`)
+    row?.scrollIntoView({ block: 'center', behavior: motionSafeScrollBehavior() })
+    ;(row?.matches('button') ? row : row?.querySelector<HTMLElement>('button'))?.focus({
+      preventScroll: true
+    })
+  })
+}
+
+/** My work board: what is mine, what waits on me, what my agents are doing, and my day as the app recorded it. */
 export default function HomePage(): React.JSX.Element {
   const t = useTranslate()
   const intlLocale = useIntlLocale()
   const signedIn = useInaxMockAccount((state) => state.signedIn)
   const myApps = useAppStore((s) => s.settings?.myApps)
   const bots = useBots()
-  const threads = useAllAgentPaneThreads().allThreads
+  const hasAgentThread = useAllAgentPaneThreads().allThreads.length > 0
+  // The whole mock board is one small object, read as it is.
+  const board = useSyncExternalStore(useHomeBoardStore.subscribe, useHomeBoardStore.getState)
   // Read once per mount: the page shows a snapshot of the day.
   const [now] = useState(() => Date.now())
   const [preview, setPreview] = useState<'auto' | HomePhase>('auto')
   const [previewFirstRun, setPreviewFirstRun] = useState(false)
-  const [answers, setAnswers] = useState<Record<string, HomeEntryAnswer>>({})
-  const [needsExpanded, setNeedsExpanded] = useState(false)
+  const [tab, setTab] = useState<HomeTaskTab>('today')
+  const [openTaskId, setOpenTaskId] = useState<string | null>(null)
+  const [openAgentId, setOpenAgentId] = useState<string | null>(null)
+  const [activityFilter, setActivityFilter] = useState<'all' | 'agents'>('all')
   const [wrapUpOpen, setWrapUpOpen] = useState(false)
-  const [wrappedUp, setWrappedUp] = useState<number | null>(null)
-  const startRef = useRef<HTMLInputElement | null>(null)
 
-  const dayStart = new Date(now).setHours(0, 0, 0, 0)
+  const midnight = new Date(now).setHours(0, 0, 0, 0)
   const minutes =
-    preview === 'auto' ? Math.floor((now - dayStart) / 60_000) : HOME_PREVIEW_MINUTES[preview]
+    preview === 'auto' ? Math.floor((now - midnight) / 60_000) : HOME_PREVIEW_MINUTES[preview]
   const phase = homePhaseForMinutes(minutes)
+  const sampleDay = homeSampleDay(now)
   const clock = (at: number): string =>
-    uiDateTimeFormat(CLOCK_OPTIONS, intlLocale).format(dayStart + at * 60_000)
+    uiDateTimeFormat(CLOCK_OPTIONS, intlLocale).format(sampleDay + at * 60_000)
+  const duration = (value: number): string =>
+    formatHomeDuration(value, {
+      hours: (count) => t('home.day.hours', '{{count}} hr', { count }),
+      minutes: (count) => t('home.day.minutes', '{{count}} min', { count })
+    })
 
-  const openTasks = (): void => {
-    useInaxSourceSelection.setState({ selected: true })
-    useAppStore.getState().openTaskPage()
-  }
   const openSettings = (pane: 'integrations' | 'my-apps', sectionId?: string): void => {
     useAppStore.getState().openSettingsTarget({ pane, repoId: null, sectionId })
     useAppStore.getState().openSettingsPage()
   }
-  const openActivity = (): void => useAppStore.getState().openActivityPage()
   const connectInax = (): void => openSettings('integrations', INAX_INTEGRATION_SECTION_ID)
+  const openTaskList = (): void => {
+    useInaxSourceSelection.setState({ selected: true })
+    useAppStore.getState().openTaskPage()
+  }
+  // A bot is this app's agent with a role: its chat when one exists, else the place to make one.
+  const handToAgent = (): void =>
+    bots[0] ? void openBotHomeTab(bots[0]) : useAppStore.getState().openModal('bot-templates')
+
+  const projects = buildHomeProjects(t)
+  // The research agent started at 09:05.
+  const working = duration(Math.max(1, minutes - (9 * 60 + 5)))
+  const tasks = applyHomeBoardState(buildHomeTasks(t, working), buildHomeFollowUps(t), board, {
+    resumed: t('home.task.resumed', 'Agent working · picked up my answer'),
+    addedDue: t('home.task.today', 'Today'),
+    addedDetail: t('home.task.addedDetail', 'A task I added here.')
+  })
+  const counts = countHomeBoard(tasks)
+  const recording = board.meetingStartedAt !== null
+  const ago = (at: number): string =>
+    formatUiRelativeTime(Math.min(-1, at - minutes) * 60_000, intlLocale)
+  const agents = orderHomeAgents(buildHomeAgents(t, tasks, ago), tasks, recording, {
+    resumedLast: t('home.agent.justNow', 'Just now'),
+    recording: t('home.agent.recording', 'Recording the meeting I started')
+  })
+  const openTasks = tasks.filter((task) => !task.done && !task.meetingId)
+  const mine = buildHomeMyActivity(t, board, minutes)
+  const activity = [...mine, ...buildHomeActivity(t).filter((entry) => entry.at <= minutes)].sort(
+    (a, b) => b.at - a.at
+  )
+  const upcoming = buildHomeUpcoming(t, minutes, board.answers.offer === undefined).filter(
+    (item) => signedIn || !item.taskId
+  )
+  const app = myApps?.find((entry) => !entry.paused)?.name
+  const day = buildHomeDay(t, phase, app)
+
+  const revealTask = (taskId: string): void => {
+    const task = tasks.find((entry) => entry.id === taskId)
+    if (!task) {
+      return
+    }
+    setTab(homeTaskTab(task)[0] ?? 'today')
+    setOpenTaskId(taskId)
+    focusRow(`[data-home-task="${taskId}"]`)
+  }
+  const revealAgent = (agentId: string): void => {
+    setOpenAgentId(agentId)
+    focusRow(`[data-home-agent="${agentId}"]`)
+  }
+  const selectTile = (tile: HomeTileId): void => {
+    const target = TILE_TAB[tile]
+    if (target) {
+      setTab(target)
+      setOpenTaskId(null)
+      focusRow(`[data-home-tab="${target}"]`)
+    } else {
+      setActivityFilter('agents')
+      focusRow('[data-home-activity-filter="agents"]')
+    }
+  }
+
+  const wrapUpItems: HomeWrapUpItem[] = [
+    ...openTasks
+      .filter((task) => task.who !== null)
+      .map((task) => ({ id: task.id, title: task.title, text: task.detail, included: true })),
+    ...day.records
+      .filter((record) => board.records[record.id] !== 'notWork')
+      .map((record) => {
+        const answer = board.records[record.id]
+        const linked = answer && answer !== 'notWork' ? answer.taskId : null
+        return {
+          id: record.id,
+          title: tasks.find((task) => task.id === (linked ?? record.suggestTaskId))?.title ?? '',
+          text: record.text,
+          included: linked !== null,
+          note: linked
+            ? undefined
+            : t(
+                'home.wrapUp.unconfirmedNote',
+                'Unconfirmed record: not reported unless you check it. The task above is the app’s guess.'
+              )
+        }
+      })
+  ]
 
   const firstRun =
-    previewFirstRun || (!signedIn && !myApps?.length && threads.length === 0 && bots.length === 0)
-
-  // Real agent sessions from today join the mock record.
-  const agentEntries: HomeTimelineEntry[] = threads
-    .filter((thread) => thread.latestTimestamp >= dayStart)
-    .map((thread) => {
-      const copy = activityThreadRowCopy(thread, t)
-      return {
-        id: thread.paneKey,
-        at: Math.floor((thread.latestTimestamp - dayStart) / 60_000),
-        text: copy.taskTitle,
-        actor: copy.workspaceLabel
-      }
-    })
-  const appNames = (myApps ?? []).filter((app) => !app.paused).map((app) => app.name)
-  const timeline = visibleTimeline([...buildHomeTimeline(t, appNames), ...agentEntries], minutes)
-  const unanswered = unansweredEntries(timeline, answers)
-
-  const needRuns = {
-    // A bot chat when a bot exists; else the agents view.
-    question: () => (bots[0] ? void openBotHome(bots[0]) : openActivity()),
-    followUps: openTasks,
-    review: openTasks
-  }
-  const needs: HomeRow[] = buildHomeNeeds(t).map((need) => ({ ...need, run: needRuns[need.id] }))
-  if (unanswered.length > 0) {
-    needs.push({
-      id: 'records',
-      title: t(
-        'home.needs.recordsTitle',
-        'Confirm whether {{count}} entries in today’s record are work',
-        {
-          count: unanswered.length
-        }
-      ),
-      detail: t('home.needs.recordsDetail', 'Browser and app use the app could not link to a task'),
-      action: t('home.needs.check', 'Check'),
-      run: () =>
-        document
-          .querySelector<HTMLElement>('[data-home-timeline] [data-home-entry="unconfirmed"] button')
-          ?.focus()
-    })
-  }
-  const shownNeeds = needsExpanded ? needs : needs.slice(0, NEEDS_CAP)
-
-  const overnight = timeline.filter((entry) => entry.at < 6 * 60 + 30).length
-  const myOpenWork = selectMyWork(INAX_MOCK_TASKS, HOME_MOCK_ME).filter(
-    (task) => task.status !== 'done'
-  )
-  const upcoming = buildHomeNext(t).filter((item) => item.at > minutes)
-  const brief: HomeRow[] = [
-    {
-      id: 'carry',
-      title: t('home.brief.carry', '{{count}} tasks carried over from yesterday', {
-        count: signedIn ? myOpenWork.length : 0
-      }),
-      detail: t('home.brief.carryDetail', 'Agents kept their status current overnight'),
-      action: t('home.brief.openTasks', 'Open tasks'),
-      run: openTasks
-    },
-    {
-      id: 'meetings',
-      title: t('home.brief.meetings', '{{count}} meetings today', { count: upcoming.length }),
-      detail: upcoming[0] ? `${clock(upcoming[0].at)} · ${upcoming[0].title}` : undefined
-    },
-    {
-      id: 'overnight',
-      title: t('home.brief.overnight', 'Agents finished {{count}} things overnight', {
-        count: overnight
-      }),
-      detail: t('home.brief.overnightDetail', 'They are at the bottom of today’s record'),
-      action: t('home.brief.see', 'See'),
-      run: openActivity
-    }
-  ]
-  const next: HomeRow[] = [
-    ...upcoming.slice(0, 2).map((item) => ({
-      id: item.id,
-      title: `${clock(item.at)} · ${item.title}`,
-      detail: item.detail
-    })),
-    ...(signedIn
-      ? myOpenWork.map((task) => ({
-          id: task.id,
-          title: task.title,
-          detail: t('home.next.dueToday', '{{task}} · due today', { task: task.id })
-        }))
-      : [
-          {
-            id: 'sign-in',
-            title: t(
-              'auto.components.TaskPage.inaxSignedOut',
-              'Sign in with inAX to see your tasks'
-            ),
-            action: t('auto.components.settings.inaxAccount.signIn', 'Sign in with inAX'),
-            run: connectInax
+    previewFirstRun || (!signedIn && !myApps?.length && !hasAgentThread && bots.length === 0)
+  const myDay = (
+    <HomeMyDayCard
+      segments={day.segments}
+      duration={duration}
+      records={day.records}
+      answers={board.records}
+      tasks={openTasks}
+      onAnswer={(recordId, answer) =>
+        useHomeBoardStore.setState((state) => {
+          const records = { ...state.records }
+          delete records[recordId]
+          if (answer) {
+            records[recordId] = answer
           }
-        ])
-  ]
-  const firstSteps: HomeRow[] = [
-    {
-      id: 'inax',
-      title: t('home.firstRun.inax', 'Connect inAX so your tasks appear here'),
-      detail: t('home.firstRun.inaxDetail', 'Agents then keep each task’s status current for you'),
-      action: t('home.firstRun.connect', 'Connect'),
-      run: connectInax
-    },
-    {
-      id: 'app',
-      title: t('home.firstRun.app', 'Register an app you work in'),
-      detail: t('home.firstRun.appDetail', 'Time in it joins the record of your day'),
-      action: t('home.firstRun.register', 'Register'),
-      run: () => openSettings('my-apps')
-    },
-    {
-      id: 'agent',
-      title: t('home.firstRun.agent', 'Start your first task with an agent'),
-      detail: t('home.firstRun.agentDetail', 'Type what you want to do in the box above'),
-      action: t('home.firstRun.start', 'Start'),
-      run: () => startRef.current?.focus()
-    }
-  ]
-  const drafts = buildHomeWrapUp(t)
-  const wrapUp: HomeRow[] = [
-    {
-      id: 'wrap-up',
-      title:
-        wrappedUp === null
-          ? t(
-              'home.wrapUp.ready',
-              'Agents drafted updates for {{count}} tasks from today’s record',
-              {
-                count: drafts.length
-              }
-            )
-          : t('home.wrapUp.confirmed', 'Today is wrapped up: {{count}} updates confirmed', {
-              count: wrappedUp
-            }),
-      detail: t('home.wrapUp.trust', 'Nothing is shared until you have seen it'),
-      action: t('home.wrapUp.preview', 'Preview'),
-      // The one filled action on the page, and only when wrapping up is the point of the visit.
-      filled: phase === 'evening' && wrappedUp === null,
-      run: () => setWrapUpOpen(true)
-    }
-  ]
-  const wrapUpTitle = t('home.wrapUp.title', 'Wrap up today')
+          return { records }
+        })
+      }
+      wrappedUp={board.wrapUp?.count ?? null}
+      prominent={phase === 'evening'}
+      hasApp={app !== undefined}
+      onRegisterApp={() => openSettings('my-apps')}
+      onWrapUp={() => setWrapUpOpen(true)}
+    />
+  )
 
   return (
     <RailPage as="main" data-home-page="" data-home-phase={firstRun ? 'first-run' : phase}>
-      <RailPageBand>
-        <h1 className="shrink-0 truncate text-sm font-semibold text-foreground">
-          {uiDateTimeFormat(DATE_OPTIONS, intlLocale).format(now)}
-        </h1>
-        <span className={`min-w-0 flex-1 truncate ${HOME_META_CLASS}`} data-home-summary="">
-          {firstRun
-            ? t('home.summaryFirstRun', 'Nothing is connected yet')
-            : t('home.summary', '{{needs}} waiting on you · {{entries}} entries recorded today', {
-                needs: needs.length,
-                entries: timeline.length
-              })}
-        </span>
-        <RailPageMoreMenu label={t('home.preview.label', 'Preview (PoC)')}>
-          <DropdownMenuLabel>{t('home.preview.label', 'Preview (PoC)')}</DropdownMenuLabel>
-          <DropdownMenuRadioGroup
-            value={preview}
-            onValueChange={(value) => {
-              if (
-                value === 'auto' ||
-                value === 'morning' ||
-                value === 'day' ||
-                value === 'evening'
-              ) {
-                setPreview(value)
-              }
-            }}
-          >
-            <DropdownMenuRadioItem value="auto">
-              {t('home.preview.auto', 'Follow the clock')}
-            </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="morning">
-              {t('home.preview.morning', 'Morning')}
-            </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="day">
-              {t('home.preview.day', 'Day')}
-            </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="evening">
-              {t('home.preview.evening', 'Evening')}
-            </DropdownMenuRadioItem>
-          </DropdownMenuRadioGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuCheckboxItem checked={previewFirstRun} onCheckedChange={setPreviewFirstRun}>
-            {t('home.preview.firstRun', 'First run')}
-          </DropdownMenuCheckboxItem>
-        </RailPageMoreMenu>
-      </RailPageBand>
       <RailPageScroll className="scrollbar-sleek min-h-0 flex-1 overflow-y-auto">
         {/* Why pb-24: the last row scrolls clear of the floating panel toggle. */}
-        <div className="rail-page-row-gutter mx-auto grid max-w-4xl gap-x-12 gap-y-6 pt-6 pb-24 @min-[56rem]/rail-page:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-          <div className="flex min-w-0 flex-col gap-6">
-            <HomeStartBar inputRef={startRef} />
-            {firstRun ? (
-              <HomeSection primary title={t('home.firstRun.title', 'Three steps to start')}>
-                <HomeActionRows rows={firstSteps} />
-              </HomeSection>
-            ) : (
-              <>
-                {phase === 'evening' ? (
-                  <HomeSection primary title={wrapUpTitle}>
-                    <HomeActionRows rows={wrapUp} />
-                  </HomeSection>
-                ) : null}
-                {phase === 'morning' ? (
-                  <HomeSection primary title={t('home.brief.title', 'This morning')}>
-                    <HomeActionRows rows={brief} />
-                  </HomeSection>
-                ) : null}
-                {phase === 'day' ? (
-                  <section
-                    aria-labelledby="home-now-heading"
-                    className={`${HOME_ROW_CLASS} rounded-md border border-border`}
-                  >
-                    <h2 id="home-now-heading" className={`shrink-0 ${HOME_LABEL_CLASS}`}>
-                      {t('home.now.title', 'Now')}
-                    </h2>
-                    <HomeRowText
-                      primary
-                      title={t('home.now.agent', 'Claude Code is working on INAX-128')}
-                      detail={t(
-                        'home.now.agentDetail',
-                        'For 12 minutes · writing the SSO callback tests'
-                      )}
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="xs"
-                      className="shrink-0"
-                      onClick={openActivity}
-                    >
-                      {t('home.now.open', 'Open')}
-                    </Button>
-                  </section>
-                ) : null}
-                <HomeSection
-                  primary
-                  title={t('home.needs.title', 'Needs you')}
-                  count={needs.length}
-                  action={
-                    needs.length > NEEDS_CAP ? (
-                      <Button
-                        type="button"
-                        variant="ghost-muted"
-                        size="xs"
-                        aria-expanded={needsExpanded}
-                        onClick={() => setNeedsExpanded((expanded) => !expanded)}
-                      >
-                        {needsExpanded
-                          ? t('home.needs.less', 'Show fewer')
-                          : t('home.needs.more', '{{count}} more', {
-                              count: needs.length - NEEDS_CAP
-                            })}
-                      </Button>
-                    ) : undefined
-                  }
-                >
-                  <HomeActionRows rows={shownNeeds} />
-                </HomeSection>
-                <section
-                  aria-labelledby="home-today-heading"
-                  className="flex min-w-0 flex-col gap-3"
-                >
-                  <div className="flex flex-col gap-1">
-                    <h2 id="home-today-heading" className="text-sm font-semibold text-foreground">
-                      {t('home.timeline.title', 'Today')}
-                    </h2>
-                    <p className={HOME_META_CLASS}>
-                      {t(
-                        'home.timeline.lead',
-                        'The app keeps this record. Correct only what is wrong.'
-                      )}
-                    </p>
-                  </div>
-                  <HomeTimeline
-                    entries={timeline}
-                    answers={answers}
-                    dayStart={dayStart}
-                    onAnswer={(id, answer) =>
-                      setAnswers((current) => {
-                        const next = { ...current }
-                        delete next[id]
-                        if (answer) {
-                          next[id] = answer
-                        }
-                        return next
-                      })
-                    }
-                  />
-                </section>
-              </>
-            )}
-          </div>
-          {firstRun ? null : (
-            <div className="flex min-w-0 flex-col gap-6">
-              <HomeSection title={t('home.next.title', 'Next')}>
-                <HomeActionRows quiet rows={next} />
-              </HomeSection>
-              {phase === 'day' ? (
-                <HomeSection title={wrapUpTitle}>
-                  <HomeActionRows quiet rows={wrapUp} />
-                </HomeSection>
+        <div className="rail-page-row-gutter mx-auto flex max-w-6xl flex-col gap-4 pt-6 pb-24">
+          <HomeGreeting
+            phase={phase}
+            date={uiDateTimeFormat(DATE_OPTIONS, intlLocale).format(sampleDay)}
+            line={t('home.header.line', 'My work today, and what my agents did.')}
+          >
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              aria-pressed={recording}
+              data-home-meeting=""
+              onClick={() =>
+                useHomeBoardStore.setState({ meetingStartedAt: recording ? null : Date.now() })
+              }
+            >
+              {recording
+                ? t('home.header.endMeeting', 'End meeting')
+                : t('home.header.startMeeting', 'Start meeting')}
+            </Button>
+            <HomeNewTaskButton
+              disabled={!signedIn}
+              onAdd={(title) => {
+                const id = `added-${Date.now()}`
+                useHomeBoardStore.setState((state) => ({
+                  addedTasks: [...state.addedTasks, { id, title }]
+                }))
+                setTab('today')
+                focusRow(`[data-home-task="${id}"]`)
+              }}
+            />
+            <Button type="button" size="sm" data-home-hand-off="" onClick={handToAgent}>
+              {t('home.header.handOff', 'Hand to an agent')}
+            </Button>
+            <HomePreviewMenu
+              preview={preview}
+              onPreviewChange={setPreview}
+              firstRun={previewFirstRun}
+              onFirstRunChange={setPreviewFirstRun}
+            />
+          </HomeGreeting>
+          {recording ? (
+            <p role="status" className={HOME_META_CLASS}>
+              {t(
+                'home.header.meetingNote',
+                'The meeting bot is recording. There is no meeting page yet, so minutes do not arrive in this sample.'
+              )}
+            </p>
+          ) : null}
+          {firstRun ? (
+            <HomeFirstSteps
+              steps={[
+                {
+                  id: 'inax',
+                  title: t('home.firstRun.inax', 'Connect inAX so your work appears here'),
+                  detail: t(
+                    'home.firstRun.inaxDetail',
+                    'Your tasks, deadlines and what waits on you'
+                  ),
+                  action: t('home.firstRun.connect', 'Connect'),
+                  run: connectInax
+                },
+                {
+                  id: 'agent',
+                  title: t('home.firstRun.agent', 'Make your first agent'),
+                  detail: t(
+                    'home.firstRun.agentDetail',
+                    'Give it a role; it shows up in Agents and bots'
+                  ),
+                  action: t('home.firstRun.make', 'Make one'),
+                  run: handToAgent
+                },
+                {
+                  id: 'app',
+                  title: t('home.firstRun.app', 'Register an app you work in'),
+                  detail: t(
+                    'home.firstRun.appDetail',
+                    'Optional. Its time joins My day, which only you see'
+                  ),
+                  action: t('home.firstRun.register', 'Register'),
+                  run: () => openSettings('my-apps')
+                }
+              ]}
+            />
+          ) : (
+            <>
+              {signedIn ? (
+                <HomeTiles counts={counts} agentDone={7} confirmedByMe={5} onSelect={selectTile} />
               ) : null}
-            </div>
+              <div className="grid items-start gap-4 @min-[60rem]/rail-page:grid-cols-[minmax(0,5fr)_minmax(0,3fr)]">
+                <div className="flex min-w-0 flex-col gap-4">
+                  {phase === 'evening' ? myDay : null}
+                  {signedIn ? (
+                    <>
+                      <HomeTasksCard
+                        tasks={tasks}
+                        projects={projects}
+                        tab={tab}
+                        onTabChange={(next) => {
+                          setTab(next)
+                          setOpenTaskId(null)
+                        }}
+                        openId={openTaskId}
+                        onOpenChange={setOpenTaskId}
+                        onAnswer={(taskId, choiceId) => {
+                          useHomeBoardStore.setState((state) => ({
+                            answers: { ...state.answers, [taskId]: choiceId }
+                          }))
+                          setOpenTaskId(null)
+                        }}
+                        onDone={(taskId) => {
+                          useHomeBoardStore.setState((state) => ({
+                            doneTaskIds: [...state.doneTaskIds, taskId]
+                          }))
+                          setOpenTaskId(null)
+                        }}
+                        onOpenTaskList={openTaskList}
+                      />
+                      <HomeAgentsCard
+                        agents={agents}
+                        openId={openAgentId}
+                        onOpenChange={setOpenAgentId}
+                        onRevealTask={revealTask}
+                        onOpenChat={bots[0] ? handToAgent : undefined}
+                      />
+                    </>
+                  ) : (
+                    <HomeCard title={t('home.tasks.title', 'My work')} data-home-card="signed-out">
+                      <div className="flex flex-col items-start gap-2 px-4 pb-2">
+                        <p className="text-[13px] text-foreground">
+                          {t(
+                            'home.signedOut.line',
+                            'Sign in with inAX to see your work, what waits on you, and what your agents are doing.'
+                          )}
+                        </p>
+                        <Button type="button" size="sm" onClick={connectInax}>
+                          {t('auto.components.settings.inaxAccount.signIn', 'Sign in with inAX')}
+                        </Button>
+                      </div>
+                    </HomeCard>
+                  )}
+                </div>
+                <div className="flex min-w-0 flex-col gap-4">
+                  <HomeUpcomingCard
+                    items={upcoming}
+                    projects={projects}
+                    onRevealTask={revealTask}
+                  />
+                  {signedIn ? (
+                    <HomeActivityCard
+                      entries={activity}
+                      filter={activityFilter}
+                      onFilterChange={setActivityFilter}
+                      clock={clock}
+                      onReveal={(entry) =>
+                        entry.taskId
+                          ? revealTask(entry.taskId)
+                          : entry.agentId && revealAgent(entry.agentId)
+                      }
+                    />
+                  ) : null}
+                  {phase === 'evening' ? null : myDay}
+                </div>
+              </div>
+            </>
           )}
         </div>
       </RailPageScroll>
-      <HomeWrapUpDialog
-        drafts={drafts}
-        open={wrapUpOpen}
-        onOpenChange={setWrapUpOpen}
-        onConfirmed={setWrappedUp}
-      />
+      {/* Remounted per open so it starts from the board as it is now. */}
+      {wrapUpOpen ? (
+        <HomeWrapUpDialog
+          items={wrapUpItems}
+          open
+          onOpenChange={setWrapUpOpen}
+          onConfirmed={(count) => useHomeBoardStore.setState({ wrapUp: { count } })}
+        />
+      ) : null}
     </RailPage>
   )
 }

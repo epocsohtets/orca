@@ -1,18 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  homePhaseForMinutes,
-  unansweredEntries,
-  visibleTimeline,
-  type HomeTimelineEntry
-} from './home-day'
-
-const entry = (id: string, at: number, suggestTask?: string): HomeTimelineEntry => ({
-  id,
-  at,
-  text: id,
-  actor: 'me',
-  suggestTask
-})
+import { formatHomeDuration, homePhaseForMinutes, homeSampleDay } from './home-day'
 
 describe('home day', () => {
   it('switches phase at 11:00 and 17:00', () => {
@@ -26,11 +13,19 @@ describe('home day', () => {
     ])
   })
 
-  it('shows only what has happened, newest first, and tracks unanswered entries', () => {
-    const entries = [entry('night', -120), entry('later', 900, 'T-2'), entry('early', 540, 'T-1')]
-    const shown = visibleTimeline(entries, 600)
-    expect(shown.map((item) => item.id)).toEqual(['early', 'night'])
-    expect(unansweredEntries(shown, {}).map((item) => item.id)).toEqual(['early'])
-    expect(unansweredEntries(shown, { early: 'notWork' })).toEqual([])
+  it('moves a weekend back to its Friday and keeps a weekday', () => {
+    const friday = new Date(2026, 10, 27).getTime()
+    expect(homeSampleDay(new Date(2026, 10, 28, 9).getTime())).toBe(friday)
+    expect(homeSampleDay(new Date(2026, 10, 29, 23).getTime())).toBe(friday)
+    expect(homeSampleDay(new Date(2026, 10, 27, 15).getTime())).toBe(friday)
+  })
+
+  it('formats durations without empty parts', () => {
+    const labels = { hours: (n: number) => `${n}h`, minutes: (n: number) => `${n}m` }
+    expect([25, 60, 80].map((value) => formatHomeDuration(value, labels))).toEqual([
+      '25m',
+      '1h',
+      '1h 20m'
+    ])
   })
 })
