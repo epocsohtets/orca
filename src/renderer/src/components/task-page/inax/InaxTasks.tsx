@@ -27,15 +27,15 @@ import { useInaxSourceSelection } from './inax-source-selection'
 function sampleTranscript(
   task: HomeTask,
   agent: HomeAgent | undefined,
-  answer: string | undefined,
-  at: number
+  answer: string | undefined
 ): NativeChatMessage[] {
   const lines = agent?.lines.length ? agent.lines : [task.detail]
   const rows = lines.map((text, index): NativeChatMessage => ({
     id: `sample-${index}`,
     role: 'assistant',
     source: 'transcript',
-    timestamp: at + index,
+    // The sample says what was said, not when.
+    timestamp: null,
     blocks: [{ type: 'text', text }]
   }))
   return answer
@@ -45,7 +45,7 @@ function sampleTranscript(
           id: 'sample-answer',
           role: 'user',
           source: 'transcript',
-          timestamp: at + lines.length,
+          timestamp: null,
           blocks: [{ type: 'text', text: answer }]
         }
       ]
@@ -77,7 +77,7 @@ export function TaskPageInax(): React.JSX.Element {
   const t = useTranslate()
   const signedIn = useInaxMockAccount((state) => state.signedIn)
   const { taskId, view: screen } = useInaxSourceSelection()
-  const { board, view, projects, now, sampleDay } = useHomeBoard()
+  const { board, view, projects, now } = useHomeBoard()
   const show = (next: string | null, as: 'detail' | 'chat' = 'detail'): void =>
     useInaxSourceSelection.setState({ taskId: next, view: as })
   const openTaskGone =
@@ -147,7 +147,7 @@ export function TaskPageInax(): React.JSX.Element {
         messages={
           loop
             ? buildHomeLoopTranscript(t, task, loop, now)
-            : sampleTranscript(task, agent, sampleAnswer, sampleDay)
+            : sampleTranscript(task, agent, sampleAnswer)
         }
         working={task.loop === 'working'}
         card={

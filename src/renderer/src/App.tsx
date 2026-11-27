@@ -35,6 +35,7 @@ import { useDocumentAppearance } from './app-shell/appearance/use-document-appea
 import { useFloatingWorkspacePanel } from './components/floating-terminal/workspace/use-floating-workspace-panel'
 import { useGlobalKeybindings } from './hooks/app-commands/use-global-keybindings'
 import { useOnboardingAndFeatureTips } from './app-shell/startup/use-onboarding-and-feature-tips'
+import { useLandOnHomeWithoutCode } from './app-shell/startup/use-land-on-home-without-code'
 import { usePersistedUIWriter } from './app-shell/storage/use-persisted-ui-writer'
 import { useRuntimeGraphSync } from './runtime/sync-runtime-graph/use-runtime-graph-sync'
 import { useWindowVisibilityEffects } from './app-shell/chrome/use-window-visibility-effects'
@@ -61,6 +62,7 @@ function App(): React.JSX.Element {
   }
   const floatingWorkspace = useFloatingWorkspacePanel()
   const onboardingGate = useOnboardingAndFeatureTips()
+  useLandOnHomeWithoutCode()
 
   useAppShellServices()
   // Load drafts before the startup chain so no failed step can skip them.

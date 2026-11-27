@@ -119,7 +119,7 @@ export function TaskPageInaxConversation({
               )
             : t(
                 'taskLoop.chat.sample',
-                'Sample conversation: {{agent}} is part of the sample day and cannot be written to here.',
+                'Sample conversation from the sample day. You cannot write to {{agent}} here.',
                 { agent: agentName }
               )}
         </p>

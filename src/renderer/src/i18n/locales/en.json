@@ -31809,7 +31809,7 @@
       "proposeStart": "First I propose changing the status {{to}}. Nothing changes on inAX until you confirm it in the card below.",
       "read": "I read the task: its description, its deadline ({{due}}) and its notes.",
       "reproposed": "I applied that. Here is the proposal again.",
-      "sample": "Sample conversation: {{agent}} is part of the sample day and cannot be written to here.",
+      "sample": "Sample conversation from the sample day. You cannot write to {{agent}} here.",
       "send": "Send",
       "waiting": "Understood. The status and the notes stay as they are. Tell me below what to change, and I will propose again."
     },
