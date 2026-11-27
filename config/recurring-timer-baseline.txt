@@ -9,6 +9,7 @@
 1 src/main/agent-hooks/server/server-opencode-binder.ts
 1 src/main/automations/observation/retained-run-reconciliation.ts
 1 src/main/automations/automation-service.ts
+1 src/main/my-apps/app-usage-tracker.ts # why: PoC frontmost-app sampler; macOS has no permission-free push signal for app activation, and a tick with no registered app does nothing
 1 src/main/backend/backend-desktop-owner-watch.ts # why: Linux backend polls main's pid every 2 s and stops once main is gone; Node exposes no exit event for a non-child pid
 1 src/main/bots/bot-access-request-watch.ts
 1 src/main/browser/extensions/native-messaging/browser-extension-native-ports.ts

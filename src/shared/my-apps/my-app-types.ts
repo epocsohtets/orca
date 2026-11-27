@@ -12,6 +12,6 @@ export type RegisteredApp = {
 }
 
 export type MyAppsGlobalSettings = {
-  /** Apps registered in Settings > My apps. A label only: nothing observes them. */
+  /** Apps registered in Settings > My apps. Foreground time of the unpaused ones is recorded locally. */
   myApps?: RegisteredApp[]
 }

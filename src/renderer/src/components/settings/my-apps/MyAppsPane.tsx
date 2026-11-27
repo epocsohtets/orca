@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
-import { AppWindow, Plus, Trash2 } from 'lucide-react'
+import { AppWindow, ClipboardCheck, Plus, Trash2 } from 'lucide-react'
 import type { GlobalSettings } from '../../../../../shared/settings/global-settings-types'
+import { summarizeAppUsage, type AppUsageDay } from '../../../../../shared/my-apps/app-usage'
 import type { InstalledApp, RegisteredApp } from '../../../../../shared/my-apps/my-app-types'
 import { useConfirmationDialog } from '@/components/dismiss/confirmation/confirmation-dialog-context'
-import { useTranslate } from '@/i18n/use-translate'
+import { installWindowVisibilityInterval } from '@/lib/window-activity/window-visibility-interval'
+import { useIntlLocale, useTranslate } from '@/i18n/use-translate'
 import { Badge } from '../../ui/badge'
 import { Button } from '../../ui/button'
 import {
@@ -18,6 +20,11 @@ import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover'
 import { Switch } from '../../ui/switch'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../ui/tooltip'
 import { SettingsGroup } from '../section-layout/SettingsGroup'
+import { AppCheckoutDialog } from './AppCheckoutDialog'
+import { formatActiveTime, formatClock } from './app-usage-format'
+
+const EMPTY_USAGE: AppUsageDay = { sessions: [], checkouts: [] }
+const USAGE_REFRESH_MS = 10_000
 
 type MyAppsPaneProps = {
   settings: GlobalSettings
@@ -37,6 +44,9 @@ export function MyAppsPane({ settings, updateSettings }: MyAppsPaneProps): React
   const confirm = useConfirmationDialog()
   const [installed, setInstalled] = useState<InstalledApp[]>([])
   const [pickerOpen, setPickerOpen] = useState(false)
+  const intlLocale = useIntlLocale()
+  const [usage, setUsage] = useState<AppUsageDay>(EMPTY_USAGE)
+  const [checkoutOpen, setCheckoutOpen] = useState(false)
   const apps = useMemo(() => settings.myApps ?? [], [settings.myApps])
   const iconByPath = useMemo(
     () => new Map(installed.map((app) => [app.path, app.icon])),
@@ -59,6 +69,17 @@ export function MyAppsPane({ settings, updateSettings }: MyAppsPaneProps): React
     }
   }, [])
 
+  useEffect(() => {
+    const load = (): void => {
+      void window.api.myApps
+        .getUsageToday()
+        .then(setUsage)
+        .catch(() => {})
+    }
+    load()
+    return installWindowVisibilityInterval({ run: load, intervalMs: USAGE_REFRESH_MS })
+  }, [])
+
   const save = (next: RegisteredApp[]): void => {
     void updateSettings({ myApps: next })
   }
@@ -79,113 +100,186 @@ export function MyAppsPane({ settings, updateSettings }: MyAppsPaneProps): React
   }
   const addLabel = t('settings.myApps.add', 'Add app')
 
+  const checkoutLabel = t('settings.myApps.checkout.title', 'Check out')
+
   return (
-    <SettingsGroup
-      title={t('settings.myApps.registered', 'Registered apps')}
-      action={
-        <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="sm">
-              <Plus className="size-3.5" />
-              {addLabel}
+    <>
+      <SettingsGroup
+        title={t('settings.myApps.registered', 'Registered apps')}
+        action={
+          <div className="flex items-center gap-2">
+            <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Plus className="size-3.5" />
+                  {addLabel}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="end" aria-label={addLabel} className="w-80">
+                <Command label={addLabel}>
+                  <CommandInput
+                    placeholder={t('settings.myApps.searchPlaceholder', 'Search installed apps…')}
+                  />
+                  <CommandList className="max-h-72">
+                    <CommandEmpty>{t('settings.myApps.noMatches', 'No apps found.')}</CommandEmpty>
+                    <CommandGroup>
+                      {available.map((app) => (
+                        <CommandItem
+                          key={app.path}
+                          value={`${app.name} ${app.path}`}
+                          selection="palette"
+                          onSelect={() => {
+                            save([...apps, { name: app.name, path: app.path }])
+                            setPickerOpen(false)
+                          }}
+                        >
+                          <AppIcon icon={app.icon} />
+                          <span className="truncate">{app.name}</span>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+            <Button
+              size="sm"
+              onClick={() => {
+                // Why: the dialog must list sessions up to this click, not the last 10 s refresh.
+                void window.api.myApps
+                  .getUsageToday()
+                  .then(setUsage)
+                  .catch(() => {})
+                  .finally(() => setCheckoutOpen(true))
+              }}
+            >
+              <ClipboardCheck className="size-3.5" />
+              {checkoutLabel}
             </Button>
-          </PopoverTrigger>
-          <PopoverContent align="end" aria-label={addLabel} className="w-80">
-            <Command label={addLabel}>
-              <CommandInput
-                placeholder={t('settings.myApps.searchPlaceholder', 'Search installed apps…')}
-              />
-              <CommandList className="max-h-72">
-                <CommandEmpty>{t('settings.myApps.noMatches', 'No apps found.')}</CommandEmpty>
-                <CommandGroup>
-                  {available.map((app) => (
-                    <CommandItem
-                      key={app.path}
-                      value={`${app.name} ${app.path}`}
-                      selection="palette"
-                      onSelect={() => {
-                        save([...apps, { name: app.name, path: app.path }])
-                        setPickerOpen(false)
-                      }}
-                    >
-                      <AppIcon icon={app.icon} />
-                      <span className="truncate">{app.name}</span>
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </CommandList>
-            </Command>
-          </PopoverContent>
-        </Popover>
-      }
-    >
-      {apps.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 py-10 text-center">
-          <AppWindow className="size-6 text-muted-foreground" />
-          <p className="text-sm font-medium">
-            {t('settings.myApps.emptyTitle', 'No apps registered')}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            {t('settings.myApps.emptyDescription', 'Add the apps you work in to watch them.')}
-          </p>
-        </div>
-      ) : (
-        apps.map((app) => (
-          <div
-            key={app.path}
-            data-settings-row=""
-            className="flex items-center justify-between gap-4 py-3"
-          >
-            <div className="flex min-w-0 items-center gap-3">
-              <AppIcon icon={iconByPath.get(app.path)} />
-              <div className="min-w-0 space-y-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-sm font-medium">{app.name}</span>
-                  {app.paused ? (
-                    <Badge variant="secondary">{t('settings.myApps.paused', 'Paused')}</Badge>
-                  ) : (
-                    <Badge variant="outline">
-                      <span className="size-1.5 rounded-full bg-status-success" />
-                      {t('settings.myApps.watching', 'Watching')}
-                    </Badge>
-                  )}
+          </div>
+        }
+      >
+        {apps.length === 0 ? (
+          <div className="flex flex-col items-center gap-2 py-10 text-center">
+            <AppWindow className="size-6 text-muted-foreground" />
+            <p className="text-sm font-medium">
+              {t('settings.myApps.emptyTitle', 'No apps registered')}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {t('settings.myApps.emptyDescription', 'Add the apps you work in to watch them.')}
+            </p>
+          </div>
+        ) : (
+          apps.map((app) => {
+            const today = summarizeAppUsage(usage.sessions, app.path)
+            return (
+              <div
+                key={app.path}
+                data-settings-row=""
+                className="flex items-center justify-between gap-4 py-3"
+              >
+                <div className="flex min-w-0 items-center gap-3">
+                  <AppIcon icon={iconByPath.get(app.path)} />
+                  <div className="min-w-0 space-y-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-sm font-medium">{app.name}</span>
+                      {app.paused ? (
+                        <Badge variant="secondary">{t('settings.myApps.paused', 'Paused')}</Badge>
+                      ) : (
+                        <Badge variant="outline">
+                          <span className="size-1.5 rounded-full bg-status-success" />
+                          {t('settings.myApps.watching', 'Watching')}
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="truncate font-mono text-xs text-muted-foreground">{app.path}</p>
+                    <p data-app-usage="" className="text-xs text-muted-foreground">
+                      {today.lastUsed === null
+                        ? t('settings.myApps.usage.none', 'No use recorded today')
+                        : t('settings.myApps.usage.today', 'Today {{time}} · last used {{when}}', {
+                            time: formatActiveTime(today.activeMs, intlLocale),
+                            when: formatClock(today.lastUsed, intlLocale)
+                          })}
+                    </p>
+                  </div>
                 </div>
-                <p className="truncate font-mono text-xs text-muted-foreground">{app.path}</p>
+                <div className="flex shrink-0 items-center gap-2">
+                  <Switch
+                    checked={!app.paused}
+                    aria-label={t('settings.myApps.watchToggle', 'Watch {{name}}', {
+                      name: app.name
+                    })}
+                    onCheckedChange={(checked) =>
+                      save(
+                        apps.map((entry) =>
+                          entry.path === app.path ? { ...entry, paused: !checked } : entry
+                        )
+                      )
+                    }
+                  />
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        aria-label={removeLabel}
+                        onClick={() => void removeApp(app)}
+                      >
+                        <Trash2 />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" sideOffset={4}>
+                      {removeLabel}
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              </div>
+            )
+          })
+        )}
+      </SettingsGroup>
+      <SettingsGroup title={t('settings.myApps.checkout.listTitle', "Today's check-outs")}>
+        {usage.checkouts.length === 0 ? (
+          <p className="py-3 text-xs text-muted-foreground">
+            {t('settings.myApps.checkout.listEmpty', 'No check-outs saved today.')}
+          </p>
+        ) : (
+          usage.checkouts.toReversed().map((entry) => (
+            <div
+              key={entry.id}
+              data-settings-row=""
+              data-checkout-entry=""
+              className="flex items-start gap-3 py-3"
+            >
+              <AppIcon icon={iconByPath.get(entry.appPath)} />
+              <div className="min-w-0 flex-1 space-y-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm font-medium">{entry.appName}</span>
+                  <span className="text-xs tabular-nums text-muted-foreground">
+                    {formatActiveTime(entry.activeMs, intlLocale)}
+                  </span>
+                  {entry.inaxTaskId ? <Badge variant="outline">{entry.inaxTaskId}</Badge> : null}
+                </div>
+                {entry.note ? <p className="text-sm">{entry.note}</p> : null}
+                {entry.outputFile ? (
+                  <p className="truncate font-mono text-xs text-muted-foreground">
+                    {entry.outputFile}
+                  </p>
+                ) : null}
               </div>
             </div>
-            <div className="flex shrink-0 items-center gap-2">
-              <Switch
-                checked={!app.paused}
-                aria-label={t('settings.myApps.watchToggle', 'Watch {{name}}', {
-                  name: app.name
-                })}
-                onCheckedChange={(checked) =>
-                  save(
-                    apps.map((entry) =>
-                      entry.path === app.path ? { ...entry, paused: !checked } : entry
-                    )
-                  )
-                }
-              />
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    aria-label={removeLabel}
-                    onClick={() => void removeApp(app)}
-                  >
-                    <Trash2 />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="top" sideOffset={4}>
-                  {removeLabel}
-                </TooltipContent>
-              </Tooltip>
-            </div>
-          </div>
-        ))
-      )}
-    </SettingsGroup>
+          ))
+        )}
+      </SettingsGroup>
+      {checkoutOpen ? (
+        <AppCheckoutDialog
+          apps={apps}
+          iconByPath={iconByPath}
+          usage={usage}
+          onClose={() => setCheckoutOpen(false)}
+          onSaved={setUsage}
+        />
+      ) : null}
+    </>
   )
 }

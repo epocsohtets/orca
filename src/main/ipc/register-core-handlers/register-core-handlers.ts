@@ -85,6 +85,7 @@ import {
   type CoreHandlerLifecycleOptions
 } from './core-handler-lifecycle'
 import { registerLazyRareIpcHandlers } from './lazy-rare-ipc-handlers'
+import { startAppUsageTracker } from '../../my-apps/app-usage-tracker'
 import { registerLazyAccountAndDiagnosticIpcHandlers } from './lazy-account-and-diagnostic-ipc-handlers'
 import { registerLazySecondaryIpcHandlers } from './lazy-secondary-ipc-handlers'
 
@@ -134,6 +135,7 @@ export async function registerCoreHandlers(
       runtime.moveRunningClaudePanes(change, held)
     )
     registerLazyAccountAndDiagnosticIpcHandlers(rateLimits)
+    startAppUsageTracker(() => store.getSettings().myApps)
     registerRateLimitHandlers(rateLimits, codexAccounts, () => store.getSettings())
     registerGitHubHandlers(store, stats, runtime)
     registerLazyGitLabHandlers(store)

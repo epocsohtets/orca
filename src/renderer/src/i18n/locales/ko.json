@@ -1274,7 +1274,25 @@
       "title": "내 앱",
       "description": "작업하는 앱입니다. 등록한 앱을 Orca가 지켜봅니다.",
       "removeTitle": "{{name}}을(를) 제거하시겠습니까?",
-      "removeDescription": "등록한 앱에서 이 앱을 제거합니다. 앱은 이 Mac에 그대로 설치되어 있습니다."
+      "removeDescription": "등록한 앱에서 이 앱을 제거합니다. 앱은 이 Mac에 그대로 설치되어 있습니다.",
+      "usage": {
+        "none": "오늘 기록된 사용이 없습니다",
+        "today": "오늘 {{time}} · 마지막 사용 {{when}}"
+      },
+      "checkout": {
+        "title": "업무 정리",
+        "description": "오늘 등록한 앱을 사용한 기록입니다. 어떤 업무였는지, 결과물이 어디 있는지 적습니다.",
+        "empty": "오늘 등록한 앱을 사용한 기록이 없습니다.",
+        "note": "어떤 업무였습니까?",
+        "task": "inAX 작업",
+        "noTask": "inAX 작업 없음",
+        "outputFile": "결과물 파일",
+        "signInHint": "inAX로 로그인하면 이 업무를 작업에 연결할 수 있습니다.",
+        "save": "저장",
+        "listTitle": "오늘의 업무 정리",
+        "listEmpty": "오늘 저장한 업무 정리가 없습니다.",
+        "activity": "오늘 업무 정리 · {{app}} {{time}}"
+      }
     }
   },
   "menu": {

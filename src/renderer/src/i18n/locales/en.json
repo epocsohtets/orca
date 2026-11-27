@@ -2267,7 +2267,25 @@
       "title": "My apps",
       "description": "The apps you work in. Orca watches the ones you register.",
       "removeTitle": "Remove {{name}}?",
-      "removeDescription": "This removes the app from your registered apps. The app stays installed on this Mac."
+      "removeDescription": "This removes the app from your registered apps. The app stays installed on this Mac.",
+      "usage": {
+        "none": "No use recorded today",
+        "today": "Today {{time}} · last used {{when}}"
+      },
+      "checkout": {
+        "title": "Check out",
+        "description": "Today's use of your registered apps. Say what the work was and where its output is.",
+        "empty": "No use of a registered app is recorded today.",
+        "note": "What was this work?",
+        "task": "inAX task",
+        "noTask": "No inAX task",
+        "outputFile": "Output file",
+        "signInHint": "Sign in with inAX to link this work to a task.",
+        "save": "Save",
+        "listTitle": "Today's check-outs",
+        "listEmpty": "No check-outs saved today.",
+        "activity": "Checked out today · {{app}} {{time}}"
+      }
     }
   },
   "menu": {

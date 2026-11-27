@@ -1,3 +1,7 @@
+import { useEffect, useState } from 'react'
+import { ClipboardCheck } from 'lucide-react'
+import type { AppCheckout } from '../../../../../shared/my-apps/app-usage'
+import { formatActiveTime } from '@/components/settings/my-apps/app-usage-format'
 import { cn } from '@/lib/class-names'
 import { useIntlLocale, useTranslate } from '@/i18n/use-translate'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -36,6 +40,14 @@ export function TaskPageInaxList(): React.JSX.Element {
   const signedIn = useInaxMockAccount((state) => state.signedIn)
   const openSettingsTarget = useAppStore((state) => state.openSettingsTarget)
   const openSettingsPage = useAppStore((state) => state.openSettingsPage)
+  const [checkouts, setCheckouts] = useState<AppCheckout[]>([])
+  useEffect(() => {
+    // Today's My apps check-outs, shown as an activity line on the task they link to.
+    void window.api.myApps
+      .getUsageToday()
+      .then((day) => setCheckouts(day.checkouts))
+      .catch(() => {})
+  }, [])
   const statusLabels: Record<InaxTaskStatus, string> = {
     // Why: the shared 'Open' key is translated as the verb.
     open: t('auto.components.TaskPage.inaxStatusOpen', 'Open'),
@@ -119,6 +131,28 @@ export function TaskPageInaxList(): React.JSX.Element {
                     </span>
                   ))}
                 </div>
+                {checkouts
+                  .filter((entry) => entry.inaxTaskId === task.id)
+                  .map((entry) => (
+                    <div
+                      key={entry.id}
+                      data-inax-checkout=""
+                      className="mt-1 flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground"
+                    >
+                      <ClipboardCheck className="size-3.5 shrink-0" />
+                      <span className="truncate">
+                        {t(
+                          'settings.myApps.checkout.activity',
+                          'Checked out today · {{app}} {{time}}',
+                          {
+                            app: entry.appName,
+                            time: formatActiveTime(entry.activeMs, intlLocale)
+                          }
+                        )}
+                        {entry.note ? ` · ${entry.note}` : ''}
+                      </span>
+                    </div>
+                  ))}
               </div>
               <div className="flex min-w-0 items-center text-xs text-muted-foreground">
                 {task.assignee ? (
