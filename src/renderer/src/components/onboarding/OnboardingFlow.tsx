@@ -25,6 +25,7 @@ import { useScrollEdgeFades } from '@/lib/list-interaction/use-scroll-edge-fades
 import { AgentSurfaceStep } from './AgentSurfaceStep'
 import { WorkStyleStep } from './WorkStyleStep'
 import { InaxStep } from './InaxStep'
+import { normalizeWorkStyles } from '../../../../shared/settings/work-styles'
 import { useInaxMockAccount } from '@/lib/inax-mock-account'
 import { stepCopy, stepTooltipLabels } from './onboarding-step-copy'
 
@@ -49,6 +50,7 @@ export default function OnboardingFlow({
   const shouldShowSetUpLater = currentStep.id !== 'notifications'
   const inaxSignedIn = useInaxMockAccount((state) => state.signedIn)
   const onInaxPage = currentStep.id === 'inax'
+  const worksWithCode = normalizeWorkStyles(flow.settings?.workStyles).includes('code')
   const shouldShowFooterBusy = Boolean(busyLabel)
   const footerPrimaryLabel =
     busyLabel ??
@@ -116,7 +118,11 @@ export default function OnboardingFlow({
   return (
     <TooltipProvider skipDelayDuration={0}>
       <div
-        className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-black/50 p-4 text-foreground"
+        className={cn(
+          'fixed inset-0 z-[100] flex items-center justify-center overflow-hidden p-4 text-foreground',
+          // Until someone picks Code, the terminal workspace behind this is not shown to them.
+          worksWithCode ? 'bg-black/50' : 'bg-background'
+        )}
         data-onboarding-overlay
         onPointerDown={(event) => {
           if (!shouldRequestOnboardingSkipConfirmation(event)) {
