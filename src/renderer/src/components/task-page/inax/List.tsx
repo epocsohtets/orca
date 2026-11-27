@@ -11,6 +11,9 @@ import {
   GITHUB_TASK_STICKY_TITLE_HEADER_CLASS,
   formatRelativeTime
 } from '../task-page-source-context'
+import { Button } from '@/components/ui/button'
+import { useInaxMockAccount } from '@/lib/inax-mock-account'
+import { useAppStore } from '@/store'
 import { INAX_MOCK_TASKS, type InaxTaskStatus } from './inax-mock-tasks'
 
 // Same columns as the GitHub issue grid without its trailing action column.
@@ -29,11 +32,36 @@ const INAX_STATUS_TONES: Record<InaxTaskStatus, string> = {
 export function TaskPageInaxList(): React.JSX.Element {
   const t = useTranslate()
   const intlLocale = useIntlLocale()
+  const signedIn = useInaxMockAccount((state) => state.signedIn)
+  const openSettingsTarget = useAppStore((state) => state.openSettingsTarget)
+  const openSettingsPage = useAppStore((state) => state.openSettingsPage)
   const statusLabels: Record<InaxTaskStatus, string> = {
     // Why: the shared 'Open' key is translated as the verb.
     open: t('auto.components.TaskPage.inaxStatusOpen', 'Open'),
     inProgress: t('auto.components.TaskPage.inaxStatusInProgress', 'In progress'),
     done: t('auto.components.TaskPage.18451e99df', 'Done')
+  }
+  if (!signedIn) {
+    return (
+      <div
+        className="mt-3 flex flex-col items-center gap-3 rounded-md border border-border/50 bg-background px-4 py-12 shadow-sm"
+        data-task-list="inax-signed-out"
+      >
+        <p className="text-sm text-muted-foreground">
+          {t('auto.components.TaskPage.inaxSignedOut', 'Sign in with inAX to see your tasks')}
+        </p>
+        <Button
+          type="button"
+          size="sm"
+          onClick={() => {
+            openSettingsTarget({ pane: 'orca-account', repoId: null })
+            openSettingsPage()
+          }}
+        >
+          {t('auto.components.settings.inaxAccount.signIn', 'Sign in with inAX')}
+        </Button>
+      </div>
+    )
   }
   return (
     <div

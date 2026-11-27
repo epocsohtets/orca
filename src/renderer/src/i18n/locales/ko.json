@@ -3595,7 +3595,8 @@
         "inaxSource": "inAX",
         "inaxSampleData": "inAX · 샘플 데이터",
         "inaxStatusOpen": "열림",
-        "inaxStatusInProgress": "진행 중"
+        "inaxStatusInProgress": "진행 중",
+        "inaxSignedOut": "inAX로 로그인하여 작업을 확인하세요"
       },
       "Terminal": {
         "73768427cf": "닫기",
@@ -12925,6 +12926,14 @@
           "saveFailed": "가시성 기본값을 저장할 수 없습니다.",
           "updateServer": "소스 기본값을 구성하려면 이 서버를 업데이트하세요.",
           "updateServerDefaults": "표시 기본값을 구성하려면 이 서버를 업데이트하세요."
+        },
+        "inaxAccount": {
+          "title": "inAX 계정",
+          "account": "inAX 계정",
+          "description": "inAX로 로그인하여 Orca에서 inAX 작업을 확인하세요.",
+          "signedOut": "로그인하여 Orca에서 inAX 작업을 확인하세요.",
+          "signIn": "inAX로 로그인",
+          "searchDescription": "inAX 작업 탭에서 사용하는 inAX 계정에 로그인하거나 로그아웃합니다."
         },
         "orcaAccount": {
           "connected": "연결됨",

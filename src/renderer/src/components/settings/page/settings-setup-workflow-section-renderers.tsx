@@ -6,6 +6,7 @@ import { AutomationsSettingsPane } from '../automations/AutomationsSettingsPane'
 import { GeneralPane } from '../general/GeneralPane'
 import { IntegrationsPane } from '../integrations/IntegrationsPane'
 import { MobileSettingsPane } from '../mobile/MobileSettingsPane'
+import { InaxAccountSettingsPane } from '../accounts/inax/InaxAccountSettingsPane'
 import { OrcaAccountSettingsPane } from '../accounts/orca/OrcaAccountSettingsPane'
 import { ServerOrcaAccountPane } from '../accounts/orca/ServerOrcaAccountPane'
 import { SettingsHostScopeUnavailableNotice } from '../host-scope/SettingsHostScopePicker'
@@ -18,6 +19,31 @@ import { getSettingsHostServerName, type SettingsRenderContext } from './setting
 import { SettingsGroup } from '../section-layout/SettingsGroup'
 import { WorkspaceCleanupSettingsPane } from '../workspace-cleanup/WorkspaceCleanupSettingsPane'
 import { runtimeTargetEnvironmentId } from '@/runtime/rpc/targets/runtime-client-target'
+
+// PoC: shown in place of renderOrcaAccountSettingsSection, which stays for the real Orca account.
+export function renderInaxAccountSettingsSection(
+  context: SettingsRenderContext,
+  t: Translate = translate
+): React.JSX.Element | null {
+  const { model, navigation, view } = context
+  return model.showDesktopOnlySettings ? (
+    <SettingsSection
+      id="orca-account"
+      title={t('auto.components.settings.inaxAccount.title', 'inAX Account')}
+      description={t(
+        'auto.components.settings.inaxAccount.description',
+        'Sign in with inAX to see your inAX tasks in Orca.'
+      )}
+      searchEntries={navigation.getSectionSearchEntries('orca-account')}
+    >
+      {view.isSectionMounted('orca-account') ? (
+        <SettingsGroup bodyClassName="py-4">
+          <InaxAccountSettingsPane />
+        </SettingsGroup>
+      ) : null}
+    </SettingsSection>
+  ) : null
+}
 
 export function renderOrcaAccountSettingsSection(
   context: SettingsRenderContext,
