@@ -8,7 +8,8 @@ import {
 } from '@/components/native-chat/NativeChatCardFrame'
 import { openMeeting, openMeetingTask } from './meeting-navigation'
 import { personName } from './meeting-people'
-import { followUpState } from './meeting-rules'
+import { followUpState, meetingAccess } from './meeting-rules'
+import { MinutesRequestControl } from './MeetingSharing'
 import { useMeetingText } from './MeetingParts'
 import type { Meeting, MeetingFollowUp, MeetingTask } from './meeting-types'
 import { acceptFollowUp, setFollowUpDeclined, useMeetings } from './meetings-store'
@@ -29,7 +30,14 @@ function SourceQuote({
   ) : null
 }
 
-export function MinutesLinkCard({ meeting }: { meeting: Meeting }): React.JSX.Element {
+export function MinutesLinkCard({
+  meeting,
+  sharedBy
+}: {
+  meeting: Meeting
+  /** Set when the reader was not in the meeting and got the minutes by link. */
+  sharedBy?: string
+}): React.JSX.Element {
   const t = useTranslate()
   const text = useMeetingText()
   return (
@@ -52,9 +60,13 @@ export function MinutesLinkCard({ meeting }: { meeting: Meeting }): React.JSX.El
     >
       <p className="text-xs text-muted-foreground">
         {text.when(meeting)} ·{' '}
-        {t('meetings.bot.sentTo', 'Sent to all {{count}} people in the meeting', {
-          count: meeting.attendeeIds.length + 1
-        })}
+        {sharedBy
+          ? t('meetings.bot.sharedBy', 'Shared with you by {{name}}', {
+              name: personName(sharedBy)
+            })
+          : t('meetings.bot.sentTo', 'Sent to all {{count}} people in the meeting', {
+              count: meeting.attendeeIds.length + 1
+            })}
       </p>
     </NativeChatCardFrame>
   )
@@ -159,6 +171,29 @@ export function ProposalCard({
       >
         <p className="text-xs text-muted-foreground">{text.due(followUp.due)}</p>
         <SourceQuote meeting={meeting} turnId={followUp.turnId} />
+        {state.kind === 'proposed' ? (
+          <p className="mt-2 text-xs text-muted-foreground" data-meeting-bot-choice-help="">
+            {t(
+              'meetings.bot.choiceHelp',
+              '“Take it” makes it your task in To do. “Not mine” shows {{name}} that it is not yours, so the host can give it to someone else.',
+              { name: personName(meeting.hostId) }
+            )}
+          </p>
+        ) : state.kind === 'declined' ? (
+          <p className="mt-2 text-xs text-muted-foreground">
+            {t('meetings.bot.declinedHelp', '{{name}} sees it as “not theirs” on the minutes.', {
+              name: personName(meeting.hostId)
+            })}
+          </p>
+        ) : state.kind === 'task' && state.task.route === 'assigned' ? (
+          <p className="mt-2 text-xs text-muted-foreground">
+            {t(
+              'meetings.bot.assignedHelp',
+              '{{name}} assigned this as the host, so there is nothing to accept.',
+              { name: personName(meeting.hostId) }
+            )}
+          </p>
+        ) : null}
       </NativeChatCardFrame>
     </div>
   )
@@ -175,6 +210,7 @@ export function AssignedTaskCard({
   const t = useTranslate()
   const text = useMeetingText()
   const turnId = meeting.followUps.find((f) => f.id === task.followUpId)?.turnId ?? ''
+  const access = useMeetings((state) => meetingAccess(meeting, state.viewerId, state.tasks))
   return (
     <div data-meeting-bot-assigned={task.id}>
       <NativeChatCardFrame
@@ -212,6 +248,18 @@ export function AssignedTaskCard({
           {text.due(task.due)}
         </p>
         <SourceQuote meeting={meeting} turnId={turnId} />
+        <p className="mt-2 text-xs text-muted-foreground">
+          {t(
+            'meetings.bot.assignedHelp',
+            '{{name}} assigned this as the host, so there is nothing to accept.',
+            { name: personName(meeting.hostId) }
+          )}
+        </p>
+        {access === 'excerpt' ? (
+          <div className="mt-2">
+            <MinutesRequestControl meeting={meeting} />
+          </div>
+        ) : null}
       </NativeChatCardFrame>
     </div>
   )

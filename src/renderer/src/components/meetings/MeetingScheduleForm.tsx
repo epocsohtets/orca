@@ -74,6 +74,25 @@ export function MeetingScheduleForm({
         ? t('meetings.form.attendeesRequired', 'Choose at least one attendee.')
         : undefined
   }
+  const others = MEETING_PEOPLE.filter((person) => person.id !== viewerId)
+  const inChat = (id: string): boolean => preset?.attendeeIds.includes(id) ?? false
+  // From a chat, its members come first and are ticked; anyone else is an explicit addition.
+  const candidateGroups = (
+    preset && origin
+      ? [
+          {
+            id: 'chat',
+            label: t('meetings.form.chatMembers', 'Members of “{{name}}”', { name: origin.name }),
+            people: others.filter((person) => inChat(person.id))
+          },
+          {
+            id: 'others',
+            label: t('meetings.form.otherPeople', 'Add someone else'),
+            people: others.filter((person) => !inChat(person.id))
+          }
+        ]
+      : [{ id: 'all', label: '', people: others }]
+  ).filter((group) => group.people.length > 0)
   const blur = (field: keyof typeof check) => () =>
     setErrors((current) => ({ ...current, [field]: check[field]() }))
   // While typing, an error only clears once the value is valid again.
@@ -243,29 +262,35 @@ export function MeetingScheduleForm({
           {t('meetings.form.attendees', 'Attendees')}
         </legend>
         <div className="flex flex-col gap-2" onBlur={blur('attendees')}>
-          {MEETING_PEOPLE.filter((person) => person.id !== viewerId).map((person, index) => (
-            <div key={person.id} className="flex items-center gap-2">
-              <Checkbox
-                id={index === 0 ? ID('attendees') : ID(`attendee-${person.id}`)}
-                checked={attendeeIds.includes(person.id)}
-                onCheckedChange={(checked) => {
-                  const next = checked
-                    ? [...attendeeIds, person.id]
-                    : attendeeIds.filter((id) => id !== person.id)
-                  setAttendeeIds(next)
-                  if (errors.attendees && !check.attendees(next)) {
-                    setErrors((current) => ({ ...current, attendees: undefined }))
-                  }
-                }}
-              />
-              <Label
-                htmlFor={index === 0 ? ID('attendees') : ID(`attendee-${person.id}`)}
-                variant="control"
-              >
-                {person.name}
-                <span className="font-normal text-muted-foreground">{person.role}</span>
-              </Label>
-            </div>
+          {candidateGroups.map((group) => (
+            <React.Fragment key={group.id}>
+              {group.label ? <p className="text-xs text-muted-foreground">{group.label}</p> : null}
+              {group.people.map((person) => {
+                const first = person.id === candidateGroups[0].people[0]?.id
+                const id = first ? ID('attendees') : ID(`attendee-${person.id}`)
+                return (
+                  <div key={person.id} className="flex items-center gap-2">
+                    <Checkbox
+                      id={id}
+                      checked={attendeeIds.includes(person.id)}
+                      onCheckedChange={(checked) => {
+                        const next = checked
+                          ? [...attendeeIds, person.id]
+                          : attendeeIds.filter((entry) => entry !== person.id)
+                        setAttendeeIds(next)
+                        if (errors.attendees && !check.attendees(next)) {
+                          setErrors((current) => ({ ...current, attendees: undefined }))
+                        }
+                      }}
+                    />
+                    <Label htmlFor={id} variant="control">
+                      {person.name}
+                      <span className="font-normal text-muted-foreground">{person.role}</span>
+                    </Label>
+                  </div>
+                )
+              })}
+            </React.Fragment>
           ))}
         </div>
         {errors.attendees ? (

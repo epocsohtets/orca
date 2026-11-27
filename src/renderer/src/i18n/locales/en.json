@@ -31399,12 +31399,7 @@
     "signIn": "Sign in"
   },
   "meetings": {
-    "chat": {
-      "setUp": "{{name}} set up a meeting: {{title}}",
-      "open": "Open the meeting"
-    },
     "recording": {
-      "status": "Recording · {{time}}",
       "statusAria": "{{title}} is being recorded. Open the meeting.",
       "on": "Recording",
       "everyoneSees": "All {{count}} people in the meeting see this.",
@@ -31418,6 +31413,7 @@
     "title": "Meetings",
     "schedule": "Set up a meeting",
     "close": "Close Meetings",
+    "demo": "Demo",
     "viewer": "Seen as {{name}}",
     "reset": "Start the sample data over",
     "pane": {
@@ -31436,6 +31432,8 @@
       "datePast": "Choose today or a later date.",
       "timeRequired": "Enter a start time.",
       "attendeesRequired": "Choose at least one attendee.",
+      "chatMembers": "Members of “{{name}}”",
+      "otherPeople": "Add someone else",
       "heading": "Set up a meeting",
       "fromChat": "From the chat “{{name}}”. The meeting links back to it; it stays its own item.",
       "intro": "Attendees get it on their own schedule and can read the outline first.",
@@ -31463,10 +31461,19 @@
       "yesterday": "Yesterday"
     },
     "due": "Due {{date}}",
+    "elapsed": {
+      "hours": "{{h}} hr {{m}} min",
+      "minutes": "{{m}} min {{s}} sec",
+      "seconds": "{{s}} sec"
+    },
     "status": {
       "todo": "To do",
       "inProgress": "In progress",
       "done": "Done"
+    },
+    "chat": {
+      "setUp": "{{name}} set up a meeting: {{title}}",
+      "open": "Open the meeting"
     },
     "save": "Save",
     "prep": {
@@ -31481,55 +31488,63 @@
       "minutesReady": "The minutes of **{{title}}** are ready.",
       "proposalsFollow": "Below is what looks like yours. Take it and it becomes your task in To do.",
       "noProposals": "Nothing in this meeting looks like yours.",
+      "sharedMessage": "{{name}} shared the full minutes of **{{title}}** with you. You were not in the meeting.",
       "assignedMessage": "{{name}} assigned you a task from **{{title}}**. You were not in the meeting, so I am sending the part it came from.",
       "name": "Meeting bot",
       "askAbout": "Ask about “{{title}}”",
       "askNone": "You can ask once you have minutes",
       "about": "Sends {{name}} the minutes and the tasks that look like theirs",
+      "aboutOutside": "Sends {{name}} assigned tasks and the part they came from. Ask on a card to see the full minutes.",
       "sample": "Sample conversation",
       "emptyTitle": "No messages yet",
       "emptyDetail": "When a meeting you are in ends its recording, the minutes come here. So do tasks assigned to you from a meeting.",
       "minutesCard": "Minutes",
       "openMinutes": "Open the minutes",
+      "sharedBy": "Shared with you by {{name}}",
       "sentTo": "Sent to all {{count}} people in the meeting",
       "givenToOther": "Assigned to {{name}}",
       "taken": "Yours · {{status}}",
       "assignedByHost": "Assigned by {{name}} · {{status}}",
       "declined": "You said this is not yours",
       "proposalCard": "This looks like yours",
+      "choiceHelp": "“Take it” makes it your task in To do. “Not mine” shows {{name}} that it is not yours, so the host can give it to someone else.",
+      "declinedHelp": "{{name}} sees it as “not theirs” on the minutes.",
+      "assignedHelp": "{{name}} assigned this as the host, so there is nothing to accept.",
       "assignedCard": "A task for you from “{{title}}”",
       "rowMinutes": "Minutes: {{title}}",
+      "rowShared": "Shared minutes: {{title}}",
       "rowTask": "New task: {{title}}",
       "rowEmpty": "Minutes and your tasks arrive here"
     },
     "source": "Where it was said",
     "ask": {
       "send": "Ask",
+      "noAnswer": "I did not find that in this meeting. Try a word that was said, or search the full transcript.",
       "label": "Ask the meeting bot about this meeting",
-      "suggestions": "For example:",
-      "noAnswer": "I did not find that in this meeting. Try a word that was said, or search the full transcript."
+      "suggestions": "For example:"
     },
     "followUps": {
-      "mine": "Mine",
       "title": "Follow-up tasks",
       "counts": "{{total}} in all · To do {{todo}} · In progress {{inProgress}} · Done {{done}} · Not a task yet {{open}}",
       "include": "Make “{{text}}” a task",
+      "mine": "Mine",
       "accepted": "Taken by the owner",
       "assigned": "Assigned by the host",
-      "declined": "{{name}} said it is not theirs",
-      "proposed": "Proposed to {{name}} · no answer yet",
+      "proposedTo": "Proposed to {{name}}",
+      "stateDeclined": "Says not theirs",
+      "stateWaiting": "No answer yet",
       "owner": "Owner of “{{text}}”",
       "chooseOwner": "Choose owner",
-      "assignedToast": "{{count}} tasks created in To do. The meeting bot tells each owner.",
+      "assignedToast": "{{count}} tasks created in To do. The meeting bot told {{people}} owners.",
       "assignAll": "Create {{count}} tasks and assign",
-      "assignHelp": "The agent drafted these from the meeting. Change an owner or untick a line that is wrong."
+      "assignWho": "The meeting bot tells the {{people}} owners. The agent drafted these: change an owner or untick a line that is wrong."
     },
     "openTask": "Open task",
     "notMine": "Not mine",
     "accept": "Take it",
     "acceptAfterAll": "Take it after all",
     "excerpt": {
-      "scope": "You were not in this meeting, so you see your task and the part of the meeting it came from. An attendee can share the full minutes with you.",
+      "scope": "You were not in this meeting, so you see your task and the part of the meeting it came from. The host or an attendee can share the full minutes with you.",
       "task": "My task",
       "assignedBy": "Assigned by {{name}}"
     },
@@ -31537,6 +31552,12 @@
     "detail": {
       "people": "Host {{host}} · Attendees {{attendees}}",
       "origin": "Set up from the chat “{{name}}”"
+    },
+    "response": {
+      "yes": "Coming",
+      "no": "Not coming",
+      "none": "No answer",
+      "label": "Will you come to “{{title}}”?"
     },
     "minutes": {
       "depth": "How much to read",
@@ -31551,6 +31572,18 @@
       "turns": "{{total}} turns",
       "notFound": "Nothing said matches. Try a shorter word."
     },
+    "share": {
+      "done": "The meeting bot sent {{name}} the link to the full minutes.",
+      "scope": "The {{count}} people who were in the meeting see the full minutes. An assignee who was not there sees only their task and the sentence it came from.",
+      "sharedWith": "Shared by link with {{names}}.",
+      "button": "Share link",
+      "request": "{{name}} asks to see the full minutes.",
+      "decline": "Not now",
+      "approve": "Approve",
+      "requestDeclined": "{{name}} did not share the full minutes.",
+      "requested": "Asked. {{name}} sees your request on the minutes.",
+      "requestButton": "Ask to see the full minutes"
+    },
     "agenda": {
       "previousWeek": "Previous week",
       "thisWeek": "This week",
@@ -31559,22 +31592,28 @@
       "host": "Host {{name}}"
     },
     "state": {
-      "myTasks": "My tasks from it: {{count}}",
       "recording": "Recording now",
       "scheduled": "Scheduled",
       "minutes": "Minutes ready",
-      "minutesFollowUps": "Minutes ready · {{done}} of {{total}} follow-ups done"
+      "minutesFollowUps": "Minutes ready · {{done}} of {{total}} follow-ups done",
+      "myTasks": "My tasks from it: {{count}}"
     },
     "list": {
+      "shared": "Minutes shared with me",
       "hosting": "Meetings I host",
       "attending": "Meetings I attend",
       "assigned": "Meetings my tasks came from",
       "empty": "No meetings yet. A meeting you host or are invited to appears here and on your schedule."
     },
     "notice": {
+      "recordingTitle": "Recording has started",
+      "recordingBody": "{{name}} is recording “{{title}}”. It stays in the status bar until it ends.",
       "minutesTitle": "Meeting bot: the minutes are here",
+      "sharedTitle": "Meeting bot: minutes were shared with you",
       "taskTitle": "Meeting bot: a task was assigned to you",
       "openMessage": "Open the message",
+      "requestTitle": "{{name}} asks to see the minutes",
+      "openRequest": "See the request",
       "soonTitle": "Starts in {{count}} minutes",
       "openOutline": "Read the outline",
       "dismiss": "Dismiss"

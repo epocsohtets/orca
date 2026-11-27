@@ -13,6 +13,8 @@ import { useTranslate } from '@/i18n/use-translate'
 import { cn } from '@/lib/class-names'
 import { useAppStore } from '@/store'
 import { MeetingBotChatRow } from '@/components/meetings/MeetingBotChatRow'
+import { personName } from '@/components/meetings/meeting-people'
+import { useMeetings } from '@/components/meetings/meetings-store'
 import { SidebarChatRow } from './SidebarChatRow'
 import { SIDEBAR_CHAT_CONVERSATIONS, type SidebarChatConversation } from './sidebar-chat-mock-data'
 
@@ -29,6 +31,7 @@ export function SidebarChatSection({
   const [collapsed, setCollapsed] = useState(false)
   const newLabel = t('sidebarChat.section.new', 'New message or group')
   const projectsFirst = useAppStore((state) => state.sidebarProjectsFirst)
+  const viewerName = useMeetings((state) => personName(state.viewerId))
   const shown = useAppStore((state) => (state.sidebarBody ?? 'workspaces') !== 'agents')
   if (!shown) {
     return null
@@ -100,7 +103,10 @@ export function SidebarChatSection({
             {t('sidebarChat.section.directMessages', 'Direct messages')}
           </div>
           <MeetingBotChatRow />
-          {SIDEBAR_CHAT_CONVERSATIONS.filter(({ kind }) => kind === 'dm').map(renderRow)}
+          {/* The sample person being viewed has no direct message with themself. */}
+          {SIDEBAR_CHAT_CONVERSATIONS.filter(
+            ({ kind, name }) => kind === 'dm' && name !== viewerName
+          ).map(renderRow)}
           <div className={LIST_LABEL}>{t('sidebarChat.section.groups', 'Groups')}</div>
           {SIDEBAR_CHAT_CONVERSATIONS.filter(({ kind }) => kind === 'group').map(renderRow)}
         </div>

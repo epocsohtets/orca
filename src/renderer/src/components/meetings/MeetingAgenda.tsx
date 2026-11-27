@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { Check, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useTranslate } from '@/i18n/use-translate'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/class-names'
@@ -8,7 +8,7 @@ import { isParticipant } from './meeting-rules'
 import { sameDay, workWeek } from './meeting-schedule'
 import { moveRowFocus, useMeetingStateLine } from './MeetingList'
 import { MEETING_FOCUS_RING, useMeetingText } from './MeetingParts'
-import { useMeetings } from './meetings-store'
+import { respondToInvitation, useMeetings } from './meetings-store'
 
 /** The viewer's own schedule: one working week, a day at a time. */
 export function MeetingAgenda({
@@ -97,6 +97,11 @@ export function MeetingAgenda({
               ) : (
                 <ul>
                   {entries.map((meeting) => {
+                    // An invited person answers until the meeting starts; the host sees it on the meeting.
+                    const answerable =
+                      meeting.hostId !== viewerId &&
+                      !meeting.minutes &&
+                      meeting.recordingStartedAt === null
                     const current = meeting.id === selectedId
                     return (
                       <li key={meeting.id}>
@@ -128,6 +133,40 @@ export function MeetingAgenda({
                             </span>
                           </span>
                         </button>
+                        {answerable ? (
+                          <div
+                            className="flex items-center gap-1.5 pb-1 pl-[3.75rem]"
+                            role="group"
+                            aria-label={t(
+                              'meetings.response.label',
+                              'Will you come to “{{title}}”?',
+                              {
+                                title: meeting.title
+                              }
+                            )}
+                            data-meeting-response={meeting.responses[viewerId] ?? 'none'}
+                          >
+                            {(['yes', 'no'] as const).map((answer) => (
+                              <Button
+                                key={answer}
+                                type="button"
+                                size="xs"
+                                variant={
+                                  meeting.responses[viewerId] === answer ? 'secondary' : 'outline'
+                                }
+                                aria-pressed={meeting.responses[viewerId] === answer}
+                                onClick={() => respondToInvitation(meeting.id, answer)}
+                              >
+                                {meeting.responses[viewerId] === answer ? (
+                                  <Check aria-hidden />
+                                ) : null}
+                                {answer === 'yes'
+                                  ? t('meetings.response.yes', 'Coming')
+                                  : t('meetings.response.no', 'Not coming')}
+                              </Button>
+                            ))}
+                          </div>
+                        ) : null}
                       </li>
                     )
                   })}

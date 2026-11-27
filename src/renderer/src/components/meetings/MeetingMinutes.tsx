@@ -146,7 +146,12 @@ export function MeetingMinutes({
             </p>
           </div>
           {found.length > 0 ? (
-            <MeetingTranscript turns={found} markedTurnId={markedTurnId} markNonce={focus?.nonce} />
+            <MeetingTranscript
+              turns={found}
+              startsAt={meeting.startsAt}
+              markedTurnId={markedTurnId}
+              markNonce={focus?.nonce}
+            />
           ) : (
             <p className="text-xs text-muted-foreground">
               {t('meetings.minutes.notFound', 'Nothing said matches. Try a shorter word.')}

@@ -194,5 +194,9 @@ export const PROMO_DEFAULTS = {
   place: '3층 회의실 한강',
   outline:
     '1. 기간과 할인율 정하기 (20% 안과 25% 안)\n2. 안내 메일과 배너 일정\n3. 문의가 몰릴 때의 고객지원',
-  materials: ['작년 연말 프로모션 결과.pdf', '12월 프로모션 일정표.xlsx']
+  materials: [
+    '작년 연말 프로모션 결과.pdf',
+    '12월 프로모션 일정표.xlsx',
+    '고객 문의 유형 정리.xlsx'
+  ]
 }

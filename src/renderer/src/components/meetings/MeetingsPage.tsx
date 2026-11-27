@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { CalendarPlus } from 'lucide-react'
 import { useTranslate } from '@/i18n/use-translate'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -89,6 +90,8 @@ export default function MeetingsPage(): React.JSX.Element {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button type="button" variant="ghost" size="toolbar" data-meeting-viewer="">
+                  {/* Not part of the product: the PoC's way to be another person on one machine. */}
+                  <Badge variant="outline">{t('meetings.demo', 'Demo')}</Badge>
                   {t('meetings.viewer', 'Seen as {{name}}', { name: personName(viewerId) })}
                 </Button>
               </DropdownMenuTrigger>

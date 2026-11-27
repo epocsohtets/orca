@@ -93,6 +93,11 @@ export function MeetingList({
       meetings: sorted.filter((m) => m.attendeeIds.includes(viewerId))
     },
     {
+      id: 'shared',
+      title: t('meetings.list.shared', 'Minutes shared with me'),
+      meetings: sorted.filter((m) => m.shares.some((entry) => entry.personId === viewerId))
+    },
+    {
       id: 'assigned',
       title: t('meetings.list.assigned', 'Meetings my tasks came from'),
       meetings: sorted.filter((m) => meetingAccess(m, viewerId, tasks) === 'excerpt')

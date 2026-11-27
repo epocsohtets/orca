@@ -20,6 +20,8 @@ export type MeetingText = {
   when: (meeting: Pick<Meeting, 'startsAt' | 'endsAt'>) => string
   due: (dateKey: string) => string
   status: Record<MeetingTaskStatus, string>
+  /** A length with its units, such as "12 min 40 sec": never read as a time of day. */
+  elapsed: (seconds: number) => string
 }
 
 export function useMeetingText(): MeetingText {
@@ -48,6 +50,15 @@ export function useMeetingText(): MeetingText {
       return t('meetings.due', 'Due {{date}}', {
         date: date(new Date(year, month - 1, dayOfMonth).getTime())
       })
+    },
+    elapsed: (seconds) => {
+      const whole = Math.max(0, Math.floor(seconds))
+      const [h, m, s] = [Math.floor(whole / 3600), Math.floor((whole % 3600) / 60), whole % 60]
+      return h > 0
+        ? t('meetings.elapsed.hours', '{{h}} hr {{m}} min', { h, m })
+        : m > 0
+          ? t('meetings.elapsed.minutes', '{{m}} min {{s}} sec', { m, s })
+          : t('meetings.elapsed.seconds', '{{s}} sec', { s })
     },
     status: {
       todo: t('meetings.status.todo', 'To do'),

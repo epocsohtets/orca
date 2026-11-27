@@ -16,7 +16,7 @@ export function meetingAccess(
   viewerId: string,
   tasks: readonly MeetingTask[]
 ): 'full' | 'excerpt' | 'none' {
-  if (isParticipant(meeting, viewerId)) {
+  if (isParticipant(meeting, viewerId) || meeting.shares.some((s) => s.personId === viewerId)) {
     return 'full'
   }
   return tasks.some((task) => task.meetingId === meeting.id && task.assigneeId === viewerId)
@@ -105,6 +105,7 @@ export function nextInaxTaskId(usedIds: readonly string[]): string {
 export type MeetingBotItem =
   | { kind: 'minutes'; key: string; at: number; meeting: Meeting; proposals: MeetingFollowUp[] }
   | { kind: 'assigned'; key: string; at: number; meeting: Meeting; task: MeetingTask }
+  | { kind: 'shared'; key: string; at: number; meeting: Meeting; byId: string }
 
 /** What the meeting bot has sent one person, oldest first. */
 export function botItemsFor(
@@ -125,6 +126,16 @@ export function botItemsFor(
         at: meeting.minutesSentAt,
         meeting,
         proposals: meeting.followUps.filter((followUp) => followUp.suggestedOwnerId === viewerId)
+      })
+    }
+    const share = meeting.shares.find((entry) => entry.personId === viewerId)
+    if (share) {
+      items.push({
+        kind: 'shared',
+        key: `shared:${meeting.id}`,
+        at: share.at,
+        meeting,
+        byId: share.byId
       })
     }
     for (const task of tasks) {

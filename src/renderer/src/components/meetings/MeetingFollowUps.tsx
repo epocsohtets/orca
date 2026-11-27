@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { toast } from 'sonner'
 import { useTranslate } from '@/i18n/use-translate'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -40,6 +41,7 @@ export function MeetingFollowUps({ meeting }: { meeting: Meeting }): React.JSX.E
     .filter((f) => followUpState(f, tasks).kind !== 'task' && !skipped.includes(f.id))
     .map((f) => ({ followUpId: f.id, assigneeId: ownerOf(f.id, f.suggestedOwnerId, f.declined) }))
     .filter((row) => row.assigneeId)
+  const ownerCount = new Set(batch.map((row) => row.assigneeId)).size
 
   return (
     <MeetingSection title={t('meetings.followUps.title', 'Follow-up tasks')}>
@@ -93,22 +95,26 @@ export function MeetingFollowUps({ meeting }: { meeting: Meeting }): React.JSX.E
                       </span>
                     ) : null}
                     {state.kind === 'task'
-                      ? `${personName(state.task.assigneeId)} · ${text.status[state.task.status]} · ${
+                      ? `${personName(state.task.assigneeId)} · ${
                           state.task.route === 'accepted'
                             ? t('meetings.followUps.accepted', 'Taken by the owner')
                             : t('meetings.followUps.assigned', 'Assigned by the host')
                         }`
-                      : state.kind === 'declined'
-                        ? t('meetings.followUps.declined', '{{name}} said it is not theirs', {
-                            name: owner
-                          })
-                        : t('meetings.followUps.proposed', 'Proposed to {{name}} · no answer yet', {
-                            name: owner
-                          })}
+                      : t('meetings.followUps.proposedTo', 'Proposed to {{name}}', { name: owner })}
                     {' · '}
                     {text.due(followUp.due)}
                   </p>
                 </div>
+                {/* The one state of the row, always in this column. */}
+                <span className="flex w-28 shrink-0 justify-start" data-meeting-follow-up-state="">
+                  <Badge variant={state.kind === 'declined' ? 'warning' : 'outline'}>
+                    {state.kind === 'task'
+                      ? text.status[state.task.status]
+                      : state.kind === 'declined'
+                        ? t('meetings.followUps.stateDeclined', 'Says not theirs')
+                        : t('meetings.followUps.stateWaiting', 'No answer yet')}
+                  </Badge>
+                </span>
                 <div className="flex shrink-0 flex-wrap items-center gap-1.5">
                   <Button
                     type="button"
@@ -198,8 +204,8 @@ export function MeetingFollowUps({ meeting }: { meeting: Meeting }): React.JSX.E
               toast.success(
                 t(
                   'meetings.followUps.assignedToast',
-                  '{{count}} tasks created in To do. The meeting bot tells each owner.',
-                  { count: batch.length }
+                  '{{count}} tasks created in To do. The meeting bot told {{people}} owners.',
+                  { count: batch.length, people: ownerCount }
                 )
               )
             }}
@@ -208,10 +214,11 @@ export function MeetingFollowUps({ meeting }: { meeting: Meeting }): React.JSX.E
               count: batch.length
             })}
           </Button>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-muted-foreground" data-meeting-assign-help="">
             {t(
-              'meetings.followUps.assignHelp',
-              'The agent drafted these from the meeting. Change an owner or untick a line that is wrong.'
+              'meetings.followUps.assignWho',
+              'The meeting bot tells the {{people}} owners. The agent drafted these: change an owner or untick a line that is wrong.',
+              { people: ownerCount }
             )}
           </p>
         </div>

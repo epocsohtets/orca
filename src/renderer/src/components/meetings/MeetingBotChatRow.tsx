@@ -43,7 +43,11 @@ export function MeetingBotChatRow(): React.JSX.Element {
             {last
               ? last.kind === 'minutes'
                 ? t('meetings.bot.rowMinutes', 'Minutes: {{title}}', { title: last.meeting.title })
-                : t('meetings.bot.rowTask', 'New task: {{title}}', { title: last.task.title })
+                : last.kind === 'shared'
+                  ? t('meetings.bot.rowShared', 'Shared minutes: {{title}}', {
+                      title: last.meeting.title
+                    })
+                  : t('meetings.bot.rowTask', 'New task: {{title}}', { title: last.task.title })
               : t('meetings.bot.rowEmpty', 'Minutes and your tasks arrive here')}
           </span>
           {unread > 0 ? (

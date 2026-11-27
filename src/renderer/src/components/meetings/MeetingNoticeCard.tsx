@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { useAppStore } from '@/store'
 import { openMeeting, openMeetingBot } from './meeting-navigation'
+import { personName } from './meeting-people'
 import { botItemsFor, isParticipant } from './meeting-rules'
 import { useMeetingText } from './MeetingParts'
 import { isSeen, markSeen, scenarioNow, useMeetings } from './meetings-store'
@@ -31,33 +32,71 @@ export function MeetingNoticeCard(): React.JSX.Element | null {
       !isSeen(state, `notice:soon:${m.id}`)
   )
   const item = onBotPage ? undefined : unread.at(-1)
-  if (!item && !soon) {
-    return null
-  }
-  const notice = item
+  // Recording that someone else started on a meeting I am in.
+  const recording = state.meetings.find(
+    (m) =>
+      m.recordingStartedAt !== null &&
+      m.hostId !== state.viewerId &&
+      isParticipant(m, state.viewerId) &&
+      !isSeen(state, `notice:recording:${m.id}:${m.recordingStartedAt}`)
+  )
+  const asked = state.meetings
+    .filter((m) => m.hostId === state.viewerId)
+    .flatMap((m) => m.requests.filter((r) => !r.declined).map((r) => ({ meeting: m, request: r })))
+    .find(
+      ({ meeting, request }) => !isSeen(state, `notice:request:${meeting.id}:${request.personId}`)
+    )
+  const bot = <Bot aria-hidden className="size-4 text-muted-foreground" />
+  const notice = recording
     ? {
-        key: `notice:${item.key}`,
-        icon: <Bot aria-hidden className="size-4 text-muted-foreground" />,
-        title:
-          item.kind === 'minutes'
-            ? t('meetings.notice.minutesTitle', 'Meeting bot: the minutes are here')
-            : t('meetings.notice.taskTitle', 'Meeting bot: a task was assigned to you'),
-        body: item.kind === 'minutes' ? item.meeting.title : item.task.title,
-        action: t('meetings.notice.openMessage', 'Open the message'),
-        run: openMeetingBot
+        key: `notice:recording:${recording.id}:${recording.recordingStartedAt}`,
+        icon: <span aria-hidden className="size-2 rounded-full bg-destructive" />,
+        title: t('meetings.notice.recordingTitle', 'Recording has started'),
+        body: t(
+          'meetings.notice.recordingBody',
+          '{{name}} is recording “{{title}}”. It stays in the status bar until it ends.',
+          { name: personName(recording.hostId), title: recording.title }
+        ),
+        action: t('meetings.chat.open', 'Open the meeting'),
+        run: () => openMeeting(recording.id)
       }
-    : soon
+    : item
       ? {
-          key: `notice:soon:${soon.id}`,
-          icon: <CalendarClock aria-hidden className="size-4 text-muted-foreground" />,
-          title: t('meetings.notice.soonTitle', 'Starts in {{count}} minutes', {
-            count: Math.max(1, Math.round((soon.startsAt - now) / 60_000))
-          }),
-          body: `${soon.title} · ${text.time(soon.startsAt)}${soon.place ? ` · ${soon.place}` : ''}`,
-          action: t('meetings.notice.openOutline', 'Read the outline'),
-          run: () => openMeeting(soon.id)
+          key: `notice:${item.key}`,
+          icon: bot,
+          title:
+            item.kind === 'minutes'
+              ? t('meetings.notice.minutesTitle', 'Meeting bot: the minutes are here')
+              : item.kind === 'shared'
+                ? t('meetings.notice.sharedTitle', 'Meeting bot: minutes were shared with you')
+                : t('meetings.notice.taskTitle', 'Meeting bot: a task was assigned to you'),
+          body: item.kind === 'assigned' ? item.task.title : item.meeting.title,
+          action: t('meetings.notice.openMessage', 'Open the message'),
+          run: openMeetingBot
         }
-      : null
+      : asked
+        ? {
+            key: `notice:request:${asked.meeting.id}:${asked.request.personId}`,
+            icon: bot,
+            title: t('meetings.notice.requestTitle', '{{name}} asks to see the minutes', {
+              name: personName(asked.request.personId)
+            }),
+            body: asked.meeting.title,
+            action: t('meetings.notice.openRequest', 'See the request'),
+            run: () => openMeeting(asked.meeting.id, { depth: 'brief' })
+          }
+        : soon
+          ? {
+              key: `notice:soon:${soon.id}`,
+              icon: <CalendarClock aria-hidden className="size-4 text-muted-foreground" />,
+              title: t('meetings.notice.soonTitle', 'Starts in {{count}} minutes', {
+                count: Math.max(1, Math.round((soon.startsAt - now) / 60_000))
+              }),
+              body: `${soon.title} · ${text.time(soon.startsAt)}${soon.place ? ` · ${soon.place}` : ''}`,
+              action: t('meetings.notice.openOutline', 'Read the outline'),
+              run: () => openMeeting(soon.id)
+            }
+          : null
   if (!notice) {
     return null
   }

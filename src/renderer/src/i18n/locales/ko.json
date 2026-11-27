@@ -29025,12 +29025,7 @@
     "signIn": "로그인"
   },
   "meetings": {
-    "chat": {
-      "setUp": "{{name}} 님이 회의를 잡았습니다: {{title}}",
-      "open": "회의 열기"
-    },
     "recording": {
-      "status": "녹음 중 · {{time}}",
       "statusAria": "{{title}}을(를) 녹음하고 있습니다. 회의를 엽니다.",
       "on": "녹음 중",
       "everyoneSees": "회의에 있는 {{count}}명 모두에게 이 표시가 보입니다.",
@@ -29044,6 +29039,7 @@
     "title": "회의",
     "schedule": "회의 잡기",
     "close": "회의 닫기",
+    "demo": "데모",
     "viewer": "보는 사람: {{name}}",
     "reset": "예시 데이터를 처음으로 되돌리기",
     "pane": {
@@ -29062,6 +29058,8 @@
       "datePast": "오늘이나 그 뒤의 날짜를 고르세요.",
       "timeRequired": "시작 시각을 입력하세요.",
       "attendeesRequired": "참석자를 한 명 이상 고르세요.",
+      "chatMembers": "“{{name}}”의 멤버",
+      "otherPeople": "다른 사람 추가",
       "heading": "회의 잡기",
       "fromChat": "채팅 “{{name}}”에서 잡는 회의입니다. 회의는 이 채팅과 연결되지만, 따로 관리됩니다.",
       "intro": "참석자의 일정에 들어가고, 참석자는 개요를 미리 읽습니다.",
@@ -29089,10 +29087,19 @@
       "yesterday": "어제"
     },
     "due": "기한 {{date}}",
+    "elapsed": {
+      "hours": "{{h}}시간 {{m}}분",
+      "minutes": "{{m}}분 {{s}}초",
+      "seconds": "{{s}}초"
+    },
     "status": {
       "todo": "할 일",
       "inProgress": "진행 중",
       "done": "완료"
+    },
+    "chat": {
+      "setUp": "{{name}} 님이 회의를 잡았습니다: {{title}}",
+      "open": "회의 열기"
     },
     "save": "저장",
     "prep": {
@@ -29107,55 +29114,63 @@
       "minutesReady": "**{{title}}** 회의록이 준비됐습니다.",
       "proposalsFollow": "아래는 내 몫으로 보이는 일입니다. 받으면 “할 일” 상태의 내 업무가 됩니다.",
       "noProposals": "이 회의에서 내 몫으로 보이는 일은 없습니다.",
+      "sharedMessage": "{{name}} 님이 **{{title}}** 회의록 전체를 공유했습니다. 이 회의에는 참석하지 않으셨습니다.",
       "assignedMessage": "{{name}} 님이 **{{title}}**에서 나온 업무를 할당했습니다. 회의에 참석하지 않으셔서, 이 일이 나온 부분을 함께 보냅니다.",
       "name": "회의 bot",
       "askAbout": "“{{title}}”에 대해 묻기",
       "askNone": "회의록을 받은 뒤에 물을 수 있습니다",
       "about": "{{name}} 님에게 회의록과 내 몫으로 보이는 업무를 보냅니다",
+      "aboutOutside": "{{name}} 님에게 할당된 업무와 그 일이 나온 부분을 보냅니다. 회의록 전체는 카드에서 요청하면 볼 수 있습니다.",
       "sample": "예시 대화",
       "emptyTitle": "아직 받은 메시지가 없습니다",
       "emptyDetail": "참석한 회의의 녹음이 끝나면 회의록이 여기로 옵니다. 회의에서 나에게 할당된 업무도 여기로 옵니다.",
       "minutesCard": "회의록",
       "openMinutes": "회의록 열기",
+      "sharedBy": "{{name}} 님이 공유함",
       "sentTo": "회의에 있던 {{count}}명 모두에게 보냄",
       "givenToOther": "{{name}} 님에게 할당됨",
       "taken": "내 업무 · {{status}}",
       "assignedByHost": "{{name}} 님이 할당함 · {{status}}",
       "declined": "내 몫이 아니라고 답함",
       "proposalCard": "내 몫으로 보이는 일",
+      "choiceHelp": "“받기”를 누르면 “할 일” 상태의 내 업무가 됩니다. “아님”을 누르면 {{name}} 님에게 “내 몫이 아님”으로 보이고, 주최자가 다른 사람에게 줄 수 있습니다.",
+      "declinedHelp": "{{name}} 님의 회의록 화면에 “내 몫 아님”으로 보입니다.",
+      "assignedHelp": "주최자인 {{name}} 님이 할당했습니다. 받기 단계는 없습니다.",
       "assignedCard": "“{{title}}”에서 나온 내 업무",
       "rowMinutes": "회의록: {{title}}",
+      "rowShared": "공유받은 회의록: {{title}}",
       "rowTask": "새 업무: {{title}}",
       "rowEmpty": "회의록과 내 업무가 여기로 옵니다"
     },
     "source": "근거 문장 보기",
     "ask": {
       "send": "묻기",
+      "noAnswer": "이 회의에서 그 내용은 찾지 못했습니다. 회의에서 나온 낱말로 다시 묻거나, 전체 전사문에서 찾아보세요.",
       "label": "이 회의에 대해 회의 bot에게 묻기",
-      "suggestions": "예를 들면:",
-      "noAnswer": "이 회의에서 그 내용은 찾지 못했습니다. 회의에서 나온 낱말로 다시 묻거나, 전체 전사문에서 찾아보세요."
+      "suggestions": "예를 들면:"
     },
     "followUps": {
-      "mine": "내 몫",
       "title": "후속 업무",
       "counts": "모두 {{total}}개 · 할 일 {{todo}} · 진행 중 {{inProgress}} · 완료 {{done}} · 아직 업무가 아님 {{open}}",
       "include": "“{{text}}”을(를) 업무로 만들기",
+      "mine": "내 몫",
       "accepted": "본인이 받음",
       "assigned": "주최자가 할당함",
-      "declined": "{{name}} 님이 내 몫이 아니라고 답함",
-      "proposed": "{{name}} 님에게 제안함 · 아직 답이 없음",
+      "proposedTo": "{{name}} 님에게 제안함",
+      "stateDeclined": "내 몫 아님",
+      "stateWaiting": "답 기다리는 중",
       "owner": "“{{text}}”의 담당자",
       "chooseOwner": "담당자 고르기",
-      "assignedToast": "업무 {{count}}개를 “할 일” 상태로 만들었습니다. 회의 bot이 담당자에게 알립니다.",
+      "assignedToast": "업무 {{count}}개를 “할 일” 상태로 만들었습니다. 회의 bot이 담당자 {{people}}명에게 알렸습니다.",
       "assignAll": "업무 {{count}}개 만들고 할당하기",
-      "assignHelp": "에이전트가 회의에서 뽑은 초안입니다. 틀린 줄만 담당자를 바꾸거나 체크를 푸세요."
+      "assignWho": "담당자 {{people}}명에게 회의 bot이 알립니다. 에이전트가 뽑은 초안이니, 틀린 줄만 담당자를 바꾸거나 체크를 푸세요."
     },
     "openTask": "업무 열기",
     "notMine": "아님",
     "accept": "받기",
     "acceptAfterAll": "다시 받기",
     "excerpt": {
-      "scope": "이 회의에 참석하지 않아서, 내 업무와 그 업무가 나온 부분만 보입니다. 회의록 전체는 참석자가 공유하면 볼 수 있습니다.",
+      "scope": "이 회의에 참석하지 않아서, 내 업무와 그 업무가 나온 부분만 보입니다. 회의록 전체는 주최자나 참석자가 공유하면 볼 수 있습니다.",
       "task": "내 업무",
       "assignedBy": "{{name}} 님이 할당함"
     },
@@ -29163,6 +29178,12 @@
     "detail": {
       "people": "주최 {{host}} · 참석 {{attendees}}",
       "origin": "채팅 “{{name}}”에서 잡은 회의"
+    },
+    "response": {
+      "yes": "참석",
+      "no": "불참",
+      "none": "답 없음",
+      "label": "“{{title}}”에 참석하나요?"
     },
     "minutes": {
       "depth": "얼마나 읽을지",
@@ -29177,6 +29198,18 @@
       "turns": "발언 {{total}}개",
       "notFound": "맞는 발언이 없습니다. 더 짧은 낱말로 찾아보세요."
     },
+    "share": {
+      "done": "회의 bot이 {{name}} 님에게 회의록 전체의 링크를 보냈습니다.",
+      "scope": "회의에 있던 {{count}}명이 회의록 전체를 봅니다. 참석하지 않은 담당자는 자기 업무와 그 근거 문장만 봅니다.",
+      "sharedWith": "링크로 공유한 사람: {{names}}.",
+      "button": "링크 공유",
+      "request": "{{name}} 님이 회의록 전체를 보고 싶어 합니다.",
+      "decline": "나중에",
+      "approve": "승인",
+      "requestDeclined": "{{name}} 님이 회의록 전체를 공유하지 않았습니다.",
+      "requested": "요청했습니다. {{name}} 님의 회의록 화면에 요청이 보입니다.",
+      "requestButton": "회의록 보기 요청"
+    },
     "agenda": {
       "previousWeek": "이전 주",
       "thisWeek": "이번 주",
@@ -29185,22 +29218,28 @@
       "host": "주최 {{name}}"
     },
     "state": {
-      "myTasks": "여기서 나온 내 업무 {{count}}개",
       "recording": "지금 녹음 중",
       "scheduled": "예정",
       "minutes": "회의록 있음",
-      "minutesFollowUps": "회의록 있음 · 후속 업무 {{total}}개 중 {{done}}개 완료"
+      "minutesFollowUps": "회의록 있음 · 후속 업무 {{total}}개 중 {{done}}개 완료",
+      "myTasks": "여기서 나온 내 업무 {{count}}개"
     },
     "list": {
+      "shared": "공유받은 회의록",
       "hosting": "내가 주최한 회의",
       "attending": "내가 참석하는 회의",
       "assigned": "내 업무가 나온 회의",
       "empty": "아직 회의가 없습니다. 주최하거나 초대받은 회의가 여기와 내 일정에 나타납니다."
     },
     "notice": {
+      "recordingTitle": "녹음이 시작됐습니다",
+      "recordingBody": "{{name}} 님이 “{{title}}”을(를) 녹음하고 있습니다. 끝날 때까지 아래 상태 줄에 표시됩니다.",
       "minutesTitle": "회의 bot: 회의록이 도착했습니다",
+      "sharedTitle": "회의 bot: 회의록을 공유받았습니다",
       "taskTitle": "회의 bot: 새 업무가 할당됐습니다",
       "openMessage": "메시지 열기",
+      "requestTitle": "{{name}} 님의 회의록 보기 요청",
+      "openRequest": "요청 보기",
       "soonTitle": "{{count}}분 뒤에 시작합니다",
       "openOutline": "개요 읽기",
       "dismiss": "닫기"

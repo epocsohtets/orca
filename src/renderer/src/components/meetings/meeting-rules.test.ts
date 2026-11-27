@@ -51,6 +51,9 @@ const meeting = (followUps: MeetingFollowUp[]): Meeting => ({
   minutes: { summary: ['', ''], decisions: [], topics: [], transcript: [] },
   minutesSentAt: 10,
   followUps,
+  responses: {},
+  shares: [],
+  requests: [],
   sample: 'generic'
 })
 
@@ -85,6 +88,10 @@ describe('meeting rules', () => {
     expect(botItemsFor('ann', [m], tasks).map((item) => item.key)).toEqual(['minutes:m'])
     expect(botItemsFor('cho', [m], tasks).map((item) => item.key)).toEqual(['assigned:INAX-2'])
     expect(botItemsFor('dan', [m], tasks)).toEqual([])
+    // A link share gives the full minutes and one message with the link.
+    const shared = { ...m, shares: [{ personId: 'dan', byId: 'host', at: 30 }] }
+    expect(meetingAccess(shared, 'dan', tasks)).toBe('full')
+    expect(botItemsFor('dan', [shared], tasks).map((item) => item.key)).toEqual(['shared:m'])
   })
 
   it('keeps the source turn with one turn each side', () => {

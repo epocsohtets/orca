@@ -13,9 +13,9 @@ import { cn } from '@/lib/class-names'
 import { openMeetingTask } from './meeting-navigation'
 import { personName } from './meeting-people'
 import { excerptAround, meetingAccess } from './meeting-rules'
-import { formatElapsed } from './meeting-schedule'
 import { MeetingMinutes } from './MeetingMinutes'
 import { MeetingSection, useMeetingText } from './MeetingParts'
+import { MinutesRequestControl, MinutesSharing } from './MeetingSharing'
 import { MeetingPrep } from './MeetingPrep'
 import { MeetingTranscript } from './MeetingTranscript'
 import type { Meeting } from './meeting-types'
@@ -43,6 +43,7 @@ function RecordingStrip({
   isHost: boolean
 }): React.JSX.Element {
   const t = useTranslate()
+  const text = useMeetingText()
   const elapsed = useElapsedSeconds(meeting.recordingStartedAt)
   const recording = meeting.recordingStartedAt !== null
   const people = meeting.attendeeIds.length + 1
@@ -63,7 +64,7 @@ function RecordingStrip({
                 {t('meetings.recording.on', 'Recording')}
               </span>
               <span role="timer" className="font-mono text-xs text-muted-foreground tabular-nums">
-                {formatElapsed(elapsed)}
+                {text.elapsed(elapsed)}
               </span>
               <span className="text-xs text-muted-foreground">
                 {t(
@@ -140,12 +141,15 @@ function MeetingExcerpt({ meeting }: { meeting: Meeting }): React.JSX.Element {
         RAIL_PAGE_GUTTER_X
       )}
     >
-      <p className="max-w-prose text-xs text-muted-foreground">
-        {t(
-          'meetings.excerpt.scope',
-          'You were not in this meeting, so you see your task and the part of the meeting it came from. An attendee can share the full minutes with you.'
-        )}
-      </p>
+      <div className="flex max-w-prose flex-col items-start gap-2">
+        <p className="text-xs text-muted-foreground">
+          {t(
+            'meetings.excerpt.scope',
+            'You were not in this meeting, so you see your task and the part of the meeting it came from. The host or an attendee can share the full minutes with you.'
+          )}
+        </p>
+        <MinutesRequestControl meeting={meeting} />
+      </div>
       {mine.map((task) => {
         const followUp = meeting.followUps.find((f) => f.id === task.followUpId)
         const turnId = followUp?.turnId ?? ''
@@ -173,6 +177,7 @@ function MeetingExcerpt({ meeting }: { meeting: Meeting }): React.JSX.Element {
             </p>
             <MeetingTranscript
               turns={excerptAround(meeting.minutes?.transcript ?? [], [turnId])}
+              startsAt={meeting.startsAt}
               markedTurnId={turnId}
               markNonce={focus?.nonce}
             />
@@ -227,10 +232,23 @@ export function MeetingDetail({
               {text.when(meeting)}
               {meeting.place ? ` · ${meeting.place}` : ''}
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground" data-meeting-people="">
               {t('meetings.detail.people', 'Host {{host}} · Attendees {{attendees}}', {
                 host: personName(meeting.hostId),
-                attendees: meeting.attendeeIds.map(personName).join(', ')
+                // Before the meeting each name carries the answer to the invitation.
+                attendees: meeting.attendeeIds
+                  .map((id) =>
+                    meeting.minutes || meeting.recordingStartedAt !== null
+                      ? personName(id)
+                      : `${personName(id)} (${
+                          meeting.responses[id] === 'yes'
+                            ? t('meetings.response.yes', 'Coming')
+                            : meeting.responses[id] === 'no'
+                              ? t('meetings.response.no', 'Not coming')
+                              : t('meetings.response.none', 'No answer')
+                        })`
+                  )
+                  .join(', ')
               })}
             </p>
             {origin && access === 'full' ? (
@@ -253,6 +271,7 @@ export function MeetingDetail({
         {access === 'full' && !meeting.minutes ? (
           <RecordingStrip meeting={meeting} isHost={isHost} />
         ) : null}
+        {access === 'full' && meeting.minutes ? <MinutesSharing meeting={meeting} /> : null}
       </div>
       {access !== 'full' ? (
         <MeetingExcerpt meeting={meeting} />

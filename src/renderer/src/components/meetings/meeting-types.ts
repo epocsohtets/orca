@@ -46,6 +46,12 @@ export type Meeting = {
   /** When the meeting bot sent the minutes to every attendee. */
   minutesSentAt: number | null
   followUps: MeetingFollowUp[]
+  /** Attendees' answers to the invitation; no entry means no answer yet. */
+  responses: Record<string, 'yes' | 'no'>
+  /** People outside the meeting who were given the full minutes by link. */
+  shares: { personId: string; byId: string; at: number }[]
+  /** People outside the meeting who asked the host for the full minutes. */
+  requests: { personId: string; declined: boolean }[]
   /** Which prepared sample the simulated recording produces. */
   sample: 'promo' | 'generic'
 }

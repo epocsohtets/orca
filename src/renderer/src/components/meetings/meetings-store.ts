@@ -31,6 +31,8 @@ type MeetingsState = {
   focus: { meetingId: string; turnId: string; nonce: number } | null
   /** The task row the Tasks view should mark after a jump from a meeting. */
   focusTaskId: string | null
+  /** Counts what happened after a meeting, so later messages sort after earlier ones. */
+  tick: number
 }
 
 function initialState(): MeetingsState {
@@ -50,7 +52,8 @@ function initialState(): MeetingsState {
     composing: null,
     depth: 'brief',
     focus: null,
-    focusTaskId: null
+    focusTaskId: null,
+    tick: 0
   }
 }
 
@@ -58,7 +61,9 @@ function initialState(): MeetingsState {
 export const useMeetings = create<MeetingsState>()(
   persist(initialState, {
     name: 'orca.poc.meetings.v2',
-    version: 1,
+    version: 2,
+    // The sample's shape changed; an older saved sample starts over.
+    migrate: () => initialState(),
     partialize: ({ focus: _focus, focusTaskId: _task, composing: _composing, ...kept }) => kept
   })
 )
@@ -119,7 +124,10 @@ export function scheduleMeeting({ startNow, ...input }: ScheduleInput): string {
         recordingStartedAt: startNow ? Date.now() : null,
         minutes: null,
         minutesSentAt: null,
-        followUps: []
+        followUps: [],
+        responses: {},
+        shares: [],
+        requests: []
       }
     ],
     selectedId: id,
@@ -175,11 +183,11 @@ function createTasks(
         followUpId: followUp.id,
         route,
         createdAt:
-          (meeting.minutesSentAt ?? meeting.endsAt) +
-          (state.tasks.length + created.length + 1) * MINUTE
+          (meeting.minutesSentAt ?? meeting.endsAt) + (state.tick + created.length + 1) * MINUTE
       })
     }
     return {
+      tick: state.tick + created.length,
       tasks: [...state.tasks, ...created],
       meetings: state.meetings.map((m) =>
         m.id === meetingId
@@ -248,4 +256,46 @@ export function askMeetingBot(meetingId: string, question: string, fallback: str
       ]
     }
   })
+}
+
+/** Answers an invitation; the host sees it on the meeting. */
+export function respondToInvitation(meetingId: string, answer: 'yes' | 'no'): void {
+  const { viewerId } = get()
+  patchMeeting(meetingId, (m) => ({ responses: { ...m.responses, [viewerId]: answer } }))
+}
+
+/** Gives someone who was not in the meeting the full minutes; the meeting bot sends them the link. */
+export function shareMinutes(meetingId: string, personId: string): void {
+  const { viewerId, tick } = get()
+  patchMeeting(meetingId, (m) =>
+    m.shares.some((entry) => entry.personId === personId)
+      ? {}
+      : {
+          shares: [
+            ...m.shares,
+            { personId, byId: viewerId, at: (m.minutesSentAt ?? m.endsAt) + (tick + 1) * MINUTE }
+          ],
+          requests: m.requests.filter((entry) => entry.personId !== personId)
+        }
+  )
+  set({ tick: tick + 1 })
+}
+
+/** An assignee who was not in the meeting asks its host for the full minutes. */
+export function requestMinutes(meetingId: string): void {
+  const { viewerId } = get()
+  patchMeeting(meetingId, (m) => ({
+    requests: [
+      ...m.requests.filter((entry) => entry.personId !== viewerId),
+      { personId: viewerId, declined: false }
+    ]
+  }))
+}
+
+export function declineMinutesRequest(meetingId: string, personId: string): void {
+  patchMeeting(meetingId, (m) => ({
+    requests: m.requests.map((entry) =>
+      entry.personId === personId ? { ...entry, declined: true } : entry
+    )
+  }))
 }

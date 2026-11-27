@@ -27,6 +27,9 @@ const meeting = (
   minutes: null,
   minutesSentAt: null,
   followUps: [],
+  responses: {},
+  shares: [],
+  requests: [],
   sample: 'generic',
   ...patch
 })
