@@ -24,6 +24,8 @@ import { addAppKeyListener, removeAppKeyListener } from '@/lib/keyboard/app-keyb
 import { useScrollEdgeFades } from '@/lib/list-interaction/use-scroll-edge-fades'
 import { AgentSurfaceStep } from './AgentSurfaceStep'
 import { WorkStyleStep } from './WorkStyleStep'
+import { InaxStep } from './InaxStep'
+import { useInaxMockAccount } from '@/lib/inax-mock-account'
 import { stepCopy, stepTooltipLabels } from './onboarding-step-copy'
 
 type OnboardingFlowProps = {
@@ -45,12 +47,16 @@ export default function OnboardingFlow({
       ? stepCopy.agent_chat
       : stepCopy[currentStep.id]
   const shouldShowSetUpLater = currentStep.id !== 'notifications'
+  const inaxSignedIn = useInaxMockAccount((state) => state.signedIn)
+  const onInaxPage = currentStep.id === 'inax'
   const shouldShowFooterBusy = Boolean(busyLabel)
   const footerPrimaryLabel =
     busyLabel ??
-    (currentStep.id === 'notifications' && !flow.hasSelectedWorkspace
-      ? t('components.onboarding.flow.actions.addFirstProject', 'Add your first project')
-      : t('components.onboarding.flow.actions.continue', 'Continue'))
+    (onInaxPage
+      ? t('taskLoop.onboarding.start', 'Start')
+      : currentStep.id === 'notifications' && !flow.hasSelectedWorkspace
+        ? t('components.onboarding.flow.actions.addFirstProject', 'Add your first project')
+        : t('components.onboarding.flow.actions.continue', 'Continue'))
   const languageOffer = useOnboardingLanguageOffer(onboarding.lastCompletedStep)
   const [languagePickerOpen, setLanguagePickerOpen] = useState(false)
   const [skipConfirmOpen, setSkipConfirmOpen] = useState(false)
@@ -225,6 +231,7 @@ export default function OnboardingFlow({
               {currentStep.id === 'work_style' && flow.settings ? (
                 <WorkStyleStep settings={flow.settings} updateSettings={flow.updateSettings} />
               ) : null}
+              {onInaxPage ? <InaxStep signedIn={inaxSignedIn} /> : null}
               {currentStep.id === 'agent_surface' && (
                 <AgentSurfaceStep
                   agentSurface={flow.agentSurface}
@@ -274,12 +281,17 @@ export default function OnboardingFlow({
             </div>
 
             <OnboardingFooter
-              shouldShowSetUpLater={shouldShowSetUpLater}
+              // Signed in, the only way on is Start.
+              shouldShowSetUpLater={shouldShowSetUpLater && !(onInaxPage && inaxSignedIn)}
+              setUpLaterLabel={
+                onInaxPage ? t('taskLoop.onboarding.skip', 'Skip for now') : undefined
+              }
               busyLabel={busyLabel}
               onSetUpLater={() => void flow.setUpLater()}
               stepIndex={stepIndex}
               onBack={flow.back}
-              showPrimary
+              // Signed out, the page's own sign-in button is the one primary action.
+              showPrimary={!onInaxPage || inaxSignedIn}
               primaryBusy={shouldShowFooterBusy}
               primaryLabel={footerPrimaryLabel}
               shortcutModifierLabel={continueShortcutModifierLabel}

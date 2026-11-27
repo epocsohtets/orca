@@ -8,7 +8,18 @@ export const stepCopy = {
     get subtitle() {
       return translate(
         'workStyles.onboarding.subtitle',
-        'Choose all that apply. Orca shows only the setup you need.'
+        'Choose all that apply. The first screens follow what you choose.'
+      )
+    }
+  },
+  inax: {
+    get title() {
+      return translate('taskLoop.onboarding.title', 'Sign in to inAX')
+    },
+    get subtitle() {
+      return translate(
+        'taskLoop.onboarding.subtitle',
+        'inAX is the team’s work tracker. Sign in and the work assigned to you appears in this app.'
       )
     }
   },
@@ -113,6 +124,11 @@ export const stepTooltipLabels = {
   work_style: {
     get value() {
       return translate('workStyles.title', 'How you work')
+    }
+  },
+  inax: {
+    get value() {
+      return translate('taskLoop.onboarding.title', 'Sign in to inAX')
     }
   },
   agent_surface: {

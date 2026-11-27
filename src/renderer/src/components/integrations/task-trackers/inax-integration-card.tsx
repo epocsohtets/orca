@@ -1,26 +1,20 @@
 import { Hexagon, Unlink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useTranslate } from '@/i18n/use-translate'
-import { INAX_MOCK_ACCOUNT, useInaxMockAccount } from '@/lib/inax-mock-account'
-import { defaultScopeHost } from '@/runtime/hosts/selection/default-creation-host'
-import { useAppStore } from '@/store/index'
+import { INAX_MOCK_ACCOUNT, signInInaxMock, useInaxMockAccount } from '@/lib/inax-mock-account'
 import {
   IntegrationCardDetails,
   IntegrationCardShell
 } from '../presentation/integration-card-shell'
 import { useIntegrationSubordinateRowClass } from '../presentation/integration-card-presentation'
-import { useProviderAccountScope } from '../../provider-accounts/use-provider-host-scope'
-import { ProviderHostScopeControl } from '../../provider-accounts/ProviderHostScopeControl'
+import { openInaxTask } from '@/components/task-page/inax/inax-source-selection'
 import { INAX_INTEGRATION_SECTION_ID } from './task-provider-integration-section-ids'
 
-/** PoC: mock inAX sign-in shaped like the Linear/Jira cards. No network, no credentials. */
+/** PoC: the mock inAX account, shaped like the Linear/Jira cards: see it, go to its tasks, disconnect it. */
 export function InaxIntegrationCard(): React.JSX.Element {
   const t = useTranslate()
   const connected = useInaxMockAccount((state) => state.signedIn)
-  const settings = useAppStore((s) => s.settings)
-  const accountScope = useProviderAccountScope(defaultScopeHost(settings))
   const subordinateRowClass = useIntegrationSubordinateRowClass('flex items-center gap-3')
-  const accountScopeRowClass = useIntegrationSubordinateRowClass('text-xs')
 
   return (
     <IntegrationCardShell
@@ -31,8 +25,8 @@ export function InaxIntegrationCard(): React.JSX.Element {
         connected
           ? t('auto.components.settings.inaxAccount.providerConnected', '1 account connected')
           : t(
-              'auto.components.settings.inaxAccount.providerDescription',
-              'Sign in with inAX to browse and start work from your inAX tasks.'
+              'taskLoop.settings.cardDescription',
+              'inAX is the team’s work tracker. Sign in and your tasks appear on Home and in Tasks.'
             )
       }
       statusTone={connected ? 'connected' : 'attention'}
@@ -48,22 +42,18 @@ export function InaxIntegrationCard(): React.JSX.Element {
             )
       }
       actions={
-        connected ? null : (
-          <Button size="sm" onClick={() => useInaxMockAccount.setState({ signedIn: true })}>
+        connected ? (
+          <Button size="sm" variant="outline" onClick={() => openInaxTask(null)}>
+            {t('taskLoop.settings.viewTasks', 'See my work')}
+          </Button>
+        ) : (
+          <Button size="sm" onClick={signInInaxMock}>
             {t('auto.components.settings.inaxAccount.signIn', 'Sign in with inAX')}
           </Button>
         )
       }
     >
       <IntegrationCardDetails>
-        <ProviderHostScopeControl
-          labelPrefix={t(
-            'auto.components.settings.task.tracker.integration.cards.account_scope_prefix',
-            'Account scope'
-          )}
-          scope={accountScope}
-          className={accountScopeRowClass}
-        />
         {connected ? (
           <div className={subordinateRowClass}>
             <div className="min-w-0 flex-1">
@@ -79,7 +69,7 @@ export function InaxIntegrationCard(): React.JSX.Element {
                 'Disconnect {{value0}}',
                 { value0: INAX_MOCK_ACCOUNT.name }
               )}
-              className="rounded-md p-1 text-muted-foreground/50 transition-colors hover:text-destructive"
+              className="rounded-md p-1 text-muted-foreground transition-colors hover:text-destructive"
             >
               <Unlink className="size-3.5" />
             </button>
@@ -87,8 +77,8 @@ export function InaxIntegrationCard(): React.JSX.Element {
         ) : (
           <p className="text-xs text-muted-foreground">
             {t(
-              'auto.components.settings.inaxAccount.providerCredentialCopy',
-              'Sign in with your inAX account. This preview uses a sample account: nothing is sent or stored, and the sign-in resets when Orca reloads.'
+              'taskLoop.onboarding.sample',
+              'This preview signs in with a sample account. Nothing is sent to inAX.'
             )}
           </p>
         )}

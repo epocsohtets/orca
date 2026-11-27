@@ -3,6 +3,8 @@ import { useTranslate } from '@/i18n/use-translate'
 
 type OnboardingFooterProps = {
   shouldShowSetUpLater: boolean
+  /** Replaces "Set up later" where leaving the page has a plainer name. */
+  setUpLaterLabel?: string
   busyLabel: string | null
   onSetUpLater: () => void
   stepIndex: number
@@ -16,6 +18,7 @@ type OnboardingFooterProps = {
 
 export function OnboardingFooter({
   shouldShowSetUpLater,
+  setUpLaterLabel,
   busyLabel,
   onSetUpLater,
   stepIndex,
@@ -35,7 +38,8 @@ export function OnboardingFooter({
           disabled={Boolean(busyLabel)}
           onClick={onSetUpLater}
         >
-          {t('auto.components.onboarding.OnboardingFooter.111d3f8d92', 'Set up later')}
+          {setUpLaterLabel ??
+            t('auto.components.onboarding.OnboardingFooter.111d3f8d92', 'Set up later')}
         </button>
       ) : (
         <span />

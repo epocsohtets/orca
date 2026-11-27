@@ -4632,11 +4632,7 @@
           "linearViewRestoreFailed": "Failed to restore saved Linear view."
         },
         "shownCount_one": "{{count}} shown",
-        "inaxSource": "inAX",
-        "inaxSampleData": "inAX · sample data",
-        "inaxStatusOpen": "Open",
-        "inaxStatusInProgress": "In progress",
-        "inaxSignedOut": "Sign in with inAX to see your tasks"
+        "inaxSource": "inAX"
       },
       "Terminal": {
         "73768427cf": "Close",
@@ -13992,9 +13988,7 @@
         },
         "inaxAccount": {
           "signIn": "Sign in with inAX",
-          "providerConnected": "1 account connected",
-          "providerDescription": "Sign in with inAX to browse and start work from your inAX tasks.",
-          "providerCredentialCopy": "Sign in with your inAX account. This preview uses a sample account: nothing is sent or stored, and the sign-in resets when Orca reloads."
+          "providerConnected": "1 account connected"
         },
         "orcaAccount": {
           "connected": "Connected",
@@ -26629,7 +26623,7 @@
     },
     "onboarding": {
       "title": "How do you work?",
-      "subtitle": "Choose all that apply. Orca shows only the setup you need.",
+      "subtitle": "Choose all that apply. The first screens follow what you choose.",
       "switchNote": "Nothing chosen shows everything. Change any time in <em>Settings → General</em>."
     }
   },
@@ -31569,7 +31563,6 @@
       "stageOf": "{{stage}}, step {{step}} of 3",
       "answerInTask": "Answer it",
       "showTask": "Show its task",
-      "openChat": "Open a bot chat",
       "sampleChat": "Sample agent: these are the last lines of its conversation."
     },
     "header": {
@@ -31596,9 +31589,8 @@
     },
     "firstRun": {
       "title": "Start here",
-      "inax": "Connect inAX so your work appears here",
-      "inaxDetail": "inAX is the team’s work tracker: your tasks, deadlines and what waits on you",
-      "connect": "Connect",
+      "inax": "Sign in with inAX (the team’s work tracker) so your work appears here",
+      "inaxDetail": "Your tasks, their deadlines and what waits on you",
       "app": "Register an app you work in",
       "appDetail": "Optional. Its time joins My day, which only you see",
       "register": "Register"
@@ -31649,7 +31641,7 @@
       "label": "Task title",
       "placeholder": "For example: book the photo studio",
       "error": "Type a title for the task, then press Add.",
-      "hintAgent": "Sample: the task joins My work as “Agent working”. No real agent starts.",
+      "hintAgent": "The task joins My work, and its conversation with the agent opens.",
       "hint": "It is added to My work, due today, in the sample board.",
       "add": "Add"
     },
@@ -31664,9 +31656,7 @@
       "emptyLate": "Nothing is late or blocked.",
       "emptyDone": "Nothing finished yet.",
       "answer": "Answer",
-      "markDone": "Move to Done",
-      "openList": "Open the task list",
-      "noDetailScreen": "A task has no page of its own yet; this is all of it."
+      "openList": "Open the task list"
     },
     "signedOut": {
       "line": "Sign in with inAX (the team’s work tracker) to see your work, what waits on you, and what your agents are doing."
@@ -31787,6 +31777,133 @@
       "done": "I finished this task.",
       "copyChosen": "The writing agent drafted two headlines and I chose one. It is matching the body text and the button to it.",
       "mine": "I worked on this task today."
+    }
+  },
+  "taskLoop": {
+    "activity": {
+      "confirmed": "· drafted “{{title}}”; I confirmed its status and note onto inAX"
+    },
+    "agent": {
+      "name": "Task agent"
+    },
+    "applied": {
+      "note": "The PM and the team of “{{project}}” can see the status and this note.",
+      "status": "The PM and the team of “{{project}}” can see the new status.",
+      "title": "It is on inAX now."
+    },
+    "chat": {
+      "answerAck": "Thank you. I am writing it that way now.",
+      "ask": "I need one decision from you before I write: {{question}}",
+      "back": "The task",
+      "confirmed": "Confirmed: the status is “{{status}}”.",
+      "confirmedNote": "Confirmed: the status is “{{status}}” and the progress note is on the task.",
+      "declined": "Not yet: nothing changed on inAX.",
+      "demo": "Demonstration response: no agent is connected on this computer, so {{agent}} answers from a prepared script. Status changes and progress notes are really saved.",
+      "done": "It is on inAX now. I am finished with this task unless you tell me more.",
+      "inputLabel": "Message to {{agent}}",
+      "kickoff": "Please take this task: {{title}}",
+      "label": "Conversation about “{{title}}”",
+      "noted": "Noted. I will apply it to the step I am on.",
+      "placeholder": "For example: make the second line shorter",
+      "proposeFinal": "The draft is above. I propose changing the status {{to}} and leaving a progress note. Read the card below: you can confirm it, correct it, or say not yet.",
+      "proposeStart": "First I propose changing the status {{to}}. Nothing changes on inAX until you confirm it in the card below.",
+      "read": "I read the task: its description, its deadline ({{due}}) and its notes.",
+      "reproposed": "I applied that. Here is the proposal again.",
+      "sample": "Sample conversation: {{agent}} is part of the sample day and cannot be written to here.",
+      "send": "Send",
+      "waiting": "Understood. The status and the notes stay as they are. Tell me below what to change, and I will propose again."
+    },
+    "detail": {
+      "description": "Description",
+      "due": "Due",
+      "finish": "I finished it myself: move to Done",
+      "noteBy": "Written by the agent, confirmed by Mako · {{when}} · status changed {{to}}",
+      "notes": "Progress notes",
+      "notesEmpty": "No notes yet. A note an agent writes is kept here once you confirm it.",
+      "openChat": "Open the conversation",
+      "project": "Project",
+      "start": "Start with an agent",
+      "status": "Status",
+      "who": "Who has it"
+    },
+    "gate": {
+      "line": "Sign in with inAX (the team’s work tracker) and your tasks appear here."
+    },
+    "home": {
+      "review": "Review"
+    },
+    "onboarding": {
+      "found": "Found {{open}} tasks assigned to you · {{due}} due today. They are on Home when you start.",
+      "sample": "This preview signs in with a sample account. Nothing is sent to inAX.",
+      "signedOut": "Not signed in yet",
+      "skip": "Skip for now",
+      "start": "Start",
+      "subtitle": "inAX is the team’s work tracker. Sign in and the work assigned to you appears in this app.",
+      "title": "Sign in to inAX"
+    },
+    "proposal": {
+      "audience": "When you confirm, the PM and the team of “{{project}}” see this on inAX. Until then nobody sees it.",
+      "cancelEdit": "Cancel",
+      "confirm": "Confirm",
+      "confirmEdited": "Confirm as corrected",
+      "decline": "Not yet",
+      "edit": "Correct",
+      "heading": "The agent’s proposal for inAX",
+      "noteError": "Write at least one line that says what was done, then confirm.",
+      "noteLabel": "Progress note",
+      "output": "See the draft this note is about",
+      "pending": "Not on inAX yet",
+      "statusLabel": "Status",
+      "title": "Change the status {{to}}",
+      "titleNote": "Change the status {{to}} and leave this progress note"
+    },
+    "question": {
+      "heading": "The agent’s question"
+    },
+    "script": {
+      "choiceA": "Short · the main points only",
+      "choiceB": "Detailed · with the reasons",
+      "draft": "**{{title}} (draft)**\n\n- What the task asks for: {{detail}}\n- What I prepared: a first draft that follows the task description.\n- What is left for you: read it and correct what is wrong.",
+      "note": "Wrote a first draft for “{{title}}”. It follows the task description. It needs a review before it is used.",
+      "plan": "This is how I will do it.\n\n1. Put the task description and its earlier notes in order.\n2. Write a draft.\n3. Show you the draft, then propose a status and a progress note.",
+      "question": "How long should the draft be?",
+      "reportA": "Kim Jiwoo only · short",
+      "reportB": "The whole campaign team · with a summary",
+      "reportDraft": "**Sharing message for last month’s campaign report (draft)**\n\nJiwoo, here is last month’s campaign report.\n\n- Visitors: 112% of the target\n- Sign-up conversion: 3.4% (2.9% the month before)\n- Ad spend: 96% of the budget\n\nThe details are in the report. Please send your comments by Wednesday.",
+      "reportNote": "Drafted the message that shares last month’s campaign report. It carries three key numbers: visitors, sign-up conversion and ad spend. Kim Jiwoo needs to check it before it is shared.",
+      "reportPlan": "The report is already written, so I will prepare what sharing it needs.\n\n1. Pull the three key numbers out of the report.\n2. Draft the message that shares it with Kim Jiwoo.\n3. Show you the draft, then propose a status and a progress note.",
+      "reportQuestion": "Who should the sharing message be written for?"
+    },
+    "settings": {
+      "cardDescription": "inAX is the team’s work tracker. Sign in and your tasks appear on Home and in Tasks.",
+      "keywordInax": "inax",
+      "keywordSignIn": "sign in",
+      "keywordTasks": "my work",
+      "searchDescription": "Sign in to inAX, see the connected account, or disconnect it.",
+      "searchTitle": "inAX account",
+      "viewTasks": "See my work"
+    },
+    "source": {
+      "chip": "inAX (the team’s work tracker) · my work · sample data"
+    },
+    "status": {
+      "done": "Done",
+      "inProgress": "In progress",
+      "review": "Review requested",
+      "todo": "To do"
+    },
+    "statusTo": {
+      "done": "to “Done”",
+      "inProgress": "to “In progress”",
+      "review": "to “Review requested”",
+      "todo": "to “To do”"
+    },
+    "who": {
+      "confirmed": "{{status}} · written by the agent, confirmed by me",
+      "declined": "Draft ready · not on inAX yet",
+      "justStarted": "Agent working · just started",
+      "proposal": "Waiting for my confirmation · {{agent}}",
+      "question": "Waiting for my answer · {{agent}}"
     }
   }
 }

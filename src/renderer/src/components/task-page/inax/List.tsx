@@ -1,162 +1,117 @@
-import { cn } from '@/lib/class-names'
-import { useIntlLocale, useTranslate } from '@/i18n/use-translate'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { GitHubUserAvatar } from '@/components/github/github-user-avatar'
+import React, { useState } from 'react'
+import { useTranslate } from '@/i18n/use-translate'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
-  GITHUB_TASK_GRID_CLASS,
-  GITHUB_TASK_HEADER_SURFACE_CLASS,
-  GITHUB_TASK_STICKY_ID_CELL_CLASS,
-  GITHUB_TASK_STICKY_ID_HEADER_CLASS,
-  GITHUB_TASK_STICKY_TITLE_CELL_CLASS,
-  GITHUB_TASK_STICKY_TITLE_HEADER_CLASS,
-  formatRelativeTime
-} from '../task-page-source-context'
-import { Button } from '@/components/ui/button'
-import { INAX_INTEGRATION_SECTION_ID } from '@/components/integrations/task-trackers/task-provider-integration-section-ids'
-import { useInaxMockAccount } from '@/lib/inax-mock-account'
-import { useAppStore } from '@/store'
-import { INAX_MOCK_TASKS, type InaxTaskStatus } from './inax-mock-tasks'
+  HOME_META_CLASS,
+  HOME_ROW_BUTTON_CLASS,
+  HomeProjectDot,
+  HomeWhoMarker
+} from '@/components/home/HomeCard'
+import {
+  homeTaskTab,
+  sortHomeTasks,
+  type HomeProjectId,
+  type HomeTask,
+  type HomeTaskTab
+} from '@/components/home/home-board'
+import type { HomeProject } from '@/components/home/home-board-mock'
+import { InaxStatusBadge } from './inax-status-badge'
 
-// Same columns as the GitHub issue grid without its trailing action column.
-const INAX_TASK_GRID_CLASS = cn(
-  GITHUB_TASK_GRID_CLASS,
-  'grid-cols-[72px_minmax(320px,1fr)_84px_100px_92px]'
-)
+const TABS: HomeTaskTab[] = ['today', 'waiting', 'late', 'done']
 
-// Tones reused from the GitHub work-item state badge.
-const INAX_STATUS_TONES: Record<InaxTaskStatus, string> = {
-  open: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300',
-  inProgress: 'border-border/60 text-foreground',
-  done: 'border-purple-500/30 bg-purple-500/10 text-purple-700 dark:text-purple-300'
-}
-
-export function TaskPageInaxList(): React.JSX.Element {
+/** My inAX tasks, with the same tabs and the same rows as Home's My work. A row opens its task. */
+export function TaskPageInaxList({
+  tasks,
+  projects,
+  onOpen
+}: {
+  tasks: readonly HomeTask[]
+  projects: Record<HomeProjectId, HomeProject>
+  onOpen: (taskId: string) => void
+}): React.JSX.Element {
   const t = useTranslate()
-  const intlLocale = useIntlLocale()
-  const signedIn = useInaxMockAccount((state) => state.signedIn)
-  const openSettingsTarget = useAppStore((state) => state.openSettingsTarget)
-  const openSettingsPage = useAppStore((state) => state.openSettingsPage)
-  const statusLabels: Record<InaxTaskStatus, string> = {
-    // Why: the shared 'Open' key is translated as the verb.
-    open: t('auto.components.TaskPage.inaxStatusOpen', 'Open'),
-    inProgress: t('auto.components.TaskPage.inaxStatusInProgress', 'In progress'),
-    done: t('auto.components.TaskPage.18451e99df', 'Done')
+  const [tab, setTab] = useState<HomeTaskTab>('today')
+  const labels: Record<HomeTaskTab, string> = {
+    today: t('home.tasks.today', 'Today'),
+    waiting: t('home.tasks.waiting', 'Needs me'),
+    late: t('home.tasks.late', 'Late'),
+    done: t('home.tasks.done', 'Done')
   }
-  if (!signedIn) {
-    return (
-      <div
-        className="mt-3 flex flex-col items-center gap-3 rounded-md border border-border/50 bg-background px-4 py-12 shadow-sm"
-        data-task-list="inax-signed-out"
-      >
-        <p className="text-sm text-muted-foreground">
-          {t('auto.components.TaskPage.inaxSignedOut', 'Sign in with inAX to see your tasks')}
-        </p>
-        <Button
-          type="button"
-          size="sm"
-          onClick={() => {
-            openSettingsTarget({
-              pane: 'integrations',
-              repoId: null,
-              sectionId: INAX_INTEGRATION_SECTION_ID
-            })
-            openSettingsPage()
-          }}
-        >
-          {t('auto.components.settings.inaxAccount.signIn', 'Sign in with inAX')}
-        </Button>
-      </div>
-    )
+  const empty: Record<HomeTaskTab, string> = {
+    today: t('home.tasks.emptyToday', 'Nothing is due today.'),
+    waiting: t('home.tasks.emptyWaiting', 'Nothing is waiting for you.'),
+    late: t('home.tasks.emptyLate', 'Nothing is late or blocked.'),
+    done: t('home.tasks.emptyDone', 'Nothing finished yet.')
   }
+  const byTab = (key: HomeTaskTab): HomeTask[] =>
+    sortHomeTasks(tasks.filter((task) => homeTaskTab(task).includes(key)))
+  const shown = byTab(tab)
+
   return (
-    <div
-      className="mt-3 flex min-h-0 min-w-0 max-h-full flex-col overflow-hidden rounded-md border border-border/50 bg-background shadow-sm"
+    <section
+      aria-label={t('home.tasks.title', 'My work')}
+      className="@container/home-card mt-3 flex min-h-0 max-h-full min-w-0 flex-col overflow-hidden rounded-md border border-border bg-background shadow-sm"
       data-task-list="inax"
     >
-      <div className="min-h-0 flex-initial overflow-auto scrollbar-sleek scrollbar-sleek-lg">
-        <div
-          className={cn(
-            'sticky top-0 z-40 grid h-8 gap-3 border-b border-border/50 px-3 text-[11px] font-semibold uppercase tracking-[0.05em] text-muted-foreground [&>span]:flex [&>span]:items-center',
-            GITHUB_TASK_HEADER_SURFACE_CLASS,
-            INAX_TASK_GRID_CLASS
-          )}
-        >
-          <span className={GITHUB_TASK_STICKY_ID_HEADER_CLASS}>
-            {t('auto.components.TaskPage.eb10c32872', 'ID')}
-          </span>
-          <span className={GITHUB_TASK_STICKY_TITLE_HEADER_CLASS}>
-            {t('auto.components.TaskPage.5eccb3c841', 'Title / Context')}
-          </span>
-          <span>{t('auto.components.TaskPage.d2a876ca53', 'Assignee')}</span>
-          <span>{t('auto.components.TaskPage.154b0fa623', 'Status')}</span>
-          <span>{t('auto.components.TaskPage.f362667d55', 'Updated')}</span>
+      <Tabs
+        value={tab}
+        onValueChange={(value) => setTab(TABS.find((key) => key === value) ?? 'today')}
+        className="min-h-0"
+      >
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 pt-3 pb-2">
+          <h2 className="text-sm font-semibold text-foreground">
+            {t('home.tasks.title', 'My work')}
+          </h2>
+          <TabsList aria-label={t('home.tasks.title', 'My work')}>
+            {TABS.map((key) => (
+              <TabsTrigger key={key} value={key} data-inax-tab={key}>
+                {labels[key]}
+                <span className="tabular-nums">{byTab(key).length}</span>
+              </TabsTrigger>
+            ))}
+          </TabsList>
         </div>
-        <div className="divide-y divide-border/40">
-          {INAX_MOCK_TASKS.map((task) => (
-            <div
-              key={task.id}
-              className={cn(
-                'group/github-task-row grid min-h-12 gap-3 px-3 py-2.5 text-left transition-colors hover:bg-accent',
-                INAX_TASK_GRID_CLASS
-              )}
-            >
-              <div className={GITHUB_TASK_STICKY_ID_CELL_CLASS}>
-                <span className="inline-flex items-center rounded-md border border-border/40 px-1.5 py-0.5 font-mono text-[11px] font-normal text-muted-foreground">
-                  {task.id}
-                </span>
-              </div>
-              <div className={GITHUB_TASK_STICKY_TITLE_CELL_CLASS}>
-                <h3 className="truncate text-[13px] font-medium text-foreground">{task.title}</h3>
-                <div className="mt-0.5 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[12px] text-muted-foreground">
-                  <span>{task.author}</span>
-                  <span>{task.project}</span>
-                  {task.labels.map((label) => (
-                    <span
-                      key={label}
-                      className="rounded-full border border-border/40 bg-muted/30 px-1.5 py-0 text-[10px] text-muted-foreground"
+        <TabsContent value={tab} className="min-h-0">
+          <div className="scrollbar-sleek max-h-full overflow-y-auto">
+            {shown.length === 0 ? (
+              <p className={`px-4 py-3 ${HOME_META_CLASS}`}>{empty[tab]}</p>
+            ) : (
+              <ul className="divide-y divide-border border-t border-border">
+                {shown.map((task) => (
+                  <li key={task.id}>
+                    <button
+                      type="button"
+                      data-inax-task={task.id}
+                      className={`${HOME_ROW_BUTTON_CLASS} grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 @min-[44rem]/home-card:grid-cols-[minmax(0,1fr)_10rem_8rem_6.5rem]`}
+                      onClick={() => onOpen(task.id)}
                     >
-                      {label}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <div className="flex min-w-0 items-center text-xs text-muted-foreground">
-                {task.assignee ? (
-                  // Why: a blank login renders initials instead of requesting a GitHub avatar.
-                  <GitHubUserAvatar
-                    login=""
-                    name={task.assignee}
-                    title={task.assignee}
-                    className="size-5"
-                  />
-                ) : (
-                  <span className="text-muted-foreground/60">-</span>
-                )}
-              </div>
-              <div className="flex items-center">
-                <span
-                  className={cn(
-                    'inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold leading-none',
-                    INAX_STATUS_TONES[task.status]
-                  )}
-                >
-                  {statusLabels[task.status]}
-                </span>
-              </div>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex items-center text-[11px] text-muted-foreground">
-                    {formatRelativeTime(task.updatedAt)}
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" sideOffset={6}>
-                  {new Date(task.updatedAt).toLocaleString(intlLocale)}
-                </TooltipContent>
-              </Tooltip>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+                      <span className="flex min-w-0 flex-col gap-1">
+                        <span className="line-clamp-2 text-[13px] font-medium text-foreground">
+                          {task.title}
+                        </span>
+                        {task.who && task.whoLabel ? (
+                          <HomeWhoMarker who={task.who} label={task.whoLabel} />
+                        ) : null}
+                      </span>
+                      <span className="min-w-0 @max-[44rem]/home-card:hidden">
+                        <HomeProjectDot project={projects[task.project]} />
+                      </span>
+                      <span
+                        className={`text-right text-xs @max-[44rem]/home-card:hidden ${task.due === 'overdue' && !task.done ? 'text-destructive' : 'text-muted-foreground'}`}
+                      >
+                        {task.dueLabel}
+                      </span>
+                      <span className="flex justify-end">
+                        {task.status ? <InaxStatusBadge status={task.status} /> : null}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
+    </section>
   )
 }

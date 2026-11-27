@@ -17,6 +17,7 @@ import { useAppStore } from '../../store/index'
 import { isWebClientLocation } from '../platform/web-client-location'
 import { useBotsEnabled, useHasBot } from '../../lib/bot-catalog'
 import type { OnboardingState } from '../../../../shared/onboarding/onboarding-state-types'
+import { worksWithoutCode } from '../../../../shared/settings/work-styles'
 
 export type OnboardingGate = ReturnType<typeof useOnboardingAndFeatureTips>
 
@@ -142,7 +143,8 @@ export function useOnboardingAndFeatureTips() {
       return
     }
 
-    if (featureTipsDecision.kind !== 'open') {
+    // The app-open tips teach the CLI, the palette and coding bots: not this person's tools.
+    if (featureTipsDecision.kind !== 'open' || worksWithoutCode(settings)) {
       return
     }
 

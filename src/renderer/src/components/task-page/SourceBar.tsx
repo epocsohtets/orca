@@ -14,7 +14,9 @@ import {
   SelectItem
 } from '@/components/ui/select'
 import { openAppHttpLink } from '@/lib/browser/navigation/app-http-link-open'
-import { useInaxSourceSelection } from './inax/inax-source-selection'
+import { useInaxSelected, useInaxSourceSelection } from './inax/inax-source-selection'
+import { useAppStore } from '@/store'
+import { worksWithoutCode } from '../../../../shared/settings/work-styles'
 
 function sourceButtonClass(active: boolean, disabled?: boolean): string {
   return cn(
@@ -31,7 +33,9 @@ export function TaskPageSourceBar({
   model: TaskPageComposerActionsModel
 }): React.JSX.Element | null {
   const t = useTranslate()
-  const inaxSelected = useInaxSourceSelection((state) => state.selected)
+  const inaxSelected = useInaxSelected()
+  // Code hosts are not this person's trackers when they chose to work without code.
+  const withoutCode = useAppStore((state) => worksWithoutCode(state.settings))
   const {
     openTaskPage,
     closeTaskPage,
@@ -85,82 +89,88 @@ export function TaskPageSourceBar({
           </TooltipContent>
         </Tooltip>
         <div className="mx-1 h-5 w-px bg-border/50" aria-hidden />
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type="button"
-              onClick={() => useInaxSourceSelection.setState({ selected: true })}
-              data-task-source="inax"
-              aria-label={t('auto.components.TaskPage.inaxSource', 'inAX')}
-              aria-pressed={inaxSelected}
-              className={sourceButtonClass(inaxSelected)}
-            >
-              <Hexagon className="size-3.5" />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom" sideOffset={6}>
-            {t('auto.components.TaskPage.inaxSource', 'inAX')}
-          </TooltipContent>
-        </Tooltip>
-        {visibleSourceOptions.map((source) => {
-          const active = !inaxSelected && taskSource === source.id
-          const sourceAvailabilityNotice = taskSourceAvailabilityNoticeByProvider[source.id] ?? null
-          const sourceDisabled = source.disabled || sourceAvailabilityNotice?.blocking
-          return (
-            <Tooltip key={source.id}>
-              <TooltipTrigger asChild>
-                <button
-                  type="button"
-                  disabled={sourceDisabled}
-                  onClick={() => {
-                    if (sourceAvailabilityNotice?.blocking) {
-                      return
-                    }
-                    useInaxSourceSelection.setState({ selected: false })
-                    taskSourceManuallyChangedRef.current = true
-                    openTaskPage(
-                      {
-                        taskSource: source.id
-                      },
-                      {
-                        recordTasksInteraction: false
-                      }
-                    )
-                    void updateSettings({
-                      defaultTaskSource: source.id
-                    }).catch(() => {
-                      toast.error(
-                        t(
-                          'auto.components.TaskPage.609532fae7',
-                          'Failed to save default task source.'
-                        )
-                      )
-                    })
-                  }}
-                  data-task-source={source.id}
-                  aria-label={sourceAvailabilityNotice?.label ?? source.label}
-                  aria-pressed={active}
-                  className={sourceButtonClass(active, sourceDisabled)}
-                >
-                  <source.Icon className="size-3.5" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom" sideOffset={6}>
-                {sourceAvailabilityNotice?.label ?? source.label}
-              </TooltipContent>
-            </Tooltip>
-          )
-        })}
-        <div
-          className="hidden min-w-0 max-w-[min(420px,40vw)] items-center rounded-md border border-border/50 bg-muted/35 px-2 py-1 text-xs text-muted-foreground sm:flex"
-          title={inaxSelected ? undefined : taskSourceContextSummary.title}
+        {/* inAX carries its name: a bare icon reads as nothing to someone who has never seen it. */}
+        <button
+          type="button"
+          onClick={() => useInaxSourceSelection.setState({ selected: true, taskId: null })}
+          data-task-source="inax"
+          aria-pressed={inaxSelected}
+          className={cn(
+            sourceButtonClass(inaxSelected),
+            'w-auto gap-1.5 px-2.5 text-xs font-medium'
+          )}
         >
-          <span className="truncate">
-            {inaxSelected
-              ? t('auto.components.TaskPage.inaxSampleData', 'inAX · sample data')
-              : taskSourceContextSummary.label}
-          </span>
-        </div>
+          <Hexagon className="size-3.5" />
+          {t('auto.components.TaskPage.inaxSource', 'inAX')}
+        </button>
+        {visibleSourceOptions
+          .filter((source) => !withoutCode || (source.id !== 'github' && source.id !== 'gitlab'))
+          .map((source) => {
+            const active = !inaxSelected && taskSource === source.id
+            const sourceAvailabilityNotice =
+              taskSourceAvailabilityNoticeByProvider[source.id] ?? null
+            const sourceDisabled = source.disabled || sourceAvailabilityNotice?.blocking
+            return (
+              <Tooltip key={source.id}>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    disabled={sourceDisabled}
+                    onClick={() => {
+                      if (sourceAvailabilityNotice?.blocking) {
+                        return
+                      }
+                      useInaxSourceSelection.setState({ selected: false })
+                      taskSourceManuallyChangedRef.current = true
+                      openTaskPage(
+                        {
+                          taskSource: source.id
+                        },
+                        {
+                          recordTasksInteraction: false
+                        }
+                      )
+                      void updateSettings({
+                        defaultTaskSource: source.id
+                      }).catch(() => {
+                        toast.error(
+                          t(
+                            'auto.components.TaskPage.609532fae7',
+                            'Failed to save default task source.'
+                          )
+                        )
+                      })
+                    }}
+                    data-task-source={source.id}
+                    aria-label={sourceAvailabilityNotice?.label ?? source.label}
+                    aria-pressed={active}
+                    className={sourceButtonClass(active, sourceDisabled)}
+                  >
+                    <source.Icon className="size-3.5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" sideOffset={6}>
+                  {sourceAvailabilityNotice?.label ?? source.label}
+                </TooltipContent>
+              </Tooltip>
+            )
+          })}
+        {inaxSelected ? (
+          // Says once what inAX is and whose list this is.
+          <p
+            className="min-w-0 truncate px-1 text-xs text-muted-foreground"
+            data-inax-source-note=""
+          >
+            {t('taskLoop.source.chip', 'inAX (the team’s work tracker) · my work · sample data')}
+          </p>
+        ) : (
+          <div
+            className="hidden min-w-0 max-w-[min(420px,40vw)] items-center rounded-md border border-border/50 bg-muted/35 px-2 py-1 text-xs text-muted-foreground sm:flex"
+            title={taskSourceContextSummary.title}
+          >
+            <span className="truncate">{taskSourceContextSummary.label}</span>
+          </div>
+        )}
       </div>
       {!inaxSelected && taskSource === 'linear' && linearConnected ? (
         <div className="flex items-center gap-2">

@@ -20,16 +20,14 @@ const CELL_CLASS = 'px-4 py-2 align-middle'
 export function HomeAgentsCard({
   agents,
   openId,
-  onOpenChange,
-  onRevealTask,
-  onOpenChat
+  onOpen,
+  onRevealTask
 }: {
   agents: readonly HomeAgent[]
   openId: string | null
-  onOpenChange: (id: string | null) => void
+  /** Goes to the agent's conversation; a bot without one opens in place. */
+  onOpen: (id: string) => void
   onRevealTask: (taskId: string) => void
-  /** Opens a real bot chat when this profile has one; undefined when it has none. */
-  onOpenChat?: () => void
 }): React.JSX.Element {
   const t = useTranslate()
   const stateLabels: Record<HomeAgentState, string> = {
@@ -83,16 +81,15 @@ export function HomeAgentsCard({
                   <tr
                     data-home-agent={agent.id}
                     className="cursor-pointer transition-colors motion-reduce:transition-none hover:bg-accent"
-                    onClick={() => onOpenChange(open ? null : agent.id)}
+                    onClick={() => onOpen(agent.id)}
                   >
                     <th scope="row" className={`${CELL_CLASS} text-left font-medium`}>
                       <button
                         type="button"
-                        aria-expanded={open}
                         className={`${HOME_FOCUS_RING_CLASS} -mx-2 flex min-h-6 items-center gap-2 rounded-md px-2 text-left text-foreground`}
                         onClick={(event) => {
                           event.stopPropagation()
-                          onOpenChange(open ? null : agent.id)
+                          onOpen(agent.id)
                         }}
                       >
                         <HomeAvatar name={agent.name} />
@@ -155,16 +152,6 @@ export function HomeAgentsCard({
                                 onClick={() => agent.taskId && onRevealTask(agent.taskId)}
                               >
                                 {t('home.agents.showTask', 'Show its task')}
-                              </Button>
-                            ) : null}
-                            {onOpenChat ? (
-                              <Button
-                                type="button"
-                                variant="ghost-muted"
-                                size="xs"
-                                onClick={onOpenChat}
-                              >
-                                {t('home.agents.openChat', 'Open a bot chat')}
                               </Button>
                             ) : null}
                             <span className={HOME_META_CLASS}>

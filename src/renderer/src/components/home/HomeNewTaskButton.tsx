@@ -107,7 +107,7 @@ export function HomeNewTaskButton({
             {agent
               ? t(
                   'home.newTask.hintAgent',
-                  'Sample: the task joins My work as “Agent working”. No real agent starts.'
+                  'The task joins My work, and its conversation with the agent opens.'
                 )
               : t('home.newTask.hint', 'It is added to My work, due today, in the sample board.')}
           </p>

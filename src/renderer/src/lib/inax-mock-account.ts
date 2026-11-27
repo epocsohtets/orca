@@ -24,3 +24,8 @@ useInaxMockAccount.subscribe((state) => {
     // A blocked store only costs the mock its memory.
   }
 })
+
+/** Signs in where the person stands: the mock has no browser step to leave for. */
+export function signInInaxMock(): void {
+  useInaxMockAccount.setState({ signedIn: true })
+}

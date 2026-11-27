@@ -2,7 +2,9 @@ import type { Translate } from '@/i18n/use-translate'
 import { uiDateTimeFormat } from '@/i18n/ui-intl-formatters'
 import { formatUiRelativeTime } from '@/i18n/relative-time-format'
 import {
+  HOME_LOOP_AGENT_ID,
   applyHomeBoardState,
+  applyHomeTaskLoops,
   countHomeBoard,
   orderHomeAgents,
   planHomeWrapUp,
@@ -11,6 +13,7 @@ import {
   type HomeBoardState,
   type HomeTask
 } from './home-board'
+import { buildHomeLoopScript, inaxStatusLabels } from './home-task-loop-script'
 import { buildHomeAgents } from './home-board-agents-mock'
 import { buildHomeActivity, type HomeActivity } from './home-board-activity-mock'
 import { buildHomeFollowUps, buildHomeTasks, type HomeSampleContext } from './home-board-mock'
@@ -58,6 +61,8 @@ export function buildHomeBoardView(
   args: {
     board: HomeBoardState
     minutes: number
+    /** The real clock, which my conversations with agents run on. */
+    now: number
     phase: HomePhase
     sampleDay: number
     intlLocale: string
@@ -83,18 +88,63 @@ export function buildHomeBoardView(
     ago: (at) => formatUiRelativeTime(Math.min(-1, at - minutes) * 60_000, intlLocale)
   }
   const baseTasks = buildHomeTasks(t, sample)
-  const tasks = applyHomeBoardState(baseTasks, buildHomeFollowUps(t, sample), board, {
-    resumed: t('home.task.resumed', 'Agent working · picked up my answer'),
-    addedDue: t('home.task.today', 'Today'),
-    addedDetail: t('home.task.addedDetail', 'A task I added here.'),
-    addedAgent: t('home.task.addedAgent', 'Agent working · just handed over'),
-    doneReport: t('home.report.done', 'I finished this task.')
-  })
+  const loopAgent = t('taskLoop.agent.name', 'Task agent')
+  const tasks = applyHomeTaskLoops(
+    applyHomeBoardState(baseTasks, buildHomeFollowUps(t, sample), board, {
+      resumed: t('home.task.resumed', 'Agent working · picked up my answer'),
+      addedDue: t('home.task.today', 'Today'),
+      addedDetail: t('home.task.addedDetail', 'A task I added here.'),
+      addedAgent: t('home.task.addedAgent', 'Agent working · just handed over'),
+      doneReport: t('home.report.done', 'I finished this task.')
+    }),
+    board,
+    args.now,
+    (task) => buildHomeLoopScript(t, task),
+    {
+      working: (count) =>
+        count < 1
+          ? t('taskLoop.who.justStarted', 'Agent working · just started')
+          : t('home.task.researchWho', 'Agent working · {{time}}', { time: args.duration(count) }),
+      question: t('taskLoop.who.question', 'Waiting for my answer · {{agent}}', {
+        agent: loopAgent
+      }),
+      proposal: t('taskLoop.who.proposal', 'Waiting for my confirmation · {{agent}}', {
+        agent: loopAgent
+      }),
+      confirmed: (status) =>
+        t('taskLoop.who.confirmed', '{{status}} · written by the agent, confirmed by me', {
+          status: inaxStatusLabels(t)[status]
+        }),
+      declined: t('taskLoop.who.declined', 'Draft ready · not on inAX yet')
+    }
+  )
   const recording = board.meetingStartedAt !== null
-  const agents = orderHomeAgents(buildHomeAgents(t, tasks, sample), tasks, recording, {
-    resumedLast: t('home.agent.justNow', 'Just now'),
-    recording: t('home.agent.recording', 'Recording the meeting I started')
-  })
+  const loopAgents: HomeAgent[] = tasks.flatMap((task) =>
+    task.loop
+      ? [
+          {
+            id: `${HOME_LOOP_AGENT_ID}:${task.id}`,
+            name: loopAgent,
+            taskId: task.id,
+            doing: task.title,
+            state:
+              task.loop === 'working' ? 'working' : task.who === 'waiting' ? 'waiting' : 'idle',
+            stage: task.loop === 'working' ? 2 : task.loop === 'question' ? 1 : 3,
+            last: t('home.agent.justNow', 'Just now'),
+            lines: []
+          }
+        ]
+      : []
+  )
+  const agents = orderHomeAgents(
+    [...loopAgents, ...buildHomeAgents(t, tasks, sample)],
+    tasks,
+    recording,
+    {
+      resumedLast: t('home.agent.justNow', 'Just now'),
+      recording: t('home.agent.recording', 'Recording the meeting I started')
+    }
+  )
 
   const me = t('home.activity.me', 'I')
   const mine: HomeActivity[] = [
@@ -111,6 +161,27 @@ export function buildHomeBoardView(
         taskId: task?.meetingId ? undefined : taskId
       }
     }),
+    ...Object.entries(board.loops).flatMap(([taskId, loop]) =>
+      loop.final?.kind === 'confirmed'
+        ? [
+            {
+              id: `loop-confirmed-${taskId}`,
+              day: 0,
+              at: minutes,
+              who: loopAgent,
+              text: t(
+                'taskLoop.activity.confirmed',
+                '· drafted “{{title}}”; I confirmed its status and note onto inAX',
+                { title: tasks.find((task) => task.id === taskId)?.title ?? '' }
+              ),
+              byAgent: true,
+              finished: true,
+              confirmed: true,
+              taskId
+            }
+          ]
+        : []
+    ),
     ...(recording
       ? [
           {

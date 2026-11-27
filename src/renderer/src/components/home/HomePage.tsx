@@ -1,26 +1,19 @@
-import React, { useState, useSyncExternalStore } from 'react'
+import React, { useState } from 'react'
 import { useAppStore } from '@/store'
 import { useIntlLocale, useTranslate } from '@/i18n/use-translate'
 import { uiDateTimeFormat } from '@/i18n/ui-intl-formatters'
 import { motionSafeScrollBehavior } from '@/hooks/theme/usePrefersReducedMotion'
 import { Button } from '@/components/ui/button'
 import { RailPage, RailPageScroll } from '@/components/rail-page/RailPage'
-import { INAX_INTEGRATION_SECTION_ID } from '@/components/integrations/task-trackers/task-provider-integration-section-ids'
-import { useInaxSourceSelection } from '@/components/task-page/inax/inax-source-selection'
+import { openInaxTask } from '@/components/task-page/inax/inax-source-selection'
 import { useAllAgentPaneThreads } from '@/components/activity/threads/use-agent-pane-threads'
-import { useInaxMockAccount } from '@/lib/inax-mock-account'
-import { openBotHomeTab, useBots } from '@/lib/bot-catalog'
+import { signInInaxMock } from '@/lib/inax-mock-account'
+import { useBots } from '@/lib/bot-catalog'
 import { homeTaskTab, type HomeRecordAnswer, type HomeTaskTab } from './home-board'
 import { useHomeBoardStore } from './home-board-store'
-import { buildHomeProjects } from './home-board-mock'
-import { buildHomeBoardView } from './home-board-view'
-import {
-  HOME_PREVIEW_MINUTES,
-  formatHomeDuration,
-  homePhaseForMinutes,
-  homeSampleDay,
-  type HomePhase
-} from './home-day'
+import { answerHomeLoop, decideHomeLoop, startHomeLoop } from './home-board-actions'
+import { useHomeBoard } from './use-home-board'
+import type { HomePhase } from './home-day'
 import { HomeCard, HOME_META_CLASS } from './HomeCard'
 import { HomeFirstSteps, HomeGreeting, HomeTiles, type HomeTileId } from './HomeHeader'
 import { HomeTasksCard } from './HomeTasksCard'
@@ -65,15 +58,11 @@ function answerRecord(recordId: string, answer: HomeRecordAnswer | null): void {
 export default function HomePage(): React.JSX.Element {
   const t = useTranslate()
   const intlLocale = useIntlLocale()
-  const signedIn = useInaxMockAccount((state) => state.signedIn)
-  const myApps = useAppStore((s) => s.settings?.myApps)
   const bots = useBots()
   const hasAgentThread = useAllAgentPaneThreads().allThreads.length > 0
-  // The whole mock board is one small object, read as it is.
-  const board = useSyncExternalStore(useHomeBoardStore.subscribe, useHomeBoardStore.getState)
-  // Read once per mount: the page shows a snapshot of the day.
-  const [now] = useState(() => Date.now())
   const [preview, setPreview] = useState<'auto' | HomePhase>('auto')
+  const { board, view, projects, signedIn, myApps, app, phase, sampleDay, duration } =
+    useHomeBoard(preview)
   const [previewFirstRun, setPreviewFirstRun] = useState(false)
   const [tab, setTab] = useState<HomeTaskTab>('today')
   const [openTaskId, setOpenTaskId] = useState<string | null>(null)
@@ -82,39 +71,11 @@ export default function HomePage(): React.JSX.Element {
   const [activityAll, setActivityAll] = useState(false)
   const [wrapUpOpen, setWrapUpOpen] = useState(false)
 
-  const midnight = new Date(now).setHours(0, 0, 0, 0)
-  const minutes =
-    preview === 'auto' ? Math.floor((now - midnight) / 60_000) : HOME_PREVIEW_MINUTES[preview]
-  const phase = homePhaseForMinutes(minutes)
-  const sampleDay = homeSampleDay(now)
-  const duration = (value: number): string =>
-    formatHomeDuration(value, {
-      hours: (count) => t('home.day.hours', '{{count}} hr', { count }),
-      minutes: (count) => t('home.day.minutes', '{{count}} min', { count })
-    })
-
-  const openSettings = (pane: 'integrations' | 'my-apps' | 'browser', sectionId?: string): void => {
+  const openSettings = (pane: 'my-apps' | 'browser', sectionId?: string): void => {
     useAppStore.getState().openSettingsTarget({ pane, repoId: null, sectionId })
     useAppStore.getState().openSettingsPage()
   }
-  const connectInax = (): void => openSettings('integrations', INAX_INTEGRATION_SECTION_ID)
-  const openTaskList = (): void => {
-    useInaxSourceSelection.setState({ selected: true })
-    useAppStore.getState().openTaskPage()
-  }
 
-  const app = myApps?.find((entry) => !entry.paused)?.name
-  const projects = buildHomeProjects(t)
-  const view = buildHomeBoardView(t, {
-    board,
-    minutes,
-    phase,
-    sampleDay,
-    intlLocale,
-    signedIn,
-    app,
-    duration
-  })
   const { tasks } = view
   const recording = board.meetingStartedAt !== null
 
@@ -142,11 +103,25 @@ export default function HomePage(): React.JSX.Element {
   }
   const addTask = (title: string, agent: boolean): void => {
     const id = `added-${Date.now()}`
-    useHomeBoardStore.setState((state) => ({
-      addedTasks: [...state.addedTasks, { id, title, agent }]
-    }))
+    useHomeBoardStore.setState((state) => ({ addedTasks: [...state.addedTasks, { id, title }] }))
+    if (agent) {
+      // Handing over is the same path as "Start with an agent" on the task's page.
+      startHomeLoop(id)
+      openInaxTask(id, 'chat')
+      return
+    }
     setTab('today')
     focusRow(`[data-home-task="${id}"]`)
+  }
+  /** An agent's row goes to its task's conversation; a bot without a task opens in place. */
+  const openAgent = (agentId: string): void => {
+    const agent = view.agents.find((entry) => entry.id === agentId)
+    const task = tasks.find((entry) => entry.id === agent?.taskId)
+    if (task && !task.meetingId) {
+      openInaxTask(task.id, 'chat')
+    } else {
+      setOpenAgentId(openAgentId === agentId ? null : agentId)
+    }
   }
 
   const firstRun =
@@ -226,13 +201,16 @@ export default function HomePage(): React.JSX.Element {
               steps={[
                 {
                   id: 'inax',
-                  title: t('home.firstRun.inax', 'Connect inAX so your work appears here'),
+                  title: t(
+                    'home.firstRun.inax',
+                    'Sign in with inAX (the team’s work tracker) so your work appears here'
+                  ),
                   detail: t(
                     'home.firstRun.inaxDetail',
-                    'inAX is the team’s work tracker: your tasks, deadlines and what waits on you'
+                    'Your tasks, their deadlines and what waits on you'
                   ),
-                  action: t('home.firstRun.connect', 'Connect'),
-                  run: connectInax
+                  action: t('auto.components.settings.inaxAccount.signIn', 'Sign in with inAX'),
+                  run: signInInaxMock
                 },
                 {
                   id: 'app',
@@ -271,29 +249,38 @@ export default function HomePage(): React.JSX.Element {
                         }}
                         openId={openTaskId}
                         onOpenChange={setOpenTaskId}
+                        onOpenTask={(taskId) => openInaxTask(taskId)}
+                        onOpenOutput={(taskId) => openInaxTask(taskId, 'chat')}
+                        onDecide={(taskId, proposal) => {
+                          const task = tasks.find((entry) => entry.id === taskId)
+                          decideHomeLoop(
+                            taskId,
+                            'final',
+                            proposal,
+                            task ? projects[task.project].name : ''
+                          )
+                          setOpenTaskId(null)
+                          focusRow(`[data-home-tab="${tab}"]`)
+                        }}
                         onAnswer={(taskId, choiceId) => {
-                          useHomeBoardStore.setState((state) => ({
-                            answers: { ...state.answers, [taskId]: choiceId }
-                          }))
+                          if (board.loops[taskId]) {
+                            answerHomeLoop(taskId, choiceId)
+                          } else {
+                            useHomeBoardStore.setState((state) => ({
+                              answers: { ...state.answers, [taskId]: choiceId }
+                            }))
+                          }
                           setOpenTaskId(null)
                           // The answered row may leave this tab; the keyboard goes back to the tab itself.
                           focusRow(`[data-home-tab="${tab}"]`)
                         }}
-                        onDone={(taskId) => {
-                          useHomeBoardStore.setState((state) => ({
-                            doneTaskIds: [...state.doneTaskIds, taskId]
-                          }))
-                          setOpenTaskId(null)
-                          focusRow(`[data-home-tab="${tab}"]`)
-                        }}
-                        onOpenTaskList={openTaskList}
+                        onOpenTaskList={() => openInaxTask(null)}
                       />
                       <HomeAgentsCard
                         agents={view.agents}
                         openId={openAgentId}
-                        onOpenChange={setOpenAgentId}
+                        onOpen={openAgent}
                         onRevealTask={revealTask}
-                        onOpenChat={bots[0] ? () => void openBotHomeTab(bots[0]) : undefined}
                       />
                     </>
                   ) : (
@@ -305,7 +292,12 @@ export default function HomePage(): React.JSX.Element {
                             'Sign in with inAX (the team’s work tracker) to see your work, what waits on you, and what your agents are doing.'
                           )}
                         </p>
-                        <Button type="button" size="sm" onClick={connectInax}>
+                        <Button
+                          type="button"
+                          size="sm"
+                          data-inax-sign-in=""
+                          onClick={signInInaxMock}
+                        >
                           {t('auto.components.settings.inaxAccount.signIn', 'Sign in with inAX')}
                         </Button>
                       </div>
@@ -316,7 +308,11 @@ export default function HomePage(): React.JSX.Element {
                   <HomeUpcomingCard
                     items={view.upcoming}
                     projects={projects}
-                    onRevealTask={revealTask}
+                    onRevealTask={(taskId) =>
+                      tasks.find((entry) => entry.id === taskId)?.meetingId
+                        ? revealTask(taskId)
+                        : openInaxTask(taskId)
+                    }
                   />
                   {signedIn ? (
                     <HomeActivityCard
@@ -327,7 +323,7 @@ export default function HomePage(): React.JSX.Element {
                       onShowAllChange={setActivityAll}
                       onReveal={(entry) => {
                         if (entry.taskId) {
-                          revealTask(entry.taskId)
+                          openInaxTask(entry.taskId)
                         } else if (entry.agentId) {
                           setOpenAgentId(entry.agentId)
                           focusRow(`[data-home-agent="${entry.agentId}"]`)

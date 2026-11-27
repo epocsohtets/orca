@@ -31,6 +31,7 @@ import { useTaskSourceProviderReadiness } from './use-task-source-provider-readi
 import { translate } from '@/i18n/i18n'
 import { useTranslate } from '@/i18n/use-translate'
 import { SettingsGroup } from '../section-layout/SettingsGroup'
+import { InaxIntegrationCard } from '../../integrations/task-trackers/inax-integration-card'
 
 type TasksPaneProps = {
   settings: GlobalSettings
@@ -182,6 +183,10 @@ export function TasksPane({ settings, updateSettings }: TasksPaneProps): React.J
         keywords={getTasksPaneSearchKeywords()}
         className="divide-y divide-border"
       >
+        {/* inAX has no setup steps: its one card is the whole of it, here as under Integrations. */}
+        <div className="py-2">
+          <InaxIntegrationCard />
+        </div>
         {TASK_PROVIDERS.map((provider) => {
           const meta = PROVIDER_META[provider]
           const readiness = readinessByProvider[provider]

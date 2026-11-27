@@ -18,6 +18,8 @@ import {
   type HomeTaskTab
 } from './home-board'
 import type { HomeProject } from './home-board-mock'
+import type { HomeProposal } from './home-task-loop'
+import { TaskProposalCard } from '@/components/task-page/inax/TaskProposalCard'
 
 const TABS: HomeTaskTab[] = ['today', 'waiting', 'late', 'done']
 
@@ -34,7 +36,9 @@ export function HomeTasksCard({
   openId,
   onOpenChange,
   onAnswer,
-  onDone,
+  onDecide,
+  onOpenTask,
+  onOpenOutput,
   onOpenTaskList
 }: {
   tasks: readonly HomeTask[]
@@ -44,7 +48,12 @@ export function HomeTasksCard({
   openId: string | null
   onOpenChange: (id: string | null) => void
   onAnswer: (taskId: string, choiceId: string) => void
-  onDone: (taskId: string) => void
+  /** My answer to an agent's proposal for inAX; null is "not yet". */
+  onDecide: (taskId: string, proposal: HomeProposal | null) => void
+  /** Opens the task's own page. */
+  onOpenTask: (taskId: string) => void
+  /** Opens the task's conversation, where the agent's draft is. */
+  onOpenOutput: (taskId: string) => void
   onOpenTaskList: () => void
 }): React.JSX.Element {
   const t = useTranslate()
@@ -92,16 +101,20 @@ export function HomeTasksCard({
           ) : (
             <ul className="divide-y divide-border border-t border-border">
               {shown.map((task) => {
-                const open = openId === task.id
                 const waiting = task.who === 'waiting'
+                // Only what waits on me opens in place; every other row goes to the task's page.
+                const open = openId === task.id && waiting
+                const offer = task.meetingId !== undefined
                 return (
                   <li key={task.id} data-home-task={task.id}>
                     <div className="flex items-stretch">
                       <button
                         type="button"
-                        aria-expanded={open}
+                        aria-expanded={offer ? open : undefined}
                         className={`${HOME_ROW_BUTTON_CLASS} grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 @min-[40rem]/home-card:grid-cols-[minmax(0,1fr)_9rem_8rem]`}
-                        onClick={() => onOpenChange(open ? null : task.id)}
+                        onClick={() =>
+                          offer ? onOpenChange(open ? null : task.id) : onOpenTask(task.id)
+                        }
                       >
                         <span className="flex min-w-0 flex-col gap-1">
                           <span className="line-clamp-2 text-[13px] font-medium text-foreground">
@@ -129,7 +142,9 @@ export function HomeTasksCard({
                               size="xs"
                               onClick={() => onOpenChange(task.id)}
                             >
-                              {t('home.tasks.answer', 'Answer')}
+                              {task.proposal
+                                ? t('taskLoop.home.review', 'Review')
+                                : t('home.tasks.answer', 'Answer')}
                             </Button>
                           ) : null}
                         </div>
@@ -137,57 +152,42 @@ export function HomeTasksCard({
                     </div>
                     {open ? (
                       <div className={HOME_ROW_DETAIL_CLASS}>
-                        <p className="text-xs text-foreground">{task.detail}</p>
-                        {task.question && task.choices ? (
-                          <div
-                            role="group"
-                            aria-label={task.question}
-                            className="flex flex-col gap-2"
-                          >
-                            <p className="text-[13px] font-medium text-foreground">
-                              {task.question}
-                            </p>
-                            <div className="flex flex-wrap gap-2">
-                              {task.choices.map((choice) => (
-                                <Button
-                                  key={choice.id}
-                                  type="button"
-                                  variant="outline"
-                                  size="xs"
-                                  onClick={() => onAnswer(task.id, choice.id)}
-                                >
-                                  {choice.label}
-                                </Button>
-                              ))}
-                            </div>
-                          </div>
+                        {task.proposal ? (
+                          <TaskProposalCard
+                            proposal={task.proposal}
+                            project={projects[task.project].name}
+                            onConfirm={(proposal) => onDecide(task.id, proposal)}
+                            onDecline={() => onDecide(task.id, null)}
+                            onOpenOutput={() => onOpenOutput(task.id)}
+                          />
                         ) : (
-                          <div className="flex flex-wrap items-center gap-2">
-                            {!task.done && task.who === null ? (
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="xs"
-                                onClick={() => onDone(task.id)}
+                          <>
+                            <p className="text-xs text-foreground">{task.detail}</p>
+                            {task.question && task.choices ? (
+                              <div
+                                role="group"
+                                aria-label={task.question}
+                                className="flex flex-col gap-2"
                               >
-                                {t('home.tasks.markDone', 'Move to Done')}
-                              </Button>
+                                <p className="text-[13px] font-medium text-foreground">
+                                  {task.question}
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                  {task.choices.map((choice) => (
+                                    <Button
+                                      key={choice.id}
+                                      type="button"
+                                      variant="outline"
+                                      size="xs"
+                                      onClick={() => onAnswer(task.id, choice.id)}
+                                    >
+                                      {choice.label}
+                                    </Button>
+                                  ))}
+                                </div>
+                              </div>
                             ) : null}
-                            <Button
-                              type="button"
-                              variant="ghost-muted"
-                              size="xs"
-                              onClick={onOpenTaskList}
-                            >
-                              {t('home.tasks.openList', 'Open the task list')}
-                            </Button>
-                            <span className={HOME_META_CLASS}>
-                              {t(
-                                'home.tasks.noDetailScreen',
-                                'A task has no page of its own yet; this is all of it.'
-                              )}
-                            </span>
-                          </div>
+                          </>
                         )}
                       </div>
                     ) : null}
@@ -196,6 +196,11 @@ export function HomeTasksCard({
               })}
             </ul>
           )}
+          <div className="border-t border-border px-2 py-1">
+            <Button type="button" variant="ghost-muted" size="xs" onClick={onOpenTaskList}>
+              {t('home.tasks.openList', 'Open the task list')}
+            </Button>
+          </div>
         </TabsContent>
       </Tabs>
     </HomeCard>

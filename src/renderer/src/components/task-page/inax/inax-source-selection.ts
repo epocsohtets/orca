@@ -1,4 +1,50 @@
 import { create } from 'zustand'
+import { useAppStore } from '@/store'
+import { worksWithoutCode } from '../../../../../shared/settings/work-styles'
 
-// shortcut: inAX is not a TaskProvider, so its selection is view state only; make it a TaskProvider when it gets a backend.
-export const useInaxSourceSelection = create<{ selected: boolean }>(() => ({ selected: false }))
+export type InaxTaskView = 'detail' | 'chat'
+
+type InaxSourceSelection = {
+  /** Null until the person picks a source; then inAX is the default for people who work without code. */
+  selected: boolean | null
+  /** The task that is open, and whether its page or its conversation shows. */
+  taskId: string | null
+  view: InaxTaskView
+}
+
+const STORAGE_KEY = 'orca.poc.inax-source-selection'
+const EMPTY: InaxSourceSelection = { selected: null, taskId: null, view: 'detail' }
+
+function readSaved(): InaxSourceSelection {
+  try {
+    const saved: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null')
+    return saved && typeof saved === 'object' ? { ...EMPTY, ...saved } : EMPTY
+  } catch {
+    return EMPTY
+  }
+}
+
+// shortcut: inAX is not a TaskProvider, so its selection lives in this window's localStorage; make it a
+// TaskProvider with a persisted default source when it gets a backend.
+export const useInaxSourceSelection = create<InaxSourceSelection>(() => readSaved())
+
+useInaxSourceSelection.subscribe((state) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+  } catch {
+    // A blocked store only costs the mock its memory.
+  }
+})
+
+/** Whether Tasks shows inAX: the person's own pick, else inAX first for people who work without code. */
+export function useInaxSelected(): boolean {
+  const selected = useInaxSourceSelection((state) => state.selected)
+  const withoutCode = useAppStore((s) => worksWithoutCode(s.settings))
+  return selected ?? withoutCode
+}
+
+/** Opens Tasks on inAX: its list, one task's page, or that task's conversation. */
+export function openInaxTask(taskId: string | null, view: InaxTaskView = 'detail'): void {
+  useInaxSourceSelection.setState({ selected: true, taskId, view })
+  useAppStore.getState().openTaskPage()
+}
