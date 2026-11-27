@@ -55,6 +55,7 @@ export function DocPreviewToolbar({
   return (
     <BrowserChromeToolbar
       closeTabOwner={{ worktreeId, browserPageId: previewId }}
+      suggestions={false}
       controls={{
         canGoBack: history.canGoBack,
         canGoForward: history.canGoForward,

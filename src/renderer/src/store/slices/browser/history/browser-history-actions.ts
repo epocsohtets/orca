@@ -85,7 +85,7 @@ export function createBrowserHistoryActions(
       })
     },
 
-    addBrowserHistoryEntry: (url, title, faviconUrl) => {
+    addBrowserHistoryEntry: (url, title, faviconUrl, pageId) => {
       const safeUrl = redactKagiSessionToken(url)
       const safeMetadata = redactBrowserMetadata({ title, faviconUrl })
       if (safeUrl === ORCA_BROWSER_BLANK_URL || safeUrl === 'about:blank' || !safeUrl) {
@@ -93,7 +93,7 @@ export function createBrowserHistoryActions(
       }
       // Every built-in browser surface reports its navigations here, so the activity record needs no listener of its own.
       if (get().settings?.browserActivityRecordEnabled !== false) {
-        recordBrowserActivityVisit(safeUrl, safeMetadata.title)
+        recordBrowserActivityVisit(safeUrl, safeMetadata.title, pageId)
       }
       const normalized = normalizeBrowserHistoryUrl(safeUrl)
       set((s) => {

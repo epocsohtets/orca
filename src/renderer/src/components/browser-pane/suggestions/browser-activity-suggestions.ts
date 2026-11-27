@@ -6,6 +6,8 @@ export type BrowserActivityVisit = {
   origin: string
   path: string
   title: string
+  /** The tab that navigated, so each tab keeps its own sequence. */
+  tabId?: string
 }
 
 export type BrowserActivitySuggestion =
@@ -16,6 +18,7 @@ export const MAX_BROWSER_ACTIVITY_VISITS = 500
 const REPEATED_PAGE_MIN_VISITS = 3
 const REPEATED_SEQUENCE_LENGTH = 3
 const REPEATED_SEQUENCE_MIN_RUNS = 2
+const MAX_REPEATED_PAGE_SUGGESTIONS = 2
 
 export function browserActivityPageUrl(visit: BrowserActivityVisit): string {
   return `${visit.origin}${visit.path}`
@@ -25,7 +28,8 @@ export function browserActivityPageUrl(visit: BrowserActivityVisit): string {
 export function toBrowserActivityVisit(
   url: string,
   title: string,
-  at: number
+  at: number,
+  tabId?: string
 ): BrowserActivityVisit | null {
   let parsed: URL
   try {
@@ -36,24 +40,64 @@ export function toBrowserActivityVisit(
   if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
     return null
   }
-  return { at, origin: parsed.origin, path: parsed.pathname, title }
+  return { at, origin: parsed.origin, path: parsed.pathname, title, ...(tabId ? { tabId } : {}) }
 }
 
-/** A title update or reload of the page just recorded refreshes that record instead of adding one. */
+/** A title update or reload of the page a tab just recorded refreshes that record instead of adding one. */
 export function appendBrowserActivityVisit(
   visits: readonly BrowserActivityVisit[],
   visit: BrowserActivityVisit
 ): BrowserActivityVisit[] {
-  const last = visits.at(-1)
+  const last = visits.findLast((entry) => entry.tabId === visit.tabId)
   if (last && browserActivityPageUrl(last) === browserActivityPageUrl(visit)) {
-    return [...visits.slice(0, -1), { ...last, title: visit.title }]
+    return visits.map((entry) => (entry === last ? { ...last, title: visit.title } : entry))
   }
   return [...visits, visit].slice(-MAX_BROWSER_ACTIVITY_VISITS)
 }
 
+/** The page's own name: its title without the trailing site name ("Issues · acme/app · GitHub"). */
+export function browserActivityPageLabel(visit: BrowserActivityVisit): string {
+  const parts = visit.title.split(/\s+[·|—–-]\s+/).filter(Boolean)
+  const label = (parts.length > 1 ? parts.slice(0, -1) : parts).join(' · ')
+  return label || browserActivityPageUrl(visit).replace(/^https?:\/\//, '')
+}
+
+type SequenceRun = { count: number; firstAt: number; pages: BrowserActivityVisit[] }
+
+/** Runs of three distinct pages, counted inside each tab so that two tabs never interleave into one. */
+function countSequenceRuns(today: readonly BrowserActivityVisit[]): Map<string, SequenceRun> {
+  const runs = new Map<string, SequenceRun>()
+  const byTab = Map.groupBy(today, (visit) => visit.tabId ?? '')
+  for (const visits of byTab.values()) {
+    const keys = visits.map(browserActivityPageUrl)
+    const lastStarts = new Map<string, number>()
+    for (let start = 0; start + REPEATED_SEQUENCE_LENGTH <= keys.length; start++) {
+      const window = keys.slice(start, start + REPEATED_SEQUENCE_LENGTH)
+      if (new Set(window).size !== REPEATED_SEQUENCE_LENGTH) {
+        continue
+      }
+      const id = `sequence:${window.join(' > ')}`
+      const lastStart = lastStarts.get(id)
+      // Overlapping windows are one run, not two.
+      if (lastStart !== undefined && start < lastStart + REPEATED_SEQUENCE_LENGTH) {
+        continue
+      }
+      lastStarts.set(id, start)
+      const pages = visits.slice(start, start + REPEATED_SEQUENCE_LENGTH)
+      const run = runs.get(id)
+      runs.set(id, {
+        count: (run?.count ?? 0) + 1,
+        firstAt: Math.min(run?.firstAt ?? Infinity, pages[0].at),
+        pages: run && run.pages[0].at > pages[0].at ? run.pages : pages
+      })
+    }
+  }
+  return runs
+}
+
 /**
- * At most one repeated sequence and one repeated page, from the day of the newest visit.
- * shortcut: visits from all tabs form one sequence; add a tab id when tabs must be told apart.
+ * At most one repeated sequence and two repeated pages, from the day of the newest visit.
+ * Pages of the suggested sequence are left out: the sequence already covers them.
  */
 export function deriveBrowserActivitySuggestions(
   visits: readonly BrowserActivityVisit[],
@@ -65,68 +109,39 @@ export function deriveBrowserActivitySuggestions(
   }
   const dayStart = startOfLocalDay(newest.at)
   const today = visits.filter((visit) => visit.at >= dayStart)
-  const keys = today.map(browserActivityPageUrl)
   const suggestions: BrowserActivitySuggestion[] = []
 
-  const runs = new Map<string, { count: number; firstStart: number; lastStart: number }>()
-  for (let start = 0; start + REPEATED_SEQUENCE_LENGTH <= keys.length; start++) {
-    const window = keys.slice(start, start + REPEATED_SEQUENCE_LENGTH)
-    if (new Set(window).size !== REPEATED_SEQUENCE_LENGTH) {
-      continue
-    }
-    const id = `sequence:${window.join(' > ')}`
-    const run = runs.get(id)
-    if (!run) {
-      runs.set(id, { count: 1, firstStart: start, lastStart: start })
-    } else if (start >= run.lastStart + REPEATED_SEQUENCE_LENGTH) {
-      // Overlapping windows are one run, not two.
-      runs.set(id, { ...run, count: run.count + 1, lastStart: start })
-    }
-  }
-  let bestRun: { id: string; count: number; firstStart: number; lastStart: number } | null = null
-  for (const [id, run] of runs) {
-    if (run.count < REPEATED_SEQUENCE_MIN_RUNS || dismissedIds.includes(id)) {
-      continue
-    }
-    // A repeated lap also repeats its rotations; the one seen first is where the user started.
-    if (
-      !bestRun ||
-      run.count > bestRun.count ||
-      (run.count === bestRun.count && run.firstStart < bestRun.firstStart)
-    ) {
-      bestRun = { id, ...run }
-    }
-  }
+  // A repeated lap also repeats its rotations; the one seen first is where the user started.
+  const bestRun = [...countSequenceRuns(today)]
+    .filter(([id, run]) => run.count >= REPEATED_SEQUENCE_MIN_RUNS && !dismissedIds.includes(id))
+    .sort(([, a], [, b]) => b.count - a.count || a.firstAt - b.firstAt)
+    .at(0)
   if (bestRun) {
-    suggestions.push({
-      id: bestRun.id,
-      kind: 'repeated-sequence',
-      pages: today.slice(bestRun.lastStart, bestRun.lastStart + REPEATED_SEQUENCE_LENGTH),
-      count: bestRun.count
-    })
+    const [id, run] = bestRun
+    suggestions.push({ id, kind: 'repeated-sequence', pages: run.pages, count: run.count })
   }
+  const covered = new Set(bestRun?.[1].pages.map(browserActivityPageUrl))
 
   const pages = new Map<string, { visit: BrowserActivityVisit; count: number }>()
   for (const visit of today) {
     const key = browserActivityPageUrl(visit)
     pages.set(key, { visit, count: (pages.get(key)?.count ?? 0) + 1 })
   }
-  let bestPage: { id: string; visit: BrowserActivityVisit; count: number } | null = null
-  for (const [key, page] of pages) {
-    const id = `page:${key}`
-    if (page.count < REPEATED_PAGE_MIN_VISITS || dismissedIds.includes(id)) {
-      continue
-    }
-    if (!bestPage || page.count > bestPage.count) {
-      bestPage = { id, ...page }
-    }
-  }
-  if (bestPage) {
+  const repeatedPages = [...pages]
+    .filter(
+      ([key, page]) =>
+        page.count >= REPEATED_PAGE_MIN_VISITS &&
+        !covered.has(key) &&
+        !dismissedIds.includes(`page:${key}`)
+    )
+    .sort(([, a], [, b]) => b.count - a.count)
+    .slice(0, MAX_REPEATED_PAGE_SUGGESTIONS)
+  for (const [key, page] of repeatedPages) {
     suggestions.push({
-      id: bestPage.id,
+      id: `page:${key}`,
       kind: 'repeated-page',
-      pages: [bestPage.visit],
-      count: bestPage.count
+      pages: [page.visit],
+      count: page.count
     })
   }
   return suggestions

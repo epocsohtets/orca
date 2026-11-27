@@ -24600,11 +24600,15 @@
     },
     "browser-pane": {
       "suggestions": {
-        "repeatedSequence": "You repeated the same sequence of pages {{times}} times today",
-        "repeatedPage": "You opened this page {{times}} times today",
-        "chipLabel": "Suggestions from your browsing",
-        "letAgent": "Let an agent do this",
-        "dismiss": "Dismiss"
+        "dismiss": "Dismiss",
+        "actionSequence": "Hand the round from {{first}} to {{last}} to an agent",
+        "actionPage": "Hand the {{page}} check you keep opening to an agent",
+        "evidenceSequence": "You went through these pages in the same order {{times}} times today, last at {{time}}.",
+        "evidencePage": "You opened this page {{times}} times today, last at {{time}}.",
+        "new": "New",
+        "start": "Start",
+        "title": "Suggestions",
+        "indicatorLabel": "Suggestions: {{total}}"
       }
     }
   },

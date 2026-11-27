@@ -41,7 +41,7 @@ export type BrowserPageWebviewNavigationHandlersArgs = {
   onSetUrlRef: MutableRefObject<BrowserPageUrlSetter>
   onUpdatePageStateRef: MutableRefObject<(tabId: string, updates: BrowserTabPageState) => void>
   addBrowserHistoryEntryRef: MutableRefObject<
-    (url: string, title: string, faviconUrl?: string | null) => void
+    (url: string, title: string, faviconUrl?: string | null, pageId?: string) => void
   >
   faviconUrlRef: MutableRefObject<string | null>
   setAddressBarValue: Dispatch<SetStateAction<string>>
@@ -190,7 +190,7 @@ export function createBrowserPageWebviewNavigationHandlers({
     const currentUrl = cachedBrowserGuestMetadata(webview)?.url || browserTabUrl
     const browserModelUrl = redactKagiSessionToken(currentUrl)
     const title = getBrowserDisplayTitle(event.title, browserModelUrl)
-    addBrowserHistoryEntryRef.current(browserModelUrl, title, faviconUrlRef.current)
+    addBrowserHistoryEntryRef.current(browserModelUrl, title, faviconUrlRef.current, browserTabId)
   }
 
   const handleFaviconUpdate = (event: { favicons?: string[] }): void => {

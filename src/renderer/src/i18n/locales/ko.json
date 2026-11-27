@@ -23588,11 +23588,15 @@
     },
     "browser-pane": {
       "suggestions": {
-        "repeatedSequence": "오늘 같은 순서로 페이지를 {{times}}번 반복했습니다",
-        "repeatedPage": "오늘 이 페이지를 {{times}}번 열었습니다",
-        "chipLabel": "브라우징에서 찾은 제안",
-        "letAgent": "에이전트에게 맡기기",
-        "dismiss": "닫기"
+        "actionSequence": "{{first}}부터 {{last}}까지 도는 확인 순서를 에이전트에게 맡기기",
+        "actionPage": "자주 여는 {{page}} 확인을 에이전트에게 맡기기",
+        "evidenceSequence": "오늘 이 페이지들을 같은 순서로 {{times}}번 돌았습니다. 마지막은 {{time}}입니다.",
+        "evidencePage": "오늘 이 페이지를 {{times}}번 열었습니다. 마지막은 {{time}}입니다.",
+        "new": "새 제안",
+        "start": "시작",
+        "dismiss": "닫기",
+        "title": "제안",
+        "indicatorLabel": "제안 {{total}}개"
       }
     }
   },
