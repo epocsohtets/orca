@@ -10,6 +10,10 @@ import { BrowserHomePageSetting } from './BrowserHomePageSetting'
 import { BrowserDefaultZoomSetting } from './BrowserDefaultZoomSetting'
 import { BrowserMemorySaverSetting } from './BrowserMemorySaverSetting'
 import { getBrowserMemorySaverSearchEntry } from './browser-memory-saver-search'
+import {
+  BrowserActivitySuggestionsSetting,
+  getBrowserActivitySearchEntry
+} from './BrowserActivitySuggestionsSetting'
 import { BrowserUseSetup } from './use/BrowserUsePane'
 import { BrowserSearchEngineSetting } from './BrowserSearchEngineSetting'
 import { BrowserLinkRoutingSetting } from './routing/BrowserLinkRoutingSetting'
@@ -140,6 +144,7 @@ export function BrowserPane({
   const showMemorySaver =
     !isWebClientLocation() &&
     matchesSettingsSearch(searchQuery, [getBrowserMemorySaverSearchEntry()])
+  const showActivity = matchesSettingsSearch(searchQuery, [getBrowserActivitySearchEntry()])
   const showBrowserUse = matchesSettingsSearch(searchQuery, getBrowserUsePaneSearchEntries())
   const isMac = isMacUserAgent()
   const linkRoutingDescription = getBrowserLinkRoutingDescription(
@@ -261,6 +266,7 @@ export function BrowserPane({
       showSearchEngine ||
       showDefaultZoom ||
       showMemorySaver ||
+      showActivity ||
       showUserAgent ||
       showSitePermissions ||
       showLinkRouting ||
@@ -296,6 +302,13 @@ export function BrowserPane({
 
           {showMemorySaver ? (
             <BrowserMemorySaverSetting settings={settings} updateSettings={updateSettings} />
+          ) : null}
+
+          {showActivity ? (
+            <BrowserActivitySuggestionsSetting
+              settings={settings}
+              updateSettings={updateSettings}
+            />
           ) : null}
 
           {showUserAgent ? <BrowserUserAgentSetting /> : null}
