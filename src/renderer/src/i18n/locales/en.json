@@ -13966,12 +13966,7 @@
           "7b2b114099": "Open artifacts"
         },
         "inaxAccount": {
-          "title": "inAX Account",
-          "account": "inAX account",
-          "description": "Sign in with inAX to see your inAX tasks in Orca.",
-          "signedOut": "Sign in to see your inAX tasks in Orca.",
           "signIn": "Sign in with inAX",
-          "searchDescription": "Sign in or out of the inAX account used by the inAX tasks tab.",
           "providerConnected": "1 account connected",
           "providerDescription": "Sign in with inAX to browse and start work from your inAX tasks.",
           "providerCredentialCopy": "Sign in with your inAX account. This preview uses a sample account: nothing is sent or stored, and the sign-in resets when Orca reloads."
