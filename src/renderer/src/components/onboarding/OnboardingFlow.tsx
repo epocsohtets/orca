@@ -23,6 +23,7 @@ import { useTranslate } from '@/i18n/use-translate'
 import { addAppKeyListener, removeAppKeyListener } from '@/lib/keyboard/app-keyboard-router'
 import { useScrollEdgeFades } from '@/lib/list-interaction/use-scroll-edge-fades'
 import { AgentSurfaceStep } from './AgentSurfaceStep'
+import { WorkStyleStep } from './WorkStyleStep'
 import { stepCopy, stepTooltipLabels } from './onboarding-step-copy'
 
 type OnboardingFlowProps = {
@@ -221,6 +222,9 @@ export default function OnboardingFlow({
                   : cn('scrollbar-sleek overflow-y-auto pr-1', 'mt-10', stepFades.className)
               )}
             >
+              {currentStep.id === 'work_style' && flow.settings ? (
+                <WorkStyleStep settings={flow.settings} updateSettings={flow.updateSettings} />
+              ) : null}
               {currentStep.id === 'agent_surface' && (
                 <AgentSurfaceStep
                   agentSurface={flow.agentSurface}

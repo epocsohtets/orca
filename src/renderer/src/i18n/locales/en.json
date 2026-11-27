@@ -1201,6 +1201,15 @@
       },
       "sessionHost": {
         "sshDetail": "Pages for this SSH host open on this computer."
+      },
+      "activitySuggestions": {
+        "title": "Activity suggestions",
+        "description": "Records the pages you open in the built-in browser (time, address without query, title) to suggest handing repeated web work to an agent. The record stays in memory on this device.",
+        "searchKeywords": {
+          "activity": "activity",
+          "suggestions": "suggestions",
+          "privacy": "privacy"
+        }
       }
     },
     "agents": {
@@ -24588,6 +24597,19 @@
         "filesStayLine": "Its files stay on {{host}}.",
         "removing": "Removing…"
       }
+    },
+    "browser-pane": {
+      "suggestions": {
+        "dismiss": "Dismiss",
+        "actionSequence": "Hand the round from {{first}} to {{last}} to an agent",
+        "actionPage": "Hand the {{page}} check you keep opening to an agent",
+        "evidenceSequence": "You went through these pages in the same order {{times}} times today, last at {{time}}.",
+        "evidencePage": "You opened this page {{times}} times today, last at {{time}}.",
+        "new": "New",
+        "start": "Start",
+        "title": "Suggestions",
+        "indicatorLabel": "Suggestions: {{total}}"
+      }
     }
   },
   "dashboardPopout": {
@@ -26577,6 +26599,38 @@
       "settingsError": "Could not load your settings.",
       "loadingSettings": "Loading settings…",
       "loading": "Loading language…"
+    }
+  },
+  "workStyles": {
+    "title": "How you work",
+    "description": "Choose every way you work. Orca hides the settings and setup steps you do not need. With nothing chosen, everything shows.",
+    "hiddenHint": "Hidden for your work style",
+    "options": {
+      "code": {
+        "label": "Code",
+        "description": "Terminal, Git and agents in repositories"
+      },
+      "web": {
+        "label": "Web",
+        "description": "Work in the browser"
+      },
+      "desktopApps": {
+        "label": "Desktop apps",
+        "description": "Excel, Photoshop and other apps"
+      },
+      "meetings": {
+        "label": "Meetings",
+        "description": "Calls, notes and dictation"
+      }
+    },
+    "showAll": {
+      "label": "Show all settings",
+      "description": "Show every Settings page, including the pages hidden for your work style."
+    },
+    "onboarding": {
+      "title": "How do you work?",
+      "subtitle": "Choose all that apply. Orca shows only the setup you need.",
+      "switchNote": "Nothing chosen shows everything. Change any time in <em>Settings → General</em>."
     }
   },
   "resourceManager": {

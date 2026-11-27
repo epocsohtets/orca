@@ -319,7 +319,13 @@ export type BrowserSlice = {
     serverClearsAnyProfile?: boolean
   }) => Promise<boolean>
   browserUrlHistory: BrowserHistoryEntry[]
-  addBrowserHistoryEntry: (url: string, title: string, faviconUrl?: string | null) => void
+  /** `pageId` names the tab that navigated; only the activity record uses it. */
+  addBrowserHistoryEntry: (
+    url: string,
+    title: string,
+    faviconUrl?: string | null,
+    pageId?: string
+  ) => void
   /** Returns the removed entry so an Undo can put it back with its visit count. */
   removeBrowserHistoryEntry: (normalizedUrl: string) => BrowserHistoryEntry | null
   /** Puts removed or cleared entries back, except ones a revisit has already re-created. */

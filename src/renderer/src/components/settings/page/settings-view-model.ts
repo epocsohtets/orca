@@ -12,6 +12,8 @@ import {
 } from '../navigation/settings-navigation-foundations'
 import { cancelPendingSettingsTargetFocus } from '../navigation/settings-target-focus'
 import type { SettingsSearchResult } from '../navigation/settings-search-results'
+import { isSettingsSectionHiddenForWorkStyles } from '../navigation/settings-navigation-work-styles'
+import type { WorkStyleSettings } from '../../../../../shared/settings/work-styles'
 
 export function useSettingsNavigationActions(
   model: Pick<
@@ -153,12 +155,18 @@ export function useSettingsNavigationActions(
 export type SettingsNavigationActions = ReturnType<typeof useSettingsNavigationActions>
 
 export function buildSettingsViewModel(
-  model: Pick<SettingsStoreModel, 'repos' | 'settingsSearchQuery' | 'activeSectionId'>,
+  model: Pick<SettingsStoreModel, 'repos' | 'settingsSearchQuery' | 'activeSectionId'> & {
+    settings?: WorkStyleSettings | null
+  },
   navigation: Pick<SettingsNavigationModel, 'visibleNavSections' | 'neededSectionIds'>,
   t: Translate = translate
 ) {
   const generalNavSections = navigation.visibleNavSections.filter(
-    (section) => section.group !== 'repositories'
+    (section) =>
+      section.group !== 'repositories' &&
+      // The open page keeps its row, so a hidden page reached by search or link shows where you are.
+      (section.id === model.activeSectionId ||
+        !isSettingsSectionHiddenForWorkStyles(section.id, model.settings))
   )
   const generalNavGroupDefinitions = getSettingsNavGroupDefinitionsForSearch(
     navigation.visibleNavSections,

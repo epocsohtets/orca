@@ -99,7 +99,12 @@ export function useRemoteBrowserPageNavigation({
       if (filing !== lastFiledHistoryRef.current) {
         lastFiledHistoryRef.current = filing
         // The host's icon belongs to this document only once the page already shows its URL.
-        addBrowserHistoryEntry(safeUrl, title, page?.url === safeUrl ? page.faviconUrl : undefined)
+        addBrowserHistoryEntry(
+          safeUrl,
+          title,
+          page?.url === safeUrl ? page.faviconUrl : undefined,
+          browserTab.id
+        )
       }
       setAddressBarValueFromPage(toDisplayUrl(safeUrl))
     },

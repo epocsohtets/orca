@@ -10,6 +10,7 @@ import { searchKeywords, translateSearchKeyword } from '../search/settings-searc
 import { createLocalizedCatalog } from '@/i18n/localized-catalog'
 import { getGeneralProjectRuntimeSearchEntries } from './project-runtime/general-project-runtime-search'
 import { getGeneralSupportSearchEntries } from './general-support-search'
+import { getWorkStyleSearchEntries } from '../work-styles/work-style-search'
 import { getUpdateDelayDescription, getUpdateDelayTitle } from '../updates/update-delay-copy'
 
 export const getGeneralWorkspaceSearchDescriptors = createLocalizedCatalog(() => [
@@ -221,6 +222,7 @@ export function getGeneralPaneSearchEntries(
   options: GeneralPaneSearchOptions = {}
 ): SettingsSearchEntry[] {
   return [
+    ...getWorkStyleSearchEntries(),
     ...getGeneralWorkspaceSearchEntries(),
     ...getGeneralNavigationSearchEntries(),
     ...Object.values(getGeneralConfirmationSearchEntries()),

@@ -6,8 +6,10 @@ import type { WorktreeCardDisplaySettings } from '../worktree/card-display-setti
 import type { BrowserLinkOpeningSettings } from '../browser/navigation/browser-link-opening-settings'
 import type { BrowserPasswordsGlobalSettings } from '../browser/passwords/browser-passwords-types'
 import type { BrowserMemorySaverGlobalSettings } from '../browser/guest-lifecycle/browser-memory-saver'
+import type { BrowserActivityRecordGlobalSettings } from '../browser/browser-activity-record-settings'
 import type { PerfNoticeGlobalSettings } from '../perf-notices/perf-notice-settings'
 import type { ClaudeAccountSwitchSettings } from '../agent-accounts/claude/claude-account-switch-settings'
+import type { WorkStyleSettings } from './work-styles'
 import type { NativeChatGlobalSettings } from '../native-chat/settings/native-chat-appearance-settings'
 import type { NativeChatIdleStopSettings } from '../native-chat/settings/native-chat-idle-stop'
 import type { SharedCodexServersSettings } from '../native-chat/settings/native-chat-shared-codex-servers'
@@ -47,6 +49,7 @@ type DesktopWindowSettings = {
 
 /** Settings groups owned by their feature modules and composed into GlobalSettings. */
 export type GlobalSettingsBase = AntigravityChatAuthSettings &
+  WorkStyleSettings &
   EmulatorOpeningSettings &
   SshRemoteControlSettings &
   ClaudeAgentViewSettings &
@@ -73,6 +76,7 @@ export type GlobalSettingsBase = AntigravityChatAuthSettings &
   BotsGlobalSettings &
   BrowserPasswordsGlobalSettings &
   BrowserMemorySaverGlobalSettings &
+  BrowserActivityRecordGlobalSettings &
   PerfNoticeGlobalSettings &
   NestedWorkerDepthSettings &
   AgentWorkspaceTrustSettings &

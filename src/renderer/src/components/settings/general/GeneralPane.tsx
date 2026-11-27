@@ -34,6 +34,8 @@ import { GeneralConfirmationsSection } from './GeneralConfirmationsSection'
 import { GeneralSearchResults } from './GeneralSearchResults'
 import { getGeneralSubPageTitle, type GeneralSubPage } from './general-sub-pages'
 import { useOpenInMenuDraft } from './OpenInMenuSetting'
+import { WorkStyleSettingsGroup } from '../work-styles/WorkStyleSettingsGroup'
+import { getWorkStyleSearchEntries } from '../work-styles/work-style-search'
 
 export function getDesktopPlatformFromUserAgent(userAgent: string): 'darwin' | 'win32' | 'other' {
   if (userAgent.includes('Mac')) {
@@ -176,6 +178,9 @@ function GeneralRootSettings({
         : t('settings.general.worktrees.hidden', 'All hidden')
   return (
     <>
+      {matchesSettingsSearch(query, getWorkStyleSearchEntries()) ? (
+        <WorkStyleSettingsGroup settings={settings} updateSettings={updateSettings} />
+      ) : null}
       {matchesSettingsSearch(query, tabsEntries) ? (
         <SettingsGroup title={t('settings.general.tabs.title', 'Tabs')}>
           <RecentTabOrderControl

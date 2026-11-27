@@ -30,6 +30,7 @@ import {
 } from './settings-search-results'
 import { WorkspaceCleanupNavProgress } from '../../workspace-cleanup/removal/run/WorkspaceCleanupNavProgress'
 import { SettingsSearchField, SettingsSearchResultsList } from './SettingsSidebarSearch'
+import { isSettingsSectionHiddenForWorkStyles } from './settings-navigation-work-styles'
 
 type NavSection = {
   id: string
@@ -266,6 +267,7 @@ export function SettingsSidebar({
           getOptionId={getOptionId}
           repoSectionById={repoSectionById}
           groupTitleById={groupTitleById}
+          isHiddenSection={(sectionId) => isSettingsSectionHiddenForWorkStyles(sectionId, settings)}
           hiddenResultCount={hiddenResultCount}
           // The deferred ranking can trail typing by a frame; don't announce a false empty state.
           pending={deferredSearchQuery !== searchQuery}

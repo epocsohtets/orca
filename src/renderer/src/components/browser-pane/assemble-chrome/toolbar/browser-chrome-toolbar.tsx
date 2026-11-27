@@ -16,6 +16,7 @@ import {
 import { resolveBrowserSourceUnifiedTab } from '@/lib/browser/workspace/browser-workspace-source-resolution'
 import { useFloatingSplitTabClose } from '@/components/floating-terminal/workspace/use-floating-split-tab-close'
 import { MarkupDrawButton } from '../../annotate/markup-tools/MarkupDrawButton'
+import { BrowserSuggestionsIndicator } from '../../suggestions/BrowserSuggestionsIndicator'
 
 export type BrowserChromeOverflowMenuProps = {
   triggerRef: React.RefObject<HTMLButtonElement | null>
@@ -42,7 +43,8 @@ export function BrowserChromeToolbar({
   shareControl,
   overflowMenu,
   closeTabOwner,
-  showTourAnchors = false
+  showTourAnchors = false,
+  suggestions = true
 }: {
   controls: BrowserNavigationControls
   addressSlot: React.ReactNode
@@ -66,6 +68,8 @@ export function BrowserChromeToolbar({
   closeTabOwner: { worktreeId: string; browserPageId: string }
   /** Only the browsing pane anchors the contextual tour; a second anchor would steal its steps. */
   showTourAnchors?: boolean
+  /** Off for document previews, which are not web browsing. */
+  suggestions?: boolean
 }): React.JSX.Element {
   const closeTab = useFloatingSplitTabClose(closeTabOwner.worktreeId, (state) =>
     resolveBrowserSourceUnifiedTab(state, closeTabOwner.browserPageId, closeTabOwner.worktreeId)
@@ -97,6 +101,7 @@ export function BrowserChromeToolbar({
       reloadLabel={reloadLabel}
       showTourAnchors={showTourAnchors}
     >
+      {suggestions ? <BrowserSuggestionsIndicator worktreeId={closeTabOwner.worktreeId} /> : null}
       {shareControl}
       {elementTools ? (
         <BrowserAnnotateToolButton

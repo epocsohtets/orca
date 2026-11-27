@@ -268,7 +268,7 @@ export function ClientHostedBrowserPagePane(props: Props) {
       })
       if (observeUrl || (state.kind === 'title' && presentDocument && !activeLoadFailure)) {
         const title = getBrowserDisplayTitle(metadata.title, metadata.url)
-        recordHistoryFromGuest(metadata.url, title, current.faviconUrl)
+        recordHistoryFromGuest(metadata.url, title, current.faviconUrl, browserTab.id)
       }
     }
     const onNavigate = (): void => setFindOpen(false)

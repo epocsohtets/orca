@@ -97,6 +97,8 @@ type SettingsSearchResultsListProps = {
   getOptionId: (index: number) => string
   repoSectionById: ReadonlyMap<string, { repoIcon?: RepoIcon | null; badgeColor?: string }>
   groupTitleById: ReadonlyMap<string, string>
+  /** The page is left out of the menu for the person's work styles. */
+  isHiddenSection: (sectionId: string) => boolean
   hiddenResultCount: number
   pending: boolean
   onSelect: (result: SettingsSearchResult) => void
@@ -110,6 +112,7 @@ export function SettingsSearchResultsList({
   getOptionId,
   repoSectionById,
   groupTitleById,
+  isHiddenSection,
   hiddenResultCount,
   pending,
   onSelect
@@ -180,6 +183,9 @@ export function SettingsSearchResultsList({
                         ? t('auto.components.settings.SettingsSidebar.5c9669ff9c', 'Projects')
                         : (groupTitleById.get(result.section.group) ?? result.section.title)
                       : result.section.title}
+                    {isHiddenSection(result.section.id)
+                      ? ` · ${t('workStyles.hiddenHint', 'Hidden for your work style')}`
+                      : null}
                   </span>
                 </span>
               </button>

@@ -153,6 +153,7 @@ export function buildDefaultSettings(args: {
     localhostWorktreeLabelsEnabled: false,
     openLinksInAppPreferencePrompted: false,
     openLinksInAppModifierInverts: false,
+    browserActivityRecordEnabled: true,
     openLinksInAppInBackground: false,
     terminalLinkActionPopoverEnabled: true,
     terminalLinkClickBehavior: 'actions',

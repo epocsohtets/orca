@@ -7,7 +7,10 @@ import type {
 import { getFeatureWallSetupStepsForSection } from '../../../../../shared/feature-education/explore/feature-wall-setup-steps'
 import { cn } from '@/lib/class-names'
 import { useScrollEdgeFades } from '@/lib/list-interaction/use-scroll-edge-fades'
-import type { FeatureWallSetupProgress } from './feature-wall-setup-progress'
+import {
+  isSetupStepForWorkStyles,
+  type FeatureWallSetupProgress
+} from './feature-wall-setup-progress'
 import { FullDiskAccessSetupPrompt } from './FullDiskAccessSetupPrompt'
 import { AgentCapabilitiesSetupAction } from './agent-capabilities/AgentCapabilitiesSetupAction'
 import {
@@ -306,8 +309,11 @@ export function FeatureWallSetupChecklist(
     activeStep?.id === 'two-worktrees' ||
     activeStep?.id === 'browser' ||
     activeStep?.id === 'add-two-repos'
-  const setupSteps = getFeatureWallSetupStepsForSection('setup')
-  const parallelWorkSteps = getFeatureWallSetupStepsForSection('parallel-work')
+  const settings = useAppStore((s) => s.settings)
+  const isAsked = (step: FeatureWallSetupStep): boolean =>
+    isSetupStepForWorkStyles(step.id, settings)
+  const setupSteps = getFeatureWallSetupStepsForSection('setup').filter(isAsked)
+  const parallelWorkSteps = getFeatureWallSetupStepsForSection('parallel-work').filter(isAsked)
   const visualBreakpoint = isEmbedded ? 'xl' : 'sm'
   const panelFades = useScrollEdgeFades<HTMLDivElement>()
   const visualGridClass =
