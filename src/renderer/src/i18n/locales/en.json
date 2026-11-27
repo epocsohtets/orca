@@ -4606,7 +4606,12 @@
           "linearViewNotFound": "Saved Linear view was not found.",
           "linearViewRestoreFailed": "Failed to restore saved Linear view."
         },
-        "shownCount_one": "{{count}} shown"
+        "shownCount_one": "{{count}} shown",
+        "inaxSource": "inAX",
+        "inaxSampleData": "inAX · sample data",
+        "inaxStatusOpen": "Open",
+        "inaxStatusInProgress": "In progress",
+        "inaxSignedOut": "Sign in with inAX to see your tasks"
       },
       "Terminal": {
         "73768427cf": "Close",
@@ -13959,6 +13964,14 @@
           "keywordUpload": "upload",
           "09f41ce46c": "Show artifacts button",
           "7b2b114099": "Open artifacts"
+        },
+        "inaxAccount": {
+          "title": "inAX Account",
+          "account": "inAX account",
+          "description": "Sign in with inAX to see your inAX tasks in Orca.",
+          "signedOut": "Sign in to see your inAX tasks in Orca.",
+          "signIn": "Sign in with inAX",
+          "searchDescription": "Sign in or out of the inAX account used by the inAX tasks tab."
         },
         "orcaAccount": {
           "connected": "Connected",

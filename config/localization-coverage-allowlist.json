@@ -452,5 +452,54 @@
   {
     "filePath": "src/shared/bots/bot-item-ask-advice.ts",
     "reason": "Agent mail for item asks."
+  },
+  {
+    "filePath": "src/renderer/src/components/task-page/inax/inax-mock-tasks.ts",
+    "kind": "object-property:title",
+    "text": "Add SSO login to the tenant admin console",
+    "dynamic": false,
+    "count": 1
+  },
+  {
+    "filePath": "src/renderer/src/components/task-page/inax/inax-mock-tasks.ts",
+    "kind": "object-property:title",
+    "text": "Retry failed SFTP uploads with backoff",
+    "dynamic": false,
+    "count": 1
+  },
+  {
+    "filePath": "src/renderer/src/components/task-page/inax/inax-mock-tasks.ts",
+    "kind": "object-property:title",
+    "text": "Show per-tenant usage on the billing page",
+    "dynamic": false,
+    "count": 1
+  },
+  {
+    "filePath": "src/renderer/src/components/task-page/inax/inax-mock-tasks.ts",
+    "kind": "object-property:title",
+    "text": "Migrate audit log storage to partitioned tables",
+    "dynamic": false,
+    "count": 1
+  },
+  {
+    "filePath": "src/renderer/src/components/task-page/inax/inax-mock-tasks.ts",
+    "kind": "object-property:title",
+    "text": "Fix role picker losing focus after search",
+    "dynamic": false,
+    "count": 1
+  },
+  {
+    "filePath": "src/renderer/src/components/task-page/inax/inax-mock-tasks.ts",
+    "kind": "object-property:title",
+    "text": "Document the xRS export API",
+    "dynamic": false,
+    "count": 1
+  },
+  {
+    "filePath": "src/renderer/src/components/task-page/inax/inax-mock-tasks.ts",
+    "kind": "object-property:title",
+    "text": "Rate-limit webhook deliveries per tenant",
+    "dynamic": false,
+    "count": 1
   }
 ]
