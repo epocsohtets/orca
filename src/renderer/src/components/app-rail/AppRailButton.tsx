@@ -8,6 +8,7 @@ export const APP_RAIL_ICON_SIZE = 16
 export const APP_RAIL_ICON_STROKE_WIDTH = 1.75
 
 const APP_RAIL_ITEM_IDS = [
+  'home',
   'workspaces',
   'tasks',
   'automations',

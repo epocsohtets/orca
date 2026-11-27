@@ -31396,7 +31396,8 @@
     "customize": "Customize",
     "pageRegion": "Page",
     "account": "Account",
-    "signIn": "Sign in"
+    "signIn": "Sign in",
+    "home": "Home"
   },
   "chats": {
     "delete": {
@@ -31463,6 +31464,41 @@
       "title": "Pinned",
       "expand": "Expand Pinned",
       "collapse": "Collapse Pinned"
+    }
+  },
+  "home": {
+    "summary": "{{inProgress}} in progress, {{needs}} waiting on you",
+    "summarySignedOut": "{{needs}} waiting on you",
+    "myWork": {
+      "title": "My work today",
+      "empty": "No tasks assigned to you",
+      "lastUpdate": "Last update by {{name}}"
+    },
+    "needsYou": {
+      "title": "Needs you",
+      "questionTitle": "Claude Code asks: keep the legacy SSO callback URL?",
+      "questionDetail": "INAX-128 · waiting for your answer",
+      "answer": "Answer",
+      "checkoutTitle": "Confirm today’s check-out",
+      "checkoutDetail": "Your apps for today are ready to review",
+      "review": "Review",
+      "reviewTitle": "Review: Fix role picker losing focus after search",
+      "reviewDetail": "INAX-119 · Codex marked it done",
+      "open": "Open"
+    },
+    "agents": {
+      "title": "What agents did",
+      "sample1Title": "Claude Code updated INAX-128",
+      "sample1Detail": "Added the SSO login form and tests",
+      "sample2Title": "Codex finished INAX-119",
+      "sample2Detail": "Role picker keeps focus after search",
+      "sample3Title": "Standup bot posted the daily summary",
+      "sample3Detail": "4 tasks moved, 1 blocked"
+    },
+    "apps": {
+      "title": "Apps today",
+      "manage": "Manage",
+      "usageUnknown": "Usage time is not recorded yet"
     }
   }
 }

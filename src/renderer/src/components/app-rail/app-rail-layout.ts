@@ -32,7 +32,8 @@ type AppRailPageState = AppRailSettingsState & Pick<UISlice, 'activeView'>
 /** A rail destination is open with the rail on: the page fills the width and the workspace list body collapses. */
 export function selectRailPageHidesWorkspaceList(state: AppRailPageState): boolean {
   return (
-    selectAppRailVisible(state) && APP_RAIL_DESTINATION_IDS.some((id) => id === state.activeView)
+    selectAppRailVisible(state) &&
+    (state.activeView === 'home' || APP_RAIL_DESTINATION_IDS.some((id) => id === state.activeView))
   )
 }
 
