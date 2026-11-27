@@ -2252,6 +2252,22 @@
         "files": "From this repo’s files",
         "open": "Open {{file}}"
       }
+    },
+    "myApps": {
+      "add": "Add app",
+      "registered": "Registered apps",
+      "searchPlaceholder": "Search installed apps…",
+      "noMatches": "No apps found.",
+      "emptyTitle": "No apps registered",
+      "emptyDescription": "Add the apps you work in to watch them.",
+      "paused": "Paused",
+      "watching": "Watching",
+      "watchToggle": "Watch {{name}}",
+      "remove": "Remove",
+      "title": "My apps",
+      "description": "The apps you work in. Orca watches the ones you register.",
+      "removeTitle": "Remove {{name}}?",
+      "removeDescription": "This removes the app from your registered apps. The app stays installed on this Mac."
     }
   },
   "menu": {

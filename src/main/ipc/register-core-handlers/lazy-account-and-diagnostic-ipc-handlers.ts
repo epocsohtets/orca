@@ -23,6 +23,8 @@ const COMPUTER_USE_PERMISSION_CHANNELS = [
   'computerUsePermissions:reset'
 ] as const
 
+const MY_APPS_CHANNELS = ['myApps:listInstalled'] as const
+
 const OPENCODE_GO_CREDENTIALS_CHANNELS = [
   'opencodeGoCredentials:getStatus',
   'opencodeGoCredentials:saveApiKey',
@@ -62,6 +64,11 @@ export function registerLazyAccountAndDiagnosticIpcHandlers(rateLimits: RateLimi
   registerLazyIpcHandleGroup(COMPUTER_USE_PERMISSION_CHANNELS, async (ipc) => {
     const { registerComputerUsePermissionHandlers } = await import('../computer-use-permissions')
     registerComputerUsePermissionHandlers(ipc)
+  })
+
+  registerLazyIpcHandleGroup(MY_APPS_CHANNELS, async (ipc) => {
+    const { registerMyAppsHandlers } = await import('../my-apps')
+    registerMyAppsHandlers(ipc)
   })
 
   registerLazyIpcHandleGroup(OPENCODE_GO_CREDENTIALS_CHANNELS, async (ipc) => {

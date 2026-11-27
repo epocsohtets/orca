@@ -1259,6 +1259,22 @@
         "files": "이 저장소 파일에 있는 서버",
         "open": "{{file}} 열기"
       }
+    },
+    "myApps": {
+      "add": "앱 추가",
+      "registered": "등록한 앱",
+      "searchPlaceholder": "설치된 앱 검색…",
+      "noMatches": "앱을 찾을 수 없습니다.",
+      "emptyTitle": "등록한 앱이 없습니다",
+      "emptyDescription": "작업하는 앱을 추가하면 Orca가 지켜봅니다.",
+      "paused": "일시 중지됨",
+      "watching": "지켜보는 중",
+      "watchToggle": "{{name}} 지켜보기",
+      "remove": "제거",
+      "title": "내 앱",
+      "description": "작업하는 앱입니다. 등록한 앱을 Orca가 지켜봅니다.",
+      "removeTitle": "{{name}}을(를) 제거하시겠습니까?",
+      "removeDescription": "등록한 앱에서 이 앱을 제거합니다. 앱은 이 Mac에 그대로 설치되어 있습니다."
     }
   },
   "menu": {
