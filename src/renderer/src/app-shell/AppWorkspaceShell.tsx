@@ -20,6 +20,7 @@ import { AppShellLeftColumn } from './chrome/AppShellLeftColumn'
 import { useRailPageFocusRecovery } from './chrome/use-rail-page-focus-recovery'
 import { RightSidebarToggle } from './chrome/RightSidebarToggle'
 import { TitlebarMainStrip } from './chrome/TitlebarMainStrip'
+import { SidebarChatConversationMount } from '../components/sidebar-chat/SidebarChatConversationView'
 import type { AppChromeLayout } from './chrome/use-app-chrome-layout'
 import type { FloatingWorkspacePanelState } from '../components/floating-terminal/workspace/use-floating-workspace-panel'
 
@@ -301,6 +302,7 @@ export function AppWorkspaceShell(props: {
                     </RecoverableRenderErrorBoundary>
                   </Suspense>
                 </div>
+                <SidebarChatConversationMount />
                 {floatingWorkspace.showToggleButton && !capturingPluginShot ? (
                   <MemoFloatingTerminalToggleButton
                     open={floatingWorkspace.open}

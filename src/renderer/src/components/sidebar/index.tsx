@@ -34,6 +34,7 @@ import { SeveredTerminalDaemonBanner } from '../maintenance/terminal-daemon/Seve
 import { StalledTerminalDaemonBanner } from '../maintenance/terminal-daemon/StalledTerminalDaemonBanner'
 import { SidebarBotsSection } from '@/components/bots/SidebarBotsSection'
 import { SidebarBotsSplit, SidebarProjectsListSlot } from './SidebarBotsSplit'
+import { SidebarChatSection } from '@/components/sidebar-chat/SidebarChatSection'
 import { SidebarContentViewport } from './SidebarContentViewport'
 import { SidebarSectionDragOverlay } from './SidebarSectionDragOverlay'
 import { PROJECTS_SECTION_GROUP_KEY } from '../../../../shared/sidebar-list/sections/group-keys'
@@ -240,6 +241,7 @@ function Sidebar({
       <SidebarBotsSection onOpenBot={closeWorkspaceBoard} reorderable />
     </SidebarBotsSplit>
   ) : null
+  const chatSection = <SidebarChatSection key="chat" onOpenConversation={closeWorkspaceBoard} />
   const projectsSection = (
     <React.Fragment key="projects">
       <SidebarHeader
@@ -298,6 +300,7 @@ function Sidebar({
     </React.Fragment>
   )
 
+  const sections = [botsSection, chatSection, projectsSection]
   return (
     <TooltipProvider>
       {/* Why: the handle lives outside the clipped sidebar so its outer half isn't cut off. */}
@@ -327,7 +330,7 @@ function Sidebar({
               >
                 <SidebarContentViewport>
                   <SidebarNav />
-                  {projectsFirst ? [projectsSection, botsSection] : [botsSection, projectsSection]}
+                  {projectsFirst ? sections.toReversed() : sections}
                 </SidebarContentViewport>
                 <SidebarSectionDragOverlay sidebarStyle={leftSidebarStyle} />
               </DndContext>

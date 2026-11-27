@@ -29031,5 +29031,30 @@
       "badJson": "붙여넣은 JSON을 확인하세요. 해석할 수 없습니다.",
       "none": "Orca가 추가할 수 있는 서버를 찾지 못했습니다. SSE 서버, 자체 OAuth 클라이언트나 도구 필터가 있는 서버, 환경에서 읽는 값(${VAR})은 지원하지 않습니다."
     }
+  },
+  "sidebarChat": {
+    "presence": {
+      "online": "온라인",
+      "away": "자리 비움",
+      "offline": "오프라인"
+    },
+    "conversation": {
+      "close": "대화 닫기",
+      "send": "보내기",
+      "now": "방금",
+      "placeholder": "{{name}}에게 메시지 보내기"
+    },
+    "members": "멤버 {{count}}명",
+    "section": {
+      "new": "새 메시지 또는 그룹",
+      "title": "채팅",
+      "expand": "채팅 펼치기",
+      "collapse": "채팅 접기",
+      "newMessage": "새 메시지",
+      "newGroup": "새 그룹",
+      "directMessages": "다이렉트 메시지",
+      "groups": "그룹"
+    },
+    "unread": "읽지 않음 {{count}}개"
   }
 }

@@ -31405,5 +31405,30 @@
       "badJson": "Check the pasted JSON: it doesn’t parse.",
       "none": "Orca found no server it can add. SSE servers, servers with their own OAuth client or tool filters, and values read from the environment (${VAR}) aren’t supported."
     }
+  },
+  "sidebarChat": {
+    "presence": {
+      "online": "Online",
+      "away": "Away",
+      "offline": "Offline"
+    },
+    "conversation": {
+      "close": "Close conversation",
+      "send": "Send",
+      "now": "Now",
+      "placeholder": "Message {{name}}"
+    },
+    "members": "{{count}} members",
+    "section": {
+      "new": "New message or group",
+      "title": "Chat",
+      "expand": "Expand Chat",
+      "collapse": "Collapse Chat",
+      "newMessage": "New message",
+      "newGroup": "New group",
+      "directMessages": "Direct messages",
+      "groups": "Groups"
+    },
+    "unread": "{{count}} unread"
   }
 }
