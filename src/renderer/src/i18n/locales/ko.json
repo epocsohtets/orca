@@ -1281,18 +1281,27 @@
       },
       "checkout": {
         "title": "업무 정리",
-        "description": "오늘 등록한 앱을 사용한 기록입니다. 어떤 업무였는지, 결과물이 어디 있는지 적습니다.",
+        "description": "오늘 등록한 앱을 사용한 기록입니다. 앱마다 업무 내용을 적거나 \"업무 아님\"으로 표시하십시오.",
         "empty": "오늘 등록한 앱을 사용한 기록이 없습니다.",
         "note": "어떤 업무였습니까?",
-        "task": "inAX 작업",
         "noTask": "inAX 작업 없음",
-        "outputFile": "결과물 파일",
         "signInHint": "inAX로 로그인하면 이 업무를 작업에 연결할 수 있습니다.",
         "save": "저장",
         "listTitle": "오늘의 업무 정리",
         "listEmpty": "오늘 저장한 업무 정리가 없습니다.",
-        "activity": "오늘 업무 정리 · {{app}} {{time}}"
-      }
+        "activity": "오늘 업무 정리 · {{app}} {{time}}",
+        "notWork": "업무 아님",
+        "removeOutputFile": "결과물 파일 제거",
+        "noteError": "업무 내용을 한 줄로 적으십시오. 업무가 아니면 \"업무 아님\"을 선택하십시오.",
+        "taskOptional": "inAX 작업 (선택)",
+        "outputFileOptional": "결과물 파일 (선택)",
+        "changeFile": "파일 변경",
+        "chooseFile": "파일 선택",
+        "brief": "짧게 쓴 앱 ({{minimum}} 미만, 묻지 않음): {{apps}}",
+        "saveError": "업무 정리를 저장하지 못했습니다. 입력한 내용은 그대로 있습니다. 저장을 다시 선택하십시오.",
+        "saving": "저장 중…"
+      },
+      "removeApp": "{{name}} 제거"
     }
   },
   "menu": {

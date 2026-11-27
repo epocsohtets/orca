@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AppWindow, ClipboardCheck, Plus, Trash2 } from 'lucide-react'
 import type { GlobalSettings } from '../../../../../shared/settings/global-settings-types'
 import { summarizeAppUsage, type AppUsageDay } from '../../../../../shared/my-apps/app-usage'
@@ -47,6 +47,7 @@ export function MyAppsPane({ settings, updateSettings }: MyAppsPaneProps): React
   const intlLocale = useIntlLocale()
   const [usage, setUsage] = useState<AppUsageDay>(EMPTY_USAGE)
   const [checkoutOpen, setCheckoutOpen] = useState(false)
+  const checkoutButtonRef = useRef<HTMLButtonElement>(null)
   const apps = useMemo(() => settings.myApps ?? [], [settings.myApps])
   const iconByPath = useMemo(
     () => new Map(installed.map((app) => [app.path, app.icon])),
@@ -110,7 +111,7 @@ export function MyAppsPane({ settings, updateSettings }: MyAppsPaneProps): React
           <div className="flex items-center gap-2">
             <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
               <PopoverTrigger asChild>
-                <Button variant="outline" size="sm">
+                <Button variant="outline-strong" size="sm">
                   <Plus className="size-3.5" />
                   {addLabel}
                 </Button>
@@ -143,6 +144,7 @@ export function MyAppsPane({ settings, updateSettings }: MyAppsPaneProps): React
               </PopoverContent>
             </Popover>
             <Button
+              ref={checkoutButtonRef}
               size="sm"
               onClick={() => {
                 // Why: the dialog must list sessions up to this click, not the last 10 s refresh.
@@ -205,6 +207,8 @@ export function MyAppsPane({ settings, updateSettings }: MyAppsPaneProps): React
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
                   <Switch
+                    // The track is 20px high; the pseudo-element makes the pointer target 30px.
+                    className="after:absolute after:-inset-1.5"
                     checked={!app.paused}
                     aria-label={t('settings.myApps.watchToggle', 'Watch {{name}}', {
                       name: app.name
@@ -222,7 +226,9 @@ export function MyAppsPane({ settings, updateSettings }: MyAppsPaneProps): React
                       <Button
                         variant="ghost"
                         size="icon-sm"
-                        aria-label={removeLabel}
+                        aria-label={t('settings.myApps.removeApp', 'Remove {{name}}', {
+                          name: app.name
+                        })}
                         onClick={() => void removeApp(app)}
                       >
                         <Trash2 />
@@ -276,6 +282,7 @@ export function MyAppsPane({ settings, updateSettings }: MyAppsPaneProps): React
           apps={apps}
           iconByPath={iconByPath}
           usage={usage}
+          returnFocusRef={checkoutButtonRef}
           onClose={() => setCheckoutOpen(false)}
           onSaved={setUsage}
         />

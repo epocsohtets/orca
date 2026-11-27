@@ -60,3 +60,29 @@ export function summarizeAppUsage(
     sessions: own
   }
 }
+
+/** Under this much foreground time today, an app is "brief use" and check-out does not ask about it. */
+export const APP_CHECKOUT_MIN_ACTIVE_MS = 120_000
+
+export type AppCheckoutRow = {
+  app: { path: string; name: string }
+  activeMs: number
+  sessions: AppUsageSession[]
+}
+
+/** Splits today's used apps into rows the check-out form asks about and brief uses it only lists. */
+export function splitCheckoutApps(
+  apps: readonly { path: string; name: string }[],
+  sessions: readonly AppUsageSession[]
+): { rows: AppCheckoutRow[]; brief: AppCheckoutRow[] } {
+  const used = apps
+    .map((app) => {
+      const summary = summarizeAppUsage(sessions, app.path)
+      return { app, activeMs: summary.activeMs, sessions: summary.sessions }
+    })
+    .filter((entry) => entry.sessions.length > 0)
+  return {
+    rows: used.filter((entry) => entry.activeMs >= APP_CHECKOUT_MIN_ACTIVE_MS),
+    brief: used.filter((entry) => entry.activeMs < APP_CHECKOUT_MIN_ACTIVE_MS)
+  }
+}

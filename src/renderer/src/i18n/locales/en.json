@@ -2274,18 +2274,27 @@
       },
       "checkout": {
         "title": "Check out",
-        "description": "Today's use of your registered apps. Say what the work was and where its output is.",
+        "description": "Today's use of your registered apps. For each app, say what the work was or mark it \"Not work\".",
         "empty": "No use of a registered app is recorded today.",
         "note": "What was this work?",
-        "task": "inAX task",
         "noTask": "No inAX task",
-        "outputFile": "Output file",
         "signInHint": "Sign in with inAX to link this work to a task.",
         "save": "Save",
         "listTitle": "Today's check-outs",
         "listEmpty": "No check-outs saved today.",
-        "activity": "Checked out today · {{app}} {{time}}"
-      }
+        "activity": "Checked out today · {{app}} {{time}}",
+        "notWork": "Not work",
+        "removeOutputFile": "Remove output file",
+        "noteError": "Write the work in one line, or mark this app \"Not work\".",
+        "taskOptional": "inAX task (optional)",
+        "outputFileOptional": "Output file (optional)",
+        "changeFile": "Change file",
+        "chooseFile": "Choose file",
+        "brief": "Brief use (under {{minimum}}, not asked): {{apps}}",
+        "saveError": "The check-out was not saved. Your text is kept. Select Save again.",
+        "saving": "Saving…"
+      },
+      "removeApp": "Remove {{name}}"
     }
   },
   "menu": {

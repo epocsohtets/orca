@@ -1,5 +1,11 @@
 import { expect, it } from 'vitest'
-import { recordAppUsageSample, summarizeAppUsage, type AppUsageSession } from './app-usage'
+import {
+  APP_CHECKOUT_MIN_ACTIVE_MS,
+  recordAppUsageSample,
+  splitCheckoutApps,
+  summarizeAppUsage,
+  type AppUsageSession
+} from './app-usage'
 
 const notes = { path: '/Applications/Notes.app', name: 'Notes' }
 const mail = { path: '/Applications/Mail.app', name: 'Mail' }
@@ -23,4 +29,24 @@ it('extends a session, merges a short gap without counting it, and splits on a l
   expect(summary.activeMs).toBe(10_000)
   expect(summary.lastUsed).toBe(200_000)
   expect(summarizeAppUsage(sessions, mail.path).sessions).toHaveLength(1)
+})
+
+it('asks about apps at or over the minimum time and lists the rest as brief use', () => {
+  const pages = { path: '/Applications/Pages.app', name: 'Pages' }
+  const session = (app: typeof notes, activeMs: number): AppUsageSession => ({
+    ...app,
+    start: 0,
+    end: activeMs,
+    activeMs
+  })
+  const { rows, brief } = splitCheckoutApps(
+    [notes, mail, pages],
+    [
+      session(notes, APP_CHECKOUT_MIN_ACTIVE_MS - 1),
+      session(mail, APP_CHECKOUT_MIN_ACTIVE_MS / 2),
+      session(mail, APP_CHECKOUT_MIN_ACTIVE_MS / 2)
+    ]
+  )
+  expect(rows.map((row) => row.app.name)).toEqual(['Mail'])
+  expect(brief.map((row) => row.app.name)).toEqual(['Notes'])
 })
