@@ -2,7 +2,7 @@ import type { TaskPageComposerActionsModel } from './use-task-page-composer-acti
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 import { Button } from '@/components/ui/button'
 import { useTranslate } from '@/i18n/use-translate'
-import { X, ExternalLink } from 'lucide-react'
+import { X, ExternalLink, Hexagon } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/class-names'
 import { LinearScopeSelector } from '@/components/task-page/source-selection/linear-scope-selector'
@@ -14,12 +14,24 @@ import {
   SelectItem
 } from '@/components/ui/select'
 import { openAppHttpLink } from '@/lib/browser/navigation/app-http-link-open'
+import { useInaxSourceSelection } from './inax/inax-source-selection'
+
+function sourceButtonClass(active: boolean, disabled?: boolean): string {
+  return cn(
+    'group flex h-8 w-8 items-center justify-center rounded-md border transition',
+    active
+      ? 'border-foreground/40 bg-muted/70 text-foreground shadow-sm'
+      : 'border-border/40 bg-transparent text-muted-foreground hover:bg-muted/40 hover:text-foreground',
+    disabled && 'cursor-not-allowed opacity-55'
+  )
+}
 export function TaskPageSourceBar({
   model
 }: {
   model: TaskPageComposerActionsModel
 }): React.JSX.Element | null {
   const t = useTranslate()
+  const inaxSelected = useInaxSourceSelection((state) => state.selected)
   const {
     openTaskPage,
     closeTaskPage,
@@ -73,8 +85,25 @@ export function TaskPageSourceBar({
           </TooltipContent>
         </Tooltip>
         <div className="mx-1 h-5 w-px bg-border/50" aria-hidden />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              onClick={() => useInaxSourceSelection.setState({ selected: true })}
+              data-task-source="inax"
+              aria-label={t('auto.components.TaskPage.inaxSource', 'inAX')}
+              aria-pressed={inaxSelected}
+              className={sourceButtonClass(inaxSelected)}
+            >
+              <Hexagon className="size-3.5" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" sideOffset={6}>
+            {t('auto.components.TaskPage.inaxSource', 'inAX')}
+          </TooltipContent>
+        </Tooltip>
         {visibleSourceOptions.map((source) => {
-          const active = taskSource === source.id
+          const active = !inaxSelected && taskSource === source.id
           const sourceAvailabilityNotice = taskSourceAvailabilityNoticeByProvider[source.id] ?? null
           const sourceDisabled = source.disabled || sourceAvailabilityNotice?.blocking
           return (
@@ -87,6 +116,7 @@ export function TaskPageSourceBar({
                     if (sourceAvailabilityNotice?.blocking) {
                       return
                     }
+                    useInaxSourceSelection.setState({ selected: false })
                     taskSourceManuallyChangedRef.current = true
                     openTaskPage(
                       {
@@ -110,13 +140,7 @@ export function TaskPageSourceBar({
                   data-task-source={source.id}
                   aria-label={sourceAvailabilityNotice?.label ?? source.label}
                   aria-pressed={active}
-                  className={cn(
-                    'group flex h-8 w-8 items-center justify-center rounded-md border transition',
-                    active
-                      ? 'border-foreground/40 bg-muted/70 text-foreground shadow-sm'
-                      : 'border-border/40 bg-transparent text-muted-foreground hover:bg-muted/40 hover:text-foreground',
-                    sourceDisabled && 'cursor-not-allowed opacity-55'
-                  )}
+                  className={sourceButtonClass(active, sourceDisabled)}
                 >
                   <source.Icon className="size-3.5" />
                 </button>
@@ -129,12 +153,16 @@ export function TaskPageSourceBar({
         })}
         <div
           className="hidden min-w-0 max-w-[min(420px,40vw)] items-center rounded-md border border-border/50 bg-muted/35 px-2 py-1 text-xs text-muted-foreground sm:flex"
-          title={taskSourceContextSummary.title}
+          title={inaxSelected ? undefined : taskSourceContextSummary.title}
         >
-          <span className="truncate">{taskSourceContextSummary.label}</span>
+          <span className="truncate">
+            {inaxSelected
+              ? t('auto.components.TaskPage.inaxSampleData', 'inAX · sample data')
+              : taskSourceContextSummary.label}
+          </span>
         </div>
       </div>
-      {taskSource === 'linear' && linearConnected ? (
+      {!inaxSelected && taskSource === 'linear' && linearConnected ? (
         <div className="flex items-center gap-2">
           <LinearScopeSelector
             workspaces={linearWorkspaces}
@@ -185,7 +213,7 @@ export function TaskPageSourceBar({
           </Tooltip>
         </div>
       ) : null}
-      {taskSource === 'jira' && jiraConnected ? (
+      {!inaxSelected && taskSource === 'jira' && jiraConnected ? (
         <div className="flex items-center gap-2">
           {jiraSites.length > 1 ? (
             <Select

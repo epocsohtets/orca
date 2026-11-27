@@ -3591,7 +3591,11 @@
           "linearViewNotFound": "저장된 Linear 보기를 찾을 수 없습니다.",
           "linearViewRestoreFailed": "저장된 Linear 보기를 복원하지 못했습니다."
         },
-        "shownCount_one": "{{count}}개 표시됨"
+        "shownCount_one": "{{count}}개 표시됨",
+        "inaxSource": "inAX",
+        "inaxSampleData": "inAX · 샘플 데이터",
+        "inaxStatusOpen": "열림",
+        "inaxStatusInProgress": "진행 중"
       },
       "Terminal": {
         "73768427cf": "닫기",

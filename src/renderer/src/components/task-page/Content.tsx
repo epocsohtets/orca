@@ -8,12 +8,15 @@ import { TaskPageGitHubList } from './github/listing/List'
 import { TaskPageGitLabTodoList } from './gitlab/TodoList'
 import { TaskPageGitLabItemList } from './gitlab/ItemList'
 import { TaskPageJiraContent } from './jira/Content'
+import { TaskPageInaxList } from './inax/List'
+import { useInaxSourceSelection } from './inax/inax-source-selection'
 export function TaskPageContent({
   model
 }: {
   model: TaskPageComposerActionsModel
 }): React.JSX.Element | null {
   const t = useTranslate()
+  const inaxSelected = useInaxSourceSelection((state) => state.selected)
   const {
     repoSelection,
     taskSource,
@@ -61,6 +64,8 @@ export function TaskPageContent({
         onClose={closeTaskDetailPage}
       />
     )
+  ) : inaxSelected ? (
+    <TaskPageInaxList />
   ) : taskSource === 'github' && githubMode === 'project' ? (
     <div className="mt-3 flex min-h-0 min-w-0 max-h-full flex-col overflow-hidden rounded-md border border-border/50 bg-muted/50 shadow-sm">
       <ProjectViewWrapper
