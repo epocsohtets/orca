@@ -8,6 +8,7 @@ import { getIntegrationsPaneSearchEntries } from '@/components/settings/integrat
 import { getLinearAgentSkillPaneSearchEntries } from '@/components/settings/skills/linear/linear-agent-skill-search'
 import { getMcpServersPaneSearchEntries } from '@/components/settings/mcp-servers/mcp-servers-search'
 import { getMobileSettingsPaneSearchEntries } from '@/components/settings/mobile/mobile-settings-search'
+import { getOrcaAccountSettingsSearchEntries } from '@/components/settings/accounts/orca/orca-account-settings-search'
 import { OrcaLogoSettingsIcon } from '@/components/settings/page/orca-logo-settings-icon'
 import { getOrchestrationPaneSearchEntries } from '@/components/settings/orchestration/orchestration-search'
 import { getVoicePaneSearchEntries } from '@/components/settings/voice/voice-pane-search'
@@ -166,21 +167,13 @@ export function buildSetupSettingsSections(
       ? [
           {
             id: 'orca-account',
-            title: t('auto.components.settings.inaxAccount.title', 'inAX Account'),
+            title: t('auto.components.settings.orcaAccount.title', 'Orca Account'),
             description: t(
-              'auto.components.settings.inaxAccount.description',
-              'Sign in with inAX to see your inAX tasks in Orca.'
+              'auto.components.settings.orcaAccount.description',
+              'Share work instantly and reach your desktop from Orca Mobile wherever you are.'
             ),
             icon: CircleUserRound,
-            searchEntries: [
-              {
-                title: t('auto.components.settings.inaxAccount.account', 'inAX account'),
-                description: t(
-                  'auto.components.settings.inaxAccount.searchDescription',
-                  'Sign in or out of the inAX account used by the inAX tasks tab.'
-                )
-              }
-            ],
+            searchEntries: getOrcaAccountSettingsSearchEntries(),
             group: 'setup'
           }
         ]

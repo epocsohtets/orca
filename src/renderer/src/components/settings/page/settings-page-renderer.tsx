@@ -23,7 +23,7 @@ import {
   renderGeneralSettingsSection,
   renderIntegrationsSettingsSection,
   renderMobileSettingsSection,
-  renderInaxAccountSettingsSection,
+  renderOrcaAccountSettingsSection,
   renderSetupGuideSettingsSection,
   renderShareSkillsSettingsSection,
   renderSharedLinksSettingsSection,
@@ -181,7 +181,7 @@ export function renderSettingsPage(
                   {renderOrchestrationSettingsSection(context, t)}
                   {renderLinearSettingsSection(context, t)}
                   {renderDesktopCapabilitySettingsSections(context, t)}
-                  {renderInaxAccountSettingsSection(context, t)}
+                  {renderOrcaAccountSettingsSection(context, t)}
                   {renderSetupGuideSettingsSection(context, t)}
                   {renderGeneralSettingsSection(context, t)}
                   {renderWorkspaceCleanupSettingsSection(context, t)}

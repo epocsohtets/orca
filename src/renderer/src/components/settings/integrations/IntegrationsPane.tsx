@@ -7,6 +7,7 @@ import {
   GitHubIntegrationCard,
   GitLabIntegrationCard
 } from '../../integrations/source-control/cli-source-control-integration-cards'
+import { InaxIntegrationCard } from '../../integrations/task-trackers/inax-integration-card'
 import { JiraIntegrationCard } from '../../integrations/task-trackers/jira-integration-card'
 import { LinearIntegrationCard } from '../../integrations/task-trackers/linear-integration-card'
 import { IntegrationCardPresentationProvider } from '../../integrations/presentation/integration-card-presentation'
@@ -69,6 +70,9 @@ export function IntegrationsPane(): React.JSX.Element {
             'Connect issue trackers Orca can use to browse tasks and start workspaces with linked context.'
           )}
         >
+          <ProviderRow>
+            <InaxIntegrationCard />
+          </ProviderRow>
           <ProviderRow>
             <LinearIntegrationCard />
           </ProviderRow>
