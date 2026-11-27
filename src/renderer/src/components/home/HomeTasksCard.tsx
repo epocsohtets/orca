@@ -100,7 +100,7 @@ export function HomeTasksCard({
                       <button
                         type="button"
                         aria-expanded={open}
-                        className={`${HOME_ROW_BUTTON_CLASS} grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 @min-[32rem]/home-card:grid-cols-[minmax(0,1fr)_9rem_8rem]`}
+                        className={`${HOME_ROW_BUTTON_CLASS} grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 @min-[40rem]/home-card:grid-cols-[minmax(0,1fr)_9rem_8rem]`}
                         onClick={() => onOpenChange(open ? null : task.id)}
                       >
                         <span className="flex min-w-0 flex-col gap-1">
@@ -111,7 +111,7 @@ export function HomeTasksCard({
                             <HomeWhoMarker who={task.who} label={task.whoLabel} />
                           ) : null}
                         </span>
-                        <span className="min-w-0 @max-[32rem]/home-card:hidden">
+                        <span className="min-w-0 @max-[40rem]/home-card:hidden">
                           <HomeProjectDot project={projects[task.project]} />
                         </span>
                         <span
