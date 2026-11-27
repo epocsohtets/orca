@@ -76,7 +76,8 @@ export function TaskPageInaxConversation({
     }),
     [messages, task.id]
   )
-  const hasDraft = messages.some((entry) => entry.id.endsWith(HOME_LOOP_DRAFT_MESSAGE_ID))
+  const draftIndex = messages.findIndex((entry) => entry.id.endsWith(HOME_LOOP_DRAFT_MESSAGE_ID))
+  const hasDraft = draftIndex !== -1
   const send = (): void => {
     const text = draft.trim()
     if (text && onSay) {
@@ -146,8 +147,8 @@ export function TaskPageInaxConversation({
                     ? () =>
                         document
                           .querySelector(
-                            // Rows the agent says in a row are one block, named by its last row.
-                            `[data-native-chat-message-id$="${HOME_LOOP_DRAFT_MESSAGE_ID}"], [data-native-chat-message-id$="loop-propose-final"]`
+                            // The transcript names a row by its place; only a turn's last row carries its id.
+                            `[data-inax-conversation] [data-native-chat-window] > [data-index="${draftIndex}"]`
                           )
                           ?.scrollIntoView({ block: 'start', behavior: motionSafeScrollBehavior() })
                     : undefined
