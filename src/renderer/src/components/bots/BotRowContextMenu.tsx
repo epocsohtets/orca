@@ -17,6 +17,7 @@ import {
   ContextMenuItem,
   ContextMenuSeparator
 } from '@/components/ui/context-menu'
+import { SidebarPinChatMenuItem } from '@/components/sidebar-chat/SidebarPinChatMenuItem'
 import { useTranslate } from '@/i18n/use-translate'
 import { updateBot } from '@/lib/bot-catalog'
 import { useBotHostOffline } from '@/lib/bot-host-views'
@@ -56,6 +57,7 @@ export function BotSidebarRowMenuContent({
         {t('bots.row.rename', 'Rename')}
       </ContextMenuItem>
       {menuItems}
+      <SidebarPinChatMenuItem pinKey={workspaceId} />
       <ContextMenuItem disabled={actionsDisabled} onSelect={toggleUnread}>
         {isUnread ? <BellOff className="size-3.5" /> : <Bell className="size-3.5" />}
         {isUnread ? t('bots.row.markRead', 'Mark Read') : t('bots.row.markUnread', 'Mark Unread')}

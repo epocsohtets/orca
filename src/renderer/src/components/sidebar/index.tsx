@@ -35,6 +35,7 @@ import { StalledTerminalDaemonBanner } from '../maintenance/terminal-daemon/Stal
 import { SidebarBotsSection } from '@/components/bots/SidebarBotsSection'
 import { SidebarBotsSplit, SidebarProjectsListSlot } from './SidebarBotsSplit'
 import { SidebarChatSection } from '@/components/sidebar-chat/SidebarChatSection'
+import { SidebarPinnedSection } from '@/components/sidebar-chat/SidebarPinnedSection'
 import { SidebarContentViewport } from './SidebarContentViewport'
 import { SidebarSectionDragOverlay } from './SidebarSectionDragOverlay'
 import { PROJECTS_SECTION_GROUP_KEY } from '../../../../shared/sidebar-list/sections/group-keys'
@@ -330,6 +331,7 @@ function Sidebar({
               >
                 <SidebarContentViewport>
                   <SidebarNav />
+                  <SidebarPinnedSection onOpen={closeWorkspaceBoard} />
                   {projectsFirst ? sections.toReversed() : sections}
                 </SidebarContentViewport>
                 <SidebarSectionDragOverlay sidebarStyle={leftSidebarStyle} />

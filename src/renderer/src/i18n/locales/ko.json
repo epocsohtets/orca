@@ -29055,6 +29055,13 @@
       "directMessages": "다이렉트 메시지",
       "groups": "그룹"
     },
-    "unread": "읽지 않음 {{count}}개"
+    "unread": "읽지 않음 {{count}}개",
+    "pinned": {
+      "unpin": "고정 해제",
+      "pin": "이 채팅 고정",
+      "title": "고정됨",
+      "expand": "고정됨 펼치기",
+      "collapse": "고정됨 접기"
+    }
   }
 }

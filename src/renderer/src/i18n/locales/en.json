@@ -31429,6 +31429,13 @@
       "directMessages": "Direct messages",
       "groups": "Groups"
     },
-    "unread": "{{count}} unread"
+    "unread": "{{count}} unread",
+    "pinned": {
+      "unpin": "Unpin",
+      "pin": "Pin this chat",
+      "title": "Pinned",
+      "expand": "Expand Pinned",
+      "collapse": "Collapse Pinned"
+    }
   }
 }
