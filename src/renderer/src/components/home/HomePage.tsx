@@ -43,7 +43,8 @@ import { HomeActivityCard } from './HomeActivityCard'
 import { HomeMyDayCard } from './HomeMyDayCard'
 import { HomeNewTaskButton } from './HomeNewTaskButton'
 import { HomePreviewMenu } from './HomePreviewMenu'
-import { HomeWrapUpDialog, type HomeWrapUpItem } from './HomeWrapUpDialog'
+import { HomeWrapUpDialog } from './HomeWrapUpDialog'
+import { buildHomeWrapUpItems } from './home-wrap-up-items'
 
 const DATE_OPTIONS: Intl.DateTimeFormatOptions = { weekday: 'long', month: 'long', day: 'numeric' }
 const CLOCK_OPTIONS: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit' }
@@ -108,7 +109,10 @@ export default function HomePage(): React.JSX.Element {
   }
   // A bot is this app's agent with a role: its chat when one exists, else the place to make one.
   const handToAgent = (): void =>
-    bots[0] ? void openBotHomeTab(bots[0]) : useAppStore.getState().openModal('bot-templates')
+    bots[0]
+      ? void openBotHomeTab(bots[0])
+      : // Opens on a template for everyday work, not on the gallery's first (a code review bot).
+        useAppStore.getState().openModal('bot-templates', { templateId: 'meeting-prep' })
 
   const projects = buildHomeProjects(t)
   // The research agent started at 09:05.
@@ -162,29 +166,7 @@ export default function HomePage(): React.JSX.Element {
     }
   }
 
-  const wrapUpItems: HomeWrapUpItem[] = [
-    ...openTasks
-      .filter((task) => task.who !== null)
-      .map((task) => ({ id: task.id, title: task.title, text: task.detail, included: true })),
-    ...day.records
-      .filter((record) => board.records[record.id] !== 'notWork')
-      .map((record) => {
-        const answer = board.records[record.id]
-        const linked = answer && answer !== 'notWork' ? answer.taskId : null
-        return {
-          id: record.id,
-          title: tasks.find((task) => task.id === (linked ?? record.suggestTaskId))?.title ?? '',
-          text: record.text,
-          included: linked !== null,
-          note: linked
-            ? undefined
-            : t(
-                'home.wrapUp.unconfirmedNote',
-                'Unconfirmed record: not reported unless you check it. The task above is the app’s guess.'
-              )
-        }
-      })
-  ]
+  const wrapUpItems = buildHomeWrapUpItems(t, tasks, day.records, board)
 
   const firstRun =
     previewFirstRun || (!signedIn && !myApps?.length && !hasAgentThread && bots.length === 0)
@@ -326,12 +308,15 @@ export default function HomePage(): React.JSX.Element {
                             answers: { ...state.answers, [taskId]: choiceId }
                           }))
                           setOpenTaskId(null)
+                          // The answered row leaves this tab; the keyboard goes back to the tab itself.
+                          focusRow(`[data-home-tab="${tab}"]`)
                         }}
                         onDone={(taskId) => {
                           useHomeBoardStore.setState((state) => ({
                             doneTaskIds: [...state.doneTaskIds, taskId]
                           }))
                           setOpenTaskId(null)
+                          focusRow(`[data-home-tab="${tab}"]`)
                         }}
                         onOpenTaskList={openTaskList}
                       />

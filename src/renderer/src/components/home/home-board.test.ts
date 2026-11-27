@@ -5,6 +5,7 @@ import {
   countHomeBoard,
   homeTaskTab,
   orderHomeAgents,
+  sortHomeTasks,
   type HomeAgent,
   type HomeTask
 } from './home-board'
@@ -38,7 +39,9 @@ describe('home board', () => {
       waitingMeetings: 1,
       late: 1
     })
-    expect(homeTaskTab(tasks[2])).toEqual(['late'])
+    expect(homeTaskTab(tasks[2])).toEqual(['today', 'late'])
+    expect(homeTaskTab(tasks[1])).toEqual(['waiting'])
+    expect(sortHomeTasks(tasks).map((entry) => entry.id)).toEqual(['copy', 'offer', 'notice'])
   })
 
   it('hands an answered task back to its agent and turns accepted follow-ups into tasks', () => {

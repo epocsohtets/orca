@@ -19,7 +19,7 @@ export function buildHomeMyActivity(
         id: `answer-${taskId}`,
         at: minutes,
         who: me,
-        text: t('home.activity.answered', 'answered “{{choice}}”', { choice: choice?.label ?? '' }),
+        text: t('home.activity.answered', 'answered: {{choice}}', { choice: choice?.label ?? '' }),
         byAgent: false,
         taskId: task?.meetingId ? undefined : taskId
       }

@@ -51,7 +51,7 @@ export function HomeActivityCard({
           value={filter}
           onValueChange={(value) => onFilterChange(value === 'agents' ? 'agents' : 'all')}
         >
-          <TabsList size="sm" aria-label={t('home.activity.filter', 'Whose activity')}>
+          <TabsList aria-label={t('home.activity.filter', 'Whose activity')}>
             <TabsTrigger value="all">{t('home.activity.filterAll', 'Everyone')}</TabsTrigger>
             <TabsTrigger value="agents" data-home-activity-filter="agents">
               {t('home.activity.filterAgents', 'Agents')}

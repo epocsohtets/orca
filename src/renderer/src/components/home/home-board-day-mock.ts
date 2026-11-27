@@ -34,9 +34,7 @@ export function buildHomeUpcoming(
       project: 'campaign',
       meeting: weeklyOver
         ? {
-            note: offerOpen
-              ? t('home.upcoming.weeklyMinutes', 'Minutes arrived · 2 items for me')
-              : t('home.upcoming.weeklyMinutesDone', 'Minutes arrived'),
+            note: t('home.upcoming.weeklyMinutes', 'Minutes arrived · 2 items for me'),
             detail: t(
               'home.upcoming.weeklyMinutesDetail',
               'Decided: launch on 21 March. Kim Jiwoo approves the headline; you choose it first.'
@@ -113,7 +111,10 @@ export function buildHomeUpcoming(
   ]
   // A finished meeting stays only while it still has something for me.
   return items.filter(
-    (item) => item.at === undefined || item.at > minutes || (item.id === 'weekly' && weeklyOver)
+    (item) =>
+      item.at === undefined ||
+      item.at > minutes ||
+      (item.id === 'weekly' && weeklyOver && offerOpen)
   )
 }
 

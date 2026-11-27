@@ -43,7 +43,8 @@ export function buildHomeTasks(t: Translate, working = ''): HomeTask[] {
       detail: t(
         'home.task.copyDetail',
         'The writing agent drafted two headlines. Once you choose, it matches the body text and the button to it.'
-      )
+      ),
+      report: t('home.report.copy', 'Two headline drafts are in. I have not chosen yet.')
     },
     {
       id: 'research',
@@ -58,7 +59,8 @@ export function buildHomeTasks(t: Translate, working = ''): HomeTask[] {
       detail: t(
         'home.task.researchDetail',
         'The research agent is putting three competitors’ promotions into one table.'
-      )
+      ),
+      report: t('home.report.research', 'Two of three competitors’ promotions are in the table.')
     },
     {
       id: 'review',
@@ -106,6 +108,10 @@ export function buildHomeTasks(t: Translate, working = ''): HomeTask[] {
       detail: t(
         'home.task.inquiriesDetail',
         'The inquiry agent sorted 214 inquiries into 6 types. Read the draft and correct only what is wrong.'
+      ),
+      report: t(
+        'home.report.inquiries',
+        '214 inquiries are sorted into 6 types as a draft. My review is left.'
       )
     },
     {
@@ -121,6 +127,10 @@ export function buildHomeTasks(t: Translate, working = ''): HomeTask[] {
       detail: t(
         'home.task.noticeDetail',
         'The notice needs the new delivery dates. Lee Doyun asked the logistics team again this morning.'
+      ),
+      report: t(
+        'home.report.notice',
+        'Still waiting for the logistics team’s new delivery dates. Past its deadline.'
       )
     },
     {

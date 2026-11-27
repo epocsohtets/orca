@@ -24,6 +24,8 @@ export type HomeTask = {
   /** A meeting's follow-ups offered to me: listed under Needs me, not counted as a task. */
   meetingId?: string
   detail: string
+  /** Today's one-line update for this task, as it would be reported. */
+  report?: string
 }
 
 export type HomeAgent = {
@@ -106,12 +108,20 @@ export function applyHomeBoardState(
   return next.map((task) => (state.doneTaskIds.includes(task.id) ? { ...task, done: true } : task))
 }
 
+const DUE_ORDER: Record<HomeDue, number> = { today: 0, overdue: 1, tomorrow: 2, week: 3 }
+
+/** Due today first, then what is late, then later days. */
+export function sortHomeTasks(tasks: readonly HomeTask[]): HomeTask[] {
+  return [...tasks].sort((a, b) => DUE_ORDER[a.due] - DUE_ORDER[b.due])
+}
+
 export function homeTaskTab(task: HomeTask): HomeTaskTab[] {
   if (task.done) {
     return ['done']
   }
   const tabs: HomeTaskTab[] = []
-  if (task.due === 'today' && !task.meetingId) {
+  // "Today" is everything open on my plate, so its count is the My work tile's number.
+  if (!task.meetingId) {
     tabs.push('today')
   }
   if (task.who === 'waiting') {

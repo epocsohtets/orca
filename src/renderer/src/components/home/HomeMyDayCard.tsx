@@ -14,8 +14,8 @@ import type { HomeDayRecord, HomeDaySegment } from './home-board-day-mock'
 
 const SEGMENT_CLASS: Record<HomeDaySegment['id'], string> = {
   app: 'bg-foreground',
-  browser: 'bg-foreground/60',
-  meeting: 'bg-foreground/30'
+  browser: 'bg-foreground/70',
+  meeting: 'bg-foreground/45'
 }
 
 function RecordRow({

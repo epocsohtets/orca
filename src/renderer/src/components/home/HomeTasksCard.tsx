@@ -10,7 +10,13 @@ import {
   HomeProjectDot,
   HomeWhoMarker
 } from './HomeCard'
-import { homeTaskTab, type HomeProjectId, type HomeTask, type HomeTaskTab } from './home-board'
+import {
+  homeTaskTab,
+  sortHomeTasks,
+  type HomeProjectId,
+  type HomeTask,
+  type HomeTaskTab
+} from './home-board'
 import type { HomeProject } from './home-board-mock'
 
 const TABS: HomeTaskTab[] = ['today', 'waiting', 'late', 'done']
@@ -55,7 +61,7 @@ export function HomeTasksCard({
     done: t('home.tasks.emptyDone', 'Nothing finished yet.')
   }
   const byTab = (key: HomeTaskTab): HomeTask[] =>
-    tasks.filter((task) => homeTaskTab(task).includes(key))
+    sortHomeTasks(tasks.filter((task) => homeTaskTab(task).includes(key)))
   const shown = byTab(tab)
   // One trailing slot for every row keeps the due column in line when only some rows have a button.
   const anyWaiting = shown.some((task) => task.who === 'waiting')
@@ -71,11 +77,11 @@ export function HomeTasksCard({
         }}
       >
         <div className="px-4 pb-2">
-          <TabsList size="sm" aria-label={t('home.tasks.title', 'My work')}>
+          <TabsList aria-label={t('home.tasks.title', 'My work')}>
             {TABS.map((key) => (
               <TabsTrigger key={key} value={key} data-home-tab={key}>
                 {labels[key]}
-                <span className="tabular-nums opacity-70">{byTab(key).length}</span>
+                <span className="tabular-nums">{byTab(key).length}</span>
               </TabsTrigger>
             ))}
           </TabsList>
