@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { AppWindow, Plus, Trash2 } from 'lucide-react'
 import type { GlobalSettings } from '../../../../../shared/settings/global-settings-types'
 import type { InstalledApp, RegisteredApp } from '../../../../../shared/my-apps/my-app-types'
+import { useConfirmationDialog } from '@/components/dismiss/confirmation/confirmation-dialog-context'
 import { useTranslate } from '@/i18n/use-translate'
 import { Badge } from '../../ui/badge'
 import { Button } from '../../ui/button'
@@ -15,6 +16,7 @@ import {
 } from '../../ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover'
 import { Switch } from '../../ui/switch'
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../ui/tooltip'
 import { SettingsGroup } from '../section-layout/SettingsGroup'
 
 type MyAppsPaneProps = {
@@ -32,6 +34,7 @@ function AppIcon({ icon }: { icon: string | null | undefined }): React.JSX.Eleme
 
 export function MyAppsPane({ settings, updateSettings }: MyAppsPaneProps): React.JSX.Element {
   const t = useTranslate()
+  const confirm = useConfirmationDialog()
   const [installed, setInstalled] = useState<InstalledApp[]>([])
   const [pickerOpen, setPickerOpen] = useState(false)
   const apps = useMemo(() => settings.myApps ?? [], [settings.myApps])
@@ -58,6 +61,21 @@ export function MyAppsPane({ settings, updateSettings }: MyAppsPaneProps): React
 
   const save = (next: RegisteredApp[]): void => {
     void updateSettings({ myApps: next })
+  }
+  const removeLabel = t('settings.myApps.remove', 'Remove')
+  const removeApp = async (app: RegisteredApp): Promise<void> => {
+    const confirmed = await confirm({
+      title: t('settings.myApps.removeTitle', 'Remove {{name}}?', { name: app.name }),
+      description: t(
+        'settings.myApps.removeDescription',
+        'This removes the app from your registered apps. The app stays installed on this Mac.'
+      ),
+      confirmLabel: removeLabel,
+      confirmVariant: 'destructive'
+    })
+    if (confirmed) {
+      save((settings.myApps ?? []).filter((entry) => entry.path !== app.path))
+    }
   }
   const addLabel = t('settings.myApps.add', 'Add app')
 
@@ -149,14 +167,21 @@ export function MyAppsPane({ settings, updateSettings }: MyAppsPaneProps): React
                   )
                 }
               />
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label={t('settings.myApps.remove', 'Remove {{name}}', { name: app.name })}
-                onClick={() => save(apps.filter((entry) => entry.path !== app.path))}
-              >
-                <Trash2 className="size-4" />
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-label={removeLabel}
+                    onClick={() => void removeApp(app)}
+                  >
+                    <Trash2 />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top" sideOffset={4}>
+                  {removeLabel}
+                </TooltipContent>
+              </Tooltip>
             </div>
           </div>
         ))

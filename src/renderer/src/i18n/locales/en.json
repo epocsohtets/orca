@@ -2263,9 +2263,11 @@
       "paused": "Paused",
       "watching": "Watching",
       "watchToggle": "Watch {{name}}",
-      "remove": "Remove {{name}}",
+      "remove": "Remove",
       "title": "My apps",
-      "description": "The apps you work in. Orca watches the ones you register."
+      "description": "The apps you work in. Orca watches the ones you register.",
+      "removeTitle": "Remove {{name}}?",
+      "removeDescription": "This removes the app from your registered apps. The app stays installed on this Mac."
     }
   },
   "menu": {
