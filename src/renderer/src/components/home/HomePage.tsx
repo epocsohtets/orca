@@ -1,113 +1,53 @@
-import React, { useId, useState } from 'react'
-import { AppWindow } from 'lucide-react'
+import React, { useRef, useState } from 'react'
 import { useAppStore } from '@/store'
 import { useIntlLocale, useTranslate } from '@/i18n/use-translate'
 import { uiDateTimeFormat } from '@/i18n/ui-intl-formatters'
-import { formatUiRelativeTime } from '@/i18n/relative-time-format'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenuCheckboxItem,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator
+} from '@/components/ui/dropdown-menu'
 import { RailPage, RailPageScroll } from '@/components/rail-page/RailPage'
-import { RailPageBand } from '@/components/rail-page/RailPageHeader'
+import { RailPageBand, RailPageMoreMenu } from '@/components/rail-page/RailPageHeader'
 import { INAX_INTEGRATION_SECTION_ID } from '@/components/integrations/task-trackers/task-provider-integration-section-ids'
-import { INAX_MOCK_TASKS, type InaxTaskStatus } from '@/components/task-page/inax/inax-mock-tasks'
+import { INAX_MOCK_TASKS } from '@/components/task-page/inax/inax-mock-tasks'
 import { useInaxSourceSelection } from '@/components/task-page/inax/inax-source-selection'
 import { useAllAgentPaneThreads } from '@/components/activity/threads/use-agent-pane-threads'
-import {
-  activityThreadRowCopy,
-  threadAgentStateLabel
-} from '@/components/activity/threads/activity-thread-presentation'
+import { activityThreadRowCopy } from '@/components/activity/threads/activity-thread-presentation'
 import { useInaxMockAccount } from '@/lib/inax-mock-account'
 import { openBotHome, useBots } from '@/lib/bot-catalog'
-import { HOME_MOCK_LAST_UPDATE_BY, HOME_MOCK_ME, selectMyWork } from './home-my-work'
+import { HOME_MOCK_ME, selectMyWork } from './home-my-work'
+import {
+  HOME_PREVIEW_MINUTES,
+  homePhaseForMinutes,
+  unansweredEntries,
+  visibleTimeline,
+  type HomeEntryAnswer,
+  type HomePhase,
+  type HomeTimelineEntry
+} from './home-day'
+import { buildHomeNeeds, buildHomeNext, buildHomeTimeline, buildHomeWrapUp } from './home-day-mock'
+import {
+  HOME_LABEL_CLASS,
+  HOME_META_CLASS,
+  HOME_ROW_CLASS,
+  HomeActionRows,
+  HomeRowText,
+  HomeSection,
+  type HomeRow
+} from './HomeSection'
+import { HomeStartBar } from './HomeStartBar'
+import { HomeTimeline } from './HomeTimeline'
+import { HomeWrapUpDialog } from './HomeWrapUpDialog'
 
 const DATE_OPTIONS: Intl.DateTimeFormatOptions = { weekday: 'long', month: 'long', day: 'numeric' }
+const CLOCK_OPTIONS: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit' }
+const NEEDS_CAP = 3
 
-// This page's whole scale. Spacing: 1, 2, 3, 6, 12, 24. Type: 14/600 title and primary heading, 13/500 primary row,
-// 13/400 secondary row, 12/400 detail, 11/600 uppercase label. Color: background, foreground, muted-foreground,
-// border, accent.
-const PRIMARY_ROW_CLASS = 'flex w-full min-w-0 items-center gap-3 p-3 text-left'
-const SECONDARY_ROW_CLASS = 'flex w-full min-w-0 items-center gap-3 py-2 text-left'
-// The rail buttons' ring: muted-foreground holds 3:1 on both themes, where `ring` does not in light.
-const FOCUS_RING_CLASS =
-  'outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-muted-foreground'
-const ROW_HOVER_CLASS = `${FOCUS_RING_CLASS} transition-colors motion-reduce:transition-none hover:bg-accent focus-visible:bg-accent`
-const META_CLASS = 'shrink-0 text-xs text-muted-foreground'
-
-/** `primary` is the area the page is for: a heading and a bordered list. Secondary is a quiet label over bare rows. */
-function HomeSection({
-  title,
-  count,
-  primary = false,
-  action,
-  children
-}: {
-  title: string
-  count?: number
-  primary?: boolean
-  action?: React.ReactNode
-  children: React.ReactNode
-}): React.JSX.Element {
-  const headingId = useId()
-  return (
-    <section aria-labelledby={headingId} className="flex min-w-0 flex-col gap-2">
-      <div className="flex items-center justify-between gap-2">
-        <h2
-          id={headingId}
-          className={
-            primary
-              ? 'flex min-w-0 items-baseline gap-2 text-sm font-semibold text-foreground'
-              : 'min-w-0 truncate text-2xs font-semibold uppercase tracking-wider text-muted-foreground'
-          }
-        >
-          <span className="truncate">{title}</span>
-          {typeof count === 'number' ? (
-            <span className="text-xs font-normal tabular-nums text-muted-foreground">{count}</span>
-          ) : null}
-        </h2>
-        {action}
-      </div>
-      <ul
-        className={
-          primary
-            ? 'divide-y divide-border overflow-hidden rounded-md border border-border'
-            : 'divide-y divide-border border-t border-border'
-        }
-      >
-        {children}
-      </ul>
-    </section>
-  )
-}
-
-function RowText({
-  title,
-  detail,
-  primary = false
-}: {
-  title: string
-  detail?: string
-  primary?: boolean
-}): React.JSX.Element {
-  return (
-    <span className="flex min-w-0 flex-1 flex-col gap-1">
-      <span
-        className={
-          primary
-            ? 'line-clamp-2 text-[13px] font-medium text-foreground'
-            : 'truncate text-[13px] text-foreground'
-        }
-      >
-        {title}
-      </span>
-      {detail ? (
-        <span className={`${primary ? 'line-clamp-2' : 'truncate'} text-xs text-muted-foreground`}>
-          {detail}
-        </span>
-      ) : null}
-    </span>
-  )
-}
-
-/** The personal start page. Read-only: every row links to the view that owns the thing. */
+/** My day, kept by my agents: start anything, see what is happening, answer what needs me, check the record. */
 export default function HomePage(): React.JSX.Element {
   const t = useTranslate()
   const intlLocale = useIntlLocale()
@@ -117,7 +57,20 @@ export default function HomePage(): React.JSX.Element {
   const threads = useAllAgentPaneThreads().allThreads
   // Read once per mount: the page shows a snapshot of the day.
   const [now] = useState(() => Date.now())
-  const ago = (timestamp: number): string => formatUiRelativeTime(timestamp - now, intlLocale)
+  const [preview, setPreview] = useState<'auto' | HomePhase>('auto')
+  const [previewFirstRun, setPreviewFirstRun] = useState(false)
+  const [answers, setAnswers] = useState<Record<string, HomeEntryAnswer>>({})
+  const [needsExpanded, setNeedsExpanded] = useState(false)
+  const [wrapUpOpen, setWrapUpOpen] = useState(false)
+  const [wrappedUp, setWrappedUp] = useState<number | null>(null)
+  const startRef = useRef<HTMLInputElement | null>(null)
+
+  const dayStart = new Date(now).setHours(0, 0, 0, 0)
+  const minutes =
+    preview === 'auto' ? Math.floor((now - dayStart) / 60_000) : HOME_PREVIEW_MINUTES[preview]
+  const phase = homePhaseForMinutes(minutes)
+  const clock = (at: number): string =>
+    uiDateTimeFormat(CLOCK_OPTIONS, intlLocale).format(dayStart + at * 60_000)
 
   const openTasks = (): void => {
     useInaxSourceSelection.setState({ selected: true })
@@ -128,228 +81,330 @@ export default function HomePage(): React.JSX.Element {
     useAppStore.getState().openSettingsPage()
   }
   const openActivity = (): void => useAppStore.getState().openActivityPage()
+  const connectInax = (): void => openSettings('integrations', INAX_INTEGRATION_SECTION_ID)
 
-  const statusLabels: Record<InaxTaskStatus, string> = {
-    open: t('auto.components.TaskPage.inaxStatusOpen', 'Open'),
-    inProgress: t('auto.components.TaskPage.inaxStatusInProgress', 'In progress'),
-    done: t('auto.components.TaskPage.18451e99df', 'Done')
-  }
-  const myWork = selectMyWork(INAX_MOCK_TASKS, HOME_MOCK_ME)
+  const firstRun =
+    previewFirstRun || (!signedIn && !myApps?.length && threads.length === 0 && bots.length === 0)
 
-  // shortcut: "Needs you" is mock; build it from agent questions, check-outs and reviews when those have a source.
-  const needs = [
-    {
-      id: 'question',
-      title: t(
-        'home.needsYou.questionTitle',
-        'Claude Code asks: keep the legacy SSO callback URL?'
-      ),
-      detail: t('home.needsYou.questionDetail', 'INAX-128 · waiting for your answer'),
-      action: t('home.needsYou.answer', 'Answer'),
-      // A bot chat when a bot exists; else the agents view.
-      run: () => (bots[0] ? void openBotHome(bots[0]) : openActivity())
-    },
-    {
-      id: 'checkout',
-      title: t('home.needsYou.checkoutTitle', 'Confirm today’s check-out'),
-      detail: t('home.needsYou.checkoutDetail', 'Your apps for today are ready to review'),
-      action: t('home.needsYou.review', 'Review'),
-      run: () => openSettings('my-apps')
-    },
-    {
-      id: 'review',
-      title: t('home.needsYou.reviewTitle', 'Review: Fix role picker losing focus after search'),
-      detail: t('home.needsYou.reviewDetail', 'INAX-119 · Codex marked it done'),
-      action: t('home.needsYou.open', 'Open'),
-      run: openTasks
-    }
-  ]
-
-  const realActivity = [...threads]
-    .sort((a, b) => b.latestTimestamp - a.latestTimestamp)
-    .slice(0, 5)
+  // Real agent sessions from today join the mock record.
+  const agentEntries: HomeTimelineEntry[] = threads
+    .filter((thread) => thread.latestTimestamp >= dayStart)
     .map((thread) => {
       const copy = activityThreadRowCopy(thread, t)
       return {
         id: thread.paneKey,
-        title: copy.taskTitle,
-        detail: [
-          copy.statusLine || threadAgentStateLabel(thread, t),
-          copy.workspaceLabel,
-          ago(thread.latestTimestamp)
-        ]
-          .filter(Boolean)
-          .join(' · ')
+        at: Math.floor((thread.latestTimestamp - dayStart) / 60_000),
+        text: copy.taskTitle,
+        actor: copy.workspaceLabel
       }
     })
-  // shortcut: sample rows stand in while no agent has run in this profile; drop them when the PoC ends.
-  const activity =
-    realActivity.length > 0
-      ? realActivity
+  const appNames = (myApps ?? []).filter((app) => !app.paused).map((app) => app.name)
+  const timeline = visibleTimeline([...buildHomeTimeline(t, appNames), ...agentEntries], minutes)
+  const unanswered = unansweredEntries(timeline, answers)
+
+  const needRuns = {
+    // A bot chat when a bot exists; else the agents view.
+    question: () => (bots[0] ? void openBotHome(bots[0]) : openActivity()),
+    followUps: openTasks,
+    review: openTasks
+  }
+  const needs: HomeRow[] = buildHomeNeeds(t).map((need) => ({ ...need, run: needRuns[need.id] }))
+  if (unanswered.length > 0) {
+    needs.push({
+      id: 'records',
+      title: t(
+        'home.needs.recordsTitle',
+        'Confirm whether {{count}} entries in today’s record are work',
+        {
+          count: unanswered.length
+        }
+      ),
+      detail: t('home.needs.recordsDetail', 'Browser and app use the app could not link to a task'),
+      action: t('home.needs.check', 'Check'),
+      run: () =>
+        document
+          .querySelector<HTMLElement>('[data-home-timeline] [data-home-entry="unconfirmed"] button')
+          ?.focus()
+    })
+  }
+  const shownNeeds = needsExpanded ? needs : needs.slice(0, NEEDS_CAP)
+
+  const overnight = timeline.filter((entry) => entry.at < 6 * 60 + 30).length
+  const myOpenWork = selectMyWork(INAX_MOCK_TASKS, HOME_MOCK_ME).filter(
+    (task) => task.status !== 'done'
+  )
+  const upcoming = buildHomeNext(t).filter((item) => item.at > minutes)
+  const brief: HomeRow[] = [
+    {
+      id: 'carry',
+      title: t('home.brief.carry', '{{count}} tasks carried over from yesterday', {
+        count: signedIn ? myOpenWork.length : 0
+      }),
+      detail: t('home.brief.carryDetail', 'Agents kept their status current overnight'),
+      action: t('home.brief.openTasks', 'Open tasks'),
+      run: openTasks
+    },
+    {
+      id: 'meetings',
+      title: t('home.brief.meetings', '{{count}} meetings today', { count: upcoming.length }),
+      detail: upcoming[0] ? `${clock(upcoming[0].at)} · ${upcoming[0].title}` : undefined
+    },
+    {
+      id: 'overnight',
+      title: t('home.brief.overnight', 'Agents finished {{count}} things overnight', {
+        count: overnight
+      }),
+      detail: t('home.brief.overnightDetail', 'They are at the bottom of today’s record'),
+      action: t('home.brief.see', 'See'),
+      run: openActivity
+    }
+  ]
+  const next: HomeRow[] = [
+    ...upcoming.slice(0, 2).map((item) => ({
+      id: item.id,
+      title: `${clock(item.at)} · ${item.title}`,
+      detail: item.detail
+    })),
+    ...(signedIn
+      ? myOpenWork.map((task) => ({
+          id: task.id,
+          title: task.title,
+          detail: t('home.next.dueToday', '{{task}} · due today', { task: task.id })
+        }))
       : [
           {
-            id: 'sample-1',
-            title: t('home.agents.sample1Title', 'Claude Code updated INAX-128'),
-            detail: `${t('home.agents.sample1Detail', 'Added the SSO login form and tests')} · ${ago(now - 3_600_000)}`
-          },
-          {
-            id: 'sample-2',
-            title: t('home.agents.sample2Title', 'Codex finished INAX-119'),
-            detail: `${t('home.agents.sample2Detail', 'Role picker keeps focus after search')} · ${ago(now - 5 * 3_600_000)}`
-          },
-          {
-            id: 'sample-3',
-            title: t('home.agents.sample3Title', 'Standup bot posted the daily summary'),
-            detail: `${t('home.agents.sample3Detail', '4 tasks moved, 1 blocked')} · ${ago(now - 8 * 3_600_000)}`
+            id: 'sign-in',
+            title: t(
+              'auto.components.TaskPage.inaxSignedOut',
+              'Sign in with inAX to see your tasks'
+            ),
+            action: t('auto.components.settings.inaxAccount.signIn', 'Sign in with inAX'),
+            run: connectInax
           }
-        ]
-
-  const inProgress = myWork.filter((task) => task.status === 'inProgress').length
-  const summary = signedIn
-    ? t('home.summary', '{{inProgress}} in progress, {{needs}} waiting on you', {
-        inProgress,
-        needs: needs.length
-      })
-    : t('home.summarySignedOut', '{{needs}} waiting on you', { needs: needs.length })
+        ])
+  ]
+  const firstSteps: HomeRow[] = [
+    {
+      id: 'inax',
+      title: t('home.firstRun.inax', 'Connect inAX so your tasks appear here'),
+      detail: t('home.firstRun.inaxDetail', 'Agents then keep each task’s status current for you'),
+      action: t('home.firstRun.connect', 'Connect'),
+      run: connectInax
+    },
+    {
+      id: 'app',
+      title: t('home.firstRun.app', 'Register an app you work in'),
+      detail: t('home.firstRun.appDetail', 'Time in it joins the record of your day'),
+      action: t('home.firstRun.register', 'Register'),
+      run: () => openSettings('my-apps')
+    },
+    {
+      id: 'agent',
+      title: t('home.firstRun.agent', 'Start your first task with an agent'),
+      detail: t('home.firstRun.agentDetail', 'Type what you want to do in the box above'),
+      action: t('home.firstRun.start', 'Start'),
+      run: () => startRef.current?.focus()
+    }
+  ]
+  const drafts = buildHomeWrapUp(t)
+  const wrapUp: HomeRow[] = [
+    {
+      id: 'wrap-up',
+      title:
+        wrappedUp === null
+          ? t(
+              'home.wrapUp.ready',
+              'Agents drafted updates for {{count}} tasks from today’s record',
+              {
+                count: drafts.length
+              }
+            )
+          : t('home.wrapUp.confirmed', 'Today is wrapped up: {{count}} updates confirmed', {
+              count: wrappedUp
+            }),
+      detail: t('home.wrapUp.trust', 'Nothing is shared until you have seen it'),
+      action: t('home.wrapUp.preview', 'Preview'),
+      // The one filled action on the page, and only when wrapping up is the point of the visit.
+      filled: phase === 'evening' && wrappedUp === null,
+      run: () => setWrapUpOpen(true)
+    }
+  ]
+  const wrapUpTitle = t('home.wrapUp.title', 'Wrap up today')
 
   return (
-    <RailPage as="main" data-home-page="">
+    <RailPage as="main" data-home-page="" data-home-phase={firstRun ? 'first-run' : phase}>
       <RailPageBand>
         <h1 className="shrink-0 truncate text-sm font-semibold text-foreground">
           {uiDateTimeFormat(DATE_OPTIONS, intlLocale).format(now)}
         </h1>
-        <span className="min-w-0 truncate text-xs text-muted-foreground" data-home-summary="">
-          {summary}
+        <span className={`min-w-0 flex-1 truncate ${HOME_META_CLASS}`} data-home-summary="">
+          {firstRun
+            ? t('home.summaryFirstRun', 'Nothing is connected yet')
+            : t('home.summary', '{{needs}} waiting on you · {{entries}} entries recorded today', {
+                needs: needs.length,
+                entries: timeline.length
+              })}
         </span>
+        <RailPageMoreMenu label={t('home.preview.label', 'Preview (PoC)')}>
+          <DropdownMenuLabel>{t('home.preview.label', 'Preview (PoC)')}</DropdownMenuLabel>
+          <DropdownMenuRadioGroup
+            value={preview}
+            onValueChange={(value) => {
+              if (
+                value === 'auto' ||
+                value === 'morning' ||
+                value === 'day' ||
+                value === 'evening'
+              ) {
+                setPreview(value)
+              }
+            }}
+          >
+            <DropdownMenuRadioItem value="auto">
+              {t('home.preview.auto', 'Follow the clock')}
+            </DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="morning">
+              {t('home.preview.morning', 'Morning')}
+            </DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="day">
+              {t('home.preview.day', 'Day')}
+            </DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="evening">
+              {t('home.preview.evening', 'Evening')}
+            </DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuCheckboxItem checked={previewFirstRun} onCheckedChange={setPreviewFirstRun}>
+            {t('home.preview.firstRun', 'First run')}
+          </DropdownMenuCheckboxItem>
+        </RailPageMoreMenu>
       </RailPageBand>
       <RailPageScroll className="scrollbar-sleek min-h-0 flex-1 overflow-y-auto">
         {/* Why pb-24: the last row scrolls clear of the floating panel toggle. */}
         <div className="rail-page-row-gutter mx-auto grid max-w-4xl gap-x-12 gap-y-6 pt-6 pb-24 @min-[56rem]/rail-page:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
           <div className="flex min-w-0 flex-col gap-6">
-            <HomeSection primary title={t('home.needsYou.title', 'Needs you')} count={needs.length}>
-              {needs.map((item) => (
-                <li key={item.id} className={PRIMARY_ROW_CLASS}>
-                  <RowText primary title={item.title} detail={item.detail} />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="xs"
-                    className="shrink-0"
-                    onClick={item.run}
+            <HomeStartBar inputRef={startRef} />
+            {firstRun ? (
+              <HomeSection primary title={t('home.firstRun.title', 'Three steps to start')}>
+                <HomeActionRows rows={firstSteps} />
+              </HomeSection>
+            ) : (
+              <>
+                {phase === 'evening' ? (
+                  <HomeSection primary title={wrapUpTitle}>
+                    <HomeActionRows rows={wrapUp} />
+                  </HomeSection>
+                ) : null}
+                {phase === 'morning' ? (
+                  <HomeSection primary title={t('home.brief.title', 'This morning')}>
+                    <HomeActionRows rows={brief} />
+                  </HomeSection>
+                ) : null}
+                {phase === 'day' ? (
+                  <section
+                    aria-labelledby="home-now-heading"
+                    className={`${HOME_ROW_CLASS} rounded-md border border-border`}
                   >
-                    {item.action}
-                  </Button>
-                </li>
-              ))}
-            </HomeSection>
-
-            <HomeSection
-              primary
-              title={t('home.myWork.title', 'My work today')}
-              count={signedIn ? myWork.length : undefined}
-            >
-              {!signedIn ? (
-                <li className={`${PRIMARY_ROW_CLASS} flex-wrap justify-between`}>
-                  <span className="min-w-0 text-xs text-muted-foreground">
-                    {t(
-                      'auto.components.TaskPage.inaxSignedOut',
-                      'Sign in with inAX to see your tasks'
-                    )}
-                  </span>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="xs"
-                    onClick={() => openSettings('integrations', INAX_INTEGRATION_SECTION_ID)}
-                  >
-                    {t('auto.components.settings.inaxAccount.signIn', 'Sign in with inAX')}
-                  </Button>
-                </li>
-              ) : myWork.length === 0 ? (
-                <li className={`${PRIMARY_ROW_CLASS} text-xs text-muted-foreground`}>
-                  {t('home.myWork.empty', 'No tasks assigned to you')}
-                </li>
-              ) : (
-                myWork.map((task) => (
-                  <li key={task.id}>
-                    <button
+                    <h2 id="home-now-heading" className={`shrink-0 ${HOME_LABEL_CLASS}`}>
+                      {t('home.now.title', 'Now')}
+                    </h2>
+                    <HomeRowText
+                      primary
+                      title={t('home.now.agent', 'Claude Code is working on INAX-128')}
+                      detail={t(
+                        'home.now.agentDetail',
+                        'For 12 minutes · writing the SSO callback tests'
+                      )}
+                    />
+                    <Button
                       type="button"
-                      className={`${PRIMARY_ROW_CLASS} ${ROW_HOVER_CLASS}`}
-                      onClick={openTasks}
+                      variant="outline"
+                      size="xs"
+                      className="shrink-0"
+                      onClick={openActivity}
                     >
-                      <RowText
-                        primary
-                        title={task.title}
-                        detail={`${task.id} · ${t(
-                          'home.myWork.lastUpdate',
-                          'Last update by {{name}}',
-                          { name: HOME_MOCK_LAST_UPDATE_BY[task.id] ?? task.author }
-                        )} · ${ago(Date.parse(task.updatedAt))}`}
-                      />
-                      <span className={META_CLASS}>{statusLabels[task.status]}</span>
-                    </button>
-                  </li>
-                ))
-              )}
-            </HomeSection>
-          </div>
-
-          <div className="flex min-w-0 flex-col gap-6">
-            <HomeSection title={t('home.agents.title', 'What agents did')}>
-              {activity.map((item) => (
-                <li key={item.id}>
-                  <button
-                    type="button"
-                    className={`${SECONDARY_ROW_CLASS} ${ROW_HOVER_CLASS}`}
-                    onClick={openActivity}
-                  >
-                    <RowText title={item.title} detail={item.detail} />
-                  </button>
-                </li>
-              ))}
-            </HomeSection>
-
-            <HomeSection
-              title={t('home.apps.title', 'Apps today')}
-              action={
-                <Button
-                  type="button"
-                  variant="ghost-muted"
-                  size="xs"
-                  // Why -mr-2: the label lines up with the rows' right edge.
-                  className="-mr-2"
-                  onClick={() => openSettings('my-apps')}
+                      {t('home.now.open', 'Open')}
+                    </Button>
+                  </section>
+                ) : null}
+                <HomeSection
+                  primary
+                  title={t('home.needs.title', 'Needs you')}
+                  count={needs.length}
+                  action={
+                    needs.length > NEEDS_CAP ? (
+                      <Button
+                        type="button"
+                        variant="ghost-muted"
+                        size="xs"
+                        aria-expanded={needsExpanded}
+                        onClick={() => setNeedsExpanded((expanded) => !expanded)}
+                      >
+                        {needsExpanded
+                          ? t('home.needs.less', 'Show fewer')
+                          : t('home.needs.more', '{{count}} more', {
+                              count: needs.length - NEEDS_CAP
+                            })}
+                      </Button>
+                    ) : undefined
+                  }
                 >
-                  {t('home.apps.manage', 'Manage')}
-                </Button>
-              }
-            >
-              {myApps?.length ? (
-                myApps.map((app) => (
-                  <li key={app.path} className={SECONDARY_ROW_CLASS}>
-                    <AppWindow className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-                    <RowText title={app.name} />
-                    {app.paused ? (
-                      <span className={META_CLASS}>{t('settings.myApps.paused', 'Paused')}</span>
-                    ) : null}
-                    {/* Usage recording is a separate PoC. */}
-                    <span className={`${META_CLASS} tabular-nums`}>
-                      <span aria-hidden>—</span>
-                      <span className="sr-only">
-                        {t('home.apps.usageUnknown', 'Usage time is not recorded yet')}
-                      </span>
-                    </span>
-                  </li>
-                ))
-              ) : (
-                <li className={`${SECONDARY_ROW_CLASS} text-xs text-muted-foreground`}>
-                  {t('settings.myApps.emptyTitle', 'No apps registered')}
-                </li>
-              )}
-            </HomeSection>
+                  <HomeActionRows rows={shownNeeds} />
+                </HomeSection>
+                <section
+                  aria-labelledby="home-today-heading"
+                  className="flex min-w-0 flex-col gap-3"
+                >
+                  <div className="flex flex-col gap-1">
+                    <h2 id="home-today-heading" className="text-sm font-semibold text-foreground">
+                      {t('home.timeline.title', 'Today')}
+                    </h2>
+                    <p className={HOME_META_CLASS}>
+                      {t(
+                        'home.timeline.lead',
+                        'The app keeps this record. Correct only what is wrong.'
+                      )}
+                    </p>
+                  </div>
+                  <HomeTimeline
+                    entries={timeline}
+                    answers={answers}
+                    dayStart={dayStart}
+                    onAnswer={(id, answer) =>
+                      setAnswers((current) => {
+                        const next = { ...current }
+                        delete next[id]
+                        if (answer) {
+                          next[id] = answer
+                        }
+                        return next
+                      })
+                    }
+                  />
+                </section>
+              </>
+            )}
           </div>
+          {firstRun ? null : (
+            <div className="flex min-w-0 flex-col gap-6">
+              <HomeSection title={t('home.next.title', 'Next')}>
+                <HomeActionRows quiet rows={next} />
+              </HomeSection>
+              {phase === 'day' ? (
+                <HomeSection title={wrapUpTitle}>
+                  <HomeActionRows quiet rows={wrapUp} />
+                </HomeSection>
+              ) : null}
+            </div>
+          )}
         </div>
       </RailPageScroll>
+      <HomeWrapUpDialog
+        drafts={drafts}
+        open={wrapUpOpen}
+        onOpenChange={setWrapUpOpen}
+        onConfirmed={setWrappedUp}
+      />
     </RailPage>
   )
 }

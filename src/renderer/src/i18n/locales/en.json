@@ -31467,38 +31467,122 @@
     }
   },
   "home": {
-    "summary": "{{inProgress}} in progress, {{needs}} waiting on you",
-    "summarySignedOut": "{{needs}} waiting on you",
-    "myWork": {
-      "title": "My work today",
-      "empty": "No tasks assigned to you",
-      "lastUpdate": "Last update by {{name}}"
+    "start": {
+      "errorBlank": "Type what you want to do, then press Start.",
+      "label": "What do you want to do?",
+      "placeholder": "For example: finish the SSO login for INAX-128",
+      "submit": "Start",
+      "agent": "Start a task with an agent",
+      "bot": "Ask a bot",
+      "meetingNote": "Meetings are not connected in this PoC.",
+      "meeting": "Start a meeting"
     },
-    "needsYou": {
-      "title": "Needs you",
-      "questionTitle": "Claude Code asks: keep the legacy SSO callback URL?",
-      "questionDetail": "INAX-128 · waiting for your answer",
+    "timeline": {
+      "yesterdayAt": "Yesterday {{time}}",
+      "excluded": "Marked as not work. It will not be reported.",
+      "linked": "Linked to {{task}}",
+      "undo": "Undo",
+      "unconfirmed": "Unconfirmed",
+      "link": "Link to {{task}}",
+      "notWork": "Not work",
+      "me": "Me",
+      "nightFix": "Fixed the role picker tests and opened a pull request",
+      "standup": "Posted yesterday’s summary to the team channel",
+      "standupBot": "Standup bot",
+      "moved128": "Moved INAX-128 to In progress",
+      "browser": "stablyai/orca issues · 3 visits",
+      "browserActor": "Browser · me",
+      "meeting": "Weekly product meeting · minutes ready, 3 follow-ups",
+      "meetingBot": "Meeting bot",
+      "ssoForm": "Added the SSO login form and its tests",
+      "done119": "Moved INAX-119 to Done",
+      "review128": "Opened the INAX-128 pull request for review",
+      "appLong": "{{app}} · 1h 20m",
+      "appShort": "{{app}} · 25m",
+      "title": "Today",
+      "lead": "The app keeps this record. Correct only what is wrong."
+    },
+    "wrapUp": {
+      "errorEmpty": "Write the update, or clear “Include” to leave this task out.",
+      "include": "Include this update",
+      "title": "Wrap up today",
+      "audience": "This is what your PM and team will see. Nothing is shared until you confirm.",
+      "done": "{{count}} updates confirmed. This PoC sends nothing.",
+      "cancel": "Cancel",
+      "confirm": "Confirm {{count}} updates",
+      "close": "Close",
+      "draft128": "Added the SSO login form and tests; pull request is in review. Waiting on a decision about the legacy callback URL.",
+      "draft119": "Fixed and merged; the role picker keeps focus after search.",
+      "draft124": "Started reading related issues; no code yet.",
+      "ready": "Agents drafted updates for {{count}} tasks from today’s record",
+      "confirmed": "Today is wrapped up: {{count}} updates confirmed",
+      "trust": "Nothing is shared until you have seen it",
+      "preview": "Preview"
+    },
+    "needs": {
+      "questionTitle": "Decide: keep the legacy SSO callback URL?",
+      "questionDetail": "Claude Code · INAX-128 · it continues when you answer",
       "answer": "Answer",
-      "checkoutTitle": "Confirm today’s check-out",
-      "checkoutDetail": "Your apps for today are ready to review",
+      "followUpsTitle": "Assign the 3 follow-ups from the weekly product meeting",
+      "followUpsDetail": "Meeting bot · minutes are ready",
+      "assign": "Assign",
+      "reviewTitle": "Approve or return the INAX-119 fix",
+      "reviewDetail": "Codex · pull request ready, tests pass",
       "review": "Review",
-      "reviewTitle": "Review: Fix role picker losing focus after search",
-      "reviewDetail": "INAX-119 · Codex marked it done",
+      "recordsTitle": "Confirm whether {{count}} entries in today’s record are work",
+      "recordsDetail": "Browser and app use the app could not link to a task",
+      "check": "Check",
+      "title": "Needs you",
+      "less": "Show fewer",
+      "more": "{{count}} more"
+    },
+    "next": {
+      "weekly": "Weekly product meeting",
+      "weeklyDetail": "Agenda ready",
+      "designReview": "Design review",
+      "designReviewDetail": "Prep ready · 2 open questions",
+      "oneOnOne": "1:1 with Jiwoo",
+      "oneOnOneDetail": "Tomorrow’s topics drafted",
+      "dueToday": "{{task}} · due today",
+      "title": "Next"
+    },
+    "brief": {
+      "carry": "{{count}} tasks carried over from yesterday",
+      "carryDetail": "Agents kept their status current overnight",
+      "openTasks": "Open tasks",
+      "meetings": "{{count}} meetings today",
+      "overnight": "Agents finished {{count}} things overnight",
+      "overnightDetail": "They are at the bottom of today’s record",
+      "see": "See",
+      "title": "This morning"
+    },
+    "firstRun": {
+      "inax": "Connect inAX so your tasks appear here",
+      "inaxDetail": "Agents then keep each task’s status current for you",
+      "connect": "Connect",
+      "app": "Register an app you work in",
+      "appDetail": "Time in it joins the record of your day",
+      "register": "Register",
+      "agent": "Start your first task with an agent",
+      "agentDetail": "Type what you want to do in the box above",
+      "start": "Start",
+      "title": "Three steps to start"
+    },
+    "summaryFirstRun": "Nothing is connected yet",
+    "summary": "{{needs}} waiting on you · {{entries}} entries recorded today",
+    "preview": {
+      "label": "Preview (PoC)",
+      "auto": "Follow the clock",
+      "morning": "Morning",
+      "day": "Day",
+      "evening": "Evening",
+      "firstRun": "First run"
+    },
+    "now": {
+      "title": "Now",
+      "agent": "Claude Code is working on INAX-128",
+      "agentDetail": "For 12 minutes · writing the SSO callback tests",
       "open": "Open"
-    },
-    "agents": {
-      "title": "What agents did",
-      "sample1Title": "Claude Code updated INAX-128",
-      "sample1Detail": "Added the SSO login form and tests",
-      "sample2Title": "Codex finished INAX-119",
-      "sample2Detail": "Role picker keeps focus after search",
-      "sample3Title": "Standup bot posted the daily summary",
-      "sample3Detail": "4 tasks moved, 1 blocked"
-    },
-    "apps": {
-      "title": "Apps today",
-      "manage": "Manage",
-      "usageUnknown": "Usage time is not recorded yet"
     }
   }
 }
