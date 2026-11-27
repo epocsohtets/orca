@@ -52,10 +52,10 @@ export function AppRailButton({
       aria-current={active ? 'page' : undefined}
       className={cn(
         'flex size-7 shrink-0 items-center justify-center rounded-md outline-none transition-colors focus-visible:ring-2 focus-visible:ring-muted-foreground focus-visible:ring-offset-1 focus-visible:ring-offset-worktree-sidebar [&>svg]:transition-opacity',
-        // Why svg opacity, not an alpha color: per-stroke alpha brightens where strokes overlap.
+        // Why svg opacity, not an alpha color: per-stroke alpha brightens where strokes overlap. 80% keeps the idle icon at 3:1 in light.
         active
           ? 'bg-worktree-sidebar-foreground/10 text-foreground'
-          : 'text-muted-foreground hover:bg-worktree-sidebar-foreground/6 data-[state=open]:bg-worktree-sidebar-foreground/10 data-[state=open]:text-foreground [&>svg]:opacity-70 hover:[&>svg]:opacity-100 data-[state=open]:[&>svg]:opacity-100 forced-colors:[&>svg]:opacity-100',
+          : 'text-muted-foreground hover:bg-worktree-sidebar-foreground/6 data-[state=open]:bg-worktree-sidebar-foreground/10 data-[state=open]:text-foreground [&>svg]:opacity-80 hover:[&>svg]:opacity-100 data-[state=open]:[&>svg]:opacity-100 forced-colors:[&>svg]:opacity-100',
         className
       )}
     >

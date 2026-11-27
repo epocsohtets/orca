@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useId, useState } from 'react'
 import { AppWindow } from 'lucide-react'
 import { useAppStore } from '@/store'
 import { useIntlLocale, useTranslate } from '@/i18n/use-translate'
@@ -26,7 +26,10 @@ const DATE_OPTIONS: Intl.DateTimeFormatOptions = { weekday: 'long', month: 'long
 // border, accent.
 const PRIMARY_ROW_CLASS = 'flex w-full min-w-0 items-center gap-3 p-3 text-left'
 const SECONDARY_ROW_CLASS = 'flex w-full min-w-0 items-center gap-3 py-2 text-left'
-const ROW_HOVER_CLASS = 'outline-none transition-colors hover:bg-accent focus-visible:bg-accent'
+// The rail buttons' ring: muted-foreground holds 3:1 on both themes, where `ring` does not in light.
+const FOCUS_RING_CLASS =
+  'outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-muted-foreground'
+const ROW_HOVER_CLASS = `${FOCUS_RING_CLASS} transition-colors motion-reduce:transition-none hover:bg-accent focus-visible:bg-accent`
 const META_CLASS = 'shrink-0 text-xs text-muted-foreground'
 
 /** `primary` is the area the page is for: a heading and a bordered list. Secondary is a quiet label over bare rows. */
@@ -43,10 +46,12 @@ function HomeSection({
   action?: React.ReactNode
   children: React.ReactNode
 }): React.JSX.Element {
+  const headingId = useId()
   return (
-    <section className="flex min-w-0 flex-col gap-2">
+    <section aria-labelledby={headingId} className="flex min-w-0 flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
         <h2
+          id={headingId}
           className={
             primary
               ? 'flex min-w-0 items-baseline gap-2 text-sm font-semibold text-foreground'
@@ -60,7 +65,7 @@ function HomeSection({
         </h2>
         {action}
       </div>
-      <div
+      <ul
         className={
           primary
             ? 'divide-y divide-border overflow-hidden rounded-md border border-border'
@@ -68,7 +73,7 @@ function HomeSection({
         }
       >
         {children}
-      </div>
+      </ul>
     </section>
   )
 }
@@ -223,7 +228,7 @@ export default function HomePage(): React.JSX.Element {
           <div className="flex min-w-0 flex-col gap-6">
             <HomeSection primary title={t('home.needsYou.title', 'Needs you')} count={needs.length}>
               {needs.map((item) => (
-                <div key={item.id} className={PRIMARY_ROW_CLASS}>
+                <li key={item.id} className={PRIMARY_ROW_CLASS}>
                   <RowText primary title={item.title} detail={item.detail} />
                   <Button
                     type="button"
@@ -234,7 +239,7 @@ export default function HomePage(): React.JSX.Element {
                   >
                     {item.action}
                   </Button>
-                </div>
+                </li>
               ))}
             </HomeSection>
 
@@ -244,7 +249,7 @@ export default function HomePage(): React.JSX.Element {
               count={signedIn ? myWork.length : undefined}
             >
               {!signedIn ? (
-                <div className={`${PRIMARY_ROW_CLASS} flex-wrap justify-between`}>
+                <li className={`${PRIMARY_ROW_CLASS} flex-wrap justify-between`}>
                   <span className="min-w-0 text-xs text-muted-foreground">
                     {t(
                       'auto.components.TaskPage.inaxSignedOut',
@@ -259,30 +264,31 @@ export default function HomePage(): React.JSX.Element {
                   >
                     {t('auto.components.settings.inaxAccount.signIn', 'Sign in with inAX')}
                   </Button>
-                </div>
+                </li>
               ) : myWork.length === 0 ? (
-                <div className={`${PRIMARY_ROW_CLASS} text-xs text-muted-foreground`}>
+                <li className={`${PRIMARY_ROW_CLASS} text-xs text-muted-foreground`}>
                   {t('home.myWork.empty', 'No tasks assigned to you')}
-                </div>
+                </li>
               ) : (
                 myWork.map((task) => (
-                  <button
-                    key={task.id}
-                    type="button"
-                    className={`${PRIMARY_ROW_CLASS} ${ROW_HOVER_CLASS}`}
-                    onClick={openTasks}
-                  >
-                    <RowText
-                      primary
-                      title={task.title}
-                      detail={`${task.id} · ${t(
-                        'home.myWork.lastUpdate',
-                        'Last update by {{name}}',
-                        { name: HOME_MOCK_LAST_UPDATE_BY[task.id] ?? task.author }
-                      )} · ${ago(Date.parse(task.updatedAt))}`}
-                    />
-                    <span className={META_CLASS}>{statusLabels[task.status]}</span>
-                  </button>
+                  <li key={task.id}>
+                    <button
+                      type="button"
+                      className={`${PRIMARY_ROW_CLASS} ${ROW_HOVER_CLASS}`}
+                      onClick={openTasks}
+                    >
+                      <RowText
+                        primary
+                        title={task.title}
+                        detail={`${task.id} · ${t(
+                          'home.myWork.lastUpdate',
+                          'Last update by {{name}}',
+                          { name: HOME_MOCK_LAST_UPDATE_BY[task.id] ?? task.author }
+                        )} · ${ago(Date.parse(task.updatedAt))}`}
+                      />
+                      <span className={META_CLASS}>{statusLabels[task.status]}</span>
+                    </button>
+                  </li>
                 ))
               )}
             </HomeSection>
@@ -291,14 +297,15 @@ export default function HomePage(): React.JSX.Element {
           <div className="flex min-w-0 flex-col gap-6">
             <HomeSection title={t('home.agents.title', 'What agents did')}>
               {activity.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={`${SECONDARY_ROW_CLASS} ${ROW_HOVER_CLASS}`}
-                  onClick={openActivity}
-                >
-                  <RowText title={item.title} detail={item.detail} />
-                </button>
+                <li key={item.id}>
+                  <button
+                    type="button"
+                    className={`${SECONDARY_ROW_CLASS} ${ROW_HOVER_CLASS}`}
+                    onClick={openActivity}
+                  >
+                    <RowText title={item.title} detail={item.detail} />
+                  </button>
+                </li>
               ))}
             </HomeSection>
 
@@ -319,25 +326,25 @@ export default function HomePage(): React.JSX.Element {
             >
               {myApps?.length ? (
                 myApps.map((app) => (
-                  <div key={app.path} className={SECONDARY_ROW_CLASS}>
+                  <li key={app.path} className={SECONDARY_ROW_CLASS}>
                     <AppWindow className="size-4 shrink-0 text-muted-foreground" aria-hidden />
                     <RowText title={app.name} />
                     {app.paused ? (
                       <span className={META_CLASS}>{t('settings.myApps.paused', 'Paused')}</span>
                     ) : null}
                     {/* Usage recording is a separate PoC. */}
-                    <span
-                      className={`${META_CLASS} tabular-nums`}
-                      title={t('home.apps.usageUnknown', 'Usage time is not recorded yet')}
-                    >
-                      —
+                    <span className={`${META_CLASS} tabular-nums`}>
+                      <span aria-hidden>—</span>
+                      <span className="sr-only">
+                        {t('home.apps.usageUnknown', 'Usage time is not recorded yet')}
+                      </span>
                     </span>
-                  </div>
+                  </li>
                 ))
               ) : (
-                <div className={`${SECONDARY_ROW_CLASS} text-xs text-muted-foreground`}>
+                <li className={`${SECONDARY_ROW_CLASS} text-xs text-muted-foreground`}>
                   {t('settings.myApps.emptyTitle', 'No apps registered')}
-                </div>
+                </li>
               )}
             </HomeSection>
           </div>
