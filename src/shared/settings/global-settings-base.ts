@@ -6,6 +6,7 @@ import type { WorktreeCardDisplaySettings } from '../worktree/card-display-setti
 import type { BrowserLinkOpeningSettings } from '../browser/navigation/browser-link-opening-settings'
 import type { BrowserPasswordsGlobalSettings } from '../browser/passwords/browser-passwords-types'
 import type { BrowserMemorySaverGlobalSettings } from '../browser/guest-lifecycle/browser-memory-saver'
+import type { BrowserActivityRecordGlobalSettings } from '../browser/browser-activity-record-settings'
 import type { PerfNoticeGlobalSettings } from '../perf-notices/perf-notice-settings'
 import type { ClaudeAccountSwitchSettings } from '../agent-accounts/claude/claude-account-switch-settings'
 import type { NativeChatGlobalSettings } from '../native-chat/settings/native-chat-appearance-settings'
@@ -73,6 +74,7 @@ export type GlobalSettingsBase = AntigravityChatAuthSettings &
   BotsGlobalSettings &
   BrowserPasswordsGlobalSettings &
   BrowserMemorySaverGlobalSettings &
+  BrowserActivityRecordGlobalSettings &
   PerfNoticeGlobalSettings &
   NestedWorkerDepthSettings &
   AgentWorkspaceTrustSettings &

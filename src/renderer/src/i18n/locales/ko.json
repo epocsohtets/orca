@@ -474,6 +474,15 @@
       },
       "sessionHost": {
         "sshDetail": "이 SSH 호스트의 페이지는 이 컴퓨터에서 열립니다."
+      },
+      "activitySuggestions": {
+        "title": "활동 기반 제안",
+        "description": "내장 브라우저에서 연 페이지(시간, 쿼리를 뺀 주소, 제목)를 기록하고, 반복하는 웹 작업을 에이전트에게 맡기도록 제안합니다. 기록은 이 기기의 메모리에만 있습니다.",
+        "searchKeywords": {
+          "activity": "활동",
+          "suggestions": "제안",
+          "privacy": "개인정보"
+        }
       }
     },
     "agents": {
@@ -23575,6 +23584,15 @@
       "dialog": {
         "cancel": "취소",
         "tryAgain": "다시 시도"
+      }
+    },
+    "browser-pane": {
+      "suggestions": {
+        "repeatedSequence": "오늘 같은 순서로 페이지를 {{times}}번 반복했습니다",
+        "repeatedPage": "오늘 이 페이지를 {{times}}번 열었습니다",
+        "chipLabel": "브라우징에서 찾은 제안",
+        "letAgent": "에이전트에게 맡기기",
+        "dismiss": "닫기"
       }
     }
   },

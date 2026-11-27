@@ -1201,6 +1201,15 @@
       },
       "sessionHost": {
         "sshDetail": "Pages for this SSH host open on this computer."
+      },
+      "activitySuggestions": {
+        "title": "Activity suggestions",
+        "description": "Records the pages you open in the built-in browser (time, address without query, title) to suggest handing repeated web work to an agent. The record stays in memory on this device.",
+        "searchKeywords": {
+          "activity": "activity",
+          "suggestions": "suggestions",
+          "privacy": "privacy"
+        }
       }
     },
     "agents": {
@@ -24587,6 +24596,15 @@
         "disconnectedHostLine": "{{host}} isn’t connected. Its files stay on the host.",
         "filesStayLine": "Its files stay on {{host}}.",
         "removing": "Removing…"
+      }
+    },
+    "browser-pane": {
+      "suggestions": {
+        "repeatedSequence": "You repeated the same sequence of pages {{times}} times today",
+        "repeatedPage": "You opened this page {{times}} times today",
+        "chipLabel": "Suggestions from your browsing",
+        "letAgent": "Let an agent do this",
+        "dismiss": "Dismiss"
       }
     }
   },

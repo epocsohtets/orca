@@ -23,6 +23,7 @@ import {
 import { browserPageDocLocationsEqual } from '../../../../../../shared/browser/workspaces/browser-page-doc-location'
 import '../../../../../../shared/orca-profiles/constants'
 import { ORCA_BROWSER_BLANK_URL } from '../../../../../../shared/browser/browser-blank-page'
+import { recordBrowserActivityVisit } from '@/components/browser-pane/suggestions/browser-activity-store'
 
 export function createBrowserHistoryActions(
   set: BrowserSliceSet,
@@ -89,6 +90,10 @@ export function createBrowserHistoryActions(
       const safeMetadata = redactBrowserMetadata({ title, faviconUrl })
       if (safeUrl === ORCA_BROWSER_BLANK_URL || safeUrl === 'about:blank' || !safeUrl) {
         return
+      }
+      // Every built-in browser surface reports its navigations here, so the activity record needs no listener of its own.
+      if (get().settings?.browserActivityRecordEnabled !== false) {
+        recordBrowserActivityVisit(safeUrl, safeMetadata.title)
       }
       const normalized = normalizeBrowserHistoryUrl(safeUrl)
       set((s) => {

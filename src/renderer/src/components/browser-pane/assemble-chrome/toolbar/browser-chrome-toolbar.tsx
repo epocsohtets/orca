@@ -16,6 +16,7 @@ import {
 import { resolveBrowserSourceUnifiedTab } from '@/lib/browser/workspace/browser-workspace-source-resolution'
 import { useFloatingSplitTabClose } from '@/components/floating-terminal/workspace/use-floating-split-tab-close'
 import { MarkupDrawButton } from '../../annotate/markup-tools/MarkupDrawButton'
+import { BrowserSuggestionsChip } from '../../suggestions/BrowserSuggestionsChip'
 
 export type BrowserChromeOverflowMenuProps = {
   triggerRef: React.RefObject<HTMLButtonElement | null>
@@ -97,6 +98,7 @@ export function BrowserChromeToolbar({
       reloadLabel={reloadLabel}
       showTourAnchors={showTourAnchors}
     >
+      <BrowserSuggestionsChip worktreeId={closeTabOwner.worktreeId} />
       {shareControl}
       {elementTools ? (
         <BrowserAnnotateToolButton
