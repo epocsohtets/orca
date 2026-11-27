@@ -12,6 +12,7 @@ import {
   formatRelativeTime
 } from '../task-page-source-context'
 import { Button } from '@/components/ui/button'
+import { INAX_INTEGRATION_SECTION_ID } from '@/components/integrations/task-trackers/task-provider-integration-section-ids'
 import { useInaxMockAccount } from '@/lib/inax-mock-account'
 import { useAppStore } from '@/store'
 import { INAX_MOCK_TASKS, type InaxTaskStatus } from './inax-mock-tasks'
@@ -54,7 +55,11 @@ export function TaskPageInaxList(): React.JSX.Element {
           type="button"
           size="sm"
           onClick={() => {
-            openSettingsTarget({ pane: 'orca-account', repoId: null })
+            openSettingsTarget({
+              pane: 'integrations',
+              repoId: null,
+              sectionId: INAX_INTEGRATION_SECTION_ID
+            })
             openSettingsPage()
           }}
         >
