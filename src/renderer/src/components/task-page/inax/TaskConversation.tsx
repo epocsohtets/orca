@@ -23,9 +23,10 @@ import type { HomeProposal } from '@/components/home/home-task-loop'
 import { HOME_LOOP_DRAFT_MESSAGE_ID } from '@/components/home/home-task-loop-script'
 import { InaxStatusBadge } from './inax-status-badge'
 import { TaskProposalCard } from './TaskProposalCard'
+import { InaxDemoNote } from './InaxDemoNote'
 
 export type InaxConversationCard =
-  | { kind: 'proposal'; step: 'start' | 'final'; proposal: HomeProposal }
+  | { kind: 'proposal'; step: 'start' | 'final'; proposal: HomeProposal; basis: string[] }
   | { kind: 'question'; question: string; choices: HomeChoice[] }
 
 /**
@@ -75,7 +76,7 @@ export function TaskPageInaxConversation({
     }),
     [messages, task.id]
   )
-  const hasDraft = messages.some((entry) => entry.id === HOME_LOOP_DRAFT_MESSAGE_ID)
+  const hasDraft = messages.some((entry) => entry.id.endsWith(HOME_LOOP_DRAFT_MESSAGE_ID))
   const send = (): void => {
     const text = draft.trim()
     if (text && onSay) {
@@ -110,28 +111,27 @@ export function TaskPageInaxConversation({
             <HomeWhoMarker who={task.who} label={task.whoLabel} />
           ) : null}
         </div>
-        <p className={HOME_META_CLASS} data-inax-demo-note="">
-          {onSay
-            ? t(
-                'taskLoop.chat.demo',
-                'Demonstration response: no agent is connected on this computer, so {{agent}} answers from a prepared script. Status changes and progress notes are really saved.',
-                { agent: agentName }
-              )
-            : t(
-                'taskLoop.chat.sample',
-                'Sample conversation from the sample day. You cannot write to {{agent}} here.',
-                { agent: agentName }
-              )}
-        </p>
+        <InaxDemoNote />
+        {onSay ? null : (
+          <p className={HOME_META_CLASS}>
+            {t('taskLoop.chat.readOnly', 'This conversation can only be read here.')}
+          </p>
+        )}
       </header>
       <div
         className={`${NATIVE_CHAT_APPEARANCE_ROOT_CLASS} flex min-h-0 flex-1 flex-col`}
         style={appearance}
         data-native-chat-scheme={appearance.colorScheme}
       >
-        <NativeChatMessageList session={session} isWorking={working} expandSignal={false} />
+        {/* The transcript's own working line counts seconds; the state is said once, in the task's words. */}
+        <NativeChatMessageList session={session} isWorking={false} expandSignal={false} />
         {card || onSay ? (
           <div className="mx-auto flex w-full max-w-(--chat-content-max-width) flex-none flex-col gap-3 px-4 pb-4">
+            {working && task.whoLabel ? (
+              <div role="status" data-inax-working="">
+                <HomeWhoMarker who="agentWorking" label={task.whoLabel} />
+              </div>
+            ) : null}
             {card?.kind === 'proposal' ? (
               <TaskProposalCard
                 // A corrected proposal starts over when the agent proposes again.
@@ -140,12 +140,14 @@ export function TaskPageInaxConversation({
                 project={project}
                 onConfirm={(proposal) => onDecide(card.step, proposal)}
                 onDecline={() => onDecide(card.step, null)}
+                basis={card.basis}
                 onOpenOutput={
                   hasDraft
                     ? () =>
                         document
                           .querySelector(
-                            `[data-native-chat-message-id="${HOME_LOOP_DRAFT_MESSAGE_ID}"]`
+                            // Rows the agent says in a row are one block, named by its last row.
+                            `[data-native-chat-message-id$="${HOME_LOOP_DRAFT_MESSAGE_ID}"], [data-native-chat-message-id$="loop-propose-final"]`
                           )
                           ?.scrollIntoView({ block: 'start', behavior: motionSafeScrollBehavior() })
                     : undefined

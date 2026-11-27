@@ -19,7 +19,7 @@ function workStyleCopy(style: WorkStyle, t: Translate): { label: string; descrip
         label: t('workStyles.options.code.label', 'Code'),
         description: t(
           'workStyles.options.code.description',
-          'Terminal, Git and agents in repositories'
+          'I write and change program code myself'
         )
       }
     case 'web':

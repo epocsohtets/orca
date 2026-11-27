@@ -1,3 +1,4 @@
+import { InaxDemoNote } from '@/components/task-page/inax/InaxDemoNote'
 import React from 'react'
 import { useTranslate } from '@/i18n/use-translate'
 import { Button } from '@/components/ui/button'
@@ -31,6 +32,7 @@ export function HomeGreeting({
         <p className="text-[13px] text-muted-foreground">
           {date} · {line}
         </p>
+        <InaxDemoNote />
       </div>
       <div className="flex flex-wrap items-center gap-2">{children}</div>
     </header>

@@ -7,7 +7,9 @@ import { HOME_META_CLASS, HomeProjectDot, HomeWhoMarker } from '@/components/hom
 import type { HomeTask } from '@/components/home/home-board'
 import type { HomeProject } from '@/components/home/home-board-mock'
 import { inaxStatusTo } from '@/components/home/home-task-loop-script'
+import { homeSampleMoment } from '@/components/home/home-day'
 import { InaxStatusBadge } from './inax-status-badge'
+import { InaxDemoNote } from './InaxDemoNote'
 
 const NOTE_TIME: Intl.DateTimeFormatOptions = {
   month: 'short',
@@ -101,6 +103,7 @@ export function TaskPageInaxTaskDetail({
               </div>
             ) : null}
           </dl>
+          <InaxDemoNote />
         </div>
       </header>
       <div className="scrollbar-sleek min-h-0 flex-1 overflow-y-auto px-5 py-4">
@@ -138,7 +141,9 @@ export function TaskPageInaxTaskDetail({
                         'taskLoop.detail.noteBy',
                         'Written by the agent, confirmed by Mako · {{when}} · status changed {{to}}',
                         {
-                          when: uiDateTimeFormat(NOTE_TIME, intlLocale).format(note.at),
+                          when: uiDateTimeFormat(NOTE_TIME, intlLocale).format(
+                            homeSampleMoment(note.at)
+                          ),
                           to: statusTo[note.status]
                         }
                       )}
@@ -148,6 +153,22 @@ export function TaskPageInaxTaskDetail({
               </ol>
             )}
           </section>
+          {task.hasDraft ? (
+            <section className="flex flex-col gap-2" data-inax-attached="">
+              <h3 className="text-sm font-semibold text-foreground">
+                {t('taskLoop.detail.attached', 'Attached')}
+              </h3>
+              <p className="text-[13px] text-foreground">
+                {t(
+                  'taskLoop.detail.attachedDraft',
+                  'The agent’s draft. It has not been sent to anyone; the reviewer reads it here.'
+                )}{' '}
+                <Button type="button" variant="link" size="inlineText" onClick={onOpenChat}>
+                  {t('taskLoop.proposal.output', 'Open the draft')}
+                </Button>
+              </p>
+            </section>
+          ) : null}
           {!task.done && task.who === null && !task.loop ? (
             <Button
               type="button"

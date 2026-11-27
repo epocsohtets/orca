@@ -28,7 +28,7 @@ export function WorkStyleStep({
             i18n={i18n}
             defaults={t(
               'workStyles.onboarding.switchNote',
-              'Nothing chosen shows everything. Change any time in <em>Settings → General</em>.'
+              'Not sure? Pick the closest one. You can change it later in <em>Settings → General</em>.'
             )}
             components={{ em: <span className="font-medium text-foreground" /> }}
           />

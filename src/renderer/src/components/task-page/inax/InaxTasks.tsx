@@ -58,7 +58,7 @@ function loopCard(
   loop: HomeTaskLoop,
   now: number
 ): InaxConversationCard | null {
-  const script = buildHomeLoopScript(t, task)
+  const script = buildHomeLoopScript(t, task, loop)
   const proposal = homeLoopOpenProposal(loop, now, script.note)
   if (task.loop === 'question') {
     return { kind: 'question', question: script.question, choices: script.choices }
@@ -67,7 +67,8 @@ function loopCard(
     ? {
         kind: 'proposal',
         step: proposal.step,
-        proposal: { status: proposal.status, note: proposal.note }
+        proposal: { status: proposal.status, note: proposal.note },
+        basis: script.basis
       }
     : null
 }

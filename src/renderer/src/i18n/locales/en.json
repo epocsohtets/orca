@@ -26602,7 +26602,7 @@
     "options": {
       "code": {
         "label": "Code",
-        "description": "Terminal, Git and agents in repositories"
+        "description": "I write and change program code myself"
       },
       "web": {
         "label": "Web",
@@ -26624,7 +26624,7 @@
     "onboarding": {
       "title": "How do you work?",
       "subtitle": "Choose all that apply. The first screens follow what you choose.",
-      "switchNote": "Nothing chosen shows everything. Change any time in <em>Settings → General</em>."
+      "switchNote": "Not sure? Pick the closest one. You can change it later in <em>Settings → General</em>."
     }
   },
   "resourceManager": {
@@ -31628,30 +31628,31 @@
       "errorEmpty": "Write the update, or clear “Report this” to leave it out.",
       "linkedRecords": "{{count}} record(s) from My day are linked to this task. The records themselves are not reported.",
       "include": "Report this",
-      "destination": "Each checked update becomes a comment on its task in inAX (the team’s work tracker). The project’s members and Kim Jiwoo (team lead) see it. Unchecked updates go nowhere.",
-      "done": "{{count}} updates confirmed. In this sample nothing is sent to inAX.",
+      "destination": "Nothing is chosen yet. Each update you check becomes a comment on its task in inAX (the team’s work tracker). The project’s members and Kim Jiwoo (team lead) see it. Unchecked updates go nowhere.",
+      "done": "{{count}} updates reported.",
       "unanswered": "Records not checked yet",
       "unansweredTitle": "{{count}} record(s) not checked yet · not reported",
       "unansweredHint": "Link one to a task and it counts toward that task’s update; say “Not work” and it is dropped.",
       "cancel": "Cancel",
       "confirm": "Report {{count}} updates",
-      "close": "Close"
+      "close": "Close",
+      "selectAll": "Select all {{count}}"
     },
     "newTask": {
       "label": "Task title",
       "placeholder": "For example: book the photo studio",
       "error": "Type a title for the task, then press Add.",
       "hintAgent": "The task joins My work, and its conversation with the agent opens.",
-      "hint": "It is added to My work, due today, in the sample board.",
+      "hint": "It is added to My work, due today.",
       "add": "Add"
     },
     "tasks": {
       "title": "My work",
-      "today": "Today",
+      "today": "Open",
       "waiting": "Needs me",
       "late": "Late",
       "done": "Done",
-      "emptyToday": "Nothing is due today.",
+      "emptyToday": "No open tasks.",
       "emptyWaiting": "Nothing is waiting for you.",
       "emptyLate": "Nothing is late or blocked.",
       "emptyDone": "Nothing finished yet.",
@@ -31797,23 +31798,29 @@
       "back": "The task",
       "confirmed": "Confirmed: the status is “{{status}}”.",
       "confirmedNote": "Confirmed: the status is “{{status}}” and the progress note is on the task.",
-      "declined": "Not yet: nothing changed on inAX.",
-      "demo": "Demonstration response: no agent is connected on this computer, so {{agent}} answers from a prepared script. Status changes and progress notes are really saved.",
-      "done": "It is on inAX now. I am finished with this task unless you tell me more.",
+      "declined": "Not yet: the status and the notes stay as they are.",
+      "done": "The status and the note are on the task. I am finished with it unless you tell me more.",
       "inputLabel": "Message to {{agent}}",
       "kickoff": "Please take this task: {{title}}",
       "label": "Conversation about “{{title}}”",
       "noted": "Noted. I will apply it to the step I am on.",
       "placeholder": "For example: make the second line shorter",
       "proposeFinal": "The draft is above. I propose changing the status {{to}} and leaving a progress note. Read the card below: you can confirm it, correct it, or say not yet.",
-      "proposeStart": "First I propose changing the status {{to}}. Nothing changes on inAX until you confirm it in the card below.",
+      "proposeStart": "First I propose changing the status {{to}}. Answer the card below and I start; the status changes only if you confirm.",
       "read": "I read the task: its description, its deadline ({{due}}) and its notes.",
-      "reproposed": "I applied that. Here is the proposal again.",
-      "sample": "Sample conversation from the sample day. You cannot write to {{agent}} here.",
+      "readOnly": "This conversation can only be read here.",
+      "reproposed": "I wrote your request into the progress note and propose again. The draft message itself is unchanged.",
       "send": "Send",
+      "started": "I am starting with step 1.",
       "waiting": "Understood. The status and the notes stay as they are. Tell me below what to change, and I will propose again."
     },
+    "demo": {
+      "chip": "Demo",
+      "line": "This build uses sample inAX data and prepared agent replies inside the app. Nothing leaves this computer."
+    },
     "detail": {
+      "attached": "Attached",
+      "attachedDraft": "The agent’s draft. It has not been sent to anyone; the reviewer reads it here.",
       "description": "Description",
       "due": "Due",
       "finish": "I finished it myself: move to Done",
@@ -31834,7 +31841,6 @@
     },
     "onboarding": {
       "found": "Found {{open}} tasks assigned to you · {{due}} due today. They are on Home when you start.",
-      "sample": "This preview signs in with a sample account. Nothing is sent to inAX.",
       "signedOut": "Not signed in yet",
       "skip": "Skip for now",
       "start": "Start",
@@ -31842,16 +31848,19 @@
       "title": "Sign in to inAX"
     },
     "proposal": {
-      "audience": "When you confirm, the PM and the team of “{{project}}” see this on inAX. Until then nobody sees it.",
+      "audienceNote": "When you confirm, this status change and this note become visible on inAX to the PM and the team of “{{project}}”. Only these two are waiting for you.",
+      "audienceStatus": "When you confirm, this status change becomes visible on inAX to the PM and the team of “{{project}}”. It is not visible yet.",
+      "basisTitle": "What this note is based on",
       "cancelEdit": "Cancel",
       "confirm": "Confirm",
       "confirmEdited": "Confirm as corrected",
       "decline": "Not yet",
       "edit": "Correct",
       "heading": "The agent’s proposal for inAX",
+      "notDone": "Confirming does not send the draft to anyone. The draft stays attached to this task for the reviewer.",
       "noteError": "Write at least one line that says what was done, then confirm.",
       "noteLabel": "Progress note",
-      "output": "See the draft this note is about",
+      "output": "Open the draft",
       "pending": "Not on inAX yet",
       "statusLabel": "Status",
       "title": "Change the status {{to}}",
@@ -31861,30 +31870,43 @@
       "heading": "The agent’s question"
     },
     "script": {
+      "basis": "The task description: “{{detail}}”",
       "choiceA": "Short · the main points only",
       "choiceB": "Detailed · with the reasons",
-      "draft": "**{{title}} (draft)**\n\n- What the task asks for: {{detail}}\n- What I prepared: a first draft that follows the task description.\n- What is left for you: read it and correct what is wrong.",
-      "note": "Wrote a first draft for “{{title}}”. It follows the task description. It needs a review before it is used.",
+      "draft": "**{{title}} (draft · short)**\n\n- What the task asks for: {{detail}}\n- What is left for you: read it and correct what is wrong.",
+      "draftLong": "**{{title}} (draft · detailed)**\n\n- What the task asks for: {{detail}}\n- What I prepared: a first draft that follows the task description, with the reason for each point.\n- Why this order: the task description names these points in this order.\n- What is left for you: read it and correct what is wrong.",
+      "note": "Wrote a short first draft for “{{title}}”. It follows the task description. It needs a review before it is used.",
+      "noteLong": "Wrote a detailed first draft for “{{title}}”, with the reason for each point. It follows the task description. It needs a review before it is used.",
       "plan": "This is how I will do it.\n\n1. Put the task description and its earlier notes in order.\n2. Write a draft.\n3. Show you the draft, then propose a status and a progress note.",
       "question": "How long should the draft be?",
       "reportA": "Kim Jiwoo only · short",
       "reportB": "The whole campaign team · with a summary",
-      "reportDraft": "**Sharing message for last month’s campaign report (draft)**\n\nJiwoo, here is last month’s campaign report.\n\n- Visitors: 112% of the target\n- Sign-up conversion: 3.4% (2.9% the month before)\n- Ad spend: 96% of the budget\n\nThe details are in the report. Please send your comments by Wednesday.",
-      "reportNote": "Drafted the message that shares last month’s campaign report. It carries three key numbers: visitors, sign-up conversion and ad spend. Kim Jiwoo needs to check it before it is shared.",
-      "reportPlan": "The report is already written, so I will prepare what sharing it needs.\n\n1. Pull the three key numbers out of the report.\n2. Draft the message that shares it with Kim Jiwoo.\n3. Show you the draft, then propose a status and a progress note.",
-      "reportQuestion": "Who should the sharing message be written for?"
+      "reportBasis1": "Visitors, 112% of the target: report page 2, “Visits” table, total row",
+      "reportBasis2": "Sign-up conversion, 3.4% and 2.9%: report page 3, “Sign-ups” table, this month and last month",
+      "reportBasis3": "Ad spend, 96% of the budget: report page 5, “Cost” table, spent ÷ budget",
+      "reportClosing": "Please read the report and leave your comments on this task.",
+      "reportDraftOne": "**Sharing message for last month’s campaign report (draft · to Kim Jiwoo)**\n\nJiwoo, here is last month’s campaign report. Three numbers matter most.",
+      "reportDraftTeam": "**Sharing message for last month’s campaign report (draft · to the whole campaign team)**\n\nCampaign team, here is last month’s campaign report.\n\n**Summary**\n\nMore people visited than we aimed for, and more of them signed up. Ad spend stayed inside the budget.",
+      "reportNoteOne": "Drafted the short message that shares last month’s campaign report with Kim Jiwoo. It has three numbers copied from the report: visitors, sign-up conversion and ad spend. The message has not been sent.",
+      "reportNoteTeam": "Drafted the message that shares last month’s campaign report with the whole campaign team. It has a summary paragraph and three numbers copied from the report: visitors, sign-up conversion and ad spend. The message has not been sent.",
+      "reportNumbers": "- Visitors: 112% of the target\n- Sign-up conversion: 3.4% (2.9% the month before)\n- Ad spend: 96% of the budget",
+      "reportPlan": "The report is already written, so I will prepare what sharing it needs.\n\n1. Pull the three key numbers out of the report.\n2. Draft the message that shares it.\n3. Show you the draft, then propose a status and a progress note.",
+      "reportQuestion": "Who should the sharing message be written for?",
+      "requested": "You asked for: “{{text}}”"
     },
     "settings": {
       "cardDescription": "inAX is the team’s work tracker. Sign in and your tasks appear on Home and in Tasks.",
       "keywordInax": "inax",
       "keywordSignIn": "sign in",
       "keywordTasks": "my work",
+      "pointer": "Looking for inAX (the team’s work tracker)? Its account is a different one.",
+      "pointerLink": "Go to the inAX account",
       "searchDescription": "Sign in to inAX, see the connected account, or disconnect it.",
       "searchTitle": "inAX account",
       "viewTasks": "See my work"
     },
     "source": {
-      "chip": "inAX (the team’s work tracker) · my work · sample data"
+      "chip": "inAX (the team’s work tracker) · my work"
     },
     "status": {
       "done": "Done",

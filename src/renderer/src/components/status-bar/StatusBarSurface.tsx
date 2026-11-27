@@ -22,6 +22,8 @@ import { scrollStripSidewaysOnWheel } from '../tab-bar/strip/tab-strip-scroll-me
 import { StatusBarVisibilityMenu } from './composition/StatusBarVisibilityMenu'
 import { isPairedWebClientWindow } from '@/app-shell/chrome/desktop-window-chrome'
 import { GitBlameStatusSegment } from './GitBlameStatusSegment'
+import { hidesDeveloperChrome } from '../../../../shared/settings/work-styles'
+import { useAppStore } from '@/store/index'
 
 const PetStatusSegment = lazyWithRetry(() =>
   import('./PetStatusSegment').then((module) => ({ default: module.PetStatusSegment }))
@@ -65,6 +67,8 @@ export function StatusBarSurface({
   // Memoized labels still need to follow language changes.
   useTranslation()
   const controller = useStatusBarController(floatingTerminalOpen)
+  // Presentation only: terminal, host and plugin segments are a developer's.
+  const hideDeveloper = useAppStore((s) => hidesDeveloperChrome(s.settings))
   if (!controller) {
     return null
   }
@@ -98,7 +102,7 @@ export function StatusBarSurface({
         setMenuOpen(true)
       }}
     >
-      <StatusBarUsageArea controller={controller} />
+      {hideDeveloper ? null : <StatusBarUsageArea controller={controller} />}
 
       {/* Why: attention segments shrink only after usage reaches its minimum, then scroll instead of
           compressing; the row's padding keeps edge badges and focus rings inside the scroll box. */}
@@ -107,7 +111,7 @@ export function StatusBarSurface({
         className="-mx-1 flex min-w-0 items-center self-stretch overflow-x-auto scrollbar-none"
       >
         <div className="flex w-max items-center gap-3 px-1">
-          {!isPairedWebClientWindow() ? (
+          {!isPairedWebClientWindow() && !hideDeveloper ? (
             <>
               <PluginsStatusSegment />
               <PluginStatusBarItems />
@@ -116,17 +120,17 @@ export function StatusBarSurface({
           ) : null}
           <RemoteServerUpdateStatusSegment />
           <SkillUpdateStatusSegment />
-          <AgentCliUpdateStatusSegment />
+          {hideDeveloper ? null : <AgentCliUpdateStatusSegment />}
           <NativeChatResumeStatusSegment />
           <UpdateStatusSegment />
-          {showGitBlame ? <GitBlameStatusSegment /> : null}
+          {showGitBlame && !hideDeveloper ? <GitBlameStatusSegment /> : null}
           <React.Suspense fallback={null}>
             {petEnabled ? <PetStatusSegment /> : null}
-            {showResourceUsage ? <ResourceUsageStatusSegment /> : null}
-            {showPorts ? <PortsStatusSegment /> : null}
-            {showSsh ? <SshStatusSegment /> : null}
+            {showResourceUsage && !hideDeveloper ? <ResourceUsageStatusSegment /> : null}
+            {showPorts && !hideDeveloper ? <PortsStatusSegment /> : null}
+            {showSsh && !hideDeveloper ? <SshStatusSegment /> : null}
           </React.Suspense>
-          {showFloatingTerminalToggle && (
+          {showFloatingTerminalToggle && !hideDeveloper && (
             <FloatingTerminalIconContextMenu currentLocation="status-bar" className="relative">
               <Tooltip>
                 <TooltipTrigger asChild>

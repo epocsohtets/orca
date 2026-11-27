@@ -50,7 +50,9 @@ export default function OnboardingFlow({
   const shouldShowSetUpLater = currentStep.id !== 'notifications'
   const inaxSignedIn = useInaxMockAccount((state) => state.signedIn)
   const onInaxPage = currentStep.id === 'inax'
-  const worksWithCode = normalizeWorkStyles(flow.settings?.workStyles).includes('code')
+  const workStyles = normalizeWorkStyles(flow.settings?.workStyles)
+  const worksWithCode = workStyles.includes('code')
+  const pageCountUnknown = currentStep.id === 'work_style' && workStyles.length === 0
   const shouldShowFooterBusy = Boolean(busyLabel)
   const footerPrimaryLabel =
     busyLabel ??
@@ -165,7 +167,13 @@ export default function OnboardingFlow({
               />
             </div>
 
-            <div className="mt-10 flex items-center gap-2 transition-[margin-top] duration-[760ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none">
+            <div
+              className={cn(
+                'mt-10 flex items-center gap-2 transition-[margin-top] duration-[760ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none',
+                // The number of pages follows the choice on page 1: no total is shown before it.
+                pageCountUnknown && 'invisible'
+              )}
+            >
               {flow.progressSteps.map(({ step, index: realStepIndex }, progressIdx) => {
                 const isActive = realStepIndex === stepIndex
                 const isDone = realStepIndex < stepIndex
@@ -300,7 +308,7 @@ export default function OnboardingFlow({
               showPrimary={!onInaxPage || inaxSignedIn}
               primaryBusy={shouldShowFooterBusy}
               primaryLabel={footerPrimaryLabel}
-              shortcutModifierLabel={continueShortcutModifierLabel}
+              shortcutModifierLabel={worksWithCode ? continueShortcutModifierLabel : null}
               onPrimary={() => void flow.next()}
             />
           </div>

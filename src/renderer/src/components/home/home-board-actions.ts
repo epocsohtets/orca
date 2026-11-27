@@ -1,6 +1,6 @@
 import { toast } from 'sonner'
 import { translate } from '@/i18n/i18n'
-import { decideHomeProposal } from './home-board'
+import { decideHomeProposal } from './home-board-loops'
 import { useHomeBoardStore } from './home-board-store'
 import { sayToHomeLoop, type HomeProposal } from './home-task-loop'
 

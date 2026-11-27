@@ -109,7 +109,7 @@ export function HomeNewTaskButton({
                   'home.newTask.hintAgent',
                   'The task joins My work, and its conversation with the agent opens.'
                 )
-              : t('home.newTask.hint', 'It is added to My work, due today, in the sample board.')}
+              : t('home.newTask.hint', 'It is added to My work, due today.')}
           </p>
           <Button type="submit" size="sm" className="self-end">
             {t('home.newTask.add', 'Add')}

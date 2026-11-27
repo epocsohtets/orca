@@ -1,11 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import {
-  EMPTY_HOME_BOARD_STATE,
-  applyHomeTaskLoops,
-  decideHomeProposal,
-  type HomeBoardState,
-  type HomeTask
-} from './home-board'
+import { EMPTY_HOME_BOARD_STATE, type HomeBoardState, type HomeTask } from './home-board'
+import { applyHomeTaskLoops, decideHomeProposal } from './home-board-loops'
 import { HOME_LOOP_FIRST_WORK_MS, HOME_LOOP_SECOND_WORK_MS } from './home-task-loop'
 
 const TASK: HomeTask = {
@@ -19,7 +14,8 @@ const TASK: HomeTask = {
   detail: ''
 }
 const START = 1_000_000
-const ANSWERED = START + HOME_LOOP_FIRST_WORK_MS + 5_000
+const STARTED_WORK = START + 1_000
+const ANSWERED = STARTED_WORK + HOME_LOOP_FIRST_WORK_MS + 5_000
 const PROPOSED = ANSWERED + HOME_LOOP_SECOND_WORK_MS
 const LABELS = {
   working: () => 'working',
@@ -28,17 +24,48 @@ const LABELS = {
   confirmed: () => 'confirmed',
   declined: 'declined'
 }
-const script = () => ({ question: 'Which?', choices: [], note: 'Drafted the message.' })
+const script = () => ({
+  question: 'Which?',
+  choices: [],
+  note: 'Drafted the message.',
+  basis: ['Report page 2']
+})
 const board = (at: number, state: HomeBoardState = STARTED): HomeTask =>
   applyHomeTaskLoops([TASK], state, at, script, LABELS)[0]
 const STARTED: HomeBoardState = {
   ...EMPTY_HOME_BOARD_STATE,
   loops: {
-    report: { startedAt: START, said: [], answer: { choiceId: 'a', at: ANSWERED } }
+    report: {
+      startedAt: START,
+      said: [],
+      start: { kind: 'declined', at: STARTED_WORK },
+      answer: { choiceId: 'a', at: ANSWERED }
+    }
   }
 }
 
 describe('an agent proposal for inAX', () => {
+  it('waits on me, not "working", until I answer the first proposal; then the agent works', () => {
+    const fresh = { ...STARTED, loops: { report: { startedAt: START, said: [] } } }
+    const waiting = board(START + 60_000, fresh)
+    expect(waiting.loop).toBe('proposal')
+    expect(waiting.who).toBe('waiting')
+    expect(waiting.proposalStep).toBe('start')
+    expect(waiting.proposal).toEqual({ status: 'inProgress', note: '' })
+    expect(waiting.status).toBe('todo')
+
+    const declined = decideHomeProposal(
+      fresh,
+      'report',
+      'start',
+      { kind: 'declined' },
+      START + 61_000
+    )
+    const working = board(START + 62_000, { ...fresh, ...declined })
+    expect(working.loop).toBe('working')
+    expect(working.status).toBe('todo')
+  })
+
   it('leaves the task as it was until I confirm, and when I say not yet', () => {
     const waiting = board(PROPOSED)
     expect(waiting.proposal).toEqual({ status: 'review', note: 'Drafted the message.' })

@@ -39,8 +39,9 @@ export type HomeLoopPhase = 'working' | 'question' | 'proposal' | 'confirmed' | 
 export const HOME_LOOP_FIRST_WORK_MS = 25_000
 export const HOME_LOOP_SECOND_WORK_MS = 20_000
 
-export function homeLoopQuestionAt(loop: HomeTaskLoop): number {
-  return loop.startedAt + HOME_LOOP_FIRST_WORK_MS
+/** The agent starts once I have answered its first proposal, either way; null until then. */
+export function homeLoopQuestionAt(loop: HomeTaskLoop): number | null {
+  return loop.start ? loop.start.at + HOME_LOOP_FIRST_WORK_MS : null
 }
 
 /** When the draft and the closing proposal arrive; null until I have answered the question. */
@@ -49,7 +50,12 @@ export function homeLoopDraftAt(loop: HomeTaskLoop): number | null {
 }
 
 export function homeLoopPhase(loop: HomeTaskLoop, now: number): HomeLoopPhase {
-  if (now < homeLoopQuestionAt(loop)) {
+  const questionAt = homeLoopQuestionAt(loop)
+  if (questionAt === null) {
+    // Waiting on me is never shown as working.
+    return 'proposal'
+  }
+  if (now < questionAt) {
     return 'working'
   }
   const draftAt = homeLoopDraftAt(loop)
@@ -62,16 +68,18 @@ export function homeLoopPhase(loop: HomeTaskLoop, now: number): HomeLoopPhase {
   return loop.final ? loop.final.kind : 'proposal'
 }
 
-/** The proposal waiting for my answer right now, if any. The first one never blocks the agent. */
+/** The proposal waiting for my answer right now, if any: first "in progress", at the end the status and note. */
 export function homeLoopOpenProposal(
   loop: HomeTaskLoop,
   now: number,
   finalNote: string
 ): (HomeProposal & { step: 'start' | 'final' }) | null {
-  if (homeLoopPhase(loop, now) === 'proposal') {
-    return { step: 'final', status: 'review', note: finalNote }
+  if (homeLoopPhase(loop, now) !== 'proposal') {
+    return null
   }
-  return loop.start || loop.final ? null : { step: 'start', status: 'inProgress', note: '' }
+  return loop.start
+    ? { step: 'final', status: 'review', note: finalNote }
+    : { step: 'start', status: 'inProgress', note: '' }
 }
 
 /**

@@ -16,6 +16,7 @@ import {
 import { openAppHttpLink } from '@/lib/browser/navigation/app-http-link-open'
 import { useInaxSelected, useInaxSourceSelection } from './inax/inax-source-selection'
 import { useAppStore } from '@/store'
+import { InaxDemoNote } from './inax/InaxDemoNote'
 import { worksWithoutCode } from '../../../../shared/settings/work-styles'
 
 function sourceButtonClass(active: boolean, disabled?: boolean): string {
@@ -157,12 +158,15 @@ export function TaskPageSourceBar({
           })}
         {inaxSelected ? (
           // Says once what inAX is and whose list this is.
-          <p
-            className="min-w-0 truncate px-1 text-xs text-muted-foreground"
-            data-inax-source-note=""
-          >
-            {t('taskLoop.source.chip', 'inAX (the team’s work tracker) · my work · sample data')}
-          </p>
+          <>
+            <p
+              className="min-w-0 truncate px-1 text-xs text-muted-foreground"
+              data-inax-source-note=""
+            >
+              {t('taskLoop.source.chip', 'inAX (the team’s work tracker) · my work')}
+            </p>
+            <InaxDemoNote />
+          </>
         ) : (
           <div
             className="hidden min-w-0 max-w-[min(420px,40vw)] items-center rounded-md border border-border/50 bg-muted/35 px-2 py-1 text-xs text-muted-foreground sm:flex"

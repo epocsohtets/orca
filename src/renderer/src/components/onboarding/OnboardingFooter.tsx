@@ -12,7 +12,8 @@ type OnboardingFooterProps = {
   showPrimary: boolean
   primaryBusy: boolean
   primaryLabel: string
-  shortcutModifierLabel: string
+  /** Null leaves the keyboard hint off the button; the shortcut itself still works. */
+  shortcutModifierLabel: string | null
   onPrimary: () => void
 }
 
@@ -64,10 +65,12 @@ export function OnboardingFooter({
           >
             {primaryBusy ? <Loader2 className="size-4 animate-spin" /> : null}
             {primaryLabel}
-            <span className="ml-1 inline-flex items-center gap-0.5 rounded border border-primary-foreground/20 px-1.5 py-0.5 text-[10px] font-medium leading-none text-current/80">
-              <span>{shortcutModifierLabel}</span>
-              <CornerDownLeft className="size-3" />
-            </span>
+            {shortcutModifierLabel === null ? null : (
+              <span className="ml-1 inline-flex items-center gap-0.5 rounded border border-primary-foreground/20 px-1.5 py-0.5 text-[10px] font-medium leading-none text-current/80">
+                <span>{shortcutModifierLabel}</span>
+                <CornerDownLeft className="size-3" />
+              </span>
+            )}
           </button>
         )}
       </div>

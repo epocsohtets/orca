@@ -255,7 +255,7 @@ export default function HomePage(): React.JSX.Element {
                           const task = tasks.find((entry) => entry.id === taskId)
                           decideHomeLoop(
                             taskId,
-                            'final',
+                            task?.proposalStep ?? 'final',
                             proposal,
                             task ? projects[task.project].name : ''
                           )

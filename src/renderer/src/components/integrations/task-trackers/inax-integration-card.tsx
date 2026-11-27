@@ -8,6 +8,7 @@ import {
 } from '../presentation/integration-card-shell'
 import { useIntegrationSubordinateRowClass } from '../presentation/integration-card-presentation'
 import { openInaxTask } from '@/components/task-page/inax/inax-source-selection'
+import { InaxDemoNote } from '@/components/task-page/inax/InaxDemoNote'
 import { INAX_INTEGRATION_SECTION_ID } from './task-provider-integration-section-ids'
 
 /** PoC: the mock inAX account, shaped like the Linear/Jira cards: see it, go to its tasks, disconnect it. */
@@ -75,12 +76,7 @@ export function InaxIntegrationCard(): React.JSX.Element {
             </button>
           </div>
         ) : (
-          <p className="text-xs text-muted-foreground">
-            {t(
-              'taskLoop.onboarding.sample',
-              'This preview signs in with a sample account. Nothing is sent to inAX.'
-            )}
-          </p>
+          <InaxDemoNote />
         )}
       </IntegrationCardDetails>
     </IntegrationCardShell>

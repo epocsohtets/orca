@@ -1,5 +1,6 @@
 import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { BookOpen, CalendarClock, Files, House, Layers, List, Smartphone } from 'lucide-react'
+import { hidesDeveloperChrome } from '../../../../shared/settings/work-styles'
 import { useAppStore } from '@/store/index'
 import { useTranslate } from '@/i18n/use-translate'
 import { useHelpMenuController } from '@/components/sidebar/chrome/help-menu-controller'
@@ -49,6 +50,7 @@ export function AppRail({
   const workspacesActive = useAppStore(isWorkspacesRailItemActive)
   const settingsActive = useAppStore((s) => s.activeView === 'settings')
   const homeActive = useAppStore((s) => s.activeView === 'home')
+  const hideDeveloper = useAppStore((s) => hidesDeveloperChrome(s.settings))
   const shownDestinationsKey = useAppStore(selectShownRailDestinationsKey)
   const currentDestination = useAppStore(selectCurrentRailDestination)
   const listShowsWorkspaces = useAppStore((s) => (s.sidebarBody ?? 'workspaces') === 'workspaces')
@@ -57,10 +59,10 @@ export function AppRail({
   // The account menu's Milestones row and ring read the app-wide setup reading; the rail runs no setup checks itself.
   const milestones = useMemo(
     () =>
-      setupProgress?.ready && setupProgress.done < setupProgress.total
+      !hideDeveloper && setupProgress?.ready && setupProgress.done < setupProgress.total
         ? { done: setupProgress.done, total: setupProgress.total }
         : null,
-    [setupProgress]
+    [hideDeveloper, setupProgress]
   )
   // Milestones sits at the top of the account menu, so Help's own list leaves it out; the menu has its own groups, so
   // Help's rows come grouped. The rail owns the controller so its feedback dialog outlives the account menu closing.
@@ -105,7 +107,7 @@ export function AppRail({
 
   const renderedItems: AppRailItemId[] = [
     'home',
-    'workspaces',
+    ...(hideDeveloper ? [] : (['workspaces'] as const)),
     ...railDestinations,
     partition.more ? 'more' : 'customize',
     'account'
@@ -313,27 +315,29 @@ export function AppRail({
               }
             />
           </RailItem>
-          <RailItem tooltip={workspacesLabel}>
-            <AppRailButton
-              itemId="workspaces"
-              icon={
-                <Layers
-                  size={APP_RAIL_ICON_SIZE}
-                  strokeWidth={APP_RAIL_ICON_STROKE_WIDTH}
-                  aria-hidden
-                />
-              }
-              label={workspacesLabel}
-              active={workspacesActive}
-              // Expansion describes only the content actually in the list column.
-              aria-expanded={listShowsWorkspaces ? listVisible : undefined}
-              aria-controls={
-                listShowsWorkspaces && listRegionPresent ? WORKSPACE_LIST_REGION_ID : undefined
-              }
-              tabStop={tabStopItem === 'workspaces'}
-              onClick={() => navigateFromRail(() => activateWorkspacesRailItem(useAppStore))}
-            />
-          </RailItem>
+          {hideDeveloper ? null : (
+            <RailItem tooltip={workspacesLabel}>
+              <AppRailButton
+                itemId="workspaces"
+                icon={
+                  <Layers
+                    size={APP_RAIL_ICON_SIZE}
+                    strokeWidth={APP_RAIL_ICON_STROKE_WIDTH}
+                    aria-hidden
+                  />
+                }
+                label={workspacesLabel}
+                active={workspacesActive}
+                // Expansion describes only the content actually in the list column.
+                aria-expanded={listShowsWorkspaces ? listVisible : undefined}
+                aria-controls={
+                  listShowsWorkspaces && listRegionPresent ? WORKSPACE_LIST_REGION_ID : undefined
+                }
+                tabStop={tabStopItem === 'workspaces'}
+                onClick={() => navigateFromRail(() => activateWorkspacesRailItem(useAppStore))}
+              />
+            </RailItem>
+          )}
           {railDestinations.map((id) => (
             <RailItem key={id} tooltip={destinationLabel(id)}>
               <AppRailButton

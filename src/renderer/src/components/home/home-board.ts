@@ -1,13 +1,10 @@
-import {
-  confirmHomeProposal,
-  homeLoopOpenProposal,
-  homeLoopPhase,
-  type HomeLoopPhase,
-  type HomeProposal,
-  type HomeTaskLoop,
-  type HomeTaskNote,
-  type HomeTaskRecord,
-  type InaxStatus
+import type {
+  HomeLoopPhase,
+  HomeProposal,
+  HomeTaskLoop,
+  HomeTaskNote,
+  HomeTaskRecord,
+  InaxStatus
 } from './home-task-loop'
 
 /** Who is on a task right now. Null is "mine to do". */
@@ -44,8 +41,13 @@ export type HomeTask = {
   notes?: HomeTaskNote[]
   /** Where my conversation with its agent stands, when I started one. */
   loop?: HomeLoopPhase
-  /** The closing proposal waiting for my answer. */
+  /** The proposal waiting for my answer, and which of the two it is. */
   proposal?: HomeProposal
+  proposalStep?: 'start' | 'final'
+  /** Where the proposed note's claims come from. */
+  proposalBasis?: string[]
+  /** The agent's draft exists and is attached to the task. */
+  hasDraft?: boolean
 }
 
 export type HomeAgent = {
@@ -54,6 +56,8 @@ export type HomeAgent = {
   taskId?: string
   doing: string
   state: HomeAgentState
+  /** The state in the task's own words, so one task reads the same in both lists. */
+  stateLabel?: string
   /** 0 none, 1 plan, 2 work, 3 review. */
   stage: 0 | 1 | 2 | 3
   last: string
@@ -144,95 +148,6 @@ export function applyHomeBoardState(
   )
 }
 
-export const HOME_LOOP_AGENT_ID = 'task-agent'
-
-/**
- * Tasks as inAX and my conversations leave them. A status comes only from the sample or from a proposal I
- * confirmed; a conversation changes who has the task, never its status.
- */
-export function applyHomeTaskLoops(
-  tasks: readonly HomeTask[],
-  state: Pick<HomeBoardState, 'loops' | 'inax'>,
-  now: number,
-  script: (task: HomeTask) => { question: string; choices: HomeChoice[]; note: string },
-  labels: {
-    working: (minutes: number) => string
-    question: string
-    proposal: string
-    confirmed: (status: InaxStatus) => string
-    declined: string
-  }
-): HomeTask[] {
-  return tasks.map((task) => {
-    const record = state.inax[task.id]
-    const status: InaxStatus =
-      record?.status ??
-      (task.done ? 'done' : task.who === null || task.meetingId ? 'todo' : 'inProgress')
-    const loop = state.loops[task.id]
-    const base = { ...task, status, done: status === 'done', notes: record?.notes ?? [] }
-    if (!loop) {
-      return base
-    }
-    const phase = homeLoopPhase(loop, now)
-    const mine = {
-      ...base,
-      loop: phase,
-      agentId: `${HOME_LOOP_AGENT_ID}:${task.id}`,
-      question: undefined
-    }
-    if (phase === 'working') {
-      const since = loop.answer?.at ?? loop.startedAt
-      return {
-        ...mine,
-        who: 'agentWorking',
-        whoLabel: labels.working(Math.floor((now - since) / 60_000))
-      }
-    }
-    const { question, choices, note } = script(task)
-    if (phase === 'question') {
-      return { ...mine, who: 'waiting', whoLabel: labels.question, question, choices }
-    }
-    if (phase === 'proposal') {
-      const proposal = homeLoopOpenProposal(loop, now, note)
-      return {
-        ...mine,
-        who: 'waiting',
-        whoLabel: labels.proposal,
-        proposal: proposal ? { status: proposal.status, note: proposal.note } : undefined
-      }
-    }
-    return {
-      ...mine,
-      who: 'draft',
-      whoLabel: phase === 'confirmed' ? labels.confirmed(status) : labels.declined
-    }
-  })
-}
-
-/** My answer to a proposal. Only "confirmed" touches what inAX holds. */
-export function decideHomeProposal(
-  state: Pick<HomeBoardState, 'loops' | 'inax'>,
-  taskId: string,
-  step: 'start' | 'final',
-  decision: { kind: 'confirmed'; proposal: HomeProposal } | { kind: 'declined' },
-  at: number
-): Pick<HomeBoardState, 'loops' | 'inax'> {
-  const loop = state.loops[taskId]
-  if (!loop) {
-    return state
-  }
-  return {
-    loops: { ...state.loops, [taskId]: { ...loop, [step]: { kind: decision.kind, at } } },
-    inax:
-      decision.kind === 'confirmed'
-        ? {
-            ...state.inax,
-            [taskId]: confirmHomeProposal(state.inax[taskId], decision.proposal, at)
-          }
-        : state.inax
-  }
-}
-
 const DUE_ORDER: Record<HomeDue, number> = { today: 0, overdue: 1, tomorrow: 2, week: 3 }
 
 /** What waits on me first, then due today, then what is late, then later days. */
@@ -302,6 +217,10 @@ export function orderHomeAgents(
           doing: labels.recording,
           last: labels.resumedLast
         }
+      }
+      if (agent.state === 'blocked') {
+        const task = tasks.find((entry) => entry.id === agent.taskId)
+        return task?.who === 'blocked' ? { ...agent, stateLabel: task.whoLabel } : agent
       }
       return agent.state === 'waiting' && !stillWaiting.has(agent.id)
         ? { ...agent, state: 'working', stage: 2, last: labels.resumedLast }

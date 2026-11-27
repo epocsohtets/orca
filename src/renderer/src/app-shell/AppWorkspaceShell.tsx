@@ -2,6 +2,7 @@ import { memo, Suspense, useCallback, useRef } from 'react'
 import { lazyWithRetry as lazy } from '@/app-shell/startup/lazy-with-retry'
 import { useTranslate } from '@/i18n/use-translate'
 import { useAppStore } from '@/store/index'
+import { hidesDeveloperChrome } from '../../../shared/settings/work-styles'
 import { usePluginViewCaptureStore } from '@/store/plugins/capture/plugin-view-capture'
 import { useBotShareReceiveRequest } from '@/components/bots/sharing/bot-share-receive-open'
 import { useHandToBotRequest } from '@/components/bots/hand-to-bot/hand-to-bot-open'
@@ -188,6 +189,7 @@ export function AppWorkspaceShell(props: {
   const { setOpenWithFocus } = floatingWorkspace
   // `orca plugin shot` captures the right sidebar, which the parked launcher floats over.
   const capturingPluginShot = usePluginViewCaptureStore((s) => s.capturing)
+  const hideDeveloper = useAppStore((s) => hidesDeveloperChrome(s.settings))
   const toggleFloatingWorkspace = useCallback(
     () => setOpenWithFocus((open) => !open),
     [setOpenWithFocus]
@@ -305,7 +307,7 @@ export function AppWorkspaceShell(props: {
                   </Suspense>
                 </div>
                 <SidebarChatConversationMount />
-                {floatingWorkspace.showToggleButton && !capturingPluginShot ? (
+                {floatingWorkspace.showToggleButton && !capturingPluginShot && !hideDeveloper ? (
                   <MemoFloatingTerminalToggleButton
                     open={floatingWorkspace.open}
                     onToggle={toggleFloatingWorkspace}

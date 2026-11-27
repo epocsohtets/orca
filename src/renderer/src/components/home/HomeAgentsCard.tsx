@@ -100,7 +100,10 @@ export function HomeAgentsCard({
                       <span className="line-clamp-2">{agent.doing}</span>
                     </td>
                     <td className={`${CELL_CLASS} whitespace-nowrap`}>
-                      <HomeWhoMarker who={agent.state} label={stateLabels[agent.state]} />
+                      <HomeWhoMarker
+                        who={agent.state}
+                        label={agent.stateLabel ?? stateLabels[agent.state]}
+                      />
                     </td>
                     <td className={CELL_CLASS}>
                       <span className="flex items-center gap-2">

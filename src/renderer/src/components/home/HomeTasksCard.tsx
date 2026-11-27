@@ -58,13 +58,13 @@ export function HomeTasksCard({
 }): React.JSX.Element {
   const t = useTranslate()
   const labels: Record<HomeTaskTab, string> = {
-    today: t('home.tasks.today', 'Today'),
+    today: t('home.tasks.today', 'Open'),
     waiting: t('home.tasks.waiting', 'Needs me'),
     late: t('home.tasks.late', 'Late'),
     done: t('home.tasks.done', 'Done')
   }
   const empty: Record<HomeTaskTab, string> = {
-    today: t('home.tasks.emptyToday', 'Nothing is due today.'),
+    today: t('home.tasks.emptyToday', 'No open tasks.'),
     waiting: t('home.tasks.emptyWaiting', 'Nothing is waiting for you.'),
     late: t('home.tasks.emptyLate', 'Nothing is late or blocked.'),
     done: t('home.tasks.emptyDone', 'Nothing finished yet.')
@@ -158,7 +158,8 @@ export function HomeTasksCard({
                             project={projects[task.project].name}
                             onConfirm={(proposal) => onDecide(task.id, proposal)}
                             onDecline={() => onDecide(task.id, null)}
-                            onOpenOutput={() => onOpenOutput(task.id)}
+                            basis={task.proposalBasis}
+                            onOpenOutput={task.hasDraft ? () => onOpenOutput(task.id) : undefined}
                           />
                         ) : (
                           <>

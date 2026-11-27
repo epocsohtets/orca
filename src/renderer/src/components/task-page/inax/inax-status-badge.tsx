@@ -7,7 +7,7 @@ import { inaxStatusLabels } from '@/components/home/home-task-loop-script'
 const TONES: Record<InaxStatus, string> = {
   todo: 'border-border text-muted-foreground',
   inProgress: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
-  review: 'border-purple-500/30 bg-purple-500/10 text-purple-700 dark:text-purple-300',
+  review: 'border-transparent bg-purple-500/10 text-purple-700 dark:text-purple-300',
   done: 'border-border text-foreground'
 }
 

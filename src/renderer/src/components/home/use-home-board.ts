@@ -12,6 +12,7 @@ import {
   formatHomeDuration,
   homePhaseForMinutes,
   homeSampleDay,
+  homeSampleMoment,
   type HomePhase
 } from './home-day'
 
@@ -35,11 +36,13 @@ export function useHomeBoard(preview: 'auto' | HomePhase = 'auto') {
     return installWindowVisibilityInterval({ run: () => setNow(Date.now()), intervalMs: 1000 })
   }, [working])
 
-  const midnight = new Date(mountedAt).setHours(0, 0, 0, 0)
-  const minutes =
-    preview === 'auto' ? Math.floor((mountedAt - midnight) / 60_000) : HOME_PREVIEW_MINUTES[preview]
-  const phase = homePhaseForMinutes(minutes)
   const sampleDay = homeSampleDay(mountedAt)
+  // One clock for the whole board: the sample day's, also at night and on a weekend.
+  const minutes =
+    preview === 'auto'
+      ? Math.floor((homeSampleMoment(mountedAt) - sampleDay) / 60_000)
+      : HOME_PREVIEW_MINUTES[preview]
+  const phase = homePhaseForMinutes(minutes)
   const duration = (value: number): string =>
     formatHomeDuration(value, {
       hours: (count) => t('home.day.hours', '{{count}} hr', { count }),

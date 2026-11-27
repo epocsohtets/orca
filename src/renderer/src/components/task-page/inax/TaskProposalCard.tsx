@@ -31,12 +31,15 @@ export function TaskProposalCard({
   project,
   onConfirm,
   onDecline,
+  basis,
   onOpenOutput
 }: {
   proposal: HomeProposal
   project: string
   onConfirm: (proposal: HomeProposal) => void
   onDecline: () => void
+  /** Where the note's claims come from, one line each. */
+  basis?: readonly string[]
   /** Shows the draft the note is about; absent while there is none yet. */
   onOpenOutput?: () => void
 }): React.JSX.Element {
@@ -187,24 +190,46 @@ export function TaskProposalCard({
               {proposal.note}
             </p>
           ) : null}
-          {onOpenOutput ? (
-            <Button
-              type="button"
-              variant="link"
-              size="inlineText"
-              className="self-start"
-              onClick={onOpenOutput}
-            >
-              {t('taskLoop.proposal.output', 'See the draft this note is about')}
-            </Button>
+          {withNote ? (
+            <div className="flex flex-col gap-1" data-task-proposal-basis="">
+              <p className="text-xs font-medium text-foreground">
+                {t('taskLoop.proposal.basisTitle', 'What this note is based on')}
+              </p>
+              <ul className="flex list-disc flex-col gap-0.5 pl-4 text-xs text-foreground">
+                {basis?.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+                {onOpenOutput ? (
+                  <li>
+                    <Button type="button" variant="link" size="inlineText" onClick={onOpenOutput}>
+                      {t('taskLoop.proposal.output', 'Open the draft')}
+                    </Button>
+                  </li>
+                ) : null}
+              </ul>
+            </div>
           ) : null}
-          <p className="text-xs text-muted-foreground">
-            {t(
-              'taskLoop.proposal.audience',
-              'When you confirm, the PM and the team of “{{project}}” see this on inAX. Until then nobody sees it.',
-              { project }
-            )}
+          <p className="text-xs text-foreground" data-task-proposal-audience="">
+            {withNote
+              ? t(
+                  'taskLoop.proposal.audienceNote',
+                  'When you confirm, this status change and this note become visible on inAX to the PM and the team of “{{project}}”. Only these two are waiting for you.',
+                  { project }
+                )
+              : t(
+                  'taskLoop.proposal.audienceStatus',
+                  'When you confirm, this status change becomes visible on inAX to the PM and the team of “{{project}}”. It is not visible yet.',
+                  { project }
+                )}
           </p>
+          {withNote ? (
+            <p className="text-xs text-foreground" data-task-proposal-not-done="">
+              {t(
+                'taskLoop.proposal.notDone',
+                'Confirming does not send the draft to anyone. The draft stays attached to this task for the reviewer.'
+              )}
+            </p>
+          ) : null}
         </div>
       </NativeChatCardFrame>
     </div>

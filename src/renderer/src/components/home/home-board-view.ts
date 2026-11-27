@@ -2,9 +2,7 @@ import type { Translate } from '@/i18n/use-translate'
 import { uiDateTimeFormat } from '@/i18n/ui-intl-formatters'
 import { formatUiRelativeTime } from '@/i18n/relative-time-format'
 import {
-  HOME_LOOP_AGENT_ID,
   applyHomeBoardState,
-  applyHomeTaskLoops,
   countHomeBoard,
   orderHomeAgents,
   planHomeWrapUp,
@@ -13,6 +11,7 @@ import {
   type HomeBoardState,
   type HomeTask
 } from './home-board'
+import { HOME_LOOP_AGENT_ID, applyHomeTaskLoops } from './home-board-loops'
 import { buildHomeLoopScript, inaxStatusLabels } from './home-task-loop-script'
 import { buildHomeAgents } from './home-board-agents-mock'
 import { buildHomeActivity, type HomeActivity } from './home-board-activity-mock'
@@ -99,7 +98,7 @@ export function buildHomeBoardView(
     }),
     board,
     args.now,
-    (task) => buildHomeLoopScript(t, task),
+    (task, loop) => buildHomeLoopScript(t, task, loop),
     {
       working: (count) =>
         count < 1
@@ -129,7 +128,12 @@ export function buildHomeBoardView(
             doing: task.title,
             state:
               task.loop === 'working' ? 'working' : task.who === 'waiting' ? 'waiting' : 'idle',
-            stage: task.loop === 'working' ? 2 : task.loop === 'question' ? 1 : 3,
+            stage:
+              task.loop === 'working'
+                ? 2
+                : task.loop === 'question' || task.proposalStep === 'start'
+                  ? 1
+                  : 3,
             last: t('home.agent.justNow', 'Just now'),
             lines: []
           }
@@ -175,7 +179,8 @@ export function buildHomeBoardView(
                 { title: tasks.find((task) => task.id === taskId)?.title ?? '' }
               ),
               byAgent: true,
-              finished: true,
+              // Sent for review is work done, not work finished: only Done counts in the tile.
+              finished: board.inax[taskId]?.status === 'done',
               confirmed: true,
               taskId
             }

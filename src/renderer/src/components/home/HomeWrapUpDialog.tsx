@@ -12,14 +12,15 @@ import {
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { InaxDemoNote } from '@/components/task-page/inax/InaxDemoNote'
 import { HOME_META_CLASS } from './HomeCard'
 import { HomeRecordRow } from './HomeRecordRow'
 import type { HomeRecordAnswer, HomeTask } from './home-board'
 import type { HomeDayRecord } from './home-board-day-mock'
 import type { HomeWrapUpUpdate } from './home-board-view'
 
-/** What I changed in the preview: an edited text, or an update I left out. */
-type Edit = { text?: string; excluded?: boolean; error?: boolean }
+/** What I changed in the preview: an edited text, and whether I chose to report it. Nothing starts chosen. */
+type Edit = { text?: string; included?: boolean; error?: boolean }
 
 function WrapUpField({
   update,
@@ -36,14 +37,14 @@ function WrapUpField({
   const textId = useId()
   const errorId = useId()
   const text = edit.text ?? update.text
-  const included = !edit.excluded
+  const included = edit.included === true
   return (
     <li className="flex flex-col gap-2" data-home-wrap-up-update={update.id}>
       <Label htmlFor={textId}>{update.title}</Label>
       <Textarea
         id={textId}
         value={text}
-        disabled={disabled || !included}
+        disabled={disabled}
         aria-invalid={edit.error ? true : undefined}
         aria-describedby={edit.error ? errorId : undefined}
         onChange={(event) =>
@@ -70,7 +71,7 @@ function WrapUpField({
         <Checkbox
           checked={included}
           disabled={disabled}
-          onCheckedChange={(checked) => onChange({ excluded: checked !== true, error: false })}
+          onCheckedChange={(checked) => onChange({ included: checked === true, error: false })}
         />
         {t('home.wrapUp.include', 'Report this')}
       </Label>
@@ -102,7 +103,8 @@ export function HomeWrapUpDialog({
   const [sending, setSending] = useState(false)
   const [done, setDone] = useState<{ title: string; text: string }[] | null>(null)
   const textOf = (update: HomeWrapUpUpdate): string => edits[update.id]?.text ?? update.text
-  const included = updates.filter((update) => !edits[update.id]?.excluded)
+  const included = updates.filter((update) => edits[update.id]?.included === true)
+  const allIncluded = updates.length > 0 && included.length === updates.length
   const patch = (id: string, change: Edit): void =>
     setEdits((current) => ({ ...current, [id]: { ...current[id], ...change } }))
   const confirm = (): void => {
@@ -130,17 +132,27 @@ export function HomeWrapUpDialog({
             {done === null
               ? t(
                   'home.wrapUp.destination',
-                  'Each checked update becomes a comment on its task in inAX (the team’s work tracker). The project’s members and Kim Jiwoo (team lead) see it. Unchecked updates go nowhere.'
+                  'Nothing is chosen yet. Each update you check becomes a comment on its task in inAX (the team’s work tracker). The project’s members and Kim Jiwoo (team lead) see it. Unchecked updates go nowhere.'
                 )
-              : t(
-                  'home.wrapUp.done',
-                  '{{count}} updates confirmed. In this sample nothing is sent to inAX.',
-                  { count: done.length }
-                )}
+              : t('home.wrapUp.done', '{{count}} updates reported.', { count: done.length })}
           </DialogDescription>
+          <InaxDemoNote />
         </DialogHeader>
         {done === null ? (
           <>
+            {/* Why min-h-6: the label is the 24px target for its 16px box. */}
+            <Label variant="control" className="min-h-6" data-home-wrap-up-all="">
+              <Checkbox
+                checked={allIncluded}
+                disabled={sending || updates.length === 0}
+                onCheckedChange={(checked) =>
+                  updates.forEach((update) =>
+                    patch(update.id, { included: checked === true, error: false })
+                  )
+                }
+              />
+              {t('home.wrapUp.selectAll', 'Select all {{count}}', { count: updates.length })}
+            </Label>
             <ul className="flex flex-col gap-6">
               {updates.map((update) => (
                 <WrapUpField

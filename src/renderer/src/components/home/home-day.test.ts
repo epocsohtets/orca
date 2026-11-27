@@ -6,6 +6,7 @@ import {
   formatHomeDuration,
   homePhaseForMinutes,
   homeSampleDay,
+  homeSampleMoment,
   inSameWeek
 } from './home-day'
 
@@ -46,5 +47,18 @@ describe('home day', () => {
     expect(inSameWeek(friday, addWorkdays(friday, -4))).toBe(true)
     expect(new Date(addWorkdays(monday, -1)).getDate()).toBe(27)
     expect([545, 60, 1090].map(formatHomeClock)).toEqual(['09:05', '01:00', '18:10'])
+  })
+
+  it('shows a weekend night as a working morning of the Friday before, in order', () => {
+    const saturdayNight = new Date(2026, 10, 28, 4, 30).getTime()
+    const shown = new Date(homeSampleMoment(saturdayNight))
+    expect([shown.getDate(), shown.getDay(), shown.getHours(), shown.getMinutes()]).toEqual([
+      27, 5, 9, 30
+    ])
+    expect(homeSampleMoment(saturdayNight + 60_000)).toBeGreaterThan(
+      homeSampleMoment(saturdayNight)
+    )
+    const fridayAfternoon = new Date(2026, 10, 27, 14, 5).getTime()
+    expect(homeSampleMoment(fridayAfternoon)).toBe(fridayAfternoon)
   })
 })

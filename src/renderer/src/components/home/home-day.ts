@@ -74,3 +74,19 @@ export function formatHomeClock(minutes: number): string {
   const pad = (value: number): string => String(value).padStart(2, '0')
   return `${pad(Math.floor(minutes / 60))}:${pad(minutes % 60)}`
 }
+
+const SAMPLE_DAY_STARTS_MS = 9 * 3_600_000
+
+/**
+ * A real moment as the sample day shows it: on the sample day (a weekend shows the Friday before), and never
+ * before working hours. The night is folded, in order, into the first working hour.
+ */
+export function homeSampleMoment(real: number): number {
+  const sinceMidnight = real - new Date(real).setHours(0, 0, 0, 0)
+  return (
+    homeSampleDay(real) +
+    (sinceMidnight < SAMPLE_DAY_STARTS_MS
+      ? SAMPLE_DAY_STARTS_MS + sinceMidnight / 9
+      : sinceMidnight)
+  )
+}

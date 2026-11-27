@@ -7,6 +7,7 @@ import { GeneralPane } from '../general/GeneralPane'
 import { IntegrationsPane } from '../integrations/IntegrationsPane'
 import { MobileSettingsPane } from '../mobile/MobileSettingsPane'
 import { OrcaAccountSettingsPane } from '../accounts/orca/OrcaAccountSettingsPane'
+import { InaxAccountPointer } from '../../integrations/task-trackers/inax-account-pointer'
 import { ServerOrcaAccountPane } from '../accounts/orca/ServerOrcaAccountPane'
 import { SettingsHostScopeUnavailableNotice } from '../host-scope/SettingsHostScopePicker'
 import { SettingsSetupGuidePane } from '../setup-guide/SettingsSetupGuidePane'
@@ -50,7 +51,10 @@ export function renderOrcaAccountSettingsSection(
           {model.settingsHostScope.target.kind === 'environment' ? (
             <ServerOrcaAccountPane environmentId={model.settingsHostScope.target.environmentId} />
           ) : (
-            <OrcaAccountSettingsPane />
+            <>
+              <OrcaAccountSettingsPane />
+              <InaxAccountPointer />
+            </>
           )}
         </SettingsGroup>
       )}

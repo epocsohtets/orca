@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { useTranslate } from '@/i18n/use-translate'
 import { INAX_MOCK_ACCOUNT, signInInaxMock } from '@/lib/inax-mock-account'
 import { useHomeBoard } from '../home/use-home-board'
+import { InaxDemoNote } from '../task-page/inax/InaxDemoNote'
 
 /** Sign in to inAX on the page, then see what it found. Skipping leaves the same button on Home and Tasks. */
 export function InaxStep({ signedIn }: { signedIn: boolean }): React.JSX.Element {
@@ -35,18 +36,11 @@ export function InaxStep({ signedIn }: { signedIn: boolean }): React.JSX.Element
           )}
         </p>
       ) : (
-        <>
-          <Button type="button" data-inax-sign-in="" onClick={signInInaxMock}>
-            {t('auto.components.settings.inaxAccount.signIn', 'Sign in with inAX')}
-          </Button>
-          <p className="text-xs text-muted-foreground">
-            {t(
-              'taskLoop.onboarding.sample',
-              'This preview signs in with a sample account. Nothing is sent to inAX.'
-            )}
-          </p>
-        </>
+        <Button type="button" data-inax-sign-in="" onClick={signInInaxMock}>
+          {t('auto.components.settings.inaxAccount.signIn', 'Sign in with inAX')}
+        </Button>
       )}
+      <InaxDemoNote />
     </div>
   )
 }

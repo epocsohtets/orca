@@ -28,3 +28,11 @@ const CODE_ONLY: readonly WorkStyle[] = ['code']
 export function worksWithoutCode(settings: WorkStyleSettings | null | undefined): boolean {
   return !isForWorkStyles(CODE_ONLY, settings)
 }
+
+/**
+ * Presentation only: someone who chose work styles without Code does not see developer-only chrome (the
+ * workspaces rail item, terminal and host status segments, the setup checklist) unless they ask to see everything.
+ */
+export function hidesDeveloperChrome(settings: WorkStyleSettings | null | undefined): boolean {
+  return settings?.showAllSettings !== true && worksWithoutCode(settings)
+}
