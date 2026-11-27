@@ -454,8 +454,20 @@
     "reason": "Agent mail for item asks."
   },
   {
-    "filePath": "src/renderer/src/components/meetings/meetings-mock-meetings.ts",
-    "reason": "PoC mock meeting data, shown as sample content."
+    "filePath": "src/renderer/src/components/meetings/meeting-people.ts",
+    "reason": "PoC sample meeting content (Korean), shown as data."
+  },
+  {
+    "filePath": "src/renderer/src/components/meetings/meeting-sample-newsletter.ts",
+    "reason": "PoC sample meeting content (Korean), shown as data."
+  },
+  {
+    "filePath": "src/renderer/src/components/meetings/meeting-sample-promo.ts",
+    "reason": "PoC sample meeting content (Korean), shown as data."
+  },
+  {
+    "filePath": "src/renderer/src/components/meetings/meeting-sample-seed.ts",
+    "reason": "PoC sample meeting content (Korean), shown as data."
   },
   {
     "filePath": "src/renderer/src/components/task-page/inax/inax-mock-tasks.ts",

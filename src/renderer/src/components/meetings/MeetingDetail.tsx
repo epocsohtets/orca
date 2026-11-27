@@ -1,90 +1,203 @@
-import React, { useState } from 'react'
-import { ArrowLeft } from 'lucide-react'
-import { useIntlLocale, useTranslate } from '@/i18n/use-translate'
+import React, { useEffect, useState } from 'react'
+import { ArrowLeft, Circle, Square } from 'lucide-react'
+import { toast } from 'sonner'
+import { useTranslate } from '@/i18n/use-translate'
 import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { RAIL_PAGE_GUTTER_X } from '@/components/rail-page/RailPage'
-import { RailPageCount } from '@/components/rail-page/RailPageHeader'
+import {
+  SIDEBAR_CHAT_CONVERSATIONS,
+  useSidebarChatOpenConversation
+} from '@/components/sidebar-chat/sidebar-chat-mock-data'
+import { installWindowVisibilityInterval } from '@/lib/window-activity/window-visibility-interval'
 import { cn } from '@/lib/class-names'
-import { isOpenFollowUp } from './meeting-follow-ups'
-import { formatMeetingDay, formatMeetingTime } from './meeting-time-format'
-import { MeetingFollowUpsTab } from './MeetingFollowUpsTab'
-import { inaxTaskStatus, MeetingEmptyState } from './MeetingParts'
-import { MeetingPrepTab } from './MeetingPrepTab'
-import { MeetingRecorder } from './MeetingRecorder'
-import { MeetingMinutesTab, MeetingTranscriptTab } from './MeetingResultTabs'
+import { openMeetingTask } from './meeting-navigation'
+import { personName } from './meeting-people'
+import { excerptAround, meetingAccess } from './meeting-rules'
+import { formatElapsed } from './meeting-schedule'
+import { MeetingMinutes } from './MeetingMinutes'
+import { MeetingSection, useMeetingText } from './MeetingParts'
+import { MeetingPrep } from './MeetingPrep'
+import { MeetingTranscript } from './MeetingTranscript'
 import type { Meeting } from './meeting-types'
+import { startRecording, stopRecording, useMeetings } from './meetings-store'
 
-const MEETING_TABS = ['prep', 'transcript', 'minutes', 'followUps'] as const
-type MeetingTab = (typeof MEETING_TABS)[number]
+/** Seconds since `startedAt`, ticking while the window can be seen. */
+export function useElapsedSeconds(startedAt: number | null): number {
+  const [now, setNow] = useState(() => Date.now())
+  useEffect(() => {
+    if (startedAt === null) {
+      return
+    }
+    setNow(Date.now())
+    // The timer is the feature, but it has nothing to draw while the window is hidden.
+    return installWindowVisibilityInterval({ run: () => setNow(Date.now()), intervalMs: 1000 })
+  }, [startedAt])
+  return startedAt === null ? 0 : (now - startedAt) / 1000
+}
 
-// The panel scrolls in a plain wrapper: TabsContent owns its own spacing and focus style.
-const TAB_PANEL = cn(
-  'h-full overflow-y-auto pt-2 pb-4 scrollbar-sleek in-focus-visible:ring-2 in-focus-visible:ring-ring in-focus-visible:ring-inset',
-  RAIL_PAGE_GUTTER_X
-)
+function RecordingStrip({
+  meeting,
+  isHost
+}: {
+  meeting: Meeting
+  isHost: boolean
+}): React.JSX.Element {
+  const t = useTranslate()
+  const elapsed = useElapsedSeconds(meeting.recordingStartedAt)
+  const recording = meeting.recordingStartedAt !== null
+  const people = meeting.attendeeIds.length + 1
+  return (
+    <div className="flex flex-col gap-1.5">
+      <div
+        className="flex min-h-11 flex-wrap items-center gap-x-3 gap-y-1.5 rounded-md border border-border px-3 py-1.5"
+        data-meeting-recorder={recording ? 'recording' : 'idle'}
+      >
+        <div className="flex min-w-0 flex-1 items-center gap-2 text-sm">
+          {recording ? (
+            <>
+              <span
+                aria-hidden
+                className="size-2 shrink-0 rounded-full bg-destructive motion-safe:animate-pulse"
+              />
+              <span role="status" className="font-medium text-foreground">
+                {t('meetings.recording.on', 'Recording')}
+              </span>
+              <span role="timer" className="font-mono text-xs text-muted-foreground tabular-nums">
+                {formatElapsed(elapsed)}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {t(
+                  'meetings.recording.everyoneSees',
+                  'All {{count}} people in the meeting see this.',
+                  {
+                    count: people
+                  }
+                )}
+              </span>
+            </>
+          ) : (
+            <span className="text-muted-foreground">
+              {isHost
+                ? t('meetings.recording.hostIdle', 'Start recording when the meeting begins.')
+                : t(
+                    'meetings.recording.attendeeIdle',
+                    'When the host starts recording, it shows here and in the status bar.'
+                  )}
+            </span>
+          )}
+        </div>
+        {isHost && !recording ? (
+          <Button type="button" size="sm" onClick={() => startRecording(meeting.id)}>
+            <Circle className="size-3 fill-current" aria-hidden />
+            {t('meetings.recording.start', 'Start recording')}
+          </Button>
+        ) : null}
+        {isHost && recording ? (
+          <Button
+            type="button"
+            size="sm"
+            onClick={() => {
+              stopRecording(meeting.id)
+              toast.success(
+                t(
+                  'meetings.recording.sent',
+                  'The meeting bot sent the minutes to all {{count}} people in the meeting.',
+                  { count: people }
+                )
+              )
+            }}
+          >
+            <Square className="size-3 fill-current" aria-hidden />
+            {t('meetings.recording.stop', 'End recording')}
+          </Button>
+        ) : null}
+      </div>
+      {isHost && !recording ? (
+        <p className="text-xs text-muted-foreground">
+          {t(
+            'meetings.recording.simulated',
+            'This build does not capture sound. When you end the recording, prepared sample minutes are made and sent to the attendees.'
+          )}
+        </p>
+      ) : null}
+    </div>
+  )
+}
 
-/** Mount with `key={meeting.id}` so the tab resets per meeting. */
+/** What an assignee who was not in the meeting may see: their task and the part it rests on. */
+function MeetingExcerpt({ meeting }: { meeting: Meeting }): React.JSX.Element {
+  const t = useTranslate()
+  const text = useMeetingText()
+  const viewerId = useMeetings((state) => state.viewerId)
+  const focus = useMeetings((state) => state.focus)
+  const mine = useMeetings((state) => state.tasks).filter(
+    (task) => task.meetingId === meeting.id && task.assigneeId === viewerId
+  )
+  return (
+    <div
+      className={cn(
+        'flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto pb-6 scrollbar-sleek',
+        RAIL_PAGE_GUTTER_X
+      )}
+    >
+      <p className="max-w-prose text-xs text-muted-foreground">
+        {t(
+          'meetings.excerpt.scope',
+          'You were not in this meeting, so you see your task and the part of the meeting it came from. An attendee can share the full minutes with you.'
+        )}
+      </p>
+      {mine.map((task) => {
+        const followUp = meeting.followUps.find((f) => f.id === task.followUpId)
+        const turnId = followUp?.turnId ?? ''
+        return (
+          <MeetingSection
+            key={task.id}
+            title={t('meetings.excerpt.task', 'My task')}
+            action={
+              <Button
+                type="button"
+                variant="ghost"
+                size="xs"
+                onClick={() => openMeetingTask(task.id)}
+              >
+                {t('meetings.openTask', 'Open task')}
+              </Button>
+            }
+          >
+            <p className="text-sm font-medium text-foreground">{task.title}</p>
+            <p className="mb-3 text-xs text-muted-foreground">
+              {text.status[task.status]} · {text.due(task.due)} ·{' '}
+              {t('meetings.excerpt.assignedBy', 'Assigned by {{name}}', {
+                name: personName(meeting.hostId)
+              })}
+            </p>
+            <MeetingTranscript
+              turns={excerptAround(meeting.minutes?.transcript ?? [], [turnId])}
+              markedTurnId={turnId}
+              markNonce={focus?.nonce}
+            />
+          </MeetingSection>
+        )
+      })}
+    </div>
+  )
+}
+
+/** One meeting: before (outline), during (recording), after (minutes and follow-up tasks). */
 export function MeetingDetail({
   meeting,
-  previous,
-  otherRecording,
   onBack
 }: {
   meeting: Meeting
-  previous: Meeting | null
-  otherRecording: boolean
   onBack: () => void
 }): React.JSX.Element {
   const t = useTranslate()
-  const intlLocale = useIntlLocale()
-  const [tab, setTab] = useState<MeetingTab>(meeting.phase === 'ready' ? 'minutes' : 'prep')
-  // Processing that finishes while the meeting is open reveals its transcript.
-  const [seenPhase, setSeenPhase] = useState(meeting.phase)
-  if (seenPhase !== meeting.phase) {
-    setSeenPhase(meeting.phase)
-    if (seenPhase === 'processing' && meeting.phase === 'ready') {
-      setTab('transcript')
-    }
-  }
-
-  const { result, phase } = meeting
-  const openCount = meeting.followUps.filter((f) => isOpenFollowUp(f, inaxTaskStatus)).length
-  const when = `${formatMeetingDay(meeting.startsAt, intlLocale)} · ${formatMeetingTime(meeting.startsAt, intlLocale)}`
-  const pending =
-    phase === 'processing' ? (
-      <MeetingEmptyState
-        title={t('meetings.empty.processingTitle', 'Processing the recording')}
-        detail={t(
-          'meetings.empty.processingDetail',
-          'The transcript, minutes and follow-ups appear here when processing finishes. Prep stays available.'
-        )}
-      />
-    ) : phase === 'stopped' ? (
-      <MeetingEmptyState
-        title={t('meetings.empty.stoppedTitle', 'Recorded, minutes not created')}
-        detail={t(
-          'meetings.empty.stoppedDetail',
-          'Select Create minutes above to get the transcript, summary and follow-ups.'
-        )}
-      />
-    ) : phase === 'recording' ? (
-      <MeetingEmptyState
-        title={t('meetings.empty.recordingTitle', 'Recording in progress')}
-        detail={t(
-          'meetings.empty.recordingDetail',
-          'Stop the recording, then create minutes to get the transcript, summary and follow-ups.'
-        )}
-      />
-    ) : (
-      <MeetingEmptyState
-        title={t('meetings.empty.idleTitle', 'Not recorded yet')}
-        detail={t(
-          'meetings.empty.idleDetail',
-          'Start recording above. The transcript, minutes and follow-ups appear here after the meeting.'
-        )}
-      />
-    )
+  const text = useMeetingText()
+  const viewerId = useMeetings((state) => state.viewerId)
+  const tasks = useMeetings((state) => state.tasks)
+  const access = meetingAccess(meeting, viewerId, tasks)
+  const isHost = meeting.hostId === viewerId
+  const origin = SIDEBAR_CHAT_CONVERSATIONS.find(({ id }) => id === meeting.originConversationId)
 
   return (
     <div className="flex h-full min-h-0 min-w-0 flex-col">
@@ -96,7 +209,7 @@ export function MeetingDetail({
               type="button"
               variant="ghost"
               size="icon-toolbar"
-              aria-label={t('meetings.backToList', 'Back to the meeting list')}
+              aria-label={t('meetings.backToList', 'Back to the list')}
               onClick={onBack}
             >
               <ArrowLeft aria-hidden />
@@ -111,67 +224,47 @@ export function MeetingDetail({
               {meeting.title}
             </h2>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              {when}
-              {meeting.calendar
-                ? ` – ${formatMeetingTime(meeting.calendar.endsAt, intlLocale)} · ${meeting.calendar.location}`
-                : ` · ${t('meetings.noCalendarEntry', 'No calendar entry')}`}
-              {' · '}
-              {t('meetings.attendeeCount', 'Attendees {{count}}', {
-                count: meeting.attendees.length
+              {text.when(meeting)}
+              {meeting.place ? ` · ${meeting.place}` : ''}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {t('meetings.detail.people', 'Host {{host}} · Attendees {{attendees}}', {
+                host: personName(meeting.hostId),
+                attendees: meeting.attendeeIds.map(personName).join(', ')
               })}
             </p>
+            {origin && access === 'full' ? (
+              <span className="mt-0.5 -ml-2 block">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="xs"
+                  data-meeting-origin=""
+                  onClick={() => useSidebarChatOpenConversation.getState().setOpenId(origin.id)}
+                >
+                  {t('meetings.detail.origin', 'Set up from the chat “{{name}}”', {
+                    name: origin.name
+                  })}
+                </Button>
+              </span>
+            ) : null}
           </div>
         </div>
-        <MeetingRecorder meeting={meeting} otherRecording={otherRecording} />
+        {access === 'full' && !meeting.minutes ? (
+          <RecordingStrip meeting={meeting} isHost={isHost} />
+        ) : null}
       </div>
-      <Tabs
-        value={tab}
-        onValueChange={(value) => setTab(MEETING_TABS.find((id) => id === value) ?? tab)}
-        className="min-h-0 flex-1"
-      >
-        <div className={cn('shrink-0 overflow-x-auto border-b border-border', RAIL_PAGE_GUTTER_X)}>
-          <TabsList variant="line" className="-mx-2">
-            <TabsTrigger value="prep">{t('meetings.tab.prep', 'Prep')}</TabsTrigger>
-            <TabsTrigger value="transcript">
-              {t('meetings.tab.transcript', 'Transcript')}
-            </TabsTrigger>
-            <TabsTrigger value="minutes">{t('meetings.tab.minutes', 'Minutes')}</TabsTrigger>
-            <TabsTrigger value="followUps">
-              {t('meetings.tab.followUps', 'Follow-ups')}
-              {openCount > 0 ? <RailPageCount value={openCount} /> : null}
-            </TabsTrigger>
-          </TabsList>
+      {access !== 'full' ? (
+        <MeetingExcerpt meeting={meeting} />
+      ) : meeting.minutes ? (
+        <MeetingMinutes meeting={meeting} minutes={meeting.minutes} />
+      ) : (
+        <div
+          className={cn('min-h-0 flex-1 overflow-y-auto pb-6 scrollbar-sleek', RAIL_PAGE_GUTTER_X)}
+        >
+          <MeetingPrep meeting={meeting} isHost={isHost} />
         </div>
-        <TabsContent value="prep" className="min-h-0">
-          <div className={TAB_PANEL}>
-            <MeetingPrepTab meeting={meeting} previous={previous} />
-          </div>
-        </TabsContent>
-        <TabsContent value="transcript" className="min-h-0">
-          <div className={TAB_PANEL}>
-            {result ? <MeetingTranscriptTab result={result} /> : pending}
-          </div>
-        </TabsContent>
-        <TabsContent value="minutes" className="min-h-0">
-          <div className={TAB_PANEL}>
-            {result ? <MeetingMinutesTab result={result} /> : pending}
-          </div>
-        </TabsContent>
-        <TabsContent value="followUps" className="min-h-0">
-          <div className={TAB_PANEL}>
-            {!result ? (
-              pending
-            ) : meeting.followUps.length > 0 ? (
-              <MeetingFollowUpsTab meetingId={meeting.id} followUps={meeting.followUps} />
-            ) : (
-              <MeetingEmptyState
-                title={t('meetings.empty.noFollowUpsTitle', 'No follow-ups')}
-                detail={t('meetings.empty.noFollowUpsDetail', 'This meeting produced no actions.')}
-              />
-            )}
-          </div>
-        </TabsContent>
-      </Tabs>
+      )}
     </div>
   )
 }

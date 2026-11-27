@@ -75,6 +75,39 @@ export const SIDEBAR_CHAT_CONVERSATIONS: SidebarChatConversation[] = [
     ]
   },
   {
+    id: 'group-promo',
+    kind: 'group',
+    name: '연말-프로모션',
+    memberCount: 4,
+    unread: 3,
+    messages: [
+      {
+        id: '1',
+        author: '박지호',
+        time: '09:12',
+        text: '작년 연말 프로모션 결과를 정리해서 공유 폴더에 올렸습니다.'
+      },
+      {
+        id: '2',
+        author: '이민아',
+        time: '09:20',
+        text: '할인율을 25%로 올리자는 의견이 있던데, 물류 쪽 계산을 먼저 봐야 할 것 같아요.'
+      },
+      {
+        id: '3',
+        author: '정다은',
+        time: '09:31',
+        text: '문의 대응 시간도 같이 정했으면 합니다. 작년 첫 주가 정말 힘들었어요.'
+      },
+      {
+        id: '4',
+        author: '박지호',
+        time: '09:38',
+        text: '글로는 길어지겠네요. 오늘 오후에 잠깐 모여서 정하면 어떨까요?'
+      }
+    ]
+  },
+  {
     id: 'group-design',
     kind: 'group',
     name: 'design',

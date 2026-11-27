@@ -128,6 +128,7 @@ export type TopLevelView =
   | 'settings'
   | 'tasks'
   | 'meetings'
+  | 'meetingBot'
   | 'activity'
   | 'automations'
   | 'space'

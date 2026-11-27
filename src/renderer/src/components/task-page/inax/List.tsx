@@ -15,6 +15,12 @@ import { Button } from '@/components/ui/button'
 import { INAX_INTEGRATION_SECTION_ID } from '@/components/integrations/task-trackers/task-provider-integration-section-ids'
 import { useInaxMockAccount } from '@/lib/inax-mock-account'
 import { useAppStore } from '@/store'
+import {
+  MeetingTaskOrigin,
+  MeetingTaskStatusSelect,
+  useMeetingTaskRows
+} from '@/components/meetings/MeetingTaskCells'
+import { useMeetings } from '@/components/meetings/meetings-store'
 import { INAX_MOCK_TASKS, type InaxTaskStatus } from './inax-mock-tasks'
 
 // Same columns as the GitHub issue grid without its trailing action column.
@@ -34,6 +40,10 @@ export function TaskPageInaxList(): React.JSX.Element {
   const t = useTranslate()
   const intlLocale = useIntlLocale()
   const signedIn = useInaxMockAccount((state) => state.signedIn)
+  // Follow-up tasks made from meetings sit above the tracker's own rows.
+  const meetingTasks = useMeetingTaskRows()
+  const meetingTaskIds = new Set(meetingTasks.map((task) => task.id))
+  const focusTaskId = useMeetings((state) => state.focusTaskId)
   const openSettingsTarget = useAppStore((state) => state.openSettingsTarget)
   const openSettingsPage = useAppStore((state) => state.openSettingsPage)
   const statusLabels: Record<InaxTaskStatus, string> = {
@@ -92,20 +102,32 @@ export function TaskPageInaxList(): React.JSX.Element {
           <span>{t('auto.components.TaskPage.f362667d55', 'Updated')}</span>
         </div>
         <div className="divide-y divide-border/40">
-          {INAX_MOCK_TASKS.map((task) => (
+          {[...meetingTasks, ...INAX_MOCK_TASKS].map((task) => (
             <div
               key={task.id}
+              data-current={task.id === focusTaskId || undefined}
+              data-inax-task-row={task.id}
               className={cn(
-                'group/github-task-row grid min-h-12 gap-3 px-3 py-2.5 text-left transition-colors hover:bg-accent',
+                'group/github-task-row grid min-h-12 gap-3 px-3 py-2.5 text-left transition-colors hover:bg-accent data-current:bg-accent',
                 INAX_TASK_GRID_CLASS
               )}
             >
-              <div className={GITHUB_TASK_STICKY_ID_CELL_CLASS}>
+              <div
+                className={cn(
+                  GITHUB_TASK_STICKY_ID_CELL_CLASS,
+                  task.id === focusTaskId && 'bg-accent'
+                )}
+              >
                 <span className="inline-flex items-center rounded-md border border-border/40 px-1.5 py-0.5 font-mono text-[11px] font-normal text-muted-foreground">
                   {task.id}
                 </span>
               </div>
-              <div className={GITHUB_TASK_STICKY_TITLE_CELL_CLASS}>
+              <div
+                className={cn(
+                  GITHUB_TASK_STICKY_TITLE_CELL_CLASS,
+                  task.id === focusTaskId && 'bg-accent'
+                )}
+              >
                 <h3 className="truncate text-[13px] font-medium text-foreground">{task.title}</h3>
                 <div className="mt-0.5 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[12px] text-muted-foreground">
                   <span>{task.author}</span>
@@ -119,9 +141,13 @@ export function TaskPageInaxList(): React.JSX.Element {
                     </span>
                   ))}
                 </div>
+                <MeetingTaskOrigin taskId={task.id} />
               </div>
               <div className="flex min-w-0 items-center text-xs text-muted-foreground">
-                {task.assignee ? (
+                {meetingTaskIds.has(task.id) ? (
+                  // A person's name, not initials: these are teammates, not tracker logins.
+                  <span className="truncate text-foreground">{task.assignee}</span>
+                ) : task.assignee ? (
                   // Why: a blank login renders initials instead of requesting a GitHub avatar.
                   <GitHubUserAvatar
                     login=""
@@ -134,14 +160,18 @@ export function TaskPageInaxList(): React.JSX.Element {
                 )}
               </div>
               <div className="flex items-center">
-                <span
-                  className={cn(
-                    'inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold leading-none',
-                    INAX_STATUS_TONES[task.status]
-                  )}
-                >
-                  {statusLabels[task.status]}
-                </span>
+                {meetingTaskIds.has(task.id) ? (
+                  <MeetingTaskStatusSelect taskId={task.id} />
+                ) : (
+                  <span
+                    className={cn(
+                      'inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold leading-none',
+                      INAX_STATUS_TONES[task.status]
+                    )}
+                  >
+                    {statusLabels[task.status]}
+                  </span>
+                )}
               </div>
               <Tooltip>
                 <TooltipTrigger asChild>
