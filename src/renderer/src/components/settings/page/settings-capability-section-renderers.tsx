@@ -4,6 +4,7 @@ import { getProviderAccountsOwnerKey } from '@/runtime/provider-accounts/observa
 import { AgentsPane } from '../agents/AgentsPane'
 import { AgentDefaultSurfaceSection } from '../agents/surfaces/AgentDefaultSurfaceSection'
 import { ComputerUsePane } from '../computer-use/ComputerUsePane'
+import { MyAppsPane } from '../my-apps/MyAppsPane'
 import { LinearAgentSkillPane } from '../skills/linear/LinearAgentSkillPane'
 import { OrchestrationPane } from '../orchestration/OrchestrationPane'
 import { VoicePane } from '../voice/VoicePane'
@@ -205,6 +206,20 @@ export function renderDesktopCapabilitySettingsSections(
         searchEntries={navigation.getSectionSearchEntries('computer-use')}
       >
         {view.isSectionMounted('computer-use') ? <ComputerUsePane /> : null}
+      </SettingsSection>
+
+      <SettingsSection
+        id="my-apps"
+        title={t('settings.myApps.title', 'My apps')}
+        description={t(
+          'settings.myApps.description',
+          'The apps you work in. Orca watches the ones you register.'
+        )}
+        searchEntries={navigation.getSectionSearchEntries('my-apps')}
+      >
+        {view.isSectionMounted('my-apps') ? (
+          <MyAppsPane settings={model.settings} updateSettings={model.updateSettings} />
+        ) : null}
       </SettingsSection>
 
       <SettingsSection

@@ -33,6 +33,7 @@ const SETTINGS_NAV_TARGETS = [
   'quick-commands',
   'notifications',
   'computer-use',
+  'my-apps',
   'developer-permissions',
   'privacy',
   'advanced',

@@ -2,6 +2,7 @@ import { LinearIcon } from '@/components/icons/LinearIcon'
 import { getAccountsPaneSearchEntries } from '@/components/settings/accounts/accounts-search'
 import { getAgentsPaneSearchEntries } from '@/components/settings/agents/agents-search'
 import { getComputerUsePaneSearchEntries } from '@/components/settings/computer-use/computer-use-search'
+import { getMyAppsPaneSearchEntries } from '@/components/settings/my-apps/my-apps-search'
 import { getGeneralPaneSearchEntries } from '@/components/settings/general/general-search'
 import { getIntegrationsPaneSearchEntries } from '@/components/settings/integrations/integrations-search'
 import { getLinearAgentSkillPaneSearchEntries } from '@/components/settings/skills/linear/linear-agent-skill-search'
@@ -16,6 +17,7 @@ import { translate } from '@/i18n/i18n'
 import type { Translate } from '@/i18n/use-translate'
 import type { SettingsNavSection } from '@/components/settings/navigation/settings-navigation-types'
 import {
+  AppWindow,
   Blocks,
   Bot,
   BrushCleaning,
@@ -126,6 +128,17 @@ export function buildCapabilitySettingsSections(
             ),
             icon: MousePointerClick,
             searchEntries: getComputerUsePaneSearchEntries(),
+            group: 'capabilities'
+          },
+          {
+            id: 'my-apps',
+            title: t('settings.myApps.title', 'My apps'),
+            description: t(
+              'settings.myApps.description',
+              'The apps you work in. Orca watches the ones you register.'
+            ),
+            icon: AppWindow,
+            searchEntries: getMyAppsPaneSearchEntries(t),
             group: 'capabilities'
           },
           {

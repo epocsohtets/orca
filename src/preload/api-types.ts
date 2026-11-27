@@ -48,6 +48,7 @@ import type {
   MacosTccPromptsApi,
   NotificationsApi
 } from './api/desktop-permissions/os-permission-api'
+import type { MyAppsApi } from './api/my-apps/my-apps-bridge'
 import type { PetApi } from './api/pets/pet-api'
 import type { AppIconApi } from './api/window-ui/app-icon-api'
 import type { BrowserPasswordsApi } from './api/browser/browser-passwords-api'
@@ -145,6 +146,7 @@ export type PreloadApi = {
   macosTccPrompts: MacosTccPromptsApi
   developerPermissions: DeveloperPermissionsApi
   computerUsePermissions: ComputerUsePermissionsApi
+  myApps: MyAppsApi
   shell: ShellApi
   botChanges: BotChangesApi
   googleSetup: GoogleSetupApi
