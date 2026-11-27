@@ -1,4 +1,7 @@
+import { useMemo } from 'react'
 import { toast } from 'sonner'
+import { isWindowsUserAgent } from '@/app-shell/platform/user-agent-platform'
+import { worksWithoutCode } from '../../../../shared/settings/work-styles'
 import type { AppState } from '@/store/types'
 import { translate } from '@/i18n/i18n'
 import {
@@ -28,13 +31,32 @@ export function shouldSkipWindowsTerminalStep(isWindows: boolean): boolean {
 export type OnboardingStepSkipOptions = {
   skipIntegrations: boolean
   skipWindowsTerminal: boolean
+  /** The person chose work styles without Code: no Chat/Terminal, GitHub CLI or terminal pages. */
+  skipDeveloperSteps?: boolean
+}
+
+export function useOnboardingStepSkipOptions(
+  status: AppState['preflightStatus'],
+  settings: GlobalSettings | null
+): Required<OnboardingStepSkipOptions> {
+  const skipIntegrations = shouldSkipIntegrationsStep(status)
+  const skipWindowsTerminal = shouldSkipWindowsTerminalStep(isWindowsUserAgent())
+  const skipDeveloperSteps = worksWithoutCode(settings)
+  return useMemo(
+    () => ({ skipIntegrations, skipWindowsTerminal, skipDeveloperSteps }),
+    [skipIntegrations, skipWindowsTerminal, skipDeveloperSteps]
+  )
 }
 
 export function isSkippedStepIndex(index: number, options: OnboardingStepSkipOptions): boolean {
   const step = STEPS[index]
   return (
     (options.skipIntegrations && step?.id === 'integrations') ||
-    (options.skipWindowsTerminal && step?.id === 'windows_terminal')
+    (options.skipWindowsTerminal && step?.id === 'windows_terminal') ||
+    (options.skipDeveloperSteps === true &&
+      (step?.id === 'agent_surface' ||
+        step?.id === 'integrations' ||
+        step?.id === 'windows_terminal'))
   )
 }
 

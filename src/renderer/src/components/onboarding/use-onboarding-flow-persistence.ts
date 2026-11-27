@@ -188,8 +188,8 @@ export function usePersistCurrentStep({
       return { ok: false }
     }
     try {
-      if (currentStepId === 'agent_surface') {
-        // Why: the Chat UI choice saves with the default agent, so leaving mid-step changes nothing.
+      if (currentStepId === 'agent_surface' || currentStepId === 'work_style') {
+        // Why: the Chat UI choice saves with the default agent, and work styles save as they are picked.
         return { ok: true }
       }
       if (currentStepId === 'agent' || currentStepId === 'notifications') {

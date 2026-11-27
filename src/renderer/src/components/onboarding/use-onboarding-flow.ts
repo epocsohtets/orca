@@ -16,13 +16,11 @@ import { persistStep, useCloseWith, usePersistCurrentStep } from './use-onboardi
 import { resolveOnboardingSettingsHydration } from './onboarding-settings-hydration'
 import { translate } from '@/i18n/i18n'
 import { useOnboardingYoloPermissions } from './use-onboarding-yolo-permissions'
-import { isWindowsUserAgent } from '@/app-shell/platform/user-agent-platform'
 import {
   isSkippedStepIndex,
   remapOpenOnboardingLastCompletedStep,
   resolveStepIndex,
-  shouldSkipIntegrationsStep,
-  shouldSkipWindowsTerminalStep
+  useOnboardingStepSkipOptions
 } from './onboarding-flow-state'
 import { useOnboardingFlowActions } from './use-onboarding-flow-actions'
 import { useOnboardingFlowTelemetry } from './use-onboarding-flow-telemetry'
@@ -48,12 +46,8 @@ export function useOnboardingFlow(
   // Why: renderToStaticMarkup uses Zustand's initial snapshot; the sync read keeps tests and the first client render aligned.
   const effectivePreflightStatus = preflightStatus ?? useAppStore.getState().preflightStatus
 
-  const skipIntegrations = shouldSkipIntegrationsStep(effectivePreflightStatus)
-  const skipWindowsTerminal = shouldSkipWindowsTerminalStep(isWindowsUserAgent())
-  const skipOptions = useMemo(
-    () => ({ skipIntegrations, skipWindowsTerminal }),
-    [skipIntegrations, skipWindowsTerminal]
-  )
+  const skipOptions = useOnboardingStepSkipOptions(effectivePreflightStatus, settings)
+  const { skipIntegrations } = skipOptions
   const remappedLastCompletedStep = remapOpenOnboardingLastCompletedStep(onboarding)
   const initialStep = resolveStepIndex(
     stepIndexAfterCompletedStep(remappedLastCompletedStep),

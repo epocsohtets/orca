@@ -26579,6 +26579,38 @@
       "loading": "Loading language…"
     }
   },
+  "workStyles": {
+    "title": "How you work",
+    "description": "Choose every way you work. Orca hides the settings and setup steps you do not need. With nothing chosen, everything shows.",
+    "hiddenHint": "Hidden for your work style",
+    "options": {
+      "code": {
+        "label": "Code",
+        "description": "Terminal, Git and agents in repositories"
+      },
+      "web": {
+        "label": "Web",
+        "description": "Work in the browser"
+      },
+      "desktopApps": {
+        "label": "Desktop apps",
+        "description": "Excel, Photoshop and other apps"
+      },
+      "meetings": {
+        "label": "Meetings",
+        "description": "Calls, notes and dictation"
+      }
+    },
+    "showAll": {
+      "label": "Show all settings",
+      "description": "Show every Settings page, including the pages hidden for your work style."
+    },
+    "onboarding": {
+      "title": "How do you work?",
+      "subtitle": "Choose all that apply. Orca shows only the setup you need.",
+      "switchNote": "Nothing chosen shows everything. Change any time in <em>Settings → General</em>."
+    }
+  },
   "resourceManager": {
     "pty": {
       "bound": "Has tab",

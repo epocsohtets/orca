@@ -16,17 +16,21 @@ export type SettingsSetupGuideProgress = {
 export function getSettingsSetupGuideProgress(progress: {
   ready: boolean
   stepDone: Partial<Record<FeatureWallSetupStepId, boolean>>
+  /** Counts of the steps this person is asked to do; absent means every step. */
+  coreDoneCount?: number
+  coreTotal?: number
 }): SettingsSetupGuideProgress {
-  const doneCount = FEATURE_WALL_SETUP_STEPS.filter((step) => progress.stepDone[step.id]).length
+  const doneCount =
+    progress.coreDoneCount ??
+    FEATURE_WALL_SETUP_STEPS.filter((step) => progress.stepDone[step.id]).length
+  const total = progress.coreTotal ?? FEATURE_WALL_SETUP_STEPS.length
   const firstIncompleteStepId =
-    doneCount === FEATURE_WALL_SETUP_STEPS.length
-      ? null
-      : getFirstIncompleteFeatureWallSetupStepId(progress.stepDone)
+    doneCount === total ? null : getFirstIncompleteFeatureWallSetupStepId(progress.stepDone)
 
   return {
     ready: progress.ready,
     doneCount,
-    total: FEATURE_WALL_SETUP_STEPS.length,
+    total,
     firstIncompleteStepId
   }
 }

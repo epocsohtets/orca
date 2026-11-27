@@ -6,6 +6,7 @@ import {
 } from '../../../../../shared/feature-education/explore/feature-wall-setup-steps'
 import type { GlobalSettings } from '../../../../../shared/settings/global-settings-types'
 import type { Worktree } from '../../../../../shared/worktree/types'
+import { worksWithoutCode } from '../../../../../shared/settings/work-styles'
 import { selectWorktreesByRepo } from '../../../store/workspaces/catalog/workspace-record-fields'
 
 export type FeatureWallSetupProgressInput = {
@@ -23,6 +24,20 @@ export type FeatureWallSetupProgressInput = {
   gitRepoCount: number
   worktreesByRepo: Record<string, Worktree[]>
   hasSetupScript: boolean
+}
+
+const CODE_ONLY_SETUP_STEPS: ReadonlySet<FeatureWallSetupStepId> = new Set([
+  'two-worktrees',
+  'setup-script',
+  'add-two-repos'
+])
+
+/** A person who works without Code is not asked for worktree, setup-script or multi-repo steps. */
+export function isSetupStepForWorkStyles(
+  stepId: FeatureWallSetupStepId,
+  settings: GlobalSettings | null
+): boolean {
+  return !(CODE_ONLY_SETUP_STEPS.has(stepId) && worksWithoutCode(settings))
 }
 
 export type FeatureWallSetupProgress = {
@@ -103,11 +118,18 @@ export function getFeatureWallSetupProgress(
     'agent-capabilities': setupGuideAgentCapabilitiesDone(input),
     'setup-script': input.hasSetupScript
   }
+  const askedSteps = FEATURE_WALL_SETUP_STEPS.filter((step) =>
+    isSetupStepForWorkStyles(step.id, input.settings)
+  )
+  // Why done: a step that is not asked must not hold the checklist open or become the next step.
+  for (const step of FEATURE_WALL_SETUP_STEPS) {
+    stepDone[step.id] ||= !askedSteps.includes(step)
+  }
   return {
     ready: input.ready ?? true,
     stepDone,
-    coreDoneCount: FEATURE_WALL_SETUP_STEPS.filter((step) => stepDone[step.id]).length,
-    coreTotal: FEATURE_WALL_SETUP_STEPS.length
+    coreDoneCount: askedSteps.filter((step) => stepDone[step.id]).length,
+    coreTotal: askedSteps.length
   }
 }
 

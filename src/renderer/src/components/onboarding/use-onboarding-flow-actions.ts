@@ -83,8 +83,8 @@ export function useOnboardingFlowActions({
   const nextInFlightRef = useRef(false)
   const trackCurrentStepCompleted = useCallback(
     (advancedVia: 'button' | 'keyboard'): void => {
-      // Step 1 spans the Chat/Terminal page and the agent page; only the agent page completes it.
-      if (currentStep.id === 'agent_surface') {
+      // Step 1 spans the work-style, Chat/Terminal and agent pages; only the agent page completes it.
+      if (currentStep.id === 'agent_surface' || currentStep.id === 'work_style') {
         return
       }
       const durationMs = consumeStepDurationMs()

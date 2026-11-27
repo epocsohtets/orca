@@ -1,6 +1,17 @@
 import { translate } from '@/i18n/i18n'
 
 export const stepCopy = {
+  work_style: {
+    get title() {
+      return translate('workStyles.onboarding.title', 'How do you work?')
+    },
+    get subtitle() {
+      return translate(
+        'workStyles.onboarding.subtitle',
+        'Choose all that apply. Orca shows only the setup you need.'
+      )
+    }
+  },
   agent_surface: {
     get title() {
       return translate(
@@ -99,6 +110,11 @@ export const stepCopy = {
 } as const
 
 export const stepTooltipLabels = {
+  work_style: {
+    get value() {
+      return translate('workStyles.title', 'How you work')
+    }
+  },
   agent_surface: {
     get value() {
       return translate('components.onboarding.flow.stepTooltip.agentSurface', 'Chat or Terminal')
