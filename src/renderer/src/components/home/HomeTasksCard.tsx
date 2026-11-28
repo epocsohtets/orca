@@ -65,7 +65,7 @@ export function HomeTasksCard({
     today: t('home.tasks.emptyToday', 'No tasks remain. Add a new task or hand one to an agent.'),
     waiting: t('home.tasks.emptyWaiting', 'Nothing is waiting for you.'),
     late: t('home.tasks.emptyLate', 'Nothing is late or blocked.'),
-    done: t('home.tasks.emptyDone', 'Tasks you finish collect here.')
+    done: ''
   }
   const byTab = (key: HomeTaskTab): HomeTask[] =>
     sortHomeTasks(tasks.filter((task) => homeTaskTab(task).includes(key)))
@@ -97,7 +97,9 @@ export function HomeTasksCard({
         </div>
         <TabsContent value={tab}>
           {shown.length === 0 ? (
-            <p className={`px-4 py-3 ${HOME_META_CLASS}`}>{empty[tab]}</p>
+            empty[tab] ? (
+              <p className={`px-4 py-3 ${HOME_META_CLASS}`}>{empty[tab]}</p>
+            ) : null
           ) : (
             <ul className="divide-y divide-border border-t border-border">
               {shown.map((task) => {

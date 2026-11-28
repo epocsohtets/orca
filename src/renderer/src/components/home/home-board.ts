@@ -54,6 +54,8 @@ export type HomeTask = {
   proposal?: HomeProposal
   /** The agent's draft exists and is attached to the task. */
   hasDraft?: boolean
+  /** What that draft is called. */
+  outputName?: string
 }
 
 export type HomeAgent = {

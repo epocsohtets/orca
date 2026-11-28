@@ -88,6 +88,7 @@ export function WorkTaskChat({
         )
       }
     ]
+    const question = buildHomeLoopScript(t, task, loop).question
     const chip = (answered: boolean): React.JSX.Element => (
       <button
         type="button"
@@ -95,7 +96,8 @@ export function WorkTaskChat({
         onClick={onOpenQuestion}
       >
         <BotItemStatusIcon status={answered ? 'working' : 'needs_you'} />
-        <span className="min-w-0 truncate">{task.title}</span>
+        {/* The item's words here are the question: the task's title read as if it were the question. */}
+        <span className="min-w-0 truncate">{question}</span>
       </button>
     )
     if (times[HOME_LOOP_ASKED_ROW] !== undefined) {

@@ -26597,7 +26597,6 @@
   },
   "workStyles": {
     "title": "How you work",
-    "description": "Choose every way you work.",
     "hiddenHint": "Hidden for your work style",
     "options": {
       "code": {
@@ -27966,7 +27965,7 @@
       "title": "Bots",
       "newBot": "New bot",
       "startFromScratch": "Start from scratch",
-      "emptyCardTitle": "Your AI teammate",
+      "emptyCardTitle": "Make a bot to hand work to",
       "emptyTemplates": "Templates",
       "expand": "Expand Bots",
       "collapse": "Collapse Bots",
@@ -31598,7 +31597,7 @@
       "assignedByMe": "Assigned by me",
       "heard": "Made by the meeting agent",
       "unassign": "Remove owner",
-      "more": "More for “{{text}}”"
+      "more": "Menu for “{{text}}”"
     },
     "openTask": "Open task",
     "excerpt": {
@@ -31913,7 +31912,6 @@
       "emptyToday": "No tasks remain. Add a new task or hand one to an agent.",
       "emptyWaiting": "Nothing is waiting for you.",
       "emptyLate": "Nothing is late or blocked.",
-      "emptyDone": "Tasks you finish collect here.",
       "answer": "Answer",
       "openList": "Open the task list",
       "open": "Open",
@@ -32044,16 +32042,14 @@
       "nowActivity": "Last activity {{when}}",
       "nowAgent": "Agent working",
       "nowMeeting": "Minutes · {{count}} follow-up tasks",
-      "starLegend": "The agent’s pick",
       "ahead": "Written by the agent ·",
-      "take": "takes it",
-      "oneOwner": "Owner · one person"
+      "take": "uses it"
     }
   },
   "taskLoop": {
     "activity": {
       "result": "· attached a draft to “{{title}}”",
-      "started": "· started with an agent: “{{title}}”"
+      "started": "· started the task “{{title}}” with an agent"
     },
     "agent": {
       "name": "Task agent"
@@ -32062,7 +32058,7 @@
       "kickoff": "Please take this task: {{title}}",
       "noted": "Noted. I will apply it to what I am writing now.",
       "moved": "Moved {{title}} {{to}}",
-      "asked": "Asked you about {{items}}"
+      "asked": "Asked you {{items}}"
     },
     "demo": {
       "chip": "Demo"
@@ -32080,9 +32076,7 @@
       "noteStatus": "Changed status {{to}}",
       "activity": "Activity",
       "folder": "Folder",
-      "notesNone": "None",
-      "output": "Result",
-      "outputDraft": "A draft, in the conversation"
+      "output": "Result"
     },
     "gate": {
       "line": "Sign in to inAX and your tasks appear here."
@@ -32113,7 +32107,8 @@
       "reportDraft": "**Last month’s campaign results report (draft)**\n\n**Summary**\n\nMore people visited than we aimed for, and more of them signed up. Ad spend stayed inside the budget.",
       "reportAgency": "- Agency fee: 18% of ad spend",
       "reportNote": "Wrote the draft of last month’s campaign results report: visitors, sign-up conversion, ad spend and the agency’s fee. Please review it.",
-      "reportNoteWithout": "Wrote the draft of last month’s campaign results report: visitors, sign-up conversion and ad spend. The agency’s fee is left out. Please review it."
+      "reportNoteWithout": "Wrote the draft of last month’s campaign results report: visitors, sign-up conversion and ad spend. The agency’s fee is left out. Please review it.",
+      "reportOutput": "Last month’s campaign results report (draft)"
     },
     "settings": {
       "cardDescription": "Sign in and your tasks appear on Home and in Tasks.",
@@ -32154,7 +32149,7 @@
     },
     "notice": {
       "title": "Needs your answer",
-      "open": "Open the question"
+      "open": "Answer"
     }
   }
 }

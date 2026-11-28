@@ -26018,7 +26018,6 @@
   },
   "workStyles": {
     "title": "일하는 방식",
-    "description": "일하는 방식을 모두 선택하세요.",
     "hiddenHint": "일하는 방식에 맞춰 숨김",
     "options": {
       "code": {
@@ -28326,7 +28325,7 @@
       "scrollRight": "오른쪽으로 스크롤 · 숨겨진 봇 {{amount}}개",
       "title": "봇",
       "startFromScratch": "처음부터 시작",
-      "emptyCardTitle": "AI 동료",
+      "emptyCardTitle": "업무를 맡길 봇을 만드세요",
       "newBot": "새 봇",
       "emptyTemplates": "템플릿"
     },
@@ -29228,7 +29227,7 @@
       "assignedByMe": "내가 할당함",
       "heard": "회의 에이전트가 만듦",
       "unassign": "담당자 해제",
-      "more": "“{{text}}” 더 보기"
+      "more": "“{{text}}” 메뉴"
     },
     "openTask": "업무 열기",
     "excerpt": {
@@ -29543,7 +29542,6 @@
       "emptyToday": "남은 업무가 없습니다. 새 업무를 추가하거나 에이전트에게 맡기세요.",
       "emptyWaiting": "나를 기다리는 것이 없습니다.",
       "emptyLate": "늦거나 멈춘 업무가 없습니다.",
-      "emptyDone": "완료한 업무가 여기에 모입니다.",
       "answer": "답변",
       "openList": "업무 목록 열기",
       "open": "열기",
@@ -29674,16 +29672,14 @@
       "nowActivity": "마지막 활동 {{when}}",
       "nowAgent": "에이전트 작업 중",
       "nowMeeting": "회의록 · 후속 업무 {{count}}건",
-      "starLegend": "에이전트 추천",
       "ahead": "에이전트가 쓴 글 ·",
-      "take": "가져오기",
-      "oneOwner": "담당자 1명"
+      "take": "사용"
     }
   },
   "taskLoop": {
     "activity": {
       "result": "· “{{title}}”에 초안을 붙였습니다",
-      "started": "· 에이전트와 시작했습니다: “{{title}}”"
+      "started": "· 에이전트와 “{{title}}” 업무를 시작했습니다"
     },
     "agent": {
       "name": "업무 에이전트"
@@ -29692,7 +29688,7 @@
       "kickoff": "이 업무를 맡아 주세요: {{title}}",
       "noted": "알겠습니다. 지금 쓰는 내용에 반영하겠습니다.",
       "moved": "{{title}}{{particle}} {{to}} 옮겼습니다",
-      "asked": "질문: {{items}}"
+      "asked": "질문 {{items}}"
     },
     "demo": {
       "chip": "데모"
@@ -29710,9 +29706,7 @@
       "noteStatus": "상태를 {{to}} 바꿈",
       "activity": "활동",
       "folder": "폴더",
-      "notesNone": "없음",
-      "output": "결과물",
-      "outputDraft": "대화에 있는 초안"
+      "output": "결과물"
     },
     "gate": {
       "line": "inAX에 로그인하면 내 업무가 여기에 보입니다."
@@ -29743,7 +29737,8 @@
       "reportDraft": "**지난달 캠페인 결과 보고서 (초안)**\n\n**요약**\n\n목표보다 많은 사람이 방문했고, 그중 신청한 사람의 비율도 올랐습니다. 광고비는 예산 안에서 썼습니다.",
       "reportAgency": "- 대행사 비용: 광고비의 18%",
       "reportNote": "지난달 캠페인 결과 보고서의 초안을 썼습니다. 방문자, 신청 전환율, 광고비, 대행사 비용이 들어 있습니다. 검토를 부탁드립니다.",
-      "reportNoteWithout": "지난달 캠페인 결과 보고서의 초안을 썼습니다. 방문자, 신청 전환율, 광고비가 들어 있고, 대행사 비용은 뺐습니다. 검토를 부탁드립니다."
+      "reportNoteWithout": "지난달 캠페인 결과 보고서의 초안을 썼습니다. 방문자, 신청 전환율, 광고비가 들어 있고, 대행사 비용은 뺐습니다. 검토를 부탁드립니다.",
+      "reportOutput": "지난달 캠페인 결과 보고서 (초안)"
     },
     "settings": {
       "cardDescription": "로그인하면 내 업무가 홈과 업무 목록에 보입니다.",
@@ -29784,7 +29779,7 @@
     },
     "notice": {
       "title": "확인이 필요합니다",
-      "open": "질문 열기"
+      "open": "답변"
     }
   }
 }

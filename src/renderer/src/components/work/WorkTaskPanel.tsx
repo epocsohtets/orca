@@ -95,9 +95,14 @@ export function WorkTaskPanel({
         className
       )}
     >
-      <div className="flex shrink-0 items-center gap-1.5 py-2.5 pr-2 pl-3.5 text-xs font-medium text-muted-foreground">
-        <BotItemStatusIcon status={group} />
-        <span data-work-task-group={group}>{groupLabels[group]}</span>
+      <div className="flex min-h-9 shrink-0 items-center gap-1.5 py-2.5 pr-2 pl-3.5 text-xs font-medium text-muted-foreground">
+        {/* The group is where the task stands with me and my agent; a colleague sees its status only. */}
+        {readOnly ? null : (
+          <>
+            <BotItemStatusIcon status={group} />
+            <span data-work-task-group={group}>{groupLabels[group]}</span>
+          </>
+        )}
       </div>
       <div className="scrollbar-sleek flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pb-3">
         <div className="px-3.5">
@@ -166,12 +171,10 @@ export function WorkTaskPanel({
               <dd className="text-foreground">{task.whoLabel}</dd>
             </>
           ) : null}
-          {task.hasDraft && !readOnly ? (
+          {task.outputName && !readOnly ? (
             <>
               <dt className="text-muted-foreground">{t('taskLoop.detail.output', 'Result')}</dt>
-              <dd className="text-foreground">
-                {t('taskLoop.detail.outputDraft', 'A draft, in the conversation')}
-              </dd>
+              <dd className="text-foreground">{task.outputName}</dd>
             </>
           ) : null}
           {task.folder && !readOnly ? (
@@ -210,13 +213,12 @@ export function WorkTaskPanel({
             />
           )}
         </div>
-        <section className="px-3.5" data-work-task-notes="">
-          <h3 className="mb-1 text-xs text-muted-foreground">
-            {t('taskLoop.detail.notes', 'Progress notes')}
-          </h3>
-          {notes.length === 0 ? (
-            <p className={HOME_META_CLASS}>{t('taskLoop.detail.notesNone', 'None')}</p>
-          ) : (
+        {notes.length === 0 ? null : (
+          <section className="px-3.5" data-work-task-notes="">
+            <h3 className="mb-1 text-xs text-muted-foreground">
+              {t('taskLoop.detail.notes', 'Progress notes')}
+            </h3>
+
             <ol className="flex flex-col gap-3">
               {notes.toReversed().map((note) => (
                 <li key={note.id} className="flex flex-col gap-1">
@@ -241,8 +243,8 @@ export function WorkTaskPanel({
                 </li>
               ))}
             </ol>
-          )}
-        </section>
+          </section>
+        )}
       </div>
       {asks ? (
         <div className="mx-3 mb-3 flex shrink-0 flex-col gap-1 rounded-xl border border-border bg-background p-2 shadow-xs">

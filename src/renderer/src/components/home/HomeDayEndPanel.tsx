@@ -231,7 +231,7 @@ export function HomeDayEndPanel({
                   </p>
                 ) : undefined
               }
-              label={t('home.dayEnd.oneOwner', 'Owner · pick one')}
+              label={t('meetings.followUps.colOwner', 'Owner')}
               chips={card.peopleIds.map((id, index) => ({
                 id,
                 label: index === 0 ? me : personName(id),

@@ -24,7 +24,13 @@ const LABELS = {
   result: 'result',
   confirmed: () => 'confirmed'
 }
-const script = () => ({ question: 'Which?', choices: [], draft: 'The report.', note: 'Wrote it.' })
+const script = () => ({
+  question: 'Which?',
+  choices: [],
+  draft: 'The report.',
+  output: 'Report',
+  note: 'Wrote it.'
+})
 // Starting is my own press: the status is "in progress" on inAX from that moment.
 const STARTED: HomeBoardState = {
   ...EMPTY_HOME_BOARD_STATE,

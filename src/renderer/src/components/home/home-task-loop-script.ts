@@ -22,6 +22,8 @@ export type HomeLoopScript = {
   draft: string | null
   /** What the agent says after my answer when there is no draft. */
   next: string
+  /** What the draft is called, on the task. */
+  output: string
   /** The progress note the agent writes ahead for the day-end card. */
   note: string
 }
@@ -83,6 +85,7 @@ export function buildHomeLoopScript(
         { id: 'b', label: t('taskLoop.script.reportB', 'Leave it out') }
       ],
       next: '',
+      output: t('taskLoop.script.reportOutput', 'Last month’s campaign results report (draft)'),
       draft: `${t(
         'taskLoop.script.reportDraft',
         '**Last month’s campaign results report (draft)**\n\n**Summary**\n\nMore people visited than we aimed for, and more of them signed up. Ad spend stayed inside the budget.'
@@ -109,6 +112,7 @@ export function buildHomeLoopScript(
       { id: 'b', label: t('taskLoop.script.choiceB', 'For the project team') }
     ],
     draft: null,
+    output: '',
     next: second
       ? t(
           'taskLoop.script.nextTeam',

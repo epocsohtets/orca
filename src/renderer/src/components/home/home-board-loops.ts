@@ -19,6 +19,8 @@ export function applyHomeTaskLoops(
     choices: HomeChoice[]
     /** Null when nothing was prepared for the task: the agent then has nothing to propose. */
     draft: string | null
+    /** What the draft is called. */
+    output: string
     note: string
   },
   labels: {
@@ -76,9 +78,16 @@ export function applyHomeTaskLoops(
         who: 'draft',
         whoLabel: labels.result,
         hasDraft: true,
+        outputName: scripted.output,
         proposal: { status: 'review', note: scripted.note }
       }
     }
-    return { ...mine, hasDraft: true, who: 'draft', whoLabel: labels.confirmed(status) }
+    return {
+      ...mine,
+      hasDraft: true,
+      outputName: scripted.output,
+      who: 'draft',
+      whoLabel: labels.confirmed(status)
+    }
   })
 }

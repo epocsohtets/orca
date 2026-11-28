@@ -88,24 +88,30 @@ export function HomeDayEndChipLine({
             )}
             onClick={() => onPick(chip.id)}
           >
-            {picked === chip.id ? <Check aria-hidden className="size-3 shrink-0" /> : null}
+            {picked === chip.id ? (
+              <Check aria-hidden className="size-3 shrink-0" />
+            ) : chip.person ? (
+              // People are one choice: an empty radio mark says so before anyone is picked.
+              <span
+                aria-hidden
+                className="size-3 shrink-0 rounded-full border border-current opacity-50"
+              />
+            ) : null}
             {chip.person ? <HomeAvatar name={chip.label} /> : null}
             <span className="min-w-0 max-w-full">
-              <BotItemChipWords reply={chip} />
+              <BotItemChipWords reply={{ ...chip, recommended: false }} />
+              {/* The agent's pick says so in words: a star alone was guessed at. */}
+              {chip.recommended ? (
+                <span className="ml-1.5 text-[11px] opacity-70" data-home-chip-recommended="">
+                  <span aria-hidden>★ </span>
+                  {t('bots.items.ask.recommended', 'Recommended')}
+                </span>
+              ) : null}
             </span>
           </button>
         ))}
         {children}
       </div>
-      {/* The star is the agent's pick; a reader should not have to guess that. */}
-      {chips.some((chip) => chip.recommended) ? (
-        <p className="mt-2 text-xs text-muted-foreground" data-home-chip-legend="">
-          <span aria-hidden className="mr-1 text-[11px]">
-            ★
-          </span>
-          {t('home.dayEnd.starLegend', 'The agent’s pick')}
-        </p>
-      ) : null}
     </div>
   )
 }

@@ -21,7 +21,7 @@ export function WorkStyleSettingsGroup({
   const t = useTranslate()
   const [workStyles, showAll] = getWorkStyleSearchEntries()
   return (
-    <SettingsGroup title={workStyles.title} description={workStyles.description}>
+    <SettingsGroup title={workStyles.title}>
       <div data-settings-row="" className="py-4">
         <WorkStylePicker
           value={normalizeWorkStyles(settings.workStyles)}
@@ -53,7 +53,6 @@ export function WorkStyleSettingsGroup({
       ) : null}
       <SettingsSwitchRow
         label={showAll.title}
-        description={showAll.description}
         checked={settings.showAllSettings === true}
         onChange={() => updateSettings({ showAllSettings: settings.showAllSettings !== true })}
       />
