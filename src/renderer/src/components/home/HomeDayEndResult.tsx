@@ -36,6 +36,7 @@ export function useHomeDayEndRows(
 ): HomeDayEndResultRow[] {
   const t = useTranslate()
   const meetings = useMeetings((state) => state.meetings)
+  const meetingTasks = useMeetings((state) => state.tasks)
   const timeOf = (at: number | undefined): string =>
     at === undefined
       ? ''
@@ -61,10 +62,12 @@ export function useHomeDayEndRows(
     }
     if (entry.kind === 'meeting') {
       const meeting = meetings.find((item) => item.id === entry.id)
+      // The row names what was settled: the follow-up that now has an owner.
+      const settled = meetingTasks.filter((task) => entry.taskIds.includes(task.id))
       return [
         {
           id: `${index}`,
-          title: meeting?.title ?? '',
+          title: settled.map((task) => task.title).join(', ') || (meeting?.title ?? ''),
           what: t('home.dayEnd.sharedOwners', 'Owners of {{count}} follow-ups', {
             count: entry.taskIds.length
           }),

@@ -17014,8 +17014,7 @@
           "f396db9f20": "Make it feel like home",
           "198b148b3c": "Pick your default agent",
           "windowsTerminalTitle": "Set Windows terminal defaults",
-          "windowsTerminalSubtitle": "Choose the DEFAULT Shell for new panes and how right-click behaves in the terminal.",
-          "stepOfTotal": "{{current}} of {{total}}"
+          "windowsTerminalSubtitle": "Choose the DEFAULT Shell for new panes and how right-click behaves in the terminal."
         },
         "OnboardingFooter": {
           "ba58547306": "Back",

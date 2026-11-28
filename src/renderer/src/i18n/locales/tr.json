@@ -16918,8 +16918,7 @@
           "f396db9f20": "Kendi evinizdeymiş gibi hissettirin",
           "198b148b3c": "Varsayılan ajanınızı seçin",
           "windowsTerminalTitle": "Windows terminal varsayılanlarını ayarla",
-          "windowsTerminalSubtitle": "Yeni bölmeler için varsayılan kabuğu ve terminaldeki sağ tık davranışını seçin.",
-          "stepOfTotal": "{{current}} / {{total}}"
+          "windowsTerminalSubtitle": "Yeni bölmeler için varsayılan kabuğu ve terminaldeki sağ tık davranışını seçin."
         },
         "OnboardingFooter": {
           "ba58547306": "Geri",

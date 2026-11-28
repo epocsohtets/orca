@@ -15799,8 +15799,7 @@
           "f396db9f20": "まるで家にいるような気分にさせてくれる",
           "198b148b3c": "デフォルトの Agent を選択",
           "windowsTerminalTitle": "Windows ターミナルの既定値を設定",
-          "windowsTerminalSubtitle": "新規ペインで使う既定のシェルと、ターミナルでの右クリックの動作を選びます。",
-          "stepOfTotal": "{{current}} / {{total}}"
+          "windowsTerminalSubtitle": "新規ペインで使う既定のシェルと、ターミナルでの右クリックの動作を選びます。"
         },
         "OnboardingFooter": {
           "ba58547306": "戻る",

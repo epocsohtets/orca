@@ -115,6 +115,8 @@ export function HomeDayEndPanel({
   /** The one labelled control a card of this kind adds, above the footer. */
   let control: React.ReactNode
   let save: HomeDayEndSave
+  /** False while Save would send nothing: a follow-up with no owner picked. */
+  let canSave = true
   if (card.kind === 'task') {
     const { task } = card
     const current = task.status ?? 'todo'
@@ -181,7 +183,8 @@ export function HomeDayEndPanel({
               patch({ text: card.suggestion })
             } else if (event.key === 'Enter') {
               event.preventDefault()
-              commit()
+              // The same as pressing Save.
+              saveButton.current?.click()
             }
           }}
         />
@@ -195,20 +198,23 @@ export function HomeDayEndPanel({
       meetingId: card.meetingId,
       rows: assigneeId ? [{ followUpId: card.followUp.id, assigneeId }] : []
     }
+    canSave = assigneeId !== undefined
     title = card.followUp.text
     project = projects[card.project]
     source = (
-      <Button
-        type="button"
-        variant="link"
-        size="inlineInherit"
-        className="text-xs leading-4 text-muted-foreground"
-        data-home-day-end-meeting=""
-        onClick={() => onOpenMeeting(card.meetingId)}
-      >
-        <MessageSquare aria-hidden className="size-3.5" />
-        {card.meetingTitle}
-      </Button>
+      // The span sets the size: the link inherits it.
+      <span className="text-xs leading-4">
+        <Button
+          type="button"
+          variant="link-muted"
+          size="inlineInherit"
+          data-home-day-end-meeting=""
+          onClick={() => onOpenMeeting(card.meetingId)}
+        >
+          <MessageSquare aria-hidden className="size-3.5" />
+          {card.meetingTitle}
+        </Button>
+      </span>
     )
     timeline = { lines: card.timeline, open: () => onOpenMeeting(card.meetingId) }
     control = (
@@ -314,6 +320,7 @@ export function HomeDayEndPanel({
             type="button"
             size="sm"
             data-home-day-end-save=""
+            disabled={!canSave}
             onClick={commit}
           >
             {t('home.dayEnd.save', 'Save')}

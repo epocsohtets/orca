@@ -137,9 +137,8 @@ export function MeetingAgenda({
                         ]
                           .filter(Boolean)
                           .join(' · ')}
-                        chip={
-                          answerable && !response ? t('home.chip.waiting', 'Needs me') : state.chip
-                        }
+                        // 내 확인 필요 is what the page counts; an invitation is marked by its 답변 button.
+                        chip={state.chip}
                         project={projects[meeting.project]}
                         date={text.time(meeting.startsAt)}
                         onClick={() => onSelect(meeting.id)}

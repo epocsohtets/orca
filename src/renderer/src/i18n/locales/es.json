@@ -16203,8 +16203,7 @@
           "f396db9f20": "Haz que te sientas como en casa",
           "198b148b3c": "Elija su agente predeterminado",
           "windowsTerminalTitle": "Configura los valores predeterminados de la terminal de Windows",
-          "windowsTerminalSubtitle": "Elige la Shell predeterminada para los paneles nuevos y cómo se comporta el clic derecho en la terminal.",
-          "stepOfTotal": "{{current}} de {{total}}"
+          "windowsTerminalSubtitle": "Elige la Shell predeterminada para los paneles nuevos y cómo se comporta el clic derecho en la terminal."
         },
         "OnboardingFooter": {
           "ba58547306": "Atrás",
