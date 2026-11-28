@@ -167,9 +167,7 @@ export function buildHomeTasks(t: Translate, sample: HomeSampleContext): HomeTas
       title: t('home.task.budget', 'Update the campaign budget sheet'),
       project: 'campaign',
       due: 'today',
-      dueLabel: t('home.task.finishedConfirmed', 'Finished {{day}} · confirmed by me', {
-        day: sample.dayName(-4)
-      }),
+      dueLabel: t('home.task.finishedOn', 'Finished {{day}}', { day: sample.dayName(-4) }),
       done: true,
       who: null,
       detail: t(

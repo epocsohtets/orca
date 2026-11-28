@@ -215,8 +215,9 @@ export function WorkTaskPanel({
           {task.folder && !readOnly ? (
             <>
               <dt className="text-muted-foreground">{t('taskLoop.detail.folder', 'Folder')}</dt>
-              <dd className="break-all text-foreground" data-work-task-folder="">
-                {task.folder}
+              {/* The folder's name; the whole path is the tooltip. */}
+              <dd className="truncate text-foreground" title={task.folder} data-work-task-folder="">
+                {task.folder.split(/[\\/]/).findLast(Boolean)}
               </dd>
             </>
           ) : null}
@@ -262,9 +263,23 @@ export function WorkTaskPanel({
                   </p>
                   <p className={HOME_META_CLASS}>
                     {[
-                      note.by === 'agentConfirmed'
-                        ? t('taskLoop.detail.noteByAgent', 'Written by the agent, confirmed by me')
-                        : t('taskLoop.detail.noteByMe', 'Written by me'),
+                      // A colleague reads the owner's name where the owner reads "me".
+                      readOnly
+                        ? note.by === 'agentConfirmed'
+                          ? t(
+                              'taskLoop.detail.noteByAgentOf',
+                              'Written by the agent, confirmed by {{name}}',
+                              { name: personName(task.assignee ?? '') }
+                            )
+                          : t('taskLoop.detail.noteBy', 'Written by {{name}}', {
+                              name: personName(task.assignee ?? '')
+                            })
+                        : note.by === 'agentConfirmed'
+                          ? t(
+                              'taskLoop.detail.noteByAgent',
+                              'Written by the agent, confirmed by me'
+                            )
+                          : t('taskLoop.detail.noteByMe', 'Written by me'),
                       uiDateTimeFormat(NOTE_TIME, intlLocale).format(note.at),
                       note.statusChanged === false
                         ? null

@@ -128,10 +128,17 @@ export function buildHomeBoardView(
         agent: loopAgent
       }),
       result: t('taskLoop.who.result', 'Result ready'),
+      // A colleague reads 마코's name where she reads "me".
       confirmed: (status) =>
-        t('taskLoop.who.confirmed', '{{status}} · written by the agent, confirmed by me', {
-          status: inaxStatusLabels(t)[status]
-        })
+        own
+          ? t('taskLoop.who.confirmed', '{{status}} · written by the agent, confirmed by me', {
+              status: inaxStatusLabels(t)[status]
+            })
+          : t(
+              'taskLoop.who.confirmedBy',
+              '{{status}} · written by the agent, confirmed by {{name}}',
+              { status: inaxStatusLabels(t)[status], name: personName(MAKO) }
+            )
     })
   // 마코's tasks as inAX holds them: her own list, and what a colleague sees of it on the board.
   const sampleTasks = buildHomeTasks(t, sample)
