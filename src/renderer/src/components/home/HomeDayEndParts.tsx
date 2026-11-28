@@ -2,6 +2,8 @@ import React from 'react'
 import { Check } from 'lucide-react'
 import { useTranslate } from '@/i18n/use-translate'
 import { cn } from '@/lib/class-names'
+import { Button } from '@/components/ui/button'
+import { ShortcutKeyCombo } from '@/components/ui/ShortcutKeyCombo'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -74,6 +76,12 @@ export function HomeDayEndChipLine({
             type="button"
             role="radio"
             aria-checked={picked === chip.id}
+            // Why a label: the visible words and the "recommended" mark ran together when read out.
+            aria-label={
+              chip.recommended
+                ? `${chip.label}, ${t('bots.items.ask.recommended', 'Recommended')}`
+                : undefined
+            }
             className={cn(
               BOT_ITEM_CHIP,
               BOT_ITEM_CHIP_ACTION,
@@ -107,6 +115,26 @@ export function HomeDayEndChipLine({
         {children}
       </div>
     </div>
+  )
+}
+
+/**
+ * Over the box while it holds only the agent's line: named as a suggestion, with the button and the key that
+ * take it. Grey text alone read as text already in the box.
+ */
+export function HomeDayEndSuggestionHint({ onTake }: { onTake: () => void }): React.JSX.Element {
+  const t = useTranslate()
+  return (
+    <span
+      className="flex items-center gap-2 px-2 text-xs text-muted-foreground"
+      data-home-day-end-ahead=""
+    >
+      {t('home.dayEnd.ahead', 'Agent’s suggestion')}
+      <Button type="button" variant="outline" size="xs" data-home-day-end-take="" onClick={onTake}>
+        {t('home.dayEnd.take', 'Use')}
+        <ShortcutKeyCombo keys={['Tab']} size="compact" />
+      </Button>
+    </span>
   )
 }
 

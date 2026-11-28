@@ -213,6 +213,7 @@ export default function MeetingBotChatPage(): React.JSX.Element {
               id={`meeting-bot:${viewerId}`}
               canSend={askable !== undefined}
               conversationShown
+              placeholder={t('home.chat.placeholder', 'Message')}
               onSend={(text) => askable && askMeetingBot(askable.id, text, fallback)}
             >
               {(messageListRef) => (

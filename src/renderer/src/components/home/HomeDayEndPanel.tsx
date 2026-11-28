@@ -4,14 +4,18 @@ import { useTranslate } from '@/i18n/use-translate'
 import { cn } from '@/lib/class-names'
 import { isImeOwnedKeyboardEvent } from '@/lib/text-input/ime/ime-composition-keyboard-event'
 import { Button } from '@/components/ui/button'
-import { ShortcutKeyCombo } from '@/components/ui/ShortcutKeyCombo'
 import { ImeTextarea } from '@/lib/text-input/ime/ime-text-field'
 import { BotItemStepper } from '@/components/bots/items/BotItemStepper'
 import { useBotItemChords } from '@/components/bots/items/use-bot-item-chords'
 import { personName } from '@/components/meetings/meeting-people'
 import { HOME_BOARD_SCOPE_CLASS, HOME_META_CLASS, HomeProjectDot } from './HomeCard'
 import { useSidePanelInset } from './use-side-panel-inset'
-import { HomeDayEndChipLine, HomeDayEndRecords, HomeDayEndTimeline } from './HomeDayEndParts'
+import {
+  HomeDayEndChipLine,
+  HomeDayEndRecords,
+  HomeDayEndSuggestionHint,
+  HomeDayEndTimeline
+} from './HomeDayEndParts'
 import type { HomeProjectId, HomeTask } from './home-board'
 import type { HomeProject } from './home-board-mock'
 import {
@@ -335,23 +339,25 @@ export function HomeDayEndPanel({
         </dl>
         {body}
       </div>
-      <div className="mx-3 mb-3 flex shrink-0 flex-col gap-2 rounded-xl border border-border bg-background p-2 shadow-xs">
+      <div
+        className={cn(
+          'mx-3 mb-3 flex shrink-0 flex-col gap-2 rounded-xl border border-border bg-background p-2 shadow-xs',
+          // A dashed edge while the box holds only the agent's suggestion.
+          suggestion && !draft.text && 'border-dashed border-muted-foreground/50'
+        )}
+      >
         {card.kind === 'task' ? (
           <label className="flex flex-col gap-0.5">
             <span className="flex items-center gap-2 px-2 pt-1 text-xs text-muted-foreground">
               <span className="min-w-0 flex-1">{progress}</span>
             </span>
-            {/* The line written ahead is named as the agent's, with the key that takes it: grey text alone read
-                as either a hint or a saved note. */}
             {suggestion && !draft.text ? (
-              <span
-                className="flex items-center gap-1.5 px-2 text-xs text-muted-foreground"
-                data-home-day-end-ahead=""
-              >
-                {t('home.dayEnd.ahead', 'Written by the agent')}
-                <ShortcutKeyCombo keys={['Tab']} size="compact" />
-                {t('home.dayEnd.take', 'to use')}
-              </span>
+              <HomeDayEndSuggestionHint
+                onTake={() => {
+                  patch({ text: suggestion })
+                  box.current?.focus()
+                }}
+              />
             ) : null}
             <ImeTextarea
               ref={box}

@@ -27,6 +27,7 @@ export function NativeChatScriptedSurface({
   conversationShown,
   isVisible = true,
   isFocusedGroup = true,
+  placeholder,
   onSend,
   children,
   ...dataAttributes
@@ -39,6 +40,8 @@ export function NativeChatScriptedSurface({
   /** For a conversation in a workspace tab: whether its tab is shown, and in the focused group. */
   isVisible?: boolean
   isFocusedGroup?: boolean
+  /** What the empty box says: these conversations take words only, no file references or commands. */
+  placeholder: string
   onSend: (text: string) => void
   children: (messageListRef: MessageListRef) => React.ReactNode
 } & Record<`data-${string}`, string | undefined>): React.JSX.Element {
@@ -86,6 +89,7 @@ export function NativeChatScriptedSurface({
         structuredTransport={transport}
         isWorking={working}
         canSend={canSend}
+        plainPlaceholder={placeholder}
         onStop={() => {}}
         notices={[]}
       />

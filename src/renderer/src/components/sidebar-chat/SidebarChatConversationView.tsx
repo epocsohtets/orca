@@ -153,6 +153,11 @@ function SidebarChatConversationView({
         <NativeChatScriptedSurface
           id={`people-chat:${conversation.id}`}
           conversationShown={messages.length > 0}
+          placeholder={
+            isGroup
+              ? t('home.chat.placeholder', 'Message')
+              : t('home.chat.placeholderTo', 'Message {{name}}', { name: conversation.name })
+          }
           onSend={send}
         >
           {() => (

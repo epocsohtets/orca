@@ -147,6 +147,7 @@ export function WorkTaskChat({
       conversationShown={session.messages.length > 0}
       isVisible={isVisible}
       isFocusedGroup={isFocusedGroup}
+      placeholder={t('home.chat.placeholder', 'Message')}
       onSend={onSay}
       data-work-chat={task.id}
     >
