@@ -243,13 +243,9 @@ export function MeetingCreateForm({
         )}
       </div>
 
-      <MeetingFormField
-        id={ID('place')}
-        label={t('meetings.form.place', 'Place')}
-        description={t('meetings.form.optional', 'Optional.')}
-      >
+      <MeetingFormField id={ID('place')} label={t('meetings.form.place', 'Place')}>
         <Input
-          {...fieldAria(ID('place'), null, true)}
+          {...fieldAria(ID('place'), null)}
           value={place}
           disabled={saving}
           onChange={(event) => setPlace(event.target.value)}
@@ -309,14 +305,7 @@ export function MeetingCreateForm({
         />
       </MeetingFormField>
 
-      <MeetingFormField
-        id={ID('materials')}
-        label={t('meetings.form.materials', 'Materials')}
-        description={t(
-          'meetings.form.materialsHelp',
-          'Files and links attendees should read first. Optional.'
-        )}
-      >
+      <MeetingFormField id={ID('materials')} label={t('meetings.form.materials', 'Materials')}>
         <MeetingMaterialsField
           id={ID('materials')}
           value={materials}
@@ -325,11 +314,7 @@ export function MeetingCreateForm({
         />
       </MeetingFormField>
 
-      <MeetingFormField
-        id={ID('outline')}
-        label={t('meetings.form.outline', 'Outline')}
-        description={t('meetings.form.outlineHelp', 'What the meeting must settle.')}
-      >
+      <MeetingFormField id={ID('outline')} label={t('meetings.form.outline', 'Outline')}>
         <MeetingOutlineField
           id={ID('outline')}
           value={outline}

@@ -29,7 +29,7 @@ export function MeetingOutlineField({
   return (
     <Textarea
       ref={field}
-      {...fieldAria(id, null, true)}
+      {...fieldAria(id, null)}
       rows={5}
       autoFocus={autoFocus}
       disabled={disabled}

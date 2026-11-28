@@ -45,7 +45,6 @@ export function MeetingPrep({
           <MeetingFormField
             id={ID(meeting.id, 'outline')}
             label={t('meetings.form.outline', 'Outline')}
-            description={t('meetings.form.outlineHelp', 'What the meeting must settle.')}
           >
             <MeetingOutlineField
               id={ID(meeting.id, 'outline')}
@@ -57,10 +56,6 @@ export function MeetingPrep({
           <MeetingFormField
             id={ID(meeting.id, 'materials')}
             label={t('meetings.form.materials', 'Materials')}
-            description={t(
-              'meetings.form.materialsHelp',
-              'Files and links attendees should read first. Optional.'
-            )}
           >
             <MeetingMaterialsField
               id={ID(meeting.id, 'materials')}
