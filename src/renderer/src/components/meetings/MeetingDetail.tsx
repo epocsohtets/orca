@@ -1,5 +1,5 @@
 import React from 'react'
-import { Check, CircleAlert, CircleCheck, List } from 'lucide-react'
+import { Check, CircleAlert, CircleCheck, List, MessageSquare } from 'lucide-react'
 import { useTranslate } from '@/i18n/use-translate'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -94,7 +94,7 @@ function MeetingExcerpt({ meeting }: { meeting: Meeting }): React.JSX.Element {
   )
 }
 
-/** The facts of a meeting on one quiet row: project, host, who comes, where it was set up. */
+/** A meeting's project, people and source on one quiet row. Each is read from its shape, with no label. */
 function MeetingFacts({
   meeting,
   project,
@@ -115,54 +115,50 @@ function MeetingFacts({
         : t('meetings.response.none', 'Not answered')
   return (
     <Card size="board" data-meeting-facts="">
-      <dl className="flex h-9 items-center gap-x-6 overflow-hidden px-4 text-[13px] leading-5 whitespace-nowrap @max-[60rem]/rail-page:h-auto @max-[60rem]/rail-page:min-h-9 @max-[60rem]/rail-page:flex-wrap @max-[60rem]/rail-page:gap-y-2 @max-[60rem]/rail-page:py-2">
-        <div className="flex min-w-0 items-center gap-2">
-          <dt className={HOME_META_CLASS}>{t('taskLoop.detail.project', 'Project')}</dt>
-          <dd className="flex min-w-0 items-center gap-1.5 text-foreground">
-            <span
-              aria-hidden
-              className="size-1.5 shrink-0 rounded-full"
-              style={{ backgroundColor: project.color }}
-            />
-            <span className="truncate">{project.name}</span>
-          </dd>
-        </div>
-        <div className="flex min-w-0 items-center gap-2" data-meeting-people="">
-          <dt className={HOME_META_CLASS}>{t('meetings.detail.attendees', 'People')}</dt>
-          <dd className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
+      <div className="flex h-9 items-center gap-x-6 overflow-hidden px-4 text-[13px] leading-5 whitespace-nowrap @max-[60rem]/rail-page:h-auto @max-[60rem]/rail-page:min-h-9 @max-[60rem]/rail-page:flex-wrap @max-[60rem]/rail-page:gap-y-2 @max-[60rem]/rail-page:py-2">
+        {/* The names the eye does not need are still there for a screen reader. */}
+        <span className="flex min-w-0 items-center gap-1.5 text-foreground">
+          <span className="sr-only">{t('taskLoop.detail.project', 'Project')}</span>
+          <span
+            aria-hidden
+            className="size-1.5 shrink-0 rounded-full"
+            style={{ backgroundColor: project.color }}
+          />
+          <span className="truncate">{project.name}</span>
+        </span>
+        <ul
+          aria-label={t('meetings.detail.attendees', 'People')}
+          className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1"
+          data-meeting-people=""
+        >
+          <li className="flex">
             <MeetingPersonChip
               plain
               personId={meeting.hostId}
-              tag={t('meetings.form.host', 'Host')}
+              tag={t('meetings.detail.host', 'Host')}
             />
-            {meeting.attendeeIds.map((id) => (
-              // Before the meeting each person carries the answer to the invitation.
-              <MeetingPersonChip
-                key={id}
-                plain
-                personId={id}
-                tag={before ? answer(id) : undefined}
-              />
-            ))}
-          </dd>
-        </div>
+          </li>
+          {meeting.attendeeIds.map((id) => (
+            // Before the meeting each person carries the answer to the invitation.
+            <li key={id} className="flex">
+              <MeetingPersonChip plain personId={id} tag={before ? answer(id) : undefined} />
+            </li>
+          ))}
+        </ul>
         {origin && showOrigin ? (
-          <div className="flex min-w-0 items-center gap-2">
-            <dt className={HOME_META_CLASS}>{t('meetings.detail.originLabel', 'Created in')}</dt>
-            <dd>
-              <Button
-                type="button"
-                variant="link"
-                size="inlineInherit"
-                data-meeting-origin=""
-                onClick={() => useSidebarChatOpenConversation.getState().setOpenId(origin.id)}
-              >
-                {t('meetings.detail.originChat', 'Chat “{{name}}”', { name: origin.name })}
-              </Button>
-            </dd>
-          </div>
+          <Button
+            type="button"
+            variant="link"
+            size="inlineInherit"
+            aria-label={t('meetings.detail.originChat', 'Chat “{{name}}”', { name: origin.name })}
+            data-meeting-origin=""
+            onClick={() => useSidebarChatOpenConversation.getState().setOpenId(origin.id)}
+          >
+            <MessageSquare aria-hidden className="size-3.5" />
+            {origin.name}
+          </Button>
         ) : null}
-      </dl>
+      </div>
     </Card>
   )
 }
@@ -192,49 +188,30 @@ export function MeetingDetail({
       ? state.task.assigneeId === viewerId
       : followUp.suggestedOwnerId === viewerId
   })
-  // Not a task yet, whether never answered or handed back: it still waits for my answer.
-  const mineOpen = mine.filter((followUp) => followUpState(followUp, tasks).kind !== 'task')
   const tiles: HomeTile<TileId>[] = [
     {
       id: 'decisions',
       icon: CircleCheck,
       label: t('meetings.minutes.decisions', 'Decisions'),
-      value: meeting.minutes?.decisions.length ?? 0,
-      sub: t('meetings.minutes.turns', '{{total}} remarks', {
-        total: meeting.minutes?.transcript.length ?? 0
-      })
+      value: meeting.minutes?.decisions.length ?? 0
     },
     {
       id: 'followUps',
       icon: List,
       label: t('meetings.followUps.title', 'Follow-up tasks'),
-      value: counts.total,
-      sub:
-        counts.open > 0
-          ? t('meetings.tiles.notTasksYet', '{{count}} without an owner', { count: counts.open })
-          : ''
+      value: counts.total
     },
     {
       id: 'done',
       icon: Check,
       label: t('meetings.tiles.done', 'Tasks done'),
-      value: counts.done,
-      sub: t('meetings.tiles.doneSub', 'Of {{total}} follow-up tasks', counts)
+      value: counts.done
     },
     {
       id: 'mine',
       icon: CircleAlert,
       label: t('meetings.followUps.mine', 'Mine'),
-      value: mine.length,
-      tone: mineOpen.length > 0 ? 'alert' : undefined,
-      sub:
-        mineOpen.length > 0
-          ? t('meetings.tiles.mineOpen', '{{count}} waiting for my answer', {
-              count: mineOpen.length
-            })
-          : mine.length > 0
-            ? t('meetings.tiles.mineTaken', 'In My work')
-            : ''
+      value: mine.length
     }
   ]
   const state =

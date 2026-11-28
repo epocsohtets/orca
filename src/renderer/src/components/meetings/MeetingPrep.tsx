@@ -118,11 +118,7 @@ export function MeetingPrep({
       ) : null}
       {/* No materials: nothing to read, so no card; the host adds them from the outline's Edit. */}
       {meeting.materials.length > 0 ? (
-        <HomeCard
-          title={t('meetings.prep.materials', 'Materials')}
-          aside={<span className="tabular-nums">{meeting.materials.length}</span>}
-          data-meeting-card="materials"
-        >
+        <HomeCard title={t('meetings.prep.materials', 'Materials')} data-meeting-card="materials">
           <div className="mx-4">
             <MeetingMaterialList materials={meeting.materials} />
           </div>

@@ -29256,16 +29256,13 @@
       "requested": "{{name}} 님에게 요청했습니다.",
       "requestButton": "회의록 보기 요청",
       "card": "보는 범위",
-      "attendees": "회의 참석자 {{count}}명",
       "whole": "회의록 전체",
-      "ownPart": "본인 업무와 그 업무가 나온 부분",
-      "byLink": "회의록 전체 · 링크"
+      "excerpt": "발췌"
     },
     "agenda": {
       "previousWeek": "이전 주",
       "thisWeek": "이번 주",
       "nextWeek": "다음 주",
-      "noMeetings": "일정 없음",
       "host": "주최 {{name}}"
     },
     "state": {
@@ -29307,22 +29304,15 @@
     },
     "detail": {
       "attendees": "사람",
-      "originLabel": "생성한 곳",
-      "originChat": "채팅 「{{name}}」"
+      "originChat": "채팅 「{{name}}」",
+      "host": "주최"
     },
     "list": {},
     "tiles": {
       "today": "오늘 회의",
       "next": "다음 {{time}} · {{title}}",
       "week": "이번 주",
-      "weekSub": "주최 {{host}} · 참석 {{attend}}",
-      "followUpsSub": "끝남 {{done}} · 진행 중 {{inProgress}} · 할 일 {{todo}} · 담당자 없음 {{open}}",
-      "notTasksYet": "담당자 없음 {{count}}건",
-      "doneSub": "후속 업무 {{total}}건 중",
-      "mineOpen": "내 답을 기다리는 것 {{count}}건",
-      "done": "끝난 업무",
-      "mineTaken": "내 업무에 있음",
-      "ended": "끝남 {{count}}"
+      "done": "끝난 업무"
     },
     "mine": "내 회의",
     "viewerLabel": "로그인한 사람",
@@ -29337,7 +29327,8 @@
       "assignee": "내 업무"
     },
     "chip": {
-      "mine": "내 몫 {{count}}건"
+      "mine": "내 몫 {{count}}건",
+      "recording": "녹음 중"
     }
   },
   "chats": {
@@ -29410,7 +29401,7 @@
       "title": "최근 활동",
       "aside": "이번 주",
       "less": "접기",
-      "all": "모두 보기 {{count}}",
+      "all": "모두 보기",
       "filter": "활동 종류",
       "filterAll": "전체",
       "filterFinished": "에이전트가 끝낸 작업",
@@ -29450,7 +29441,6 @@
       "colState": "상태",
       "colProgress": "진행",
       "colLast": "마지막 활동",
-      "stageOf": "{{stage}} · {{step}}/3",
       "answerInTask": "답변",
       "showTask": "맡은 업무 보기"
     },
@@ -29466,11 +29456,8 @@
     },
     "tiles": {
       "tasks": "내 업무",
-      "tasksSub": "오늘 마감 {{count}}건",
       "waiting": "내 확인 필요",
-      "waitingSub": "에이전트 {{agents}}, 회의 {{meetings}}",
       "agentDone": "에이전트가 끝낸 작업",
-      "agentDoneSub": "이번 주 · {{total}}건 중 {{confirmed}}건 확인",
       "late": "지연 · 회신 대기"
     },
     "firstRun": {
@@ -29489,18 +29476,16 @@
       "unconfirmed": "업무를 정하지 않은 기록",
       "hours": "{{count}}시간",
       "minutes": "{{count}}분",
-      "excluded": "업무 아님",
-      "linked": "“{{task}}”에 연결됨",
       "undo": "실행 취소",
       "pickTask": "이 기록을 연결할 업무",
-      "link": "연결",
       "notWork": "업무 아님",
       "browser": "브라우저",
       "meetings": "회의",
       "recordBrowser": "브라우저 · 경쟁사 프로모션 페이지 3곳 · {{range}}",
       "recordApp": "{{app}} · {{range}}",
       "tomorrow": "내일",
-      "yesterday": "어제"
+      "yesterday": "어제",
+      "pick": "업무 선택"
     },
     "wrapUp": {
       "title": "업무 정리",
@@ -29638,7 +29623,7 @@
       "task": "업무",
       "recordYes": "이 업무",
       "recordOther": "다른 업무",
-      "resultTitle": "오늘 팀이 보는 것 {{count}}건",
+      "resultTitle": "오늘 팀이 보는 것",
       "next": "다음",
       "visibleNow": "지금",
       "nowStatus": "상태 {{status}}",

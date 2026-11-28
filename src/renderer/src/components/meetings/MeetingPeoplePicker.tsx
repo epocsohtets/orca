@@ -3,7 +3,7 @@ import { X } from 'lucide-react'
 import { useTranslate } from '@/i18n/use-translate'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import { HomeAvatar } from '@/components/home/HomeCard'
+import { HomeAvatar, HomeChip } from '@/components/home/HomeCard'
 import { cn } from '@/lib/class-names'
 import { MEETING_PEOPLE, personName } from './meeting-people'
 
@@ -35,7 +35,13 @@ export function MeetingPersonChip({
     >
       <HomeAvatar name={name} />
       {name}
-      {tag ? <span className="text-xs leading-4 text-muted-foreground">{tag}</span> : null}
+      {tag ? (
+        plain ? (
+          <HomeChip>{tag}</HomeChip>
+        ) : (
+          <span className="text-xs leading-4 text-muted-foreground">{tag}</span>
+        )
+      ) : null}
       {onRemove ? (
         <button
           type="button"

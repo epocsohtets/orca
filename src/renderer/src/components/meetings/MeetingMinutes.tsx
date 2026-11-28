@@ -83,10 +83,7 @@ export function MeetingMinutes({
         <TabsContent value="brief">
           <div className="flex flex-col gap-2">
             <section aria-label={t('meetings.minutes.decisions', 'Decisions')}>
-              <h3 className={HOME_GROUP_CLASS}>
-                {t('meetings.minutes.decisions', 'Decisions')}
-                <span className="tabular-nums">{minutes.decisions.length}</span>
-              </h3>
+              <h3 className={HOME_GROUP_CLASS}>{t('meetings.minutes.decisions', 'Decisions')}</h3>
               <ul className="mx-4">
                 {minutes.decisions.map((decision) => (
                   <li
@@ -120,10 +117,7 @@ export function MeetingMinutes({
           <div className="flex flex-col gap-2">
             {minutes.topics.map((topic) => (
               <section key={topic.title} aria-label={topic.title}>
-                <h3 className={HOME_GROUP_CLASS}>
-                  {topic.title}
-                  <span className="tabular-nums">{topic.points.length}</span>
-                </h3>
+                <h3 className={HOME_GROUP_CLASS}>{topic.title}</h3>
                 <ul>
                   {topic.points.map((point) => (
                     <li key={point.turnId}>

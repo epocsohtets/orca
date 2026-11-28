@@ -153,10 +153,7 @@ export function MeetingMyPart({ meeting }: { meeting: Meeting }): React.JSX.Elem
   }
   return (
     <section aria-label={t('meetings.followUps.mine', 'Mine')} data-meeting-my-part="">
-      <h3 className={HOME_GROUP_CLASS}>
-        {t('meetings.followUps.mine', 'Mine')}
-        <span className="tabular-nums">{offers.length}</span>
-      </h3>
+      <h3 className={HOME_GROUP_CLASS}>{t('meetings.followUps.mine', 'Mine')}</h3>
       <ul className="mx-4">
         {offers.map(({ followUp, state }) => (
           <HomeRow

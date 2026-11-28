@@ -31601,8 +31601,8 @@
     },
     "detail": {
       "attendees": "People",
-      "originLabel": "Created in",
-      "originChat": "Chat “{{name}}”"
+      "originChat": "Chat “{{name}}”",
+      "host": "Host"
     },
     "response": {
       "yes": "Coming",
@@ -31631,16 +31631,13 @@
       "requested": "Asked {{name}}.",
       "requestButton": "Ask to see the full minutes",
       "card": "Who sees what",
-      "attendees": "{{count}} attendees",
       "whole": "Full minutes",
-      "ownPart": "Own task and the part it came from",
-      "byLink": "Full minutes · by link"
+      "excerpt": "Excerpt"
     },
     "agenda": {
       "previousWeek": "Previous week",
       "thisWeek": "This week",
       "nextWeek": "Next week",
-      "noMeetings": "No meetings",
       "host": "Host {{name}}"
     },
     "state": {
@@ -31685,14 +31682,7 @@
       "today": "Today’s meetings",
       "next": "Next {{time}} · {{title}}",
       "week": "This week",
-      "weekSub": "I host {{host}} · I attend {{attend}}",
-      "followUpsSub": "Done {{done}} · in progress {{inProgress}} · to do {{todo}} · no owner {{open}}",
-      "notTasksYet": "{{count}} without an owner",
-      "doneSub": "Of {{total}} follow-up tasks",
-      "mineOpen": "{{count}} waiting for my answer",
-      "done": "Tasks done",
-      "mineTaken": "In My work",
-      "ended": "Ended {{count}}"
+      "done": "Tasks done"
     },
     "mine": "My meetings",
     "viewerLabel": "Signed in as",
@@ -31707,7 +31697,8 @@
       "assignee": "My task"
     },
     "chip": {
-      "mine": "Mine: {{count}}"
+      "mine": "Mine: {{count}}",
+      "recording": "Recording"
     }
   },
   "chats": {
@@ -31780,7 +31771,7 @@
       "title": "Recent activity",
       "aside": "This week",
       "less": "Show fewer",
-      "all": "View all {{count}}",
+      "all": "View all",
       "filter": "Activity type",
       "filterAll": "Everything",
       "filterFinished": "Finished by agents",
@@ -31820,7 +31811,6 @@
       "colState": "State",
       "colProgress": "Progress",
       "colLast": "Last activity",
-      "stageOf": "{{stage}} · {{step}} of 3",
       "answerInTask": "Answer it",
       "showTask": "Show its task"
     },
@@ -31836,11 +31826,8 @@
     },
     "tiles": {
       "tasks": "My work",
-      "tasksSub": "{{count}} due today",
       "waiting": "Needs me",
-      "waitingSub": "Agents {{agents}}, meetings {{meetings}}",
       "agentDone": "Finished by agents",
-      "agentDoneSub": "This week · {{confirmed}} of {{total}} confirmed by me",
       "late": "Late · awaiting others"
     },
     "firstRun": {
@@ -31859,18 +31846,16 @@
       "unconfirmed": "Records without a task",
       "hours": "{{count}} hr",
       "minutes": "{{count}} min",
-      "excluded": "Not work",
-      "linked": "Linked to “{{task}}”",
       "undo": "Undo",
       "pickTask": "Task to link this record to",
-      "link": "Link",
       "notWork": "Not work",
       "browser": "Browser",
       "meetings": "Meetings",
       "recordBrowser": "Browser · 3 competitor promotion pages · {{range}}",
       "recordApp": "{{app}} · {{range}}",
       "tomorrow": "tomorrow",
-      "yesterday": "yesterday"
+      "yesterday": "yesterday",
+      "pick": "Pick a task"
     },
     "wrapUp": {
       "title": "Wrap-up",
@@ -32008,7 +31993,7 @@
       "task": "Task",
       "recordYes": "This task",
       "recordOther": "Another task",
-      "resultTitle": "What the team sees today · {{count}}",
+      "resultTitle": "What the team sees today",
       "next": "Next",
       "visibleNow": "Now",
       "nowStatus": "Status {{status}}",

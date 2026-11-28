@@ -78,63 +78,36 @@ export default function MeetingsPage(): React.JSX.Element {
     past.filter((m) => meetingAccess(m, viewerId, tasks) === 'full').flatMap((m) => m.followUps),
     tasks
   )
-  const endedToday = today.filter((m) => m.minutes).length
   const tiles: HomeTile<TileId>[] = [
     {
       id: 'today',
       icon: CalendarDays,
       label: t('meetings.tiles.today', 'Today’s meetings'),
       value: today.length,
-      sub: [
-        endedToday > 0 ? t('meetings.tiles.ended', 'Ended {{count}}', { count: endedToday }) : null,
-        next
-          ? t('meetings.tiles.next', 'Next {{time}} · {{title}}', {
-              time: text.time(next.startsAt),
-              title: next.title
-            })
-          : null
-      ]
-        .filter(Boolean)
-        .join(' · ')
+      sub: next
+        ? t('meetings.tiles.next', 'Next {{time}} · {{title}}', {
+            time: text.time(next.startsAt),
+            title: next.title
+          })
+        : undefined
     },
     {
       id: 'waiting',
       icon: CircleAlert,
       label: t('home.tiles.waiting', 'Needs me'),
-      value: waiting.length,
-      sub:
-        waiting.length > 0
-          ? t('meetings.tiles.mineOpen', '{{count}} waiting for my answer', {
-              count: waiting.length
-            })
-          : '',
-      tone: 'alert'
+      value: waiting.length
     },
     {
       id: 'week',
       icon: CalendarRange,
       label: t('meetings.tiles.week', 'This week'),
-      value: thisWeek.length,
-      sub: t('meetings.tiles.weekSub', 'I host {{host}} · I attend {{attend}}', {
-        host: thisWeek.filter((m) => m.hostId === viewerId).length,
-        attend: thisWeek.filter((m) => m.hostId !== viewerId).length
-      })
+      value: thisWeek.length
     },
     {
       id: 'followUps',
       icon: ListChecks,
       label: t('meetings.followUps.title', 'Follow-up tasks'),
-      value: counts.total,
-      sub: t(
-        'meetings.tiles.followUpsSub',
-        'Done {{done}} · in progress {{inProgress}} · to do {{todo}} · no owner {{open}}',
-        {
-          done: counts.done,
-          inProgress: counts.inProgress,
-          todo: counts.todo,
-          open: counts.open
-        }
-      )
+      value: counts.total
     }
   ]
   const setPane = (value: MeetingsPane): void => {

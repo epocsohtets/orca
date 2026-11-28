@@ -34,6 +34,7 @@ export function useMeetingState(): (meeting: Meeting) => MeetingState {
       return {
         who: 'agentWorking',
         kind: 'recording',
+        chip: t('meetings.chip.recording', 'Recording'),
         label: t('meetings.state.recording', 'Recording now')
       }
     }

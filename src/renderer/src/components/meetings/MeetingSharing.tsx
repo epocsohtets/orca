@@ -77,40 +77,29 @@ export function MinutesScopeCard({ meeting }: { meeting: Meeting }): React.JSX.E
   return (
     <HomeCard title={t('meetings.share.card', 'Who sees what')} data-meeting-card="scope">
       <div data-meeting-sharing="">
-        <dl className="mx-4 text-[13px] leading-5">
+        <ul className="mx-4 text-[13px] leading-5">
           {[
-            {
-              who: t('meetings.share.attendees', '{{count}} attendees', {
-                count: meeting.attendeeIds.length + 1
-              }),
-              what: t('meetings.share.whole', 'Full minutes')
-            },
-            ...(outside.length > 0
-              ? [
-                  {
-                    who: outside.map(personName).join(', '),
-                    what: t('meetings.share.ownPart', 'Own task and the part it came from')
-                  }
-                ]
-              : []),
-            ...(meeting.shares.length > 0
-              ? [
-                  {
-                    who: meeting.shares.map((entry) => personName(entry.personId)).join(', '),
-                    what: t('meetings.share.byLink', 'Full minutes · by link')
-                  }
-                ]
-              : [])
+            ...[meeting.hostId, ...meeting.attendeeIds].map((id) => ({ id, part: false })),
+            ...meeting.shares.map((entry) => ({ id: entry.personId, part: false })),
+            ...outside.map((id) => ({ id, part: true }))
           ].map((row) => (
-            <div
-              key={row.what}
+            <li
+              key={row.id}
+              data-meeting-scope={row.id}
               className="flex h-9 items-center justify-between gap-4 border-t border-border"
             >
-              <dt className="min-w-0 truncate text-foreground">{row.who}</dt>
-              <dd className={`shrink-0 ${HOME_META_CLASS}`}>{row.what}</dd>
-            </div>
+              <span className="flex min-w-0 items-center gap-2 text-foreground">
+                <HomeAvatar name={personName(row.id)} />
+                <span className="truncate">{personName(row.id)}</span>
+              </span>
+              <span className={`shrink-0 ${HOME_META_CLASS}`}>
+                {row.part
+                  ? t('meetings.share.excerpt', 'Excerpt')
+                  : t('meetings.share.whole', 'Full minutes')}
+              </span>
+            </li>
           ))}
-        </dl>
+        </ul>
         {meeting.hostId === viewerId && pending.length > 0 ? (
           <ul className="mx-4">
             {pending.map((request) => (
@@ -130,7 +119,7 @@ export function MinutesScopeCard({ meeting }: { meeting: Meeting }): React.JSX.E
                 <span className="flex shrink-0 items-center gap-1.5">
                   <Button
                     type="button"
-                    variant="ghost"
+                    variant="outline"
                     size="xs"
                     onClick={() => declineMinutesRequest(meeting.id, request.personId)}
                   >

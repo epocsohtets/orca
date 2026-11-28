@@ -21,11 +21,7 @@ export function MeetingWaitingCard({
 }): React.JSX.Element {
   const t = useTranslate()
   return (
-    <HomeCard
-      title={t('home.tiles.waiting', 'Needs me')}
-      aside={<span className="tabular-nums">{rows.length}</span>}
-      data-meeting-card="waiting"
-    >
+    <HomeCard title={t('home.tiles.waiting', 'Needs me')} data-meeting-card="waiting">
       {rows.length === 0 ? null : (
         <ul className="mx-4">
           {rows.map((row) => {
