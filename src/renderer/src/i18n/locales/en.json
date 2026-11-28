@@ -31477,11 +31477,8 @@
       "now": "Start now and record",
       "attendees": "Attendees",
       "place": "Place",
-      "optional": "Optional.",
       "outline": "Outline",
-      "outlineHelp": "What the meeting must settle.",
       "materials": "Materials",
-      "materialsHelp": "Files and links attendees should read first. Optional.",
       "submit": "Create",
       "removeMaterial": "Remove “{{name}}”",
       "linkInvalid": "Enter the full address, starting with https://, such as https://example.com/file.",
@@ -32125,10 +32122,7 @@
       "confirmedBy": "{{status}} · written by the agent, confirmed by {{name}}"
     },
     "group": {
-      "needsYou": "Needs me",
-      "working": "In progress",
-      "waiting": "Waiting",
-      "closed": "Closed"
+      "needsYou": "Needs me"
     },
     "notice": {
       "title": "Needs your answer",

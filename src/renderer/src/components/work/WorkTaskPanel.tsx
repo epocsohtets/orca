@@ -8,7 +8,6 @@ import { ImeTextarea } from '@/lib/text-input/ime/ime-text-field'
 import { Button } from '@/components/ui/button'
 import { BOT_ITEM_CHIP, BOT_ITEM_CHIP_ACTION } from '@/components/bots/items/BotItemQuestionStep'
 import { BotItemStatusIcon } from '@/components/bots/items/BotItemStatusIcon'
-import type { BotItemStatus } from '../../../../shared/bots/bot-items'
 import { HOME_META_CLASS, HomeProjectDot } from '@/components/home/HomeCard'
 import { useSidePanelInset } from '@/components/home/use-side-panel-inset'
 import { HomeDayEndChipLine } from '@/components/home/HomeDayEndParts'
@@ -23,17 +22,6 @@ const NOTE_TIME: Intl.DateTimeFormatOptions = {
   day: 'numeric',
   hour: 'numeric',
   minute: '2-digit'
-}
-
-/** Which of the item list's four groups the task is in. */
-function itemGroup(task: HomeTask): BotItemStatus {
-  if (task.status === 'done') {
-    return 'done'
-  }
-  if (task.who === 'waiting') {
-    return 'needs_you'
-  }
-  return task.who === 'agentWorking' ? 'working' : 'waiting'
 }
 
 /**
@@ -67,15 +55,6 @@ export function WorkTaskPanel({
   useSidePanelInset()
   const statusLabels = inaxStatusLabels(t)
   const statusTo = inaxStatusTo(t)
-  const group = itemGroup(task)
-  const groupLabels: Record<BotItemStatus, string> = {
-    needs_you: t('taskLoop.group.needsYou', 'Needs me'),
-    working: t('taskLoop.group.working', 'In progress'),
-    waiting: t('taskLoop.group.waiting', 'Waiting'),
-    planned: t('taskLoop.group.waiting', 'Waiting'),
-    done: t('taskLoop.group.closed', 'Closed'),
-    canceled: t('taskLoop.group.closed', 'Closed')
-  }
   const status = task.status ?? 'todo'
   const asks = !readOnly && task.question !== undefined && task.choices !== undefined
   const notes = task.notes ?? []
@@ -97,11 +76,11 @@ export function WorkTaskPanel({
       )}
     >
       <div className="flex min-h-9 shrink-0 items-center gap-1.5 py-2.5 pr-2 pl-3.5 text-xs font-medium text-muted-foreground">
-        {/* The group is where the task stands with me and my agent; a colleague sees its status only. */}
-        {readOnly ? null : (
+        {/* One state at a time: the agent's open question here, else the status choice below. */}
+        {readOnly || !asks ? null : (
           <>
-            <BotItemStatusIcon status={group} />
-            <span data-work-task-group={group}>{groupLabels[group]}</span>
+            <BotItemStatusIcon status="needs_you" />
+            <span data-work-task-group="needs_you">{t('taskLoop.group.needsYou', 'Needs me')}</span>
           </>
         )}
       </div>
