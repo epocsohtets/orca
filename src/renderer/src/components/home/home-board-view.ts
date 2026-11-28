@@ -22,9 +22,10 @@ import { MAKO, personName } from '@/components/meetings/meeting-people'
 import {
   buildHomeDay,
   buildHomeUpcoming,
+  placeHomeDayBlocks,
   homeResearchWorkingSince,
   type HomeDayRecord,
-  type HomeDaySegment,
+  type HomeDayBlock,
   type HomeUpcoming
 } from './home-board-day-mock'
 import {
@@ -59,7 +60,8 @@ export type HomeBoardView = {
   agentFinished: number
   agentConfirmed: number
   upcoming: HomeUpcoming[]
-  segments: HomeDaySegment[]
+  /** My day on its clock: app use, meetings, and records with no task, oldest first. */
+  blocks: HomeDayBlock[]
   records: HomeDayRecord[]
   /** The day-end cards still to go through. */
   dayEnd: HomeDayEndCard[]
@@ -96,7 +98,8 @@ export function buildHomeBoardView(
       }
       return away === -1 ? t('home.day.yesterday', 'yesterday') : weekday(day, WEEKDAY_LONG)
     },
-    ago: (at) => formatUiRelativeTime(Math.min(-1, at - minutes) * 60_000, intlLocale)
+    ago: (at) => formatUiRelativeTime(Math.min(-1, at - minutes) * 60_000, intlLocale),
+    at: (workdays, clock) => addWorkdays(sampleDay, workdays) + clock * 60_000
   }
   // The written sample is 마코's day. Seen as someone else, the board holds only what the meetings give them.
   const own = args.meetings.viewerId === MAKO
@@ -237,7 +240,10 @@ export function buildHomeBoardView(
     }))
   const finished = activity.filter((entry) => entry.finished)
 
-  const day = own ? buildHomeDay(t, phase, args.app) : { segments: [], records: [] }
+  const day = own ? buildHomeDay(t, phase, args.app, minutes) : { blocks: [], records: [] }
+  const blocks = own
+    ? placeHomeDayBlocks(day.blocks, tasks, board.records, { ...args.meetings, sampleDay, minutes })
+    : []
   const dayEnd = own
     ? planHomeDayEnd({
         tasks,
@@ -285,7 +291,7 @@ export function buildHomeBoardView(
     ]
       .filter((item) => args.signedIn || !item.taskId)
       .sort((a, b) => a.at - b.at),
-    segments: day.segments,
+    blocks,
     records: day.records,
     dayEnd
   }

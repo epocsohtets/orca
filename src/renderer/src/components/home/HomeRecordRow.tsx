@@ -20,17 +20,25 @@ export function HomeRecordRow({
   record,
   answer,
   tasks,
+  highlighted,
+  onHover,
   onAnswer
 }: {
   record: HomeDayRecord
   answer: HomeRecordAnswer | undefined
   tasks: readonly HomeTask[]
+  /** Its block on the day column is under the pointer. */
+  highlighted?: boolean
+  onHover?: () => void
   onAnswer: (answer: HomeRecordAnswer | null) => void
 }): React.JSX.Element {
   const t = useTranslate()
   return (
     <HomeRow
       data-home-record={answer ? 'answered' : 'open'}
+      data-home-record-id={record.id}
+      data-highlighted={highlighted ? 'true' : 'false'}
+      onHover={onHover}
       title={record.text}
       tip={record.text}
       action={

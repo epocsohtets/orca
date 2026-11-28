@@ -231,6 +231,7 @@ export function HomeRow({
   onClick,
   expanded,
   button,
+  onHover,
   ...props
 }: {
   icon?: React.ReactNode
@@ -248,6 +249,8 @@ export function HomeRow({
   onClick?: () => void
   expanded?: boolean
   button?: Record<`data-${string}`, string>
+  /** The pointer is on the row: something tied to it elsewhere lights up. */
+  onHover?: () => void
 } & Record<`data-${string}`, string>): React.JSX.Element {
   const Main = onClick ? 'button' : 'div'
   const main = (
@@ -294,7 +297,8 @@ export function HomeRow({
   )
   return (
     <li
-      className={`group/home-row relative -mx-2 flex h-9 items-center rounded-md px-2 transition-colors before:absolute before:inset-x-2 before:top-0 before:border-t before:border-border motion-reduce:transition-none ${onClick ? 'hover:bg-accent' : ''}`}
+      className={`group/home-row relative -mx-2 flex h-9 items-center rounded-md px-2 transition-colors before:absolute before:inset-x-2 before:top-0 before:border-t before:border-border motion-reduce:transition-none data-[highlighted=true]:bg-accent ${onClick ? 'hover:bg-accent' : ''}`}
+      onMouseEnter={onHover}
       {...props}
     >
       {tip ? (

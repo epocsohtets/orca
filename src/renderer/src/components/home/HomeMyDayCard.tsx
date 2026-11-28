@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useTranslate } from '@/i18n/use-translate'
 import { Button } from '@/components/ui/button'
 import {
@@ -8,21 +8,15 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { HOME_GROUP_RULED_CLASS, HomeCard } from './HomeCard'
+import { HomeDayColumn } from './HomeDayColumn'
 import { HomeRecordRow } from './HomeRecordRow'
 import type { HomeRecordAnswer, HomeTask } from './home-board'
-import type { HomeDayRecord, HomeDaySegment } from './home-board-day-mock'
-
-// Three steps of one token: each holds 3:1 against the card in both themes.
-const SEGMENT_CLASS: Record<HomeDaySegment['id'], string> = {
-  app: 'bg-foreground',
-  browser: 'bg-foreground/75',
-  meeting: 'bg-foreground/50'
-}
+import type { HomeDayBlock, HomeDayRecord } from './home-board-day-mock'
 
 /** My day as the app recorded it. Only I see it. */
 export function HomeMyDayCard({
-  segments,
-  duration,
+  blocks,
+  now,
   records,
   answers,
   tasks,
@@ -33,8 +27,9 @@ export function HomeMyDayCard({
   onManageBrowser,
   onWrapUp
 }: {
-  segments: readonly HomeDaySegment[]
-  duration: (minutes: number) => string
+  blocks: readonly HomeDayBlock[]
+  /** Minutes from midnight now: the line on the column. */
+  now: number
   records: readonly HomeDayRecord[]
   answers: Readonly<Record<string, HomeRecordAnswer>>
   tasks: readonly HomeTask[]
@@ -48,7 +43,8 @@ export function HomeMyDayCard({
   onWrapUp: () => void
 }): React.JSX.Element {
   const t = useTranslate()
-  const total = segments.reduce((sum, segment) => sum + segment.minutes, 0)
+  // A block and its record row light up together.
+  const [hovered, setHovered] = useState<string | null>(null)
   const open = records.filter((record) => !answers[record.id]).length
 
   return (
@@ -73,34 +69,7 @@ export function HomeMyDayCard({
         </DropdownMenu>
       }
     >
-      <div className="flex flex-col gap-2 px-4 pb-3">
-        {total > 0 ? (
-          <>
-            <div aria-hidden className="flex h-2 overflow-hidden rounded-full">
-              {segments.map((segment) => (
-                <span
-                  key={segment.id}
-                  className={SEGMENT_CLASS[segment.id]}
-                  style={{ width: `${(segment.minutes / total) * 100}%` }}
-                />
-              ))}
-            </div>
-            {/* The legend is the text form of the bar, in the bar's order. */}
-            <ul className="flex flex-wrap gap-x-4 gap-y-1" data-home-day-legend="">
-              {segments.map((segment) => (
-                <li key={segment.id} className="flex items-center gap-1.5 text-xs text-foreground">
-                  <span
-                    aria-hidden
-                    className={`size-2 shrink-0 rounded-sm ${SEGMENT_CLASS[segment.id]}`}
-                  />
-                  <span>{segment.label}</span>
-                  <span className="tabular-nums">{duration(segment.minutes)}</span>
-                </li>
-              ))}
-            </ul>
-          </>
-        ) : null}
-      </div>
+      <HomeDayColumn blocks={blocks} now={now} hovered={hovered} onHover={setHovered} />
       {records.length > 0 ? (
         <section aria-label={t('home.day.unconfirmed', 'Records without a task')}>
           <h3 className={HOME_GROUP_RULED_CLASS}>
@@ -110,11 +79,13 @@ export function HomeMyDayCard({
               {open}
             </span>
           </h3>
-          <ul className="mx-4">
+          <ul className="mx-4" onMouseLeave={() => setHovered(null)}>
             {records.map((record) => (
               <HomeRecordRow
                 key={record.id}
                 record={record}
+                highlighted={hovered === record.id}
+                onHover={() => setHovered(record.id)}
                 answer={answers[record.id]}
                 tasks={tasks}
                 onAnswer={(answer) => onAnswer(record.id, answer)}

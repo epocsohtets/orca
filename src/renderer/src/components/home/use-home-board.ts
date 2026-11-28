@@ -77,6 +77,7 @@ export function useHomeBoard(preview: 'auto' | HomePhase = 'auto') {
     phase,
     sampleDay,
     duration,
-    now
+    now,
+    minutes
   }
 }

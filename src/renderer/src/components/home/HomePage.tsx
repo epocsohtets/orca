@@ -9,7 +9,7 @@ import { openInaxTask } from '@/components/task-page/inax/inax-source-selection'
 import { useAllAgentPaneThreads } from '@/components/activity/threads/use-agent-pane-threads'
 import { signInInaxMock } from '@/lib/inax-mock-account'
 import { useBots } from '@/lib/bot-catalog'
-import { homeTaskTab, sortHomeTasks, type HomeTaskTab } from './home-board'
+import { homeTaskTab, type HomeTaskTab } from './home-board'
 import { useHomeBoardStore } from './home-board-store'
 import {
   openMeeting,
@@ -58,7 +58,7 @@ export default function HomePage(): React.JSX.Element {
   const bots = useBots()
   const hasAgentThread = useAllAgentPaneThreads().allThreads.length > 0
   const [preview, setPreview] = useState<'auto' | HomePhase>('auto')
-  const { board, view, viewerId, projects, signedIn, myApps, phase, sampleDay, duration } =
+  const { board, view, viewerId, projects, signedIn, myApps, phase, sampleDay, minutes } =
     useHomeBoard(preview)
   const [previewFirstRun, setPreviewFirstRun] = useState(false)
   const [tab, setTab] = useState<HomeTaskTab>('today')
@@ -125,14 +125,13 @@ export default function HomePage(): React.JSX.Element {
     }
   }
 
-  const lateFirst = sortHomeTasks(tasks.filter((task) => homeTaskTab(task).includes('late')))[0]
   const dayEndRows = useHomeDayEndRows(board.dayEnd, tasks, projects, viewerId)
   const firstRun =
     previewFirstRun || (!signedIn && !myApps?.length && !hasAgentThread && bots.length === 0)
   const myDay = (
     <HomeMyDayCard
-      segments={view.segments}
-      duration={duration}
+      blocks={view.blocks}
+      now={minutes}
       records={view.records}
       answers={board.records}
       tasks={view.openTasks}
@@ -224,7 +223,6 @@ export default function HomePage(): React.JSX.Element {
                   <HomeTiles
                     counts={view.counts}
                     agentFinished={view.agentFinished}
-                    lateFirst={lateFirst?.title ?? ''}
                     onSelect={selectTile}
                   />
                 ) : null}
