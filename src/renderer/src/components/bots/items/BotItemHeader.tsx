@@ -82,6 +82,18 @@ export function BotItemHeader({
           {/* The date stays whole; the chat title truncates, and a narrow pane drops it (the title's
               number and the Chat row already say both). */}
           <p className="flex min-w-0 gap-1 text-xs text-muted-foreground">
+            {item.due ? (
+              <span
+                className={
+                  item.due.late
+                    ? 'shrink-0 font-medium text-destructive'
+                    : 'shrink-0 text-foreground'
+                }
+              >
+                {item.due.label}
+                <span className="font-normal text-muted-foreground"> ·</span>
+              </span>
+            ) : null}
             <span className="min-w-0 truncate @max-[360px]:hidden">
               {t('bots.items.view.subWhere', 'Item {{number}} · {{chat}}', {
                 number: item.number,

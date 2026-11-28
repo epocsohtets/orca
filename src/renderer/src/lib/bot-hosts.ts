@@ -8,6 +8,7 @@ import {
 import type { RuntimeClientTarget } from '../../../shared/remote-runtime/host-catalog/runtime-client-target'
 import { callRuntimeRpc } from '@/runtime/rpc/calls/runtime-rpc-call'
 import { readBotHostIds, readLiveBotHostIds } from './bot-catalog-snapshot'
+import { localBotItems } from './local-bot-items'
 
 /** A bot as listed, stamped with the host that listed it. Ids are random per host, so never a bare id. */
 export type BotOnHost = { readonly hostId: ExecutionHostId }
@@ -72,6 +73,11 @@ export function callBotRpc<TResult>(
   method: string,
   ...rest: [params?: unknown, options?: Parameters<typeof callRuntimeRpc>[3]]
 ): Promise<TResult> {
+  const params = rest[0] as Record<string, unknown> | undefined
+  const local = localBotItems('id' in bot ? bot.id : params?.botId)
+  if (local) {
+    return local.call(method, params ?? {}) as Promise<TResult>
+  }
   return callRuntimeRpc<TResult>(botTarget(bot), method, ...rest)
 }
 

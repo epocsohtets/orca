@@ -269,7 +269,6 @@ export function BotItemActivityList({
   /** What the waiting question's quick replies do; absent where the item takes no comment (deleted). */
   quickReplies?: BotItemQuickReplyActions
 }): React.JSX.Element {
-  const t = useTranslate()
   const entries = botItemActivity(item, events)
   const waitKey = botItemWaitEntryKey(item, entries)
   const liveAskId = botItemLiveAskKey(entries)
@@ -387,12 +386,7 @@ export function BotItemActivityList({
           )
         })}
       </div>
-      {entries.some((entry) => entry.kind !== 'worker' && entry.kind !== 'event') ||
-      pending?.shown.length ? null : (
-        <p className="pt-0.5 text-xs leading-[18px] text-muted-foreground">
-          {t('bots.items.activity.noComments', 'No comments yet.')}
-        </p>
-      )}
+      {/* No line saying there are no comments: an empty Activity stays empty (owner's bar). */}
     </>
   )
 }

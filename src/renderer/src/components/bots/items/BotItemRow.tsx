@@ -91,6 +91,7 @@ const ITEM_FIELD_RULES: Record<keyof BotItem, ItemFieldEqual> = {
   waitingAsk: skipped,
   closeNote: (a, b) => a.closeNote === b.closeNote,
   wait: (a, b) => a.wait?.text === b.wait?.text && a.wait?.at === b.wait?.at,
+  due: (a, b) => structuralValuesEqual(a.due, b.due),
   links: (a, b) => itemLive(a) === itemLive(b),
   version: (a, b) => a.version === b.version,
   lastEventId: (a, b) => a.lastEventId === b.lastEventId,

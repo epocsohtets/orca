@@ -28184,13 +28184,39 @@
         "previous": "이전 항목",
         "next": "다음 항목",
         "loading": "항목 로드 중…",
-        "subWhere": "항목 {{number}} · {{chat}}"
+        "subWhere": "항목 {{number}} · {{chat}}",
+        "activity": "활동",
+        "canceledNote": "취소:",
+        "doneNote": "완료:",
+        "links": "링크",
+        "showLess": "접기",
+        "showMore": "더 보기",
+        "showEarlier": "이전 활동",
+        "place": "{{index}} / {{total}}",
+        "deleted": "이 항목은 삭제되었습니다.",
+        "moreLinks": "링크 {{count}}개 더"
       },
       "activity": {
         "linked": "이(가) {{links}}을(를) 연결함",
         "anotherAgent": "다른 에이전트",
         "you": "나",
-        "waitingOn": "기다리는 대상"
+        "waitingOn": "기다리는 대상",
+        "canceled": "취소함",
+        "changed": "{{field}} 바꿈",
+        "closed": "완료로 표시함",
+        "commentLabel": "{{name}}, {{time}}",
+        "replyingTo": "답변 대상: {{question}}. 질문으로 이동",
+        "made": "항목을 만듦",
+        "madeNeedsYou": "내 확인 필요 항목으로 만듦",
+        "moved": "상태를 바꿈:",
+        "notSent": "보내지 못함.",
+        "retry": "다시 시도",
+        "discard": "삭제",
+        "reopened": "다시 엶",
+        "snoozed": "{{when}}까지 미룸",
+        "snoozedBare": "미룸",
+        "unsnoozed": "미룸을 끝냄",
+        "snoozeEnded": "미룸이 일찍 끝남"
       },
       "chat": {
         "moreItems": "+{{count}}개 더",
@@ -28201,10 +28227,20 @@
         "label": "댓글",
         "submit": "댓글",
         "replyingToShow": "답변 대상: {{question}}. 질문 보기",
-        "showQuestion": "질문 보기"
+        "showQuestion": "질문 보기",
+        "showLess": "접기",
+        "replyOrPick": "답을 쓰거나 고르세요",
+        "replyingTo": "답변 대상:",
+        "hideReplyingTo": "숨김",
+        "replyTo": "{{name}}에게 답장…",
+        "thisServer": "이 서버"
       },
       "group": {
-        "new": "새 항목 {{count}}개"
+        "new": "새 항목 {{count}}개",
+        "closed": "끝남",
+        "showMore": "{{count}}개 더 보기",
+        "stale": "오래됨",
+        "snoozed": "미룸"
       },
       "link": {
         "automation": "자동화",
@@ -28212,16 +28248,25 @@
         "automationEnded": "종료됨"
       },
       "menu": {
-        "waiting": "대기 중…"
+        "waiting": "대기 중…",
+        "cancel": "취소",
+        "done": "완료"
       },
       "row": {
-        "more": "더 보기"
+        "more": "더 보기",
+        "done": "완료",
+        "select": "{{title}} 선택"
       },
       "stale": {
         "cancelAll": "모두 취소"
       },
       "status": {
-        "waiting": "대기 중"
+        "waiting": "대기",
+        "canceled": "취소됨",
+        "done": "완료",
+        "needsYou": "내 확인 필요",
+        "planned": "할 일",
+        "working": "진행 중"
       },
       "tab": "홈",
       "loading": "항목 로드 중…",
@@ -28232,7 +28277,15 @@
         "time": "시간",
         "back": "뒤로",
         "week": "일주일 후",
-        "pickCustom": "직접 시간 지정"
+        "pickCustom": "직접 시간 지정",
+        "until": "{{when}}까지 미룸",
+        "unsnooze": "미룸 해제",
+        "pick": "시간 선택…",
+        "later": "오늘 나중에",
+        "tomorrow": "내일",
+        "monday": "월요일",
+        "inHours_one": "{{count}}시간 뒤",
+        "inHours_other": "{{count}}시간 뒤"
       },
       "ask": {
         "notSentYet": "아직 보내지 않음",
@@ -28246,7 +28299,8 @@
         "changeAnswer": "{{question}}: {{answer}}. 답변 변경",
         "heldImagesLimit": "답변은 댓글 하나로 보내지며, 이미지는 최대 {{max}}개까지 담을 수 있어요. 지금까지 보류된 답변을 먼저 보내거나 일부를 빼 주세요.",
         "heldSkillsLimit": "답변은 댓글 하나로 보내지며, 스킬은 최대 {{max}}개까지 담을 수 있어요. 지금까지 보류된 답변을 먼저 보내거나 일부를 빼 주세요.",
-        "recommended": "추천"
+        "recommended": "추천",
+        "typeAnswer": "직접 입력"
       },
       "readMoreClosedFailed": "닫힌 항목을 더 읽지 못했습니다",
       "wait": {
@@ -28255,7 +28309,31 @@
         "placeholder": "기다리는 대상",
         "keep": "취소",
         "confirm": "대기 중으로 설정"
-      }
+      },
+      "empty": {
+        "allClear": "내 확인 필요 없음",
+        "needsYou": "내 확인 필요 없음.",
+        "title": "항목 없음",
+        "filtered": "맞는 항목이 없습니다."
+      },
+      "field": {
+        "chat": "채팅",
+        "description": "설명",
+        "title": "제목",
+        "doneMeans": "완료 기준",
+        "doneMeansLower": "완료 기준"
+      },
+      "filter": {
+        "clearAll": "필터 해제",
+        "label": "항목 필터",
+        "needsYou": "내 확인 필요만",
+        "remove": "{{name}} 필터 해제"
+      },
+      "homeChat": "홈 채팅",
+      "chatFallback": "채팅",
+      "readFailed": "항목을 읽지 못했습니다.",
+      "readFailedStale": "항목을 새로 읽지 못했습니다. 마지막으로 읽은 목록입니다.",
+      "retry": "다시 시도"
     },
     "hover": {
       "asksQuestion": "답변을 기다리는 중",

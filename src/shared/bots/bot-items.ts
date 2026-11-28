@@ -259,6 +259,8 @@ export type BotItem = {
   createdAt: number
   updatedAt: number
   closedAt: number | null
+  /** A tracker task's due date as its tracker words it; bot hosts send none. */
+  due?: { label: string; late: boolean }
 }
 
 /** How the Items list and item view show an item's number: `#35`. */
