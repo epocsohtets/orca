@@ -1,7 +1,7 @@
 import { useAppStore } from '@/store'
 import { useInaxMockAccount } from '@/lib/inax-mock-account'
 import { openInaxTask } from '@/components/task-page/inax/inax-source-selection'
-import { useMeetings, type MinutesDepth } from './meetings-store'
+import { useMeetings, type MeetingComposing, type MinutesDepth } from './meetings-store'
 
 /** Opens a meeting; `turnId` lands on that sentence of the transcript. */
 export function openMeeting(id: string, target?: { turnId?: string; depth?: MinutesDepth }): void {
@@ -22,8 +22,11 @@ export function openMeeting(id: string, target?: { turnId?: string; depth?: Minu
 }
 
 /** Opens the creation form; from a chat, that conversation becomes the meeting's origin. */
-export function openScheduleForm(conversationId: string | null, startNow = false): void {
-  useMeetings.setState({ composing: { conversationId, startNow } })
+export function openScheduleForm(
+  conversationId: string | null,
+  options: Omit<MeetingComposing, 'conversationId'> = {}
+): void {
+  useMeetings.setState({ composing: { conversationId, ...options } })
   useAppStore.getState().openMeetingsPage()
 }
 

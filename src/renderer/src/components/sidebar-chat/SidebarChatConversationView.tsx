@@ -7,13 +7,19 @@ import { useTranslate } from '@/i18n/use-translate'
 import { useAppStore } from '@/store'
 import { ChatMeetingLinks } from '@/components/meetings/ChatMeetingLinks'
 import { ScheduleMeetingFromChatButton } from '@/components/meetings/ScheduleMeetingFromChatButton'
+import { MeetingWhisperLine } from '@/components/meetings/MeetingWhisperLine'
+import { personName } from '@/components/meetings/meeting-people'
+import { whisperFor } from '@/components/meetings/meeting-whisper'
+import { scenarioNow, useMeetings } from '@/components/meetings/meetings-store'
 import { SidebarChatAvatar } from './SidebarChatAvatar'
 import {
   SIDEBAR_CHAT_CONVERSATIONS,
   SIDEBAR_CHAT_SELF,
+  chatAuthorId,
+  sendSidebarChatMessage,
   useSidebarChatOpenConversation,
-  type SidebarChatConversation,
-  type SidebarChatMessage
+  useSidebarChatSent,
+  type SidebarChatConversation
 } from './sidebar-chat-mock-data'
 
 /** UI-only PoC: the open mock conversation, drawn over the main area. */
@@ -52,9 +58,30 @@ function SidebarChatConversationView({
   onClose: () => void
 }): React.JSX.Element {
   const t = useTranslate()
-  // Sent messages live only here: they go when the conversation closes.
-  const [sent, setSent] = useState<SidebarChatMessage[]>([])
+  const sent = useSidebarChatSent((state) => state.sent[conversation.id])
+  const viewerId = useMeetings((state) => state.viewerId)
+  const dismissed = useMeetings((state) =>
+    state.whisperDismissed.includes(`${viewerId}:${conversation.id}`)
+  )
+  const handled = useMeetings((state) => state.whisperHandled)
   const [draft, setDraft] = useState('')
+  // Read once per open: the question is about the day this conversation is being read on.
+  const [now] = useState(scenarioNow)
+  const messages = [...conversation.messages, ...(sent ?? [])]
+  const whisper = whisperFor({
+    lines: messages.map((message) => ({
+      id: message.id,
+      authorId: chatAuthorId(message),
+      text: message.text,
+      whisperFor: message.whisperFor
+    })),
+    viewerId,
+    dismissed,
+    handledMessageIds: handled
+      .filter((key) => key.startsWith(`${conversation.id}:`))
+      .map((key) => key.slice(conversation.id.length + 1)),
+    now
+  })
   const isGroup = conversation.kind === 'group'
   const title = isGroup ? `# ${conversation.name}` : conversation.name
   const presenceLabels = {
@@ -69,15 +96,12 @@ function SidebarChatConversationView({
     if (!text) {
       return
     }
-    setSent((messages) => [
-      ...messages,
-      {
-        id: `sent-${messages.length}`,
-        author: SIDEBAR_CHAT_SELF,
-        time: t('sidebarChat.conversation.now', 'Now'),
-        text
-      }
-    ])
+    sendSidebarChatMessage(conversation.id, {
+      author: personName(viewerId),
+      authorId: viewerId,
+      time: t('sidebarChat.conversation.now', 'Now'),
+      text
+    })
     setDraft('')
   }
 
@@ -96,7 +120,7 @@ function SidebarChatConversationView({
           <span className="shrink-0 text-xs text-muted-foreground">
             {isGroup
               ? t('sidebarChat.members', '{{count}} members', {
-                  count: conversation.memberCount ?? 0
+                  count: conversation.memberIds.length
                 })
               : conversation.presence
                 ? presenceLabels[conversation.presence]
@@ -122,18 +146,30 @@ function SidebarChatConversationView({
         </Tooltip>
       </div>
       <div className="scrollbar-sleek flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-4">
-        {[...conversation.messages, ...sent].map((message) => (
-          <div key={message.id} className="flex gap-2.5">
-            <SidebarChatAvatar name={message.author} kind="dm" />
-            <div className="flex min-w-0 flex-col">
-              <div className="flex items-baseline gap-2">
-                <span className="text-sm font-semibold">{message.author}</span>
-                <span className="text-xs text-muted-foreground tabular-nums">{message.time}</span>
+        {messages.map((message) => {
+          const authorId = chatAuthorId(message)
+          // The sample is written from 마코's seat; seen as someone else, "me" is that person.
+          const author = authorId === viewerId ? SIDEBAR_CHAT_SELF : personName(authorId)
+          return (
+            <React.Fragment key={message.id}>
+              <div className="flex gap-2.5" data-sidebar-chat-message={message.id}>
+                <SidebarChatAvatar name={author} kind="dm" />
+                <div className="flex min-w-0 flex-col">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-sm font-semibold">{author}</span>
+                    <span className="text-xs text-muted-foreground tabular-nums">
+                      {message.time}
+                    </span>
+                  </div>
+                  <div className="text-sm break-words whitespace-pre-wrap">{message.text}</div>
+                </div>
               </div>
-              <div className="text-sm break-words whitespace-pre-wrap">{message.text}</div>
-            </div>
-          </div>
-        ))}
+              {whisper?.messageId === message.id ? (
+                <MeetingWhisperLine conversation={conversation} whisper={whisper} />
+              ) : null}
+            </React.Fragment>
+          )
+        })}
         <ChatMeetingLinks conversationId={conversation.id} />
       </div>
       <form

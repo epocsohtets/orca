@@ -12,7 +12,7 @@ export type MeetingFollowUp = {
   text: string
   /** The sentence in the transcript this follow-up came from. */
   turnId: string
-  /** Who the agent thinks owns it; the meeting bot proposes it to them. */
+  /** Who the agent thinks owns it; the meeting agent proposes it to them. */
   suggestedOwnerId: string
   /** YYYY-MM-DD. */
   due: string
@@ -52,7 +52,7 @@ export type Meeting = {
   project: HomeProjectId
   recordingStartedAt: number | null
   minutes: MeetingMinutes | null
-  /** When the meeting bot sent the minutes to every attendee. */
+  /** When the meeting agent sent the minutes to every attendee. */
   minutesSentAt: number | null
   followUps: MeetingFollowUp[]
   /** Attendees' answers to the invitation; no entry means no answer yet. */
@@ -76,7 +76,7 @@ export type MeetingTask = {
   due: string
   meetingId: string
   followUpId: string
-  /** 'accepted': the owner took the bot's proposal. 'assigned': the host created and assigned it. */
+  /** 'accepted': the owner took the agent's proposal. 'assigned': the host created and assigned it. */
   route: 'accepted' | 'assigned'
   createdAt: number
 }

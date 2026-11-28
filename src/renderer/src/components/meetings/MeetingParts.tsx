@@ -18,6 +18,8 @@ export type MeetingText = {
   day: (timestamp: number) => string
   date: (timestamp: number) => string
   when: (meeting: Pick<Meeting, 'startsAt' | 'endsAt'>) => string
+  /** As `when`, with the weekday beside "today" and "tomorrow" too: "Tomorrow (Tue) 15:00–15:30". */
+  whenWithWeekday: (meeting: Pick<Meeting, 'startsAt' | 'endsAt'>) => string
   due: (dateKey: string) => string
   status: Record<MeetingTaskStatus, string>
   /** A length with its units, such as "12 min 40 sec": never read as a time of day. */
@@ -40,11 +42,23 @@ export function useMeetingText(): MeetingText {
           ? t('meetings.day.yesterday', 'Yesterday')
           : date(timestamp)
   }
+  // A meeting that ends on another day says so.
+  const span = (meeting: Pick<Meeting, 'startsAt' | 'endsAt'>): string =>
+    dayDistance(meeting.startsAt, meeting.endsAt) === 0
+      ? `${time(meeting.startsAt)}–${time(meeting.endsAt)}`
+      : `${time(meeting.startsAt)} – ${day(meeting.endsAt)} ${time(meeting.endsAt)}`
+  const when = (meeting: Pick<Meeting, 'startsAt' | 'endsAt'>): string =>
+    `${day(meeting.startsAt)} ${span(meeting)}`
   return {
     time,
     day,
     date,
-    when: (meeting) => `${day(meeting.startsAt)} ${time(meeting.startsAt)}–${time(meeting.endsAt)}`,
+    when,
+    whenWithWeekday: (meeting) => {
+      const near = Math.abs(dayDistance(today, meeting.startsAt)) <= 1
+      const weekday = uiDateTimeFormat({ weekday: 'short' }, intlLocale).format(meeting.startsAt)
+      return near ? `${day(meeting.startsAt)}(${weekday}) ${span(meeting)}` : when(meeting)
+    },
     due: (dateKey) => {
       const [year, month, dayOfMonth] = dateKey.split('-').map(Number)
       return t('meetings.due', 'Due {{date}}', {

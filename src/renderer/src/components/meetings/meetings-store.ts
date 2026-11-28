@@ -18,6 +18,28 @@ const MINUTE = 60_000
 export type MeetingsPane = 'list' | 'agenda'
 export type MinutesDepth = 'brief' | 'summary' | 'full' | 'ask'
 
+export type MeetingDraft = Pick<
+  Meeting,
+  | 'title'
+  | 'attendeeIds'
+  | 'startsAt'
+  | 'endsAt'
+  | 'place'
+  | 'outline'
+  | 'materials'
+  | 'sample'
+  | 'project'
+>
+
+export type MeetingComposing = {
+  conversationId: string | null
+  startNow?: boolean
+  /** What the meeting agent read from the chat; the form opens with it filled in. */
+  draft?: MeetingDraft
+  /** The chat line the draft came from, marked as handled once the meeting exists. */
+  whisperMessageId?: string
+}
+
 type MeetingsState = {
   /** The scenario's "today": sample times are relative to it, not to the wall clock. */
   day: number
@@ -31,7 +53,11 @@ type MeetingsState = {
   selectedId: string | null
   pane: MeetingsPane
   /** Set while the schedule form is open; the chat it was opened from, if any. */
-  composing: { conversationId: string | null; startNow?: boolean } | null
+  composing: MeetingComposing | null
+  /** `${viewerId}:${conversationId}` of chats where the person told the meeting agent "no thanks". */
+  whisperDismissed: string[]
+  /** `${conversationId}:${messageId}` of chat lines that already became a meeting. */
+  whisperHandled: string[]
   depth: MinutesDepth
   /** The transcript turn to show and mark; `nonce` re-triggers the same turn. */
   focus: { meetingId: string; turnId: string; nonce: number } | null
@@ -54,6 +80,8 @@ function initialState(): MeetingsState {
     selectedId: null,
     pane: 'list',
     composing: null,
+    whisperDismissed: [],
+    whisperHandled: [],
     depth: 'brief',
     focus: null,
     tick: 0
@@ -64,7 +92,7 @@ function initialState(): MeetingsState {
 export const useMeetings = create<MeetingsState>()(
   persist(initialState, {
     name: 'orca.poc.meetings.v2',
-    version: 3,
+    version: 4,
     // The sample's shape changed; an older saved sample starts over.
     migrate: () => initialState(),
     partialize: ({ focus: _focus, composing: _composing, ...kept }) => kept
@@ -114,21 +142,14 @@ export function unreadBotItemCount(state: MeetingsState): number {
   ).length
 }
 
-export type ScheduleInput = Pick<
-  Meeting,
-  | 'title'
-  | 'attendeeIds'
-  | 'startsAt'
-  | 'endsAt'
-  | 'place'
-  | 'outline'
-  | 'materials'
-  | 'sample'
-  | 'project'
-> & { originConversationId: string | null; startNow: boolean }
+export type ScheduleInput = MeetingDraft & {
+  originConversationId: string | null
+  startNow: boolean
+  whisperMessageId?: string
+}
 
-export function scheduleMeeting({ startNow, ...input }: ScheduleInput): string {
-  const { viewerId, meetings } = get()
+export function scheduleMeeting({ startNow, whisperMessageId, ...input }: ScheduleInput): string {
+  const { viewerId, meetings, whisperHandled } = get()
   const id = `meeting-${meetings.length + 1}-${input.startsAt}`
   set({
     meetings: [
@@ -147,9 +168,19 @@ export function scheduleMeeting({ startNow, ...input }: ScheduleInput): string {
       }
     ],
     selectedId: id,
-    composing: null
+    composing: null,
+    whisperHandled:
+      whisperMessageId && input.originConversationId
+        ? [...whisperHandled, `${input.originConversationId}:${whisperMessageId}`]
+        : whisperHandled
   })
   return id
+}
+
+/** "No thanks" to the meeting agent: it does not ask about this chat again. */
+export function dismissWhisper(conversationId: string): void {
+  const { viewerId, whisperDismissed } = get()
+  set({ whisperDismissed: [...whisperDismissed, `${viewerId}:${conversationId}`] })
 }
 
 export function saveOutline(id: string, outline: string, materials: MeetingMaterial[]): void {
@@ -220,7 +251,7 @@ function createTasks(
   })
 }
 
-/** Route 1: the person takes the bot's proposal. */
+/** Route 1: the person takes the agent's proposal. */
 export function acceptFollowUp(meetingId: string, followUpId: string): void {
   createTasks(meetingId, [{ followUpId, assigneeId: get().viewerId }], 'accepted')
 }
@@ -249,7 +280,7 @@ export function setTaskStatus(taskId: string, status: MeetingTaskStatus): void {
   }))
 }
 
-/** Asks the meeting bot. Answers are prepared per sample; `fallback` is used when none fits. */
+/** Asks the meeting agent. Answers are prepared per sample; `fallback` is used when none fits. */
 export function askMeetingBot(meetingId: string, question: string, fallback: string): void {
   set((state) => {
     const meeting = state.meetings.find((m) => m.id === meetingId)
@@ -280,7 +311,7 @@ export function respondToInvitation(meetingId: string, answer: 'yes' | 'no'): vo
   patchMeeting(meetingId, (m) => ({ responses: { ...m.responses, [viewerId]: answer } }))
 }
 
-/** Gives someone who was not in the meeting the full minutes; the meeting bot sends them the link. */
+/** Gives someone who was not in the meeting the full minutes; the meeting agent sends them the link. */
 export function shareMinutes(meetingId: string, personId: string): void {
   const { viewerId, tick } = get()
   patchMeeting(meetingId, (m) =>

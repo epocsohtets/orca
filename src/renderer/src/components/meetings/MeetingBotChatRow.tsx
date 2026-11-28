@@ -8,7 +8,7 @@ import { openMeetingBot } from './meeting-navigation'
 import { botItemsFor } from './meeting-rules'
 import { unreadBotItemCount, useMeetings } from './meetings-store'
 
-/** The meeting bot among the direct messages: where its minutes and task proposals arrive. */
+/** The meeting agent among the direct messages: where its minutes and task proposals arrive. */
 export function MeetingBotChatRow(): React.JSX.Element {
   const t = useTranslate()
   const active = useAppStore((state) => state.activeView === 'meetingBot')
@@ -36,7 +36,7 @@ export function MeetingBotChatRow(): React.JSX.Element {
       </span>
       <span className="flex min-w-0 flex-1 flex-col justify-center">
         <span className={cn('truncate text-[13px] leading-5', unread > 0 && 'font-semibold')}>
-          {t('meetings.bot.name', 'Meeting bot')}
+          {t('meetings.bot.name', 'Meeting agent')}
         </span>
         <span className="flex min-w-0 items-center gap-1.5">
           <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">

@@ -29,7 +29,7 @@ export function MinutesSharing({ meeting }: { meeting: Meeting }): React.JSX.Ele
   const share = (personId: string): void => {
     shareMinutes(meeting.id, personId)
     toast.success(
-      t('meetings.share.done', 'The meeting bot sent {{name}} the link to the full minutes.', {
+      t('meetings.share.done', 'The meeting agent sent {{name}} the link to the full minutes.', {
         name: personName(personId)
       })
     )

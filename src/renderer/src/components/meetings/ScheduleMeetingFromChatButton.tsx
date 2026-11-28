@@ -20,7 +20,7 @@ export function ScheduleMeetingFromChatButton({
       onClick={() => openScheduleForm(conversationId)}
     >
       <CalendarPlus aria-hidden />
-      {t('meetings.schedule', 'Set up a meeting')}
+      {t('meetings.schedule', 'Create meeting')}
     </Button>
   )
 }

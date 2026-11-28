@@ -107,7 +107,7 @@ export type MeetingBotItem =
   | { kind: 'assigned'; key: string; at: number; meeting: Meeting; task: MeetingTask }
   | { kind: 'shared'; key: string; at: number; meeting: Meeting; byId: string }
 
-/** What the meeting bot has sent one person, oldest first. */
+/** What the meeting agent has sent one person, oldest first. */
 export function botItemsFor(
   viewerId: string,
   meetings: readonly Meeting[],

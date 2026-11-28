@@ -1,4 +1,13 @@
 import { create } from 'zustand'
+import {
+  DAEUN,
+  HYUNWOO,
+  JIHO,
+  JIWOO,
+  MAKO,
+  MEETING_PEOPLE,
+  MINA
+} from '@/components/meetings/meeting-people'
 
 // shortcut: hard-coded PoC data with no backend, IPC or persistence; replace with a real chat store when messaging exists.
 
@@ -9,6 +18,10 @@ export type SidebarChatMessage = {
   author: string
   time: string
   text: string
+  /** Set on messages typed here; sample messages name their author. */
+  authorId?: string
+  /** Sample only: who the meeting agent asks when this line reads as setting up a meeting. */
+  whisperFor?: string
 }
 
 export type SidebarChatConversation = {
@@ -16,7 +29,8 @@ export type SidebarChatConversation = {
   kind: 'dm' | 'group'
   name: string
   presence?: SidebarChatPresence
-  memberCount?: number
+  /** Everyone in the conversation, the app's owner included. */
+  memberIds: string[]
   unread: number
   messages: SidebarChatMessage[]
 }
@@ -26,6 +40,7 @@ export const SIDEBAR_CHAT_SELF = '나'
 export const SIDEBAR_CHAT_CONVERSATIONS: SidebarChatConversation[] = [
   {
     id: 'dm-jiwoo',
+    memberIds: [MAKO, JIHO],
     kind: 'dm',
     name: '박지호',
     presence: 'online',
@@ -49,11 +64,19 @@ export const SIDEBAR_CHAT_CONVERSATIONS: SidebarChatConversation[] = [
         time: '10:15',
         text: '좋습니다. 그 전에 지난달 결과 표를 먼저 보내 둘게요.'
       },
-      { id: '4', author: '박지호', time: '10:15', text: '공유 폴더에 올렸습니다.' }
+      { id: '4', author: '박지호', time: '10:15', text: '공유 폴더에 올렸습니다.' },
+      {
+        id: '5',
+        author: '박지호',
+        time: '10:21',
+        text: '뉴스레터 주제 건은 금요일 2시에 회의로 잡읍시다.',
+        whisperFor: MAKO
+      }
     ]
   },
   {
     id: 'dm-alex',
+    memberIds: [MAKO, MINA],
     kind: 'dm',
     name: '이민아',
     presence: 'away',
@@ -75,6 +98,7 @@ export const SIDEBAR_CHAT_CONVERSATIONS: SidebarChatConversation[] = [
   },
   {
     id: 'dm-mina',
+    memberIds: [MAKO, DAEUN],
     kind: 'dm',
     name: '정다은',
     presence: 'online',
@@ -90,6 +114,7 @@ export const SIDEBAR_CHAT_CONVERSATIONS: SidebarChatConversation[] = [
   },
   {
     id: 'dm-sam',
+    memberIds: [MAKO, HYUNWOO],
     kind: 'dm',
     name: '최현우',
     presence: 'offline',
@@ -106,9 +131,9 @@ export const SIDEBAR_CHAT_CONVERSATIONS: SidebarChatConversation[] = [
   },
   {
     id: 'group-promo',
+    memberIds: [MAKO, JIHO, MINA, DAEUN],
     kind: 'group',
     name: '연말-프로모션',
-    memberCount: 4,
     unread: 3,
     messages: [
       {
@@ -133,15 +158,16 @@ export const SIDEBAR_CHAT_CONVERSATIONS: SidebarChatConversation[] = [
         id: '4',
         author: '박지호',
         time: '09:38',
-        text: '글로는 길어지겠네요. 오늘 오후에 잠깐 모여서 정하면 어떨까요?'
+        text: '글로는 길어지겠네요. 다음 주 화요일 오후 2시에 30분만 모여서 정하면 어떨까요?',
+        whisperFor: MAKO
       }
     ]
   },
   {
     id: 'group-design',
+    memberIds: [MAKO, JIHO, MINA, DAEUN, HYUNWOO, JIWOO],
     kind: 'group',
     name: '마케팅팀',
-    memberCount: 6,
     unread: 2,
     messages: [
       { id: '1', author: '박지호', time: '11:01', text: '이번 주 콘텐츠 일정표를 올렸습니다.' },
@@ -151,9 +177,9 @@ export const SIDEBAR_CHAT_CONVERSATIONS: SidebarChatConversation[] = [
   },
   {
     id: 'group-release',
+    memberIds: [MAKO, MINA, DAEUN, JIHO, HYUNWOO],
     kind: 'group',
     name: '운영-공지',
-    memberCount: 12,
     unread: 0,
     messages: [
       {
@@ -167,15 +193,42 @@ export const SIDEBAR_CHAT_CONVERSATIONS: SidebarChatConversation[] = [
   },
   {
     id: 'group-random',
+    memberIds: [MAKO, JIHO, MINA, DAEUN, HYUNWOO, JIWOO],
     kind: 'group',
     name: '점심-모임',
-    memberCount: 9,
     unread: 0,
     messages: [
       { id: '1', author: '최현우', time: '금', text: '금요일 점심은 1층 식당에서 모입니다.' }
     ]
   }
 ]
+
+/** Who wrote a message: the typed ones say so, the sample ones are matched by name. */
+export function chatAuthorId(message: SidebarChatMessage): string {
+  return (
+    message.authorId ??
+    (message.author === SIDEBAR_CHAT_SELF
+      ? MAKO
+      : (MEETING_PEOPLE.find((person) => person.name === message.author)?.id ?? message.author))
+  )
+}
+
+/** Messages typed in this window, by conversation. They last until the window reloads. */
+export const useSidebarChatSent = create<{ sent: Record<string, SidebarChatMessage[]> }>(() => ({
+  sent: {}
+}))
+
+export function sendSidebarChatMessage(
+  conversationId: string,
+  message: Omit<SidebarChatMessage, 'id'>
+): void {
+  useSidebarChatSent.setState(({ sent }) => {
+    const list = sent[conversationId] ?? []
+    return {
+      sent: { ...sent, [conversationId]: [...list, { ...message, id: `sent-${list.length + 1}` }] }
+    }
+  })
+}
 
 /** The conversation shown over the main area; null shows the page under it. */
 export const useSidebarChatOpenConversation = create<{

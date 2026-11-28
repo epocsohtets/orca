@@ -33,7 +33,7 @@ const message = (
 
 /**
  * The meeting bot's direct messages to the person looking. A sample conversation: the transcript and
- * cards are the chat's own components, the bot is not in the bot catalog and no agent runs behind it.
+ * cards are the chat's own components, the meeting agent is not in the bot catalog and no agent runs behind it.
  */
 export default function MeetingBotChatPage(): React.JSX.Element {
   const t = useTranslate()
@@ -171,7 +171,7 @@ export default function MeetingBotChatPage(): React.JSX.Element {
       setDraft('')
     }
   }
-  const name = t('meetings.bot.name', 'Meeting bot')
+  const name = t('meetings.bot.name', 'Meeting agent')
   const askLabel = askable
     ? t('meetings.bot.askAbout', 'Ask about “{{title}}”', { title: askable.title })
     : t('meetings.bot.askNone', 'You can ask once you have minutes')

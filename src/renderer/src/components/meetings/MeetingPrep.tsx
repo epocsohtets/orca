@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-import { FileText } from 'lucide-react'
 import { useTranslate } from '@/i18n/use-translate'
 import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { fieldAria, MeetingFormField, MeetingSection } from './MeetingParts'
+import { MeetingOutlineField } from './MeetingOutlineField'
+import { MeetingMaterialList, MeetingMaterialsField } from './MeetingMaterialsField'
+import { MeetingFormField, MeetingSection } from './MeetingParts'
 import type { Meeting } from './meeting-types'
 import { saveOutline } from './meetings-store'
 
@@ -20,12 +20,10 @@ export function MeetingPrep({
   const t = useTranslate()
   const [editing, setEditing] = useState(false)
   const [outline, setOutline] = useState(meeting.outline)
-  const [materials, setMaterials] = useState(
-    meeting.materials.map((entry) => entry.name).join('\n')
-  )
+  const [materials, setMaterials] = useState(meeting.materials)
   const edit = (): void => {
     setOutline(meeting.outline)
-    setMaterials(meeting.materials.map((entry) => entry.name).join('\n'))
+    setMaterials(meeting.materials)
     setEditing(true)
   }
   const editButton = (label: string): React.JSX.Element => (
@@ -40,15 +38,7 @@ export function MeetingPrep({
         className="flex max-w-xl flex-col gap-4"
         onSubmit={(event) => {
           event.preventDefault()
-          saveOutline(
-            meeting.id,
-            outline.trim(),
-            materials
-              .split('\n')
-              .map((line) => line.trim())
-              .filter(Boolean)
-              .map((name) => ({ kind: 'file' as const, name, size: 0 }))
-          )
+          saveOutline(meeting.id, outline.trim(), materials)
           setEditing(false)
         }}
       >
@@ -57,27 +47,28 @@ export function MeetingPrep({
           label={t('meetings.form.outline', 'Outline')}
           description={t(
             'meetings.form.outlineHelp',
-            'What the meeting must settle. Attendees read this before they come.'
+            'What the meeting must settle. Start a line with “1.” and the numbers continue.'
           )}
         >
-          <Textarea
-            {...fieldAria(ID(meeting.id, 'outline'), null, true)}
-            rows={5}
-            autoFocus
+          <MeetingOutlineField
+            id={ID(meeting.id, 'outline')}
             value={outline}
-            onChange={(event) => setOutline(event.target.value)}
+            autoFocus
+            onChange={setOutline}
           />
         </MeetingFormField>
         <MeetingFormField
           id={ID(meeting.id, 'materials')}
           label={t('meetings.form.materials', 'Materials')}
-          description={t('meetings.form.materialsHelp', 'One file or link name on each line.')}
+          description={t(
+            'meetings.form.materialsHelp',
+            'Files and links attendees should read first. Optional.'
+          )}
         >
-          <Textarea
-            {...fieldAria(ID(meeting.id, 'materials'), null, true)}
-            rows={3}
+          <MeetingMaterialsField
+            id={ID(meeting.id, 'materials')}
             value={materials}
-            onChange={(event) => setMaterials(event.target.value)}
+            onChange={setMaterials}
           />
         </MeetingFormField>
         <div className="flex gap-2">
@@ -126,14 +117,9 @@ export function MeetingPrep({
       </MeetingSection>
       {meeting.materials.length > 0 ? (
         <MeetingSection title={t('meetings.prep.materials', 'Materials')}>
-          <ul className="flex flex-col gap-1">
-            {meeting.materials.map(({ name }) => (
-              <li key={name} className="flex items-center gap-2 text-[13px] text-foreground">
-                <FileText aria-hidden className="size-3.5 shrink-0 text-muted-foreground" />
-                {name}
-              </li>
-            ))}
-          </ul>
+          <div className="max-w-xl">
+            <MeetingMaterialList materials={meeting.materials} />
+          </div>
         </MeetingSection>
       ) : null}
     </div>

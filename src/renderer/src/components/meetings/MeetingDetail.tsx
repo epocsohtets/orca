@@ -102,7 +102,7 @@ function RecordingStrip({
               toast.success(
                 t(
                   'meetings.recording.sent',
-                  'The meeting bot sent the minutes to all {{count}} people in the meeting.',
+                  'The meeting agent sent the minutes to all {{count}} people in the meeting.',
                   { count: people }
                 )
               )

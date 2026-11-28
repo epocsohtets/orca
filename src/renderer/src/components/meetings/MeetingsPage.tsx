@@ -26,7 +26,7 @@ import { meetingAccess } from './meeting-rules'
 import { MeetingAgenda } from './MeetingAgenda'
 import { MeetingDetail } from './MeetingDetail'
 import { MeetingList } from './MeetingList'
-import { MeetingScheduleForm } from './MeetingScheduleForm'
+import { MeetingCreateForm } from './MeetingCreateForm'
 import { resetMeetingsSample, scenarioNow, setViewer, useMeetings } from './meetings-store'
 
 const isShown = (element: HTMLElement | null): boolean =>
@@ -74,7 +74,7 @@ export default function MeetingsPage(): React.JSX.Element {
     setDetailOpen(true)
   }
   const title = t('meetings.title', 'Meetings')
-  const scheduleLabel = t('meetings.schedule', 'Set up a meeting')
+  const scheduleLabel = t('meetings.schedule', 'Create meeting')
   return (
     <RailPage as="main" aria-label={title}>
       <RailPageHeader
@@ -168,10 +168,9 @@ export default function MeetingsPage(): React.JSX.Element {
         >
           {composing ? (
             <div className={cn('h-full overflow-y-auto py-4 scrollbar-sleek', RAIL_PAGE_GUTTER_X)}>
-              <MeetingScheduleForm
+              <MeetingCreateForm
                 key={composing.conversationId ?? 'blank'}
-                conversationId={composing.conversationId}
-                startNow={composing.startNow}
+                composing={composing}
                 onCancel={() => useMeetings.setState({ composing: null })}
               />
             </div>

@@ -12,7 +12,7 @@ import { isSeen, markSeen, scenarioNow, useMeetings } from './meetings-store'
 
 const SOON_MS = 10 * 60_000
 
-/** Brings a meeting to the person: one that is about to start, or what the meeting bot just sent. */
+/** Brings a meeting to the person: one that is about to start, or what the meeting agent just sent. */
 export function MeetingNoticeCard(): React.JSX.Element | null {
   const t = useTranslate()
   const text = useMeetingText()
@@ -66,10 +66,10 @@ export function MeetingNoticeCard(): React.JSX.Element | null {
           icon: bot,
           title:
             item.kind === 'minutes'
-              ? t('meetings.notice.minutesTitle', 'Meeting bot: the minutes are here')
+              ? t('meetings.notice.minutesTitle', 'Meeting agent: the minutes are here')
               : item.kind === 'shared'
-                ? t('meetings.notice.sharedTitle', 'Meeting bot: minutes were shared with you')
-                : t('meetings.notice.taskTitle', 'Meeting bot: a task was assigned to you'),
+                ? t('meetings.notice.sharedTitle', 'Meeting agent: minutes were shared with you')
+                : t('meetings.notice.taskTitle', 'Meeting agent: a task was assigned to you'),
           body: item.kind === 'assigned' ? item.task.title : item.meeting.title,
           action: t('meetings.notice.openMessage', 'Open the message'),
           run: openMeetingBot

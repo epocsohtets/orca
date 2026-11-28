@@ -16,7 +16,7 @@ export function useAskFallback(): string {
   )
 }
 
-/** Ask the meeting bot about one meeting. Answers point at the sentence they rest on. */
+/** Ask the meeting agent about one meeting. Answers point at the sentence they rest on. */
 export function MeetingAsk({ meeting }: { meeting: Meeting }): React.JSX.Element {
   const t = useTranslate()
   const fallback = useAskFallback()
@@ -31,7 +31,7 @@ export function MeetingAsk({ meeting }: { meeting: Meeting }): React.JSX.Element
       setQuestion('')
     }
   }
-  const label = t('meetings.ask.label', 'Ask the meeting bot about this meeting')
+  const label = t('meetings.ask.label', 'Ask the meeting agent about this meeting')
   return (
     <div className="flex max-w-prose flex-col gap-4">
       {asks.length > 0 ? (

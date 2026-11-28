@@ -19,7 +19,7 @@ import type { Meeting } from './meeting-types'
 import { acceptFollowUp, assignFollowUps, setFollowUpDeclined, useMeetings } from './meetings-store'
 
 /**
- * Follow-ups and where each one stands. Each is one task: the owner takes the bot's proposal, or the
+ * Follow-ups and where each one stands. Each is one task: the owner takes the agent's proposal, or the
  * host creates and assigns the rest in one go. Statuses are read from the tasks, never copied.
  */
 export function MeetingFollowUps({ meeting }: { meeting: Meeting }): React.JSX.Element | null {
@@ -53,7 +53,7 @@ export function MeetingFollowUps({ meeting }: { meeting: Meeting }): React.JSX.E
         )}
       </p>
       <ul className="divide-y divide-border">
-        {/* The reader's own follow-ups come first: 30 seconds is the decisions and "mine". */}
+        {/* The reader's own follow-ups come first: the key points are the decisions and "mine". */}
         {[...meeting.followUps]
           .sort(
             (a, b) =>
@@ -204,7 +204,7 @@ export function MeetingFollowUps({ meeting }: { meeting: Meeting }): React.JSX.E
               toast.success(
                 t(
                   'meetings.followUps.assignedToast',
-                  '{{count}} tasks created in To do. The meeting bot told {{people}} owners.',
+                  '{{count}} tasks created in To do. The meeting agent told {{people}} owners.',
                   { count: batch.length, people: ownerCount }
                 )
               )
@@ -217,7 +217,7 @@ export function MeetingFollowUps({ meeting }: { meeting: Meeting }): React.JSX.E
           <p className="text-xs text-muted-foreground" data-meeting-assign-help="">
             {t(
               'meetings.followUps.assignWho',
-              'The meeting bot tells the {{people}} owners. The agent drafted these: change an owner or untick a line that is wrong.',
+              'The meeting agent tells the {{people}} owners. The agent drafted these: change an owner or untick a line that is wrong.',
               { people: ownerCount }
             )}
           </p>

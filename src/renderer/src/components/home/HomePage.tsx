@@ -191,7 +191,9 @@ export default function HomePage(): React.JSX.Element {
               size="sm"
               data-home-meeting=""
               onClick={() =>
-                recordingMeetingId ? openMeeting(recordingMeetingId) : openScheduleForm(null, true)
+                recordingMeetingId
+                  ? openMeeting(recordingMeetingId)
+                  : openScheduleForm(null, { startNow: true })
               }
             >
               {recordingMeetingId

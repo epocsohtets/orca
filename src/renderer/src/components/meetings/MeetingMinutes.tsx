@@ -22,7 +22,7 @@ const PANEL = cn(
   RAIL_PAGE_GUTTER_X
 )
 
-/** The minutes at the depth the reader picks: 30 seconds, 2 minutes, everything, or a question. */
+/** The minutes at the depth the reader picks: key points, summary, transcript, or a question. */
 export function MeetingMinutes({
   meeting,
   minutes
@@ -61,9 +61,9 @@ export function MeetingMinutes({
           className="-mx-2"
           aria-label={t('meetings.minutes.depth', 'How much to read')}
         >
-          <TabsTrigger value="brief">{t('meetings.minutes.brief', '30 seconds')}</TabsTrigger>
-          <TabsTrigger value="summary">{t('meetings.minutes.summary', '2 minutes')}</TabsTrigger>
-          <TabsTrigger value="full">{t('meetings.minutes.full', 'Everything')}</TabsTrigger>
+          <TabsTrigger value="brief">{t('meetings.minutes.brief', 'Key points')}</TabsTrigger>
+          <TabsTrigger value="summary">{t('meetings.minutes.summary', 'Summary')}</TabsTrigger>
+          <TabsTrigger value="full">{t('meetings.minutes.full', 'Transcript')}</TabsTrigger>
           <TabsTrigger value="ask">{t('meetings.minutes.ask', 'Ask')}</TabsTrigger>
         </TabsList>
       </div>
