@@ -122,7 +122,18 @@ export function buildHomeTaskItems(input: HomeItemsInput): HomeItemEntry[] {
     if (loop) {
       const script = buildHomeLoopScript(t, task, loop)
       const askAt = homeLoopQuestionAt(loop)
-      // The agent's plan is its first word on the task, in the chat and here.
+      // The conversation as the chat tab has it: my hand-over, the agent's plan, its reply to each line I wrote.
+      drafts.push({
+        kind: 'commented',
+        actor: ME,
+        data: {
+          text: t('taskLoop.chat.kickoff', 'Please take this task: {{title}}', {
+            title: task.title
+          })
+        },
+        // Before the status move it caused.
+        at: loop.startedAt - 1
+      })
       drafts.push({
         kind: 'commented',
         actor: bot,
@@ -157,6 +168,14 @@ export function buildHomeTaskItems(input: HomeItemsInput): HomeItemEntry[] {
         open = { ask, at: askAt, answer }
       }
       for (const said of loop.said) {
+        drafts.push({
+          kind: 'commented',
+          actor: bot,
+          data: {
+            text: t('taskLoop.chat.noted', 'Noted. I will apply it to what I am writing now.')
+          },
+          at: said.at + 1
+        })
         if (!(task.notes ?? []).some((note) => note.at === said.at)) {
           drafts.push({ kind: 'commented', actor: ME, data: { text: said.text }, at: said.at })
         }
@@ -192,8 +211,6 @@ export function buildHomeTaskItems(input: HomeItemsInput): HomeItemEntry[] {
         entry.kind === 'task' && entry.id === task.id
     )
     if (!open && card) {
-      const current = task.status ?? 'todo'
-      const pick = card.proposed ?? current
       open = {
         ask: {
           ...(card.suggestion ? { context: card.suggestion } : {}),
@@ -201,7 +218,8 @@ export function buildHomeTaskItems(input: HomeItemsInput): HomeItemEntry[] {
             {
               prompt: t('taskLoop.detail.status', 'Status'),
               options: INAX_STATUSES.map((status) => ({ label: labels[status] })),
-              recommended: INAX_STATUSES.indexOf(pick)
+              // A star only for a status the agent proposes: never on the one the task already has.
+              ...(card.proposed ? { recommended: INAX_STATUSES.indexOf(card.proposed) } : {})
             }
           ]
         },

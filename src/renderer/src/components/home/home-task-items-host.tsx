@@ -13,7 +13,8 @@ import { useAppStore } from '@/store'
 import { mascotAvatar } from '../../../../shared/bot-avatar'
 import type { Bot } from '../../../../shared/bot-types'
 import type { BotItem, BotItemEvent } from '../../../../shared/bots/bot-items'
-import { parseBotItemEventId } from '../../../../shared/bots/bot-items'
+import { BOT_ITEM_STATUSES, parseBotItemEventId } from '../../../../shared/bots/bot-items'
+import { isRecord } from '../../../../shared/agent-status/child-work/agent-status-child-work-value-guards'
 import { LOCAL_EXECUTION_HOST_ID } from '../../../../shared/execution-host/execution-host'
 import { useHomeBoard } from './use-home-board'
 import { useHomeBoardStore } from './home-board-store'
@@ -53,7 +54,7 @@ export function homeTasksBot(name: string): Bot {
     itemsStale: 'never',
     createdAt: 1,
     updatedAt: 1
-  } as Bot
+  }
 }
 
 /** Which 업무 Home's panel shows, so a click elsewhere on Home (a row, 업무 정리) opens it there. */
@@ -213,7 +214,8 @@ function applyWrite(write: NonNullable<ReturnType<typeof homeItemAnswerWrite>>):
   }
 }
 
-async function call(method: string, params: Record<string, unknown>): Promise<unknown> {
+async function call(method: string, raw: unknown): Promise<unknown> {
+  const params = isRecord(raw) ? raw : {}
   switch (method) {
     case 'bots.items.owner.list': {
       const items: BotItem[] = listed().map((entry) => entry.item)
@@ -245,7 +247,8 @@ async function call(method: string, params: Record<string, unknown>): Promise<un
       return { ok: true }
     case 'bots.items.owner.status': {
       const uids = Array.isArray(params.items) ? params.items : []
-      const to = inaxStatusOfItem(params.status as BotItem['status'])
+      const status = BOT_ITEM_STATUSES.find((entry) => entry === params.status)
+      const to = status ? inaxStatusOfItem(status) : null
       for (const uid of uids) {
         const entry = entryOf(uid)
         if (entry.taskId && to) {
@@ -257,7 +260,7 @@ async function call(method: string, params: Record<string, unknown>): Promise<un
     case 'bots.items.owner.snooze': {
       const list = Array.isArray(params.items) ? params.items : []
       for (const row of list) {
-        const uid = (row as { item?: unknown }).item
+        const uid = isRecord(row) ? row.item : undefined
         if (typeof uid === 'string') {
           if (typeof params.until === 'number') {
             snoozed.set(uid, params.until)

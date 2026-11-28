@@ -51,16 +51,17 @@ export function HomeDayColumn({
     hours.push(hour)
   }
   // Each block at its time; one that would overlap the one before moves down. Its start time still says when.
-  let bottom = 0
   const placed = [...blocks]
     .filter((block) => block.from < end)
     .sort((a, b) => a.from - b.from)
-    .map((block) => {
-      const top = Math.max(y(block.from), bottom)
+    .reduce<{ block: HomeDayBlock; top: number; height: number }[]>((rows, block) => {
+      const last = rows.at(-1)
+      const top = Math.max(y(block.from), last ? last.top + last.height + 1 : 0)
       const height = Math.max(BLOCK_MIN_PX, y(Math.min(block.to, end)) - y(block.from) - 1)
-      bottom = top + height + 1
-      return { block, top, height }
-    })
+      return [...rows, { block, top, height }]
+    }, [])
+  const last = placed.at(-1)
+  const bottom = last ? last.top + last.height + 1 : 0
   const columnHeight = Math.max(y(end), bottom)
 
   return (

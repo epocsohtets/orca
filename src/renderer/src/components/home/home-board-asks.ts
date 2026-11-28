@@ -44,7 +44,7 @@ export function withDayEndAsks(
       ? [
           {
             id: 'day-records',
-            title: t('home.day.unconfirmed', 'Records with no task'),
+            title: t('home.day.unconfirmed', 'Records without a task'),
             // shortcut: records belong to no project; the row hides this one (dayEndRecords).
             project: 'campaign' as const,
             due: 'today' as const,
