@@ -1,13 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { MessageSquare, X } from 'lucide-react'
-import { useTranslate } from '@/i18n/use-translate'
+import { useIntlLocale, useTranslate } from '@/i18n/use-translate'
+import { uiDateTimeFormat } from '@/i18n/ui-intl-formatters'
 import { cn } from '@/lib/class-names'
 import { isImeOwnedKeyboardEvent } from '@/lib/text-input/ime/ime-composition-keyboard-event'
 import { Button } from '@/components/ui/button'
 import { ImeTextarea } from '@/lib/text-input/ime/ime-text-field'
 import { useBotItemChords } from '@/components/bots/items/use-bot-item-chords'
 import { personName } from '@/components/meetings/meeting-people'
-import { HOME_BOARD_SCOPE_CLASS, HomeProjectDot } from './HomeCard'
+import { HOME_BOARD_SCOPE_CLASS, HomeChip, HomeProjectDot } from './HomeCard'
 import { useSidePanelInset } from './use-side-panel-inset'
 import {
   HomeDayEndChipLine,
@@ -26,6 +27,13 @@ import {
 } from './home-day-end'
 import { INAX_STATUSES } from './home-task-loop'
 import { inaxStatusLabels } from './home-task-loop-script'
+
+const NOTE_TIME: Intl.DateTimeFormatOptions = {
+  month: 'short',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit'
+}
 
 /**
  * The day-end cards beside Home, one at a time, in the shape of Orca's item pane: the task's project and
@@ -50,6 +58,7 @@ export function HomeDayEndPanel({
   onOpenMeeting: (meetingId: string) => void
 }): React.JSX.Element | null {
   const t = useTranslate()
+  const intlLocale = useIntlLocale()
   const root = useRef<HTMLDivElement | null>(null)
   const box = useRef<HTMLTextAreaElement | null>(null)
   const saveButton = useRef<HTMLButtonElement | null>(null)
@@ -103,6 +112,12 @@ export function HomeDayEndPanel({
   }
 
   const statusLabels = inaxStatusLabels(t)
+  const stateChips: Record<NonNullable<HomeTask['who']>, string> = {
+    waiting: t('home.chip.waiting', 'Needs me'),
+    blocked: t('home.chip.blocked', 'Awaiting reply'),
+    agentWorking: t('home.chip.working', 'Working'),
+    draft: t('home.chip.draft', 'Draft ready')
+  }
   const me = t('home.activity.me', 'I')
   /** The task's own words, after its project. */
   let title: string
@@ -117,10 +132,13 @@ export function HomeDayEndPanel({
   let save: HomeDayEndSave
   /** False while Save would send nothing: a follow-up with no owner picked. */
   let canSave = true
+  /** The task's state word, as its row on Home shows it. */
+  let chip: string | null = null
   if (card.kind === 'task') {
     const { task } = card
     const current = task.status ?? 'todo'
-    const picked = draft.status ?? card.proposed ?? current
+    // The pick starts at the status the task has; the agent's pick is only marked.
+    const picked = draft.status ?? current
     // The line written ahead is not mine until I take it: Save sends only what stands in the box.
     const text = (draft.text ?? '').trim()
     save = {
@@ -134,6 +152,7 @@ export function HomeDayEndPanel({
     }
     title = task.title
     project = projects[task.project]
+    chip = task.who ? stateChips[task.who] : null
     timeline = { lines: card.timeline, open: () => onOpenTask(task.id) }
     status = (
       <div className="mx-3.5 rounded-[10px] bg-sidebar-accent/60 p-3">
@@ -147,48 +166,82 @@ export function HomeDayEndPanel({
           picked={picked}
           onPick={(value) => patch({ status: INAX_STATUSES.find((entry) => entry === value) })}
         />
+        {card.proposed && card.proposed !== current ? (
+          // The one grey line an agent's proposal may carry: what it picks, and why.
+          <p
+            className="mt-2 truncate text-xs leading-4 text-muted-foreground/70"
+            data-home-day-end-guess=""
+          >
+            {task.who === 'draft' || task.hasDraft
+              ? t('home.dayEnd.guessDraft', 'Agent’s pick: {{status}} · a draft is attached', {
+                  status: statusLabels[card.proposed]
+                })
+              : t('home.dayEnd.guess', 'Agent’s pick: {{status}}', {
+                  status: statusLabels[card.proposed]
+                })}
+          </p>
+        ) : null}
       </div>
     )
+    const last = task.notes?.at(-1)
     control = (
-      <label className="flex flex-col gap-0.5">
-        <span className="px-2 pt-1 text-xs text-muted-foreground">
-          {t('home.dayEnd.progress', 'Progress note')}
-        </span>
-        {card.suggestion && !draft.text ? (
-          <HomeDayEndSuggestionHint
-            onTake={() => {
-              patch({ text: card.suggestion ?? '' })
-              box.current?.focus()
+      <div className="flex flex-col gap-1">
+        {last ? (
+          // What was written last time, above today's box: the box holds only today's new entry.
+          <p
+            className="truncate px-3.5 text-xs leading-4 text-muted-foreground/70"
+            title={last.text}
+            data-home-day-end-last=""
+          >
+            {`${uiDateTimeFormat(NOTE_TIME, intlLocale).format(last.at)} · ${last.text}`}
+          </p>
+        ) : null}
+        <label
+          className={cn(
+            'mx-3 flex flex-col gap-0.5 rounded-xl border border-border bg-background p-2 shadow-xs',
+            // A dashed edge while the box holds only the agent's suggestion.
+            card.suggestion && !draft.text && 'border-dashed border-muted-foreground/50'
+          )}
+        >
+          <span className="px-2 pt-1 text-xs text-muted-foreground">
+            {t('home.dayEnd.progress', 'Progress note')}
+          </span>
+          {card.suggestion && !draft.text ? (
+            <HomeDayEndSuggestionHint
+              onTake={() => {
+                patch({ text: card.suggestion ?? '' })
+                box.current?.focus()
+              }}
+            />
+          ) : null}
+          <ImeTextarea
+            ref={box}
+            // Remounted per card, so one card's line never shows in the next.
+            key={key}
+            rows={2}
+            placeholder={card.suggestion ?? undefined}
+            value={draft.text ?? ''}
+            data-home-day-end-box=""
+            className="scrollbar-sleek block max-h-[6lh] min-h-[2lh] w-full resize-none border-0 bg-transparent px-2 py-1 text-[13px] leading-5 outline-none [field-sizing:content] placeholder:text-muted-foreground"
+            onChange={(event) => patch({ text: event.target.value })}
+            onKeyDown={(event) => {
+              const plain = !event.shiftKey && !event.altKey && !event.metaKey && !event.ctrlKey
+              if (!plain || isImeOwnedKeyboardEvent(event)) {
+                return
+              }
+              // The chat composer's keys: Tab takes the line written ahead; Enter without it saves the state only.
+              if (event.key === 'Tab' && card.suggestion && !draft.text) {
+                event.preventDefault()
+                patch({ text: card.suggestion })
+              } else if (event.key === 'Enter') {
+                event.preventDefault()
+                // The same as pressing Save.
+                saveButton.current?.click()
+              }
             }}
           />
-        ) : null}
-        <ImeTextarea
-          ref={box}
-          // Remounted per card, so one card's line never shows in the next.
-          key={key}
-          rows={2}
-          placeholder={card.suggestion ?? undefined}
-          value={draft.text ?? ''}
-          data-home-day-end-box=""
-          className="scrollbar-sleek block max-h-[6lh] min-h-[2lh] w-full resize-none border-0 bg-transparent px-2 py-1 text-[13px] leading-5 outline-none [field-sizing:content] placeholder:text-muted-foreground"
-          onChange={(event) => patch({ text: event.target.value })}
-          onKeyDown={(event) => {
-            const plain = !event.shiftKey && !event.altKey && !event.metaKey && !event.ctrlKey
-            if (!plain || isImeOwnedKeyboardEvent(event)) {
-              return
-            }
-            // The chat composer's keys: Tab takes the line written ahead; Enter without it saves the state only.
-            if (event.key === 'Tab' && card.suggestion && !draft.text) {
-              event.preventDefault()
-              patch({ text: card.suggestion })
-            } else if (event.key === 'Enter') {
-              event.preventDefault()
-              // The same as pressing Save.
-              saveButton.current?.click()
-            }
-          }}
-        />
-      </label>
+        </label>
+      </div>
     )
   } else if (card.kind === 'meeting') {
     const assigneeId = draft.picks?.[card.id]
@@ -218,24 +271,27 @@ export function HomeDayEndPanel({
     )
     timeline = { lines: card.timeline, open: () => onOpenMeeting(card.meetingId) }
     control = (
-      <HomeDayEndSelect
-        label={t('meetings.followUps.colOwner', 'Owner')}
-        value={assigneeId}
-        placeholder={t('meetings.followUps.chooseOwner', 'Choose owner')}
-        options={card.peopleIds.map((id, index) => ({
-          id,
-          label: index === 0 ? me : personName(id)
-        }))}
-        onChange={(id) => patch({ picks: { ...draft.picks, [card.id]: id } })}
-      />
+      <div className="px-1.5">
+        <HomeDayEndSelect
+          label={t('meetings.followUps.colOwner', 'Owner')}
+          value={assigneeId}
+          placeholder={t('meetings.followUps.chooseOwner', 'Choose owner')}
+          options={card.peopleIds.map((id, index) => ({
+            id,
+            label: index === 0 ? me : personName(id)
+          }))}
+          onChange={(id) => patch({ picks: { ...draft.picks, [card.id]: id } })}
+        />
+      </div>
     )
   } else {
     const { record } = card
     const answer = draft.picks?.[record.id] ?? record.suggestTaskId
     save = { kind: 'records', answers: [{ recordId: record.id, answer }] }
-    title = t('home.day.unconfirmed', 'Records without a task')
+    // Named as on Home, with what is left of them.
+    title = `${t('home.day.unconfirmed', 'Records without a task')} · ${cards.filter((entry) => entry.kind === 'records').length}`
     control = (
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1 px-1.5">
         <p className="truncate px-2 pt-1 text-[13px] leading-5 text-foreground" title={record.text}>
           {record.text}
         </p>
@@ -254,7 +310,6 @@ export function HomeDayEndPanel({
     onSave(save)
     advance()
   }
-  const suggestion = card.kind === 'task' ? card.suggestion : null
 
   return (
     <aside
@@ -292,40 +347,34 @@ export function HomeDayEndPanel({
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 px-3.5">
           {project ? <HomeProjectDot project={project} /> : null}
           <h3 className="min-w-0 text-sm leading-5 font-semibold text-foreground">{title}</h3>
+          {chip ? <HomeChip>{chip}</HomeChip> : null}
           {source}
         </div>
         {timeline ? <HomeDayEndTimeline lines={timeline.lines} onOpen={timeline.open} /> : null}
         {status}
-      </div>
-      <div
-        className={cn(
-          'mx-3 mb-3 flex shrink-0 flex-col gap-2 rounded-xl border border-border bg-background p-2 shadow-xs',
-          // A dashed edge while the box holds only the agent's suggestion.
-          suggestion && !draft.text && 'border-dashed border-muted-foreground/50'
-        )}
-      >
         {control}
-        <div className="flex items-center justify-end gap-1">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            data-home-day-end-skip=""
-            onClick={advance}
-          >
-            {t('home.dayEnd.skip', 'Skip')}
-          </Button>
-          <Button
-            ref={saveButton}
-            type="button"
-            size="sm"
-            data-home-day-end-save=""
-            disabled={!canSave}
-            onClick={commit}
-          >
-            {t('home.dayEnd.save', 'Save')}
-          </Button>
-        </div>
+      </div>
+      {/* Only the two buttons keep to the bottom; what they save is in the flow above. */}
+      <div className="mx-3 mb-3 flex shrink-0 items-center justify-end gap-1">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          data-home-day-end-skip=""
+          onClick={advance}
+        >
+          {t('home.dayEnd.skip', 'Skip')}
+        </Button>
+        <Button
+          ref={saveButton}
+          type="button"
+          size="sm"
+          data-home-day-end-save=""
+          disabled={!canSave}
+          onClick={commit}
+        >
+          {t('home.dayEnd.save', 'Save')}
+        </Button>
       </div>
     </aside>
   )

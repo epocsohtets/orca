@@ -31,6 +31,8 @@ export type HomeSampleContext = {
   dayName: (workdays: number) => string
   /** Words a time of the sample day as how long ago it was. */
   ago: (at: number) => string
+  /** The moment `minutes` past midnight on the working day `workdays` away from the sample day. */
+  at: (workdays: number, minutes: number) => number
 }
 
 export function buildHomeTasks(t: Translate, sample: HomeSampleContext): HomeTask[] {
@@ -47,6 +49,40 @@ export function buildHomeTasks(t: Translate, sample: HomeSampleContext): HomeTas
       whoLabel: t('home.task.copyWho', 'Needs me · Writing agent'),
       agentId: 'writer',
       question: t('home.task.copyQuestion', 'Which headline should the page use?'),
+      // Saved on earlier days: the log a day-end save adds to.
+      notes: [
+        {
+          id: 'copy-note-1',
+          at: sample.at(-3, 17 * 60 + 40),
+          text: t('home.note.copy1', 'Narrowed the headline down to three directions.'),
+          status: 'inProgress',
+          by: 'me'
+        },
+        {
+          id: 'copy-note-2',
+          at: sample.at(-2, 17 * 60 + 20),
+          text: t('home.note.copy2', 'Started drafts for two of the three directions.'),
+          status: 'inProgress',
+          by: 'agentConfirmed',
+          statusChanged: false
+        },
+        {
+          id: 'copy-note-3',
+          at: sample.at(-1, 10 * 60),
+          text: t('home.note.copy3', 'Compared the drafts with competitors’ headlines.'),
+          status: 'inProgress',
+          by: 'agentConfirmed',
+          statusChanged: false
+        },
+        {
+          id: 'copy-note-4',
+          at: sample.at(-1, 18 * 60 + 5),
+          text: t('home.note.copy4', 'Took out a phrase that needs a legal review.'),
+          status: 'inProgress',
+          by: 'me',
+          statusChanged: false
+        }
+      ],
       choices: [
         { id: 'a', label: t('home.task.copyA', 'A · The first way to meet it') },
         { id: 'b', label: t('home.task.copyB', 'B · Before anyone else, now') },

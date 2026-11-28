@@ -42,7 +42,8 @@ export function applyHomeTaskLoops(
       status,
       statusAt: record?.statusAt,
       done: status === 'done',
-      notes: record?.notes ?? []
+      // Notes from before the sample day come first; what I save adds to them.
+      notes: [...(task.notes ?? []), ...(record?.notes ?? [])]
     }
     if (!loop) {
       return base

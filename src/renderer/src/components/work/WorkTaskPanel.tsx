@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { Pencil } from 'lucide-react'
+import { FileText, Folder, Pencil } from 'lucide-react'
 import { useIntlLocale, useTranslate } from '@/i18n/use-translate'
 import { uiDateTimeFormat } from '@/i18n/ui-intl-formatters'
 import { cn } from '@/lib/class-names'
@@ -8,7 +8,7 @@ import { ImeTextarea } from '@/lib/text-input/ime/ime-text-field'
 import { Button } from '@/components/ui/button'
 import { BOT_ITEM_CHIP, BOT_ITEM_CHIP_ACTION } from '@/components/bots/items/BotItemQuestionStep'
 import { BotItemStatusIcon } from '@/components/bots/items/BotItemStatusIcon'
-import { HOME_META_CLASS, HomeProjectDot } from '@/components/home/HomeCard'
+import { HOME_META_CLASS, HomeAvatar, HomeProjectDot } from '@/components/home/HomeCard'
 import { useSidePanelInset } from '@/components/home/use-side-panel-inset'
 import { HomeDayEndChipLine } from '@/components/home/HomeDayEndParts'
 import type { HomeTask } from '@/components/home/home-board'
@@ -16,6 +16,10 @@ import type { HomeProject } from '@/components/home/home-board-mock'
 import { INAX_STATUSES, type InaxStatus } from '@/components/home/home-task-loop'
 import { inaxStatusLabels, inaxStatusTo } from '@/components/home/home-task-loop-script'
 import { personName } from '@/components/meetings/meeting-people'
+import { LOCAL_EXECUTION_HOST_ID } from '../../../../shared/execution-host/execution-host'
+
+/** The newest entries shown before 모두 보기. */
+const NOTES_SHOWN = 3
 
 const NOTE_TIME: Intl.DateTimeFormatOptions = {
   month: 'short',
@@ -52,6 +56,7 @@ export function WorkTaskPanel({
   const box = useRef<HTMLTextAreaElement | null>(null)
   const [own, setOwn] = useState('')
   const [typing, setTyping] = useState(false)
+  const [allNotes, setAllNotes] = useState(false)
   useSidePanelInset()
   const statusLabels = inaxStatusLabels(t)
   const statusTo = inaxStatusTo(t)
@@ -185,22 +190,43 @@ export function WorkTaskPanel({
               <dd className="text-foreground">{task.whoLabel}</dd>
             </>
           ) : null}
-          {task.outputName && !readOnly ? (
-            <>
-              <dt className="text-muted-foreground">{t('taskLoop.detail.output', 'Result')}</dt>
-              <dd className="text-foreground">{task.outputName}</dd>
-            </>
-          ) : null}
-          {task.folder && !readOnly ? (
-            <>
-              <dt className="text-muted-foreground">{t('taskLoop.detail.folder', 'Folder')}</dt>
-              {/* The folder's name; the whole path is the tooltip. */}
-              <dd className="truncate text-foreground" title={task.folder} data-work-task-folder="">
-                {task.folder.split(/[\\/]/).findLast(Boolean)}
-              </dd>
-            </>
-          ) : null}
         </dl>
+        {/* What the task made, as the things themselves: the draft, then the folder it lives in. */}
+        {(task.outputName || task.folder) && !readOnly ? (
+          <ul className="px-3.5" data-work-task-outputs="">
+            <li className="flex h-8 min-w-0 items-center gap-2 text-[13px] leading-5">
+              {task.outputName ? (
+                <>
+                  <FileText aria-hidden className="size-4 shrink-0 text-muted-foreground" />
+                  {/* The file's name is cut last: the folder gives up its width first. */}
+                  <span className="max-w-[70%] shrink-0 truncate text-foreground">
+                    {task.outputName}
+                  </span>
+                </>
+              ) : null}
+              {task.folder ? (
+                // The span sets the size: the link inherits it.
+                <span className="flex min-w-0 text-xs leading-4">
+                  <Button
+                    type="button"
+                    variant="link-muted"
+                    size="inlineInherit"
+                    title={task.folder}
+                    data-work-task-folder=""
+                    className="min-w-0"
+                    onClick={() =>
+                      task.folder &&
+                      void window.api.shell.openPath(task.folder, LOCAL_EXECUTION_HOST_ID)
+                    }
+                  >
+                    <Folder aria-hidden className="size-3.5 shrink-0" />
+                    <span className="truncate">{task.folder.split(/[\\/]/).findLast(Boolean)}</span>
+                  </Button>
+                </span>
+              ) : null}
+            </li>
+          </ul>
+        ) : null}
         {/* While the agent's question waits, that is the task's one state here: the status choice comes back after the answer. */}
         {asks ? null : (
           <div className="px-3.5">
@@ -233,47 +259,85 @@ export function WorkTaskPanel({
         )}
         {notes.length === 0 ? null : (
           <section className="px-3.5" data-work-task-notes="">
-            <h3 className="mb-1 text-xs text-muted-foreground">
-              {t('taskLoop.detail.notes', 'Progress notes')}
-            </h3>
-
-            <ol className="flex flex-col gap-3">
-              {notes.toReversed().map((note) => (
-                <li key={note.id} className="flex flex-col gap-1">
-                  <p className="text-[13px] leading-5 whitespace-pre-line text-foreground">
-                    {note.text}
-                  </p>
-                  <p className={HOME_META_CLASS}>
-                    {[
-                      // A colleague reads the owner's name where the owner reads "me".
-                      readOnly
-                        ? note.by === 'agentConfirmed'
-                          ? t(
-                              'taskLoop.detail.noteByAgentOf',
-                              'Written by the agent, confirmed by {{name}}',
-                              { name: personName(task.assignee ?? '') }
-                            )
-                          : t('taskLoop.detail.noteBy', 'Written by {{name}}', {
-                              name: personName(task.assignee ?? '')
-                            })
-                        : note.by === 'agentConfirmed'
-                          ? t(
-                              'taskLoop.detail.noteByAgent',
-                              'Written by the agent, confirmed by me'
-                            )
-                          : t('taskLoop.detail.noteByMe', 'Written by me'),
-                      uiDateTimeFormat(NOTE_TIME, intlLocale).format(note.at),
-                      note.statusChanged === false
-                        ? null
-                        : t('taskLoop.detail.noteStatus', 'Changed status {{to}}', {
-                            to: statusTo[note.status]
-                          })
-                    ]
-                      .filter(Boolean)
-                      .join(' · ')}
-                  </p>
-                </li>
-              ))}
+            <div className="mb-1 flex items-center justify-between gap-2">
+              <h3 className="text-xs text-muted-foreground">
+                {t('taskLoop.detail.notes', 'Progress notes')}
+              </h3>
+              {notes.length > NOTES_SHOWN ? (
+                <Button
+                  type="button"
+                  variant="ghost-muted"
+                  size="xs"
+                  aria-expanded={allNotes}
+                  data-work-task-notes-all=""
+                  onClick={() => setAllNotes(!allNotes)}
+                >
+                  {allNotes
+                    ? t('home.activity.less', 'Show fewer')
+                    : t('home.activity.all', 'View all {{count}}', { count: notes.length })}
+                </Button>
+              ) : null}
+            </div>
+            {/* A log: each save adds an entry, newest first, and none is written over. */}
+            <ol className="flex flex-col">
+              {notes
+                .toReversed()
+                .slice(0, allNotes ? undefined : NOTES_SHOWN)
+                .map((note) => {
+                  const owner = readOnly
+                    ? personName(task.assignee ?? '')
+                    : t('home.activity.me', 'I')
+                  return (
+                    <li
+                      key={note.id}
+                      className="flex gap-2 border-t border-border py-2 first:border-0 first:pt-1"
+                    >
+                      <HomeAvatar
+                        name={
+                          note.by === 'agentConfirmed'
+                            ? t('taskLoop.agent.name', 'Task agent')
+                            : owner
+                        }
+                      />
+                      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                        <p className="text-[13px] leading-5 whitespace-pre-line text-foreground">
+                          {note.text}
+                        </p>
+                        <p className={HOME_META_CLASS}>
+                          {[
+                            // A colleague reads the owner's name where the owner reads "me".
+                            readOnly
+                              ? note.by === 'agentConfirmed'
+                                ? t(
+                                    'taskLoop.detail.noteByAgentOf',
+                                    'Written by the agent, confirmed by {{name}}',
+                                    { name: owner }
+                                  )
+                                : t('taskLoop.detail.noteBy', 'Written by {{name}}', {
+                                    name: owner
+                                  })
+                              : note.by === 'agentConfirmed'
+                                ? t(
+                                    'taskLoop.detail.noteByAgent',
+                                    'Written by the agent, confirmed by me'
+                                  )
+                                : t('taskLoop.detail.noteByMe', 'Written by me'),
+                            note.statusChanged === false
+                              ? null
+                              : t('taskLoop.detail.noteStatus', 'Changed status {{to}}', {
+                                  to: statusTo[note.status]
+                                })
+                          ]
+                            .filter(Boolean)
+                            .join(' · ')}
+                        </p>
+                      </div>
+                      <span className="shrink-0 pt-0.5 text-xs leading-4 whitespace-nowrap text-muted-foreground/70 tabular-nums">
+                        {uiDateTimeFormat(NOTE_TIME, intlLocale).format(note.at)}
+                      </span>
+                    </li>
+                  )
+                })}
             </ol>
           </section>
         )}
