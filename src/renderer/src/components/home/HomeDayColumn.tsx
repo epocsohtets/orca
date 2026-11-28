@@ -37,10 +37,12 @@ export function HomeDayColumn({
   onHover: (recordId: string | null) => void
 }): React.JSX.Element {
   const t = useTranslate()
-  // From the hour of the first thing that happened to the hour after now: no empty evening ahead.
-  const first = Math.min(...blocks.map((b) => b.from), now)
+  // From the hour of the first activity to the hour after the last one ends, not to now: no empty evening.
+  // With nothing recorded yet, the hour now is in.
+  const first = blocks.length > 0 ? Math.min(...blocks.map((b) => b.from)) : now
+  const lastEnd = blocks.length > 0 ? Math.max(...blocks.map((b) => b.to)) : now
   const start = Math.floor(first / 60) * 60
-  const end = Math.max(start + 60, Math.ceil((now + 1) / 60) * 60)
+  const end = Math.max(start + 60, (Math.floor(lastEnd / 60) + 1) * 60)
   const pxPerHour = Math.min(
     MAX_PX_PER_HOUR,
     Math.max(MIN_PX_PER_HOUR, MAX_AXIS_PX / ((end - start) / 60))
