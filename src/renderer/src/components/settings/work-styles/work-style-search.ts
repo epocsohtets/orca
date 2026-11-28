@@ -4,10 +4,7 @@ import { createLocalizedCatalog } from '@/i18n/localized-catalog'
 export const getWorkStyleSearchEntries = createLocalizedCatalog(() => [
   {
     title: translate('workStyles.title', 'How you work'),
-    description: translate(
-      'workStyles.description',
-      'Choose every way you work. You see only the settings those ways need.'
-    ),
+    description: translate('workStyles.description', 'Choose every way you work.'),
     keywords: [
       translate('workStyles.options.code.label', 'Code'),
       translate('workStyles.options.web.label', 'Web'),

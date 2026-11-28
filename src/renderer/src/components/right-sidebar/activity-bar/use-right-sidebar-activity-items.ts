@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { useAppStore } from '@/store'
+import { hidesDeveloperChrome } from '../../../../../shared/settings/work-styles'
 import { useRepoById } from '@/store/repos/use-repository-catalog'
 import { isFolderRepo } from '../../../../../shared/repository/repo-kind'
 import { parseWorkspaceKey } from '../../../../../shared/workspace/identity/workspace-scope'
@@ -99,6 +100,7 @@ export function useRightSidebarActivityItems({
     [installedPlugins]
   )
   // Why here: the checks tab announces this status, so a plugin tab's name is judged against it.
+  const hideCode = useAppStore((s) => hidesDeveloperChrome(s.settings))
   const creatingWorktree = useAppStore(selectWorktreeCreationSurfaceShown)
   const checksStatus = useAppStore((s) =>
     s.rightSidebarOpen && !creatingWorktree ? getActiveChecksStatus(s) : null
@@ -156,7 +158,8 @@ export function useRightSidebarActivityItems({
           hasRemoteHost,
           isBot,
           isGroupHome,
-          hasChatWorkers
+          hasChatWorkers,
+          hideCode
         }),
         (item) => activityItemStatus(item, checksStatus)
       ),
@@ -168,6 +171,7 @@ export function useRightSidebarActivityItems({
       isBot,
       isGroupHome,
       hasChatWorkers,
+      hideCode,
       checksStatus
     ]
   )

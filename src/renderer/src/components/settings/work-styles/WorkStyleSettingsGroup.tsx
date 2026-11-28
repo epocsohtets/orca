@@ -1,6 +1,11 @@
 import type { GlobalSettings } from '../../../../../shared/settings/global-settings-types'
-import { normalizeWorkStyles } from '../../../../../shared/settings/work-styles'
-import { SettingsSwitchRow } from '../form-controls/SettingsFormControls'
+import {
+  hidesDeveloperChrome,
+  normalizeWorkStyles
+} from '../../../../../shared/settings/work-styles'
+import { Button } from '@/components/ui/button'
+import { useTranslate } from '@/i18n/use-translate'
+import { SettingsRow, SettingsSwitchRow } from '../form-controls/SettingsFormControls'
 import { SettingsGroup } from '../section-layout/SettingsGroup'
 import { WorkStylePicker } from './WorkStylePicker'
 import { saveWorkStyles } from './save-work-styles'
@@ -13,6 +18,7 @@ export function WorkStyleSettingsGroup({
   settings: GlobalSettings
   updateSettings: (updates: Partial<GlobalSettings>) => void
 }): React.JSX.Element {
+  const t = useTranslate()
   const [workStyles, showAll] = getWorkStyleSearchEntries()
   return (
     <SettingsGroup title={workStyles.title} description={workStyles.description}>
@@ -22,6 +28,29 @@ export function WorkStyleSettingsGroup({
           onChange={(next) => saveWorkStyles(settings, next, updateSettings)}
         />
       </div>
+      {hidesDeveloperChrome(settings) ? (
+        <SettingsRow
+          label={t('workStyles.workFolder.label', 'Work folder location')}
+          description={settings.workspaceDir}
+          control={
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              data-work-folder-change=""
+              onClick={() =>
+                void window.api.shell.pickDirectory({}).then((path) => {
+                  if (path) {
+                    updateSettings({ workspaceDir: path })
+                  }
+                })
+              }
+            >
+              {t('workStyles.workFolder.change', 'Change')}
+            </Button>
+          }
+        />
+      ) : null}
       <SettingsSwitchRow
         label={showAll.title}
         description={showAll.description}

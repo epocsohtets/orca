@@ -4,6 +4,7 @@ import { useSidebarResize } from '@/hooks/useSidebarResize'
 import { cn } from '@/lib/class-names'
 import { useTranslate } from '@/i18n/use-translate'
 import { BOTS_GROUP_KEY } from '../../../../shared/sidebar-list/sections/group-keys'
+import { hidesDeveloperChrome } from '../../../../shared/settings/work-styles'
 import {
   SIDEBAR_BOTS_MIN_HEIGHT,
   SIDEBAR_PROJECTS_MIN_LIST_HEIGHT,
@@ -249,4 +250,9 @@ export function SidebarBotsSplit({
       )}
     </div>
   )
+}
+
+/** A project row opens a terminal workspace, so the list is not shown to someone who left Code out. */
+export function useShowsProjects(): boolean {
+  return useAppStore((s) => !hidesDeveloperChrome(s.settings))
 }

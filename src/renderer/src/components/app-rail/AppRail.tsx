@@ -1,5 +1,14 @@
 import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { BookOpen, CalendarClock, Files, House, Layers, List, Smartphone } from 'lucide-react'
+import {
+  BookOpen,
+  CalendarClock,
+  Files,
+  House,
+  Layers,
+  List,
+  Smartphone,
+  SquareKanban
+} from 'lucide-react'
 import { hidesDeveloperChrome } from '../../../../shared/settings/work-styles'
 import { useAppStore } from '@/store/index'
 import { useTranslate } from '@/i18n/use-translate'
@@ -199,7 +208,9 @@ export function AppRail({
   const destinationLabel = (id: AppRailDestinationId): string => {
     switch (id) {
       case 'tasks':
-        return t('auto.components.sidebar.SidebarNav.fee535205b', 'Tasks')
+        return hideDeveloper
+          ? t('appRail.work', 'Work')
+          : t('auto.components.sidebar.SidebarNav.fee535205b', 'Tasks')
       case 'meetings':
         return t('meetings.title', 'Meetings')
       case 'automations':
@@ -221,7 +232,7 @@ export function AppRail({
     const props = { size, strokeWidth, className, 'aria-hidden': true }
     switch (id) {
       case 'tasks':
-        return <List {...props} />
+        return hideDeveloper ? <SquareKanban {...props} /> : <List {...props} />
       case 'meetings':
         return <MeetingsRailIcon {...props} />
       case 'automations':

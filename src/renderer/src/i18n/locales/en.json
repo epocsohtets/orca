@@ -26597,7 +26597,7 @@
   },
   "workStyles": {
     "title": "How you work",
-    "description": "Choose every way you work. You see only the settings those ways need.",
+    "description": "Choose every way you work.",
     "hiddenHint": "Hidden for your work style",
     "options": {
       "code": {
@@ -26624,6 +26624,10 @@
       "title": "How do you work?",
       "subtitle": "Choose all that apply. The first screens follow what you choose.",
       "switchNote": "Not sure? Pick the closest one. You can change it later in <em>Settings → General</em>."
+    },
+    "workFolder": {
+      "label": "Work folder location",
+      "change": "Change"
     }
   },
   "resourceManager": {
@@ -31444,7 +31448,8 @@
     "pageRegion": "Page",
     "account": "Account",
     "signIn": "Sign in",
-    "home": "Home"
+    "home": "Home",
+    "work": "Work"
   },
   "meetings": {
     "recording": {

@@ -2,6 +2,7 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { useAppStore } from '@/store/index'
+import { hidesDeveloperChrome } from '../../../../../shared/settings/work-styles'
 import { cn } from '@/lib/class-names'
 import { getAgentCatalog } from '@/lib/agent-catalog/agent-catalog'
 import { getScreenSubmitModifierLabel } from '@/lib/keyboard/screen-submit-shortcut'
@@ -106,6 +107,7 @@ export default function NewWorkspaceComposerCard(
   const branchNameInputId = React.useId()
   const projectDescriptionId = React.useId()
   const [sparseEditing, setSparseEditing] = React.useState(false)
+  const hideCode = useAppStore((s) => hidesDeveloperChrome(s.settings))
   const [addRemoteHostMode, setAddRemoteHostMode] = React.useState<AddRemoteHostMode | null>(null)
   const [addWslDistro, setAddWslDistro] = React.useState<string>()
   const remoteHostDialogOpenRef = React.useRef(false)
@@ -325,7 +327,7 @@ export default function NewWorkspaceComposerCard(
           onAddProjectEntryRequest={handleAddProjectEntryRequest}
           handleOpenRemoteHostDialog={handleRemoteHostModeChange}
           focusNameInput={focusNameInput}
-          shouldShowRunTargetPicker={shouldShowRunTargetPicker}
+          shouldShowRunTargetPicker={shouldShowRunTargetPicker && !hideCode}
           handleProjectHostSetupChange={(setupId) => onProjectHostSetupChange?.(setupId)}
           handleAddSshHost={() => handleRemoteHostModeChange('ssh')}
           handleAddRemoteServer={() => handleRemoteHostModeChange('server')}
@@ -339,7 +341,12 @@ export default function NewWorkspaceComposerCard(
           connectButtonLabel={connectButtonLabel}
           selectedProjectName={selectedProjectName}
         />
-        <NewWorkspaceComposerNameSection {...props} onNamePlainEnter={handleNamePlainEnter} />
+        <NewWorkspaceComposerNameSection
+          {...props}
+          // Without Code there is no branch to start from: the field is the name only.
+          {...(hideCode ? { selectedRepoIsGit: false, onBaseBranchChange: undefined } : {})}
+          onNamePlainEnter={handleNamePlainEnter}
+        />
         <NewWorkspaceComposerAgentSection
           {...props}
           createDisabled={props.createDisabled || sparseEditing}
@@ -348,18 +355,20 @@ export default function NewWorkspaceComposerCard(
           defaultTuiAgent={defaultTuiAgent}
           handleSetDefaultAgent={handleSetDefaultAgent}
         />
-        <NewWorkspaceComposerAdvancedSection
-          {...props}
-          onSparseEditingChange={setSparseEditing}
-          sparseEditing={sparseEditing}
-          branchNameInputId={branchNameInputId}
-          showSetupAgentStartupPolicy={showSetupAgentStartupPolicy}
-          parentWorktreeId={parentWorktreeId}
-          onParentWorktreeIdChange={onParentWorktreeIdChange}
-          selectedRepoExecutionHostId={selectedRepoExecutionHostId}
-          selectedRepoProjectId={selectedRepoProjectId}
-          activeFolderWorkspaceId={activeFolderWorkspaceId}
-        />
+        {hideCode ? null : (
+          <NewWorkspaceComposerAdvancedSection
+            {...props}
+            onSparseEditingChange={setSparseEditing}
+            sparseEditing={sparseEditing}
+            branchNameInputId={branchNameInputId}
+            showSetupAgentStartupPolicy={showSetupAgentStartupPolicy}
+            parentWorktreeId={parentWorktreeId}
+            onParentWorktreeIdChange={onParentWorktreeIdChange}
+            selectedRepoExecutionHostId={selectedRepoExecutionHostId}
+            selectedRepoProjectId={selectedRepoProjectId}
+            activeFolderWorkspaceId={activeFolderWorkspaceId}
+          />
+        )}
       </div>
       {!sparseEditing ? (
         <div className="shrink-0 space-y-1">
