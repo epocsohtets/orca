@@ -15,17 +15,18 @@ import {
   BOT_ITEM_OPEN_QUESTION,
   BotItemChipWords
 } from '@/components/bots/items/BotItemQuestionStep'
-import { HOME_ROW_BUTTON_CLASS } from './HomeCard'
+import { HOME_ROW_BUTTON_CLASS, HomeAvatar } from './HomeCard'
 import { HomeActivityLine } from './HomeActivityCard'
 import type { HomeTask } from './home-board'
 import { HOME_RECORD_NOT_WORK, HOME_RECORD_YES, type HomeDayEndLine } from './home-day-end'
 
-type Chip = { id: string; label: string; recommended: boolean }
+type Chip = { id: string; label: string; recommended: boolean; person?: boolean }
 
 /** One question of a card in the item ask's shape: its words, then reply chips; the pick is filled, with a check. */
 export function HomeDayEndChipLine({
   question,
   note,
+  label,
   chips,
   picked,
   onPick,
@@ -33,6 +34,8 @@ export function HomeDayEndChipLine({
 }: {
   question: string
   note?: React.ReactNode
+  /** What the chips choose, when the question's own words do not say it. */
+  label?: string
   chips: readonly Chip[]
   picked: string | undefined
   onPick: (id: string) => void
@@ -46,20 +49,29 @@ export function HomeDayEndChipLine({
     >
       <p className={cn('min-w-0 text-sm leading-5', BOT_ITEM_OPEN_QUESTION)}>{question}</p>
       {note}
-      <div className="mt-2.5 flex flex-wrap gap-2">
+      {label ? <p className="mt-2.5 text-xs text-muted-foreground">{label}</p> : null}
+      {/* One answer per line: a radio group, so the pick is announced and the arrows move through it. */}
+      <div
+        role="radiogroup"
+        aria-label={label ?? question}
+        className={cn('flex flex-wrap gap-2', label ? 'mt-1.5' : 'mt-2.5')}
+      >
         {chips.map((chip) => (
           <button
             key={chip.id}
             type="button"
-            aria-pressed={picked === chip.id}
+            role="radio"
+            aria-checked={picked === chip.id}
             className={cn(
               BOT_ITEM_CHIP,
               BOT_ITEM_CHIP_ACTION,
+              'flex items-center gap-1.5',
               picked === chip.id ? BOT_ITEM_CHIP_PICKED : 'text-foreground'
             )}
             onClick={() => onPick(chip.id)}
           >
             {picked === chip.id ? <Check aria-hidden className="size-3 shrink-0" /> : null}
+            {chip.person ? <HomeAvatar name={chip.label} /> : null}
             <span className="min-w-0 max-w-full">
               <BotItemChipWords reply={chip} />
             </span>

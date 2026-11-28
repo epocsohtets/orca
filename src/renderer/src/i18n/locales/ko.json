@@ -29174,7 +29174,7 @@
       "minutesReady": "**{{title}}** 회의록이 준비됐습니다.",
       "noProposals": "이 회의에서 나온 내 업무는 없습니다.",
       "sharedMessage": "{{name}} 님이 **{{title}}** 회의록 전체를 공유했습니다.",
-      "assignedMessage": "{{name}} 님이 **{{title}}**에서 나온 업무를 할당했습니다. 이 업무가 나온 부분을 함께 보냅니다.",
+      "assignedMessage": "{{name}} 님이 **{{title}}**에서 나온 업무를 할당했습니다.",
       "name": "회의 에이전트",
       "askAbout": "「{{title}}」에 대한 질문",
       "about": "회의록과 회의에서 나온 내 업무를 보냅니다",
@@ -29196,7 +29196,7 @@
       "rowShared": "공유받은 회의록: {{title}}",
       "rowTask": "새 업무: {{title}}",
       "rowEmpty": "회의록과 내 업무가 여기로 옵니다",
-      "heardMessage": "**{{title}}**에서 나온 업무를 보냅니다. 이 업무가 나온 부분도 함께 보냅니다."
+      "heardMessage": "**{{title}}**에서 나온 업무입니다."
     },
     "source": "나온 부분 보기",
     "ask": {
@@ -29439,7 +29439,7 @@
       "tookFollowUp": "· 회의 「{{title}}」에서 「{{task}}」 업무를 내 업무로 받았습니다",
       "assignedFollowUp": "· 회의 「{{title}}」에서 「{{task}}」 업무를 나에게 할당했습니다",
       "copyComment": "· 댓글: “두 번째 안이 더 낫습니다”",
-      "heardFollowUp": "· 회의 「{{title}}」에서 나온 「{{task}}」 업무를 내 업무에 넣었습니다"
+      "heardFollowUp": "· 회의 「{{title}}」에서 나온 「{{task}}」 업무를 ‘내 업무’에 넣었습니다"
     },
     "agents": {
       "waiting": "내 답을 기다림",
@@ -29497,7 +29497,7 @@
       "nothing": "등록한 앱을 쓰거나 회의를 하면 오늘의 기록이 여기에 모입니다.",
       "scope": "등록한 앱의 사용 시간, 이 앱의 브라우저에서 본 페이지의 주소와 제목, 회의 시간만 기록합니다. 화면 내용은 기록하지 않습니다.",
       "noApp": "업무에 쓰는 앱을 등록하면 사용 시간이 여기에 모입니다.",
-      "unconfirmed": "업무 미정 기록",
+      "unconfirmed": "업무를 정하지 않은 기록",
       "unconfirmedHint": "업무였는지 골라 주세요.",
       "hours": "{{count}}시간",
       "minutes": "{{count}}분",
@@ -29623,7 +29623,7 @@
       "fromMeetingAssigned": "회의 「{{title}}」에서 나온 후속 업무입니다. {{host}} 님이 {{name}} 님에게 할당했습니다.",
       "request": "{{name}} 님의 「{{title}}」 회의록 보기 요청",
       "requestWho": "내 승인을 기다림",
-      "fromMeetingHeard": "회의 「{{title}}」에서 나온 후속 업무입니다. 회의에서 {{name}} 님이 맡기로 했습니다."
+      "fromMeetingHeard": "회의 「{{title}}」의 후속 업무입니다. 회의에서 {{name}} 님이 맡기로 했습니다."
     },
     "project": {
       "campaign": "신제품 출시 캠페인",
@@ -29648,10 +29648,10 @@
       "progress": "진행 기록",
       "status": "상태",
       "save": "저장",
-      "shared": "저장 후 보이는 것",
+      "shared": "저장하면",
       "viewers": "보는 사람",
       "sharedStatus": "상태 {{from}} → {{to}}",
-      "sharedNothing": "없음",
+      "sharedNothing": "더 없음",
       "sharedOwners": "후속 업무 {{count}}건의 담당자",
       "audienceTask": "“{{project}}”의 PM과 팀",
       "followUpCount": "담당자 없는 후속 업무 {{count}}건",
@@ -29660,7 +29660,7 @@
       "recordOther": "다른 업무",
       "resultTitle": "오늘 팀이 보는 것 {{count}}건",
       "next": "다음",
-      "visibleNow": "지금 보이는 것",
+      "visibleNow": "지금",
       "nowStatus": "상태 {{status}}",
       "nowActivity": "마지막 활동 {{when}}",
       "nowAgent": "에이전트 작업 중",
@@ -29776,8 +29776,8 @@
       "reportPlan": "보고서는 이미 써 두셨으니, 저는 공유에 필요한 것을 준비하겠습니다.\n\n1. 보고서에서 핵심 숫자 세 가지를 뽑습니다.\n2. 보고서를 공유하는 글의 초안을 씁니다.\n3. 초안을 보여 드리고, 상태와 진행 기록을 제안합니다.",
       "reportQuestion": "공유 글을 누구에게 맞춰 쓸까요?",
       "requested": "요청하신 것: “{{text}}”",
-      "next": "지금 업무 설명을 항목으로 나누고 있습니다. 목록이 준비되면 이 대화에 올리겠습니다.",
-      "nextTeam": "지금 업무 설명을 항목으로 나누고 있습니다. 목록이 준비되면 프로젝트 팀이 읽을 수 있게 써서 이 대화에 올리겠습니다."
+      "next": "지금 업무를 항목으로 나누고 있습니다. 목록이 준비되면 이 대화에 올리겠습니다.",
+      "nextTeam": "지금 업무를 항목으로 나누고 있습니다. 목록이 준비되면 프로젝트 팀이 읽을 수 있게 써서 이 대화에 올리겠습니다."
     },
     "settings": {
       "cardDescription": "로그인하면 내 업무가 홈과 업무 목록에 보입니다.",

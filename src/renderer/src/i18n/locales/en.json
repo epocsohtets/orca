@@ -31547,7 +31547,7 @@
       "minutesReady": "The minutes of **{{title}}** are ready.",
       "noProposals": "Nothing in this meeting looks like yours.",
       "sharedMessage": "{{name}} shared the full minutes of **{{title}}** with you.",
-      "assignedMessage": "{{name}} assigned you a task from **{{title}}**. Here is the part it came from.",
+      "assignedMessage": "{{name}} assigned you a task from **{{title}}**.",
       "name": "Meeting agent",
       "askAbout": "Ask about “{{title}}”",
       "about": "Sends you the minutes and the items that look like yours",
@@ -31569,7 +31569,7 @@
       "rowShared": "Shared minutes: {{title}}",
       "rowTask": "New task: {{title}}",
       "rowEmpty": "Minutes and your tasks arrive here",
-      "heardMessage": "A task for you came out of **{{title}}**. Here is the part it came from."
+      "heardMessage": "A task for you from **{{title}}**."
     },
     "source": "Where it was said",
     "ask": {
@@ -32021,10 +32021,10 @@
       "progress": "Progress note",
       "status": "Status",
       "save": "Save",
-      "shared": "Shown after Save",
+      "shared": "After Save",
       "viewers": "Who sees it",
       "sharedStatus": "Status {{from}} → {{to}}",
-      "sharedNothing": "Nothing",
+      "sharedNothing": "Nothing more",
       "sharedOwners": "Owners of {{count}} follow-ups",
       "audienceTask": "The PM and the team of “{{project}}”",
       "followUpCount": "{{count}} follow-ups without an owner",
@@ -32033,7 +32033,7 @@
       "recordOther": "Another task",
       "resultTitle": "What the team sees today · {{count}}",
       "next": "Next",
-      "visibleNow": "Shown now",
+      "visibleNow": "Now",
       "nowStatus": "Status {{status}}",
       "nowActivity": "Last activity {{when}}",
       "nowAgent": "Agent working",
@@ -32149,8 +32149,8 @@
       "reportPlan": "The report is already written, so I will prepare what sharing it needs.\n\n1. Pull the three key numbers out of the report.\n2. Draft the message that shares it.\n3. Show you the draft, then propose a status and a progress note.",
       "reportQuestion": "Who should the sharing message be written for?",
       "requested": "You asked for: “{{text}}”",
-      "next": "I am splitting the task description into items now. When the list is ready I will put it in this conversation.",
-      "nextTeam": "I am splitting the task description into items now. When the list is ready I will put it in this conversation, written for the project team to read."
+      "next": "I am splitting the task into items now. When the list is ready I will put it in this conversation.",
+      "nextTeam": "I am splitting the task into items now. When the list is ready I will put it in this conversation, written for the project team to read."
     },
     "settings": {
       "cardDescription": "Sign in and your tasks appear on Home and in Tasks.",

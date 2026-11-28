@@ -135,7 +135,7 @@ export function HomeDayEndPanel({
           : null
       ]
         .filter(Boolean)
-        .join(' · ') || t('home.dayEnd.sharedNothing', 'Nothing')
+        .join(' · ') || t('home.dayEnd.sharedNothing', 'Nothing more')
     // Status and activity are shared as they happen; only the written line and a proposed status wait for Save.
     visibleNow = [
       t('home.dayEnd.nowStatus', 'Status {{status}}', { status: statusLabels[current] }),
@@ -193,7 +193,7 @@ export function HomeDayEndPanel({
     shared =
       rows.length > 0
         ? t('home.dayEnd.sharedOwners', 'Owners of {{count}} follow-ups', { count: rows.length })
-        : t('home.dayEnd.sharedNothing', 'Nothing')
+        : t('home.dayEnd.sharedNothing', 'Nothing more')
     visibleNow = t('home.dayEnd.nowMeeting', 'Minutes · {{count}} follow-up tasks', {
       count: card.settled
     })
@@ -228,10 +228,12 @@ export function HomeDayEndPanel({
                   </p>
                 ) : undefined
               }
+              label={t('meetings.followUps.colOwner', 'Owner')}
               chips={card.peopleIds.map((id, index) => ({
                 id,
                 label: index === 0 ? me : personName(id),
-                recommended: false
+                recommended: false,
+                person: true
               }))}
               picked={draft.picks?.[followUp.id]}
               onPick={(id) => patch({ picks: { ...draft.picks, [followUp.id]: id } })}
@@ -305,14 +307,14 @@ export function HomeDayEndPanel({
       </div>
       <div className="scrollbar-sleek flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pb-3">
         <div className="px-3.5">{header}</div>
-        <dl className="grid grid-cols-[104px_minmax(0,1fr)] gap-x-2 gap-y-1 px-3.5 text-xs">
+        <dl className="grid grid-cols-[72px_minmax(0,1fr)] gap-x-2 gap-y-1 px-3.5 text-xs">
           <dt className="text-muted-foreground">{t('home.dayEnd.viewers', 'Who sees it')}</dt>
           <dd className="text-foreground" data-home-day-end-viewers="">
             {viewers}
           </dd>
           {visibleNow === null ? null : (
             <>
-              <dt className="text-muted-foreground">{t('home.dayEnd.visibleNow', 'Shown now')}</dt>
+              <dt className="text-muted-foreground">{t('home.dayEnd.visibleNow', 'Now')}</dt>
               <dd className="text-foreground" data-home-day-end-now="">
                 {visibleNow}
               </dd>
@@ -320,9 +322,7 @@ export function HomeDayEndPanel({
           )}
           {shared === null ? null : (
             <>
-              <dt className="text-muted-foreground">
-                {t('home.dayEnd.shared', 'Shown after Save')}
-              </dt>
+              <dt className="text-muted-foreground">{t('home.dayEnd.shared', 'After Save')}</dt>
               <dd className="text-foreground" data-home-day-end-shared="">
                 {shared}
               </dd>

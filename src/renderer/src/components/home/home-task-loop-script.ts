@@ -134,11 +134,11 @@ export function buildHomeLoopScript(
     next: second
       ? t(
           'taskLoop.script.nextTeam',
-          'I am splitting the task description into items now. When the list is ready I will put it in this conversation, written for the project team to read.'
+          'I am splitting the task into items now. When the list is ready I will put it in this conversation, written for the project team to read.'
         )
       : t(
           'taskLoop.script.next',
-          'I am splitting the task description into items now. When the list is ready I will put it in this conversation.'
+          'I am splitting the task into items now. When the list is ready I will put it in this conversation.'
         ),
     note: '',
     basis: []
