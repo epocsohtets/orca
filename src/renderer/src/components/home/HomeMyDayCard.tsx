@@ -126,9 +126,9 @@ export function HomeMyDayCard({
         )}
       </div>
       {records.length > 0 ? (
-        <section aria-label={t('home.day.unconfirmed', 'Records to check')}>
+        <section aria-label={t('home.day.unconfirmed', 'Records without a task')}>
           <h3 className="flex flex-wrap items-baseline gap-x-2 border-t border-border px-4 pt-2 text-xs font-medium text-foreground">
-            {t('home.day.unconfirmed', 'Records to check')}
+            {t('home.day.unconfirmed', 'Records without a task')}
             <span className="tabular-nums" data-home-records-open="">
               {open}
             </span>

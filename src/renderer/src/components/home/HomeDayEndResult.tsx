@@ -43,7 +43,7 @@ export function useHomeDayEndRows(
             {
               id: `${index}`,
               title: task.title,
-              what: entry.noteId ? t('home.dayEnd.progress', 'Today’s progress') : '',
+              what: entry.noteId ? t('home.dayEnd.progress', 'Progress note') : '',
               status: entry.status,
               viewers: t('home.dayEnd.audienceTask', 'The PM and the team of “{{project}}”', {
                 project: projects[task.project].name

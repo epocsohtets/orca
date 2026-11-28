@@ -44,7 +44,7 @@ export function HomeAgentsCard({
   ]
 
   return (
-    <HomeCard title={t('home.agents.title', 'Agents and bots')} data-home-card="agents">
+    <HomeCard title={t('home.agents.title', 'Agents')} data-home-card="agents">
       <div className="scrollbar-sleek overflow-x-auto border-t border-border">
         <table className="w-full min-w-[40rem] border-collapse text-[13px]">
           <thead>

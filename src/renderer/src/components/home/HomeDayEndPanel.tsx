@@ -98,7 +98,7 @@ export function HomeDayEndPanel({
   }
 
   const statusLabels = inaxStatusLabels(t)
-  const progress = t('home.dayEnd.progress', 'Today’s progress')
+  const progress = t('home.dayEnd.progress', 'Progress note')
   const me = t('home.activity.me', 'I')
   let header: React.ReactNode
   let body: React.ReactNode
@@ -253,7 +253,7 @@ export function HomeDayEndPanel({
     viewers = me
     header = (
       <h3 className="text-[15px] leading-5 font-semibold text-foreground">
-        {t('home.day.unconfirmed', 'Records to check')}
+        {t('home.day.unconfirmed', 'Records without a task')}
       </h3>
     )
     body = (

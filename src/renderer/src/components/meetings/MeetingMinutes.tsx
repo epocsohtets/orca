@@ -44,10 +44,10 @@ export function MeetingMinutes({
     brief: t('meetings.minutes.brief', 'Key points'),
     summary: t('meetings.minutes.summary', 'Summary'),
     full: t('meetings.minutes.full', 'Transcript'),
-    ask: t('meetings.minutes.ask', 'Ask')
+    ask: t('meetings.minutes.ask', 'Ask the agent')
   }
+  // Key points holds two lists, each with its own count, so the tab itself carries none.
   const counts: Partial<Record<MinutesDepth, number>> = {
-    brief: minutes.decisions.length,
     summary: minutes.topics.length,
     full: minutes.transcript.length
   }

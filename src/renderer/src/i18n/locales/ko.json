@@ -1273,7 +1273,7 @@
       "add": "앱 추가",
       "registered": "등록한 앱",
       "searchPlaceholder": "설치된 앱 검색…",
-      "noMatches": "그 이름의 앱이 없습니다. 이름을 확인하세요.",
+      "noMatches": "그 이름의 앱이 없습니다. 이름을 다시 입력하세요.",
       "emptyTitle": "등록한 앱이 없습니다",
       "emptyDescription": "업무에 쓰는 앱을 추가하면 사용 시간이 “내 하루”에 모입니다.",
       "paused": "일시 중지됨",
@@ -29122,7 +29122,7 @@
       "endTime": "끝 시각",
       "timeInvalid": "입력한 “{{typed}}” 값은 시각이 아닙니다. 15:30처럼 적거나 목록에서 고르세요.",
       "endBeforeStart": "끝이 시작보다 늦어야 합니다. 끝 시각이나 끝 날짜를 뒤로 옮기세요.",
-      "rangeTooLong": "14일이 넘습니다. 끝 날짜를 확인하세요.",
+      "rangeTooLong": "14일이 넘습니다. 끝 날짜를 앞당기세요.",
       "fromWhisper": "회의 에이전트가 채팅 「{{name}}」에서 읽은 내용으로 채웠습니다. 틀린 곳만 고치세요.",
       "spansDays": "{{count}}일에 걸친 회의입니다.",
       "lengthHours": "회의 길이 {{h}}시간 {{m}}분",
@@ -29135,7 +29135,7 @@
       "host": "주최자",
       "findPerson": "이름 검색",
       "people": "사람",
-      "noPerson": "“{{query}}”라는 이름이 없습니다. 이름을 확인하세요.",
+      "noPerson": "“{{query}}”라는 이름이 없습니다. 이름을 다시 입력하세요.",
       "everyoneIn": "모두 들어 있습니다.",
       "inChat": "이 채팅",
       "line": "회의가 참석자의 일정에 개요, 자료와 함께 들어갑니다.",
@@ -29172,13 +29172,13 @@
     },
     "bot": {
       "minutesReady": "**{{title}}** 회의록이 준비됐습니다.",
-      "noProposals": "이 회의에서 내 몫으로 보이는 일은 없습니다.",
+      "noProposals": "이 회의에서 나온 내 업무는 없습니다.",
       "sharedMessage": "{{name}} 님이 **{{title}}** 회의록 전체를 공유했습니다.",
-      "assignedMessage": "{{name}} 님이 **{{title}}**에서 나온 업무를 할당했습니다. 이 일이 나온 부분을 함께 보냅니다.",
+      "assignedMessage": "{{name}} 님이 **{{title}}**에서 나온 업무를 할당했습니다. 이 업무가 나온 부분을 함께 보냅니다.",
       "name": "회의 에이전트",
       "askAbout": "「{{title}}」에 대한 질문",
-      "about": "회의록과 내 몫으로 보이는 일을 보냅니다",
-      "aboutOutside": "할당된 업무와 그 일이 나온 부분을 보냅니다",
+      "about": "회의록과 회의에서 나온 내 업무를 보냅니다",
+      "aboutOutside": "할당된 업무와 그 업무가 나온 부분을 보냅니다",
       "emptyTitle": "아직 받은 메시지가 없습니다",
       "emptyDetail": "참석한 회의의 녹음이 끝나면 회의록이 여기로 옵니다. 회의에서 나에게 할당된 업무도 여기로 옵니다.",
       "minutesCard": "회의록",
@@ -29196,9 +29196,9 @@
       "rowShared": "공유받은 회의록: {{title}}",
       "rowTask": "새 업무: {{title}}",
       "rowEmpty": "회의록과 내 업무가 여기로 옵니다",
-      "heardMessage": "**{{title}}**에서 내 업무가 나왔습니다. 이 일이 나온 부분을 함께 보냅니다."
+      "heardMessage": "**{{title}}**에서 내 업무가 나왔습니다. 이 업무가 나온 부분을 함께 보냅니다."
     },
-    "source": "근거 문장 보기",
+    "source": "나온 부분 보기",
     "ask": {
       "send": "질문",
       "noAnswer": "이 회의에서 그 내용은 찾지 못했습니다. 회의에서 나온 낱말로 다시 묻거나, 대화록에서 검색해 보세요.",
@@ -29224,7 +29224,7 @@
     "excerpt": {
       "task": "내 업무",
       "assignedBy": "{{name}} 님이 할당함",
-      "where": "이 일이 나온 부분"
+      "where": "이 업무가 나온 부분"
     },
     "response": {
       "yes": "참석",
@@ -29237,7 +29237,7 @@
       "brief": "핵심",
       "summary": "요약",
       "full": "대화록",
-      "ask": "질문",
+      "ask": "에이전트에게 질문",
       "decisions": "결정 사항",
       "find": "대화록에서 검색",
       "found": "발언 {{total}}개 중 {{count}}개",
@@ -29257,7 +29257,7 @@
       "requested": "{{name}} 님에게 요청했습니다.",
       "requestButton": "회의록 보기 요청",
       "card": "보는 범위",
-      "scopeOutside": "{{names}} 님은 자기 업무와 그 일이 나온 부분만 봅니다."
+      "scopeOutside": "{{names}} 님은 자기 업무와 그 업무가 나온 부분만 봅니다."
     },
     "agenda": {
       "previousWeek": "이전 주",
@@ -29288,8 +29288,8 @@
       "dismiss": "닫기"
     },
     "task": {
-      "from": "회의 「{{title}}」에서 나온 일 · {{day}}",
-      "source": "근거 문장 보기"
+      "from": "회의 「{{title}}」에서 나온 업무 · {{day}}",
+      "source": "나온 부분 보기"
     },
     "whisper": {
       "whoGroup": "이 채팅의 {{count}}명",
@@ -29333,7 +29333,7 @@
     "agent": {
       "aside": "나에게 보낸 것",
       "open": "대화 열기",
-      "proposals": "내 몫으로 보이는 일 {{count}}건"
+      "proposals": "내 업무 {{count}}건"
     },
     "role": {
       "host": "주최",
@@ -29417,7 +29417,7 @@
       "all": "모두 보기 {{count}}",
       "filter": "활동 종류",
       "filterAll": "전체",
-      "filterFinished": "에이전트가 끝낸 일",
+      "filterFinished": "에이전트가 끝낸 작업",
       "empty": "에이전트에게 업무를 맡기면 이번 주 활동이 여기에 모입니다.",
       "confirmed": "내가 확인함",
       "unconfirmed": "내 확인 전",
@@ -29433,7 +29433,7 @@
       "researchDone": "· “경쟁사 프로모션 조사”를 끝냈습니다",
       "me": "나",
       "answered": "· 답을 골랐습니다: {{choice}}",
-      "meetingStarted": "· 회의를 시작했습니다. 회의 에이전트가 기록하고 있습니다",
+      "meetingStarted": "· 회의를 시작했습니다. 회의 에이전트가 녹음하고 있습니다",
       "minutesSent": "· 「{{title}}」의 회의록을 {{count}}명에게 보냈습니다",
       "tookFollowUp": "· 회의 「{{title}}」에서 「{{task}}」 업무를 내 업무로 받았습니다",
       "assignedFollowUp": "· 회의 「{{title}}」에서 「{{task}}」 업무를 나에게 할당했습니다",
@@ -29449,9 +29449,9 @@
       "stagePlan": "계획",
       "stageWork": "작업",
       "stageReview": "검토",
-      "title": "에이전트와 봇",
+      "title": "에이전트",
       "colWho": "이름",
-      "colDoing": "지금 하는 일",
+      "colDoing": "지금 하는 작업",
       "colState": "상태",
       "colProgress": "진행",
       "colLast": "마지막 활동",
@@ -29474,7 +29474,7 @@
       "tasksSub": "오늘 마감 {{count}}건",
       "waiting": "내 확인 필요",
       "waitingSub": "에이전트 {{agents}}, 회의 {{meetings}}",
-      "agentDone": "에이전트가 끝낸 일",
+      "agentDone": "에이전트가 끝낸 작업",
       "agentDoneSub": "이번 주 · {{total}}건 중 {{confirmed}}건 확인",
       "late": "지연 · 회신 대기",
       "lateNone": "늦거나 멈춘 업무가 없습니다"
@@ -29496,7 +29496,7 @@
       "nothing": "등록한 앱을 쓰거나 회의를 하면 오늘의 기록이 여기에 모입니다.",
       "scope": "등록한 앱의 사용 시간, 이 앱의 브라우저에서 본 페이지의 주소와 제목, 회의 시간만 기록합니다. 화면 내용은 기록하지 않습니다.",
       "noApp": "업무에 쓰는 앱을 등록하면 사용 시간이 여기에 모입니다.",
-      "unconfirmed": "기록 확인",
+      "unconfirmed": "업무 미정 기록",
       "unconfirmedHint": "업무였는지 골라 주세요.",
       "hours": "{{count}}시간",
       "minutes": "{{count}}분",
@@ -29540,7 +29540,7 @@
       "openMinutes": "회의록 열기"
     },
     "signedOut": {
-      "line": "inAX에 로그인하면 내 업무, 나를 기다리는 것, 에이전트가 하는 일이 여기에 보입니다."
+      "line": "inAX에 로그인하면 내 업무, 나를 기다리는 것, 에이전트의 작업이 여기에 보입니다."
     },
     "preview": {
       "label": "시각",
@@ -29556,7 +29556,7 @@
       "tomorrow": "내일",
       "week": "이번 주",
       "nextWeek": "다음 주",
-      "title": "다가오는 일",
+      "title": "다가오는 일정",
       "calendar": "캘린더",
       "deadline": "마감",
       "prepReady": "준비 자료 있음",
@@ -29576,8 +29576,8 @@
       "writerLine2": "고르시면 본문과 버튼의 문구를 그 안에 맞추겠습니다.",
       "triageLine1": "안내문을 고치려면 새 배송 일정이 필요합니다.",
       "triageLine2": "이민아 님이 물류팀에 다시 물었습니다. 회신이 오면 이어서 하겠습니다.",
-      "calendar": "일정 정리 봇",
-      "calendarDoing": "맡은 일 없음",
+      "calendar": "일정 에이전트",
+      "calendarDoing": "맡은 작업 없음",
       "calendarLine": "다음 주 일정이 바뀌면 알려 드리겠습니다.",
       "recording": "「{{title}}」 녹음 중"
     },
@@ -29644,7 +29644,7 @@
       "jiwoo": "김지우"
     },
     "dayEnd": {
-      "progress": "오늘의 진행",
+      "progress": "진행 기록",
       "status": "상태",
       "save": "저장",
       "shared": "저장 후 보이는 것",
@@ -29697,7 +29697,7 @@
       "reproposed": "요청하신 내용을 진행 기록에 넣었습니다. 다시 확인해 주세요.",
       "send": "전송",
       "started": "1번부터 시작하겠습니다.",
-      "waiting": "알겠습니다. 상태와 기록은 그대로 둡니다. 무엇을 바꿀지 아래에 써 주시면 다시 제안하겠습니다."
+      "waiting": "알겠습니다. 상태와 진행 기록은 그대로 둡니다. 무엇을 바꿀지 아래에 써 주시면 다시 제안하겠습니다."
     },
     "demo": {
       "chip": "데모"
@@ -29737,7 +29737,7 @@
     "proposal": {
       "audienceNote": "확인하면 “{{project}}”의 PM과 팀이 inAX에서 이 상태 변경과 진행 기록을 봅니다.",
       "audienceStatus": "확인하면 “{{project}}”의 PM과 팀이 inAX에서 이 상태 변경을 봅니다. 지금은 나만 봅니다.",
-      "basisTitle": "이 기록의 근거",
+      "basisTitle": "이 진행 기록의 근거",
       "cancelEdit": "취소",
       "confirm": "확인",
       "confirmEdited": "고친 내용으로 확인",
@@ -29759,7 +29759,7 @@
     "script": {
       "choiceA": "나에게 먼저",
       "choiceB": "프로젝트 팀에 바로",
-      "plan": "이렇게 진행하겠습니다.\n\n1. 업무 설명과 지난 기록을 읽습니다.\n2. 진행에 필요한 것 한 가지를 여쭙니다.\n3. 할 일을 항목으로 나누고, 그 목록을 이 대화에 올립니다.",
+      "plan": "이렇게 진행하겠습니다.\n\n1. 업무 설명과 지난 진행 기록을 읽습니다.\n2. 진행에 필요한 것 한 가지를 여쭙니다.\n3. 업무를 항목으로 나누고, 그 목록을 이 대화에 올립니다.",
       "question": "결과를 누구에게 먼저 보일까요?",
       "reportA": "김지우 님에게만 · 짧게",
       "reportB": "캠페인 팀 전체 · 요약 포함",
@@ -29775,8 +29775,8 @@
       "reportPlan": "보고서는 이미 써 두셨으니, 저는 공유에 필요한 것을 준비하겠습니다.\n\n1. 보고서에서 핵심 숫자 세 가지를 뽑습니다.\n2. 보고서를 공유하는 글의 초안을 씁니다.\n3. 초안을 보여 드리고, 상태와 진행 기록을 제안합니다.",
       "reportQuestion": "공유 글을 누구에게 맞춰 쓸까요?",
       "requested": "요청하신 것: “{{text}}”",
-      "next": "지금 업무 설명에서 할 일을 항목으로 나누고 있습니다. 목록이 준비되면 먼저 보실 수 있게 이 대화에 올리겠습니다.",
-      "nextTeam": "지금 업무 설명에서 할 일을 항목으로 나누고 있습니다. 목록이 준비되면 프로젝트 팀이 읽을 수 있게 정리해서 이 대화에 올리겠습니다."
+      "next": "지금 업무 설명을 항목으로 나누고 있습니다. 목록이 준비되면 먼저 보실 수 있게 이 대화에 올리겠습니다.",
+      "nextTeam": "지금 업무 설명을 항목으로 나누고 있습니다. 목록이 준비되면 프로젝트 팀이 읽을 수 있게 써서 이 대화에 올리겠습니다."
     },
     "settings": {
       "cardDescription": "로그인하면 내 업무가 홈과 업무 목록에 보입니다.",

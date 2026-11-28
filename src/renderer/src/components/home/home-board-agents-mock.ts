@@ -77,7 +77,7 @@ export function buildHomeAgents(
     },
     {
       id: 'calendar',
-      name: t('home.agent.calendar', 'Schedule bot'),
+      name: t('home.agent.calendar', 'Schedule agent'),
       doing: t('home.agent.calendarDoing', 'Nothing assigned'),
       state: 'idle',
       stage: 0,
