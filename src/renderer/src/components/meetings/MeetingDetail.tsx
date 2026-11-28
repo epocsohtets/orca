@@ -199,7 +199,9 @@ export function MeetingDetail({
       icon: CircleCheck,
       label: t('meetings.minutes.decisions', 'Decisions'),
       value: meeting.minutes?.decisions.length ?? 0,
-      sub: ''
+      sub: t('meetings.minutes.turns', '{{total}} remarks', {
+        total: meeting.minutes?.transcript.length ?? 0
+      })
     },
     {
       id: 'followUps',

@@ -82,9 +82,6 @@ export function MeetingMinutes({
       <>
         <TabsContent value="brief">
           <div className="flex flex-col gap-2">
-            <p className="max-w-prose px-4 text-[13px] leading-5 text-foreground">
-              {minutes.summary.join(' ')}
-            </p>
             <section aria-label={t('meetings.minutes.decisions', 'Decisions')}>
               <h3 className={HOME_GROUP_CLASS}>
                 {t('meetings.minutes.decisions', 'Decisions')}

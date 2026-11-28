@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Bot, CalendarClock, X } from 'lucide-react'
 import { useTranslate } from '@/i18n/use-translate'
 import { Button } from '@/components/ui/button'
@@ -11,6 +11,7 @@ import { useMeetingText } from './MeetingParts'
 import { isSeen, markSeen, scenarioNow, useMeetings } from './meetings-store'
 
 const SOON_MS = 10 * 60_000
+const NOTICE_STAY_MS = 8_000
 
 /** Brings a meeting to the person: one that is about to start, or what the meeting agent just sent. */
 export function MeetingNoticeCard(): React.JSX.Element | null {
@@ -18,6 +19,8 @@ export function MeetingNoticeCard(): React.JSX.Element | null {
   const text = useMeetingText()
   const state = useMeetings()
   const onBotPage = useAppStore((s) => s.activeView === 'meetingBot')
+  // What the meeting agent sent shows over Home and Meetings only: it does not follow me into a conversation.
+  const onBoard = useAppStore((s) => s.activeView === 'home' || s.activeView === 'meetings')
   const now = scenarioNow()
   const unread = botItemsFor(state.viewerId, state.meetings, state.tasks).filter(
     (item) => !isSeen(state, item.key) && !isSeen(state, `notice:${item.key}`)
@@ -31,7 +34,7 @@ export function MeetingNoticeCard(): React.JSX.Element | null {
       m.startsAt - now <= SOON_MS &&
       !isSeen(state, `notice:soon:${m.id}`)
   )
-  const item = onBotPage ? undefined : unread.at(-1)
+  const item = onBotPage || !onBoard ? undefined : unread.at(-1)
   // Recording that someone else started on a meeting I am in.
   const recording = state.meetings.find(
     (m) =>
@@ -96,6 +99,16 @@ export function MeetingNoticeCard(): React.JSX.Element | null {
               run: () => openMeeting(soon.id)
             }
           : null
+  // What the meeting agent sent is also in its list and in Recent activity, so its notice leaves by itself
+  // and does not stay over the next screen. A notice about a time (recording, starting soon) stays.
+  const passingKey = notice && item && !recording ? notice.key : null
+  useEffect(() => {
+    if (!passingKey) {
+      return
+    }
+    const timer = window.setTimeout(() => markSeen([passingKey]), NOTICE_STAY_MS)
+    return () => window.clearTimeout(timer)
+  }, [passingKey])
   if (!notice) {
     return null
   }

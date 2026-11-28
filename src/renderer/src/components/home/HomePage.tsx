@@ -9,7 +9,7 @@ import { openInaxTask } from '@/components/task-page/inax/inax-source-selection'
 import { useAllAgentPaneThreads } from '@/components/activity/threads/use-agent-pane-threads'
 import { signInInaxMock } from '@/lib/inax-mock-account'
 import { useBots } from '@/lib/bot-catalog'
-import { homeTaskTab, type HomeTaskTab } from './home-board'
+import { homeTaskTab, sortHomeTasks, type HomeTaskTab } from './home-board'
 import { useHomeBoardStore } from './home-board-store'
 import {
   openMeeting,
@@ -125,6 +125,7 @@ export default function HomePage(): React.JSX.Element {
     }
   }
 
+  const lateFirst = sortHomeTasks(tasks.filter((task) => homeTaskTab(task).includes('late')))[0]
   const dayEndRows = useHomeDayEndRows(board.dayEnd, tasks, projects, viewerId)
   const firstRun =
     previewFirstRun || (!signedIn && !myApps?.length && !hasAgentThread && bots.length === 0)
@@ -224,6 +225,7 @@ export default function HomePage(): React.JSX.Element {
                     counts={view.counts}
                     agentFinished={view.agentFinished}
                     agentConfirmed={view.agentConfirmed}
+                    lateFirst={lateFirst ? `${lateFirst.dueLabel} · ${lateFirst.title}` : ''}
                     onSelect={selectTile}
                   />
                 ) : null}

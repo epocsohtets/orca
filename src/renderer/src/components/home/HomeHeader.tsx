@@ -70,11 +70,14 @@ export function HomeTiles({
   counts,
   agentFinished,
   agentConfirmed,
+  lateFirst,
   onSelect
 }: {
   counts: HomeBoardCounts
   agentFinished: number
   agentConfirmed: number
+  /** The first late row, in the row's own words: every tile has a line under its number. */
+  lateFirst: string
   onSelect: (tile: HomeTileId) => void
 }): React.JSX.Element {
   const t = useTranslate()
@@ -112,7 +115,8 @@ export function HomeTiles({
       icon: Clock,
       label: t('home.tiles.late', 'Late · awaiting others'),
       value: counts.late,
-      sub: '',
+      sub: lateFirst,
+      tone: 'alert',
       alert: counts.late > 0
     }
   ]

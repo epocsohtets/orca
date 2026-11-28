@@ -95,6 +95,11 @@ export const WEEKLY_FOLLOW_UPS: [string, string, string, number][] = [
 
 export const WEEKLY_ASKS: MeetingAskAnswer[] = [
   {
+    keywords: ['언제까지', '오늘 안', '기한'],
+    answer: '머리 문구는 마코 님이 오늘 안에 고릅니다.',
+    turnId: 't4'
+  },
+  {
     keywords: ['날짜', '언제', '시작'],
     answer: '캠페인은 다음 달 5일에 시작합니다.',
     turnId: 't3'

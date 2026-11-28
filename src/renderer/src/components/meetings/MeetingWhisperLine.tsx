@@ -113,7 +113,7 @@ export function MeetingWhisperLine({
           data-meeting-whisper-dismiss=""
           onClick={() => dismissWhisper(conversation.id)}
         >
-          {t('meetings.whisper.dismiss', 'No thanks')}
+          {t('meetings.whisper.dismiss', 'Don’t create')}
         </Button>
       </div>
     </div>

@@ -97,7 +97,7 @@ export function HomeCard({
                 {...item.data}
               >
                 {/* A narrow header cuts a long tab name before it pushes the link out of the card. */}
-                <span className="truncate">{item.label}</span>
+                <span className="min-w-[2em] truncate">{item.label}</span>
                 {item.count === undefined ? null : (
                   <span className="text-muted-foreground tabular-nums">{item.count}</span>
                 )}

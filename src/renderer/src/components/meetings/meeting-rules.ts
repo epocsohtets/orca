@@ -88,9 +88,16 @@ export function answerQuestion(
   answers: readonly MeetingAskAnswer[],
   question: string
 ): MeetingAskAnswer | null {
-  return (
-    answers.find((entry) => entry.keywords.some((keyword) => question.includes(keyword))) ?? null
-  )
+  // The longest word that matches decides: "언제까지" names the question better than "언제" or "문구" alone.
+  let best: { answer: MeetingAskAnswer; length: number } | null = null
+  for (const answer of answers) {
+    for (const keyword of answer.keywords) {
+      if (question.includes(keyword) && (!best || keyword.length > best.length)) {
+        best = { answer, length: keyword.length }
+      }
+    }
+  }
+  return best?.answer ?? null
 }
 
 /** The next free INAX number after every id already in use. */
