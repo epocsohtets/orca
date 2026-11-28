@@ -2,18 +2,15 @@ import { create } from 'zustand'
 import { useAppStore } from '@/store'
 import { worksWithoutCode } from '../../../../../shared/settings/work-styles'
 
-export type InaxTaskView = 'detail' | 'chat'
-
 type InaxSourceSelection = {
   /** Null until the person picks a source; then inAX is the default for people who work without code. */
   selected: boolean | null
-  /** The task that is open, and whether its page or its conversation shows. */
+  /** The task whose conversation is open; null shows the board. */
   taskId: string | null
-  view: InaxTaskView
 }
 
 const STORAGE_KEY = 'orca.poc.inax-source-selection'
-const EMPTY: InaxSourceSelection = { selected: null, taskId: null, view: 'detail' }
+const EMPTY: InaxSourceSelection = { selected: null, taskId: null }
 
 function readSaved(): InaxSourceSelection {
   try {
@@ -43,8 +40,8 @@ export function useInaxSelected(): boolean {
   return selected ?? withoutCode
 }
 
-/** Opens Tasks on inAX: its list, one task's page, or that task's conversation. */
-export function openInaxTask(taskId: string | null, view: InaxTaskView = 'detail'): void {
-  useInaxSourceSelection.setState({ selected: true, taskId, view })
+/** Opens Work: the board, or one task's conversation. */
+export function openInaxTask(taskId: string | null): void {
+  useInaxSourceSelection.setState({ selected: true, taskId })
   useAppStore.getState().openTaskPage()
 }

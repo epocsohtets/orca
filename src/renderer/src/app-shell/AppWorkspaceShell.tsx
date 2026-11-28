@@ -46,6 +46,7 @@ const ArtifactsPage = lazy(() => import('../components/artifacts/ArtifactsPage')
 const WorkspaceSpacePage = lazy(() => import('../components/workspace-space/WorkspaceSpacePage'))
 const MobilePage = lazy(() => import('../components/mobile/MobilePage'))
 const HomePage = lazy(() => import('../components/home/HomePage'))
+const WorkPage = lazy(() => import('../components/work/WorkPage'))
 const HandToBotFlow = lazy(() =>
   import('../components/bots/hand-to-bot/HandToBotFlow').then((module) => ({
     default: module.HandToBotFlow
@@ -144,12 +145,14 @@ function HandToBotMount(): React.JSX.Element | null {
 
 function ActivePage({ layout }: { layout: AppChromeLayout }): React.JSX.Element {
   const { activeView, hasActiveWorktree, activePendingCreationId, creationLayoutActive } = layout
+  // Without Code the Tasks slot is the work board; the code trackers are not this person's.
+  const hideDeveloper = useAppStore((s) => hidesDeveloperChrome(s.settings))
   return (
     <>
       {activeView === 'settings' ? <Settings /> : null}
       {activeView === 'skills' ? <SkillsPage /> : null}
       {activeView === 'artifacts' ? <ArtifactsPage /> : null}
-      {activeView === 'tasks' ? <TaskPage /> : null}
+      {activeView === 'tasks' ? hideDeveloper ? <WorkPage /> : <TaskPage /> : null}
       {activeView === 'meetings' ? <MeetingsPage /> : null}
       {activeView === 'meetingBot' ? <MeetingBotChatPage /> : null}
       {activeView === 'automations' ? <AutomationsPage /> : null}

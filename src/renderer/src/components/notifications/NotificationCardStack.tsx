@@ -76,7 +76,7 @@ export function NotificationCardStack({ children }: { children: ReactNode }): Re
     <div
       ref={stackRef}
       style={STACK_STYLE}
-      className="notification-card-stack pointer-events-none fixed right-0 z-50 flex w-[calc(360px_+_2rem)] max-w-[100vw] flex-col-reverse gap-2 overflow-y-auto scrollbar-sleek data-overflowing:[--stack-shadow-room-y:0px]! [&>*]:pointer-events-auto [&>*]:relative [&>*]:z-[calc(10_-_sibling-index())] [&>*]:shrink-0 max-[480px]:left-0 max-[480px]:w-auto [&_[data-slot=card]]:border-(--notice-border) [&_[data-slot=card]]:shadow-notice"
+      className="notification-card-stack pointer-events-none fixed right-(--side-panel-inset,0px) z-50 flex w-[calc(360px_+_2rem)] max-w-[100vw] flex-col-reverse gap-2 overflow-y-auto scrollbar-sleek data-overflowing:[--stack-shadow-room-y:0px]! [&>*]:pointer-events-auto [&>*]:relative [&>*]:z-[calc(10_-_sibling-index())] [&>*]:shrink-0 max-[480px]:left-0 max-[480px]:w-auto [&_[data-slot=card]]:border-(--notice-border) [&_[data-slot=card]]:shadow-notice"
     >
       {children}
     </div>

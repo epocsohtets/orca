@@ -1,8 +1,8 @@
-/** A task's status as inAX holds it. */
+/** A task's status: the board's column, and what inAX holds. */
 export type InaxStatus = 'todo' | 'inProgress' | 'review' | 'done'
 export const INAX_STATUSES: readonly InaxStatus[] = ['todo', 'inProgress', 'review', 'done']
 
-/** What an agent asks to put on inAX. Nothing of it is on the task until I confirm it. */
+/** What an agent would put on inAX. Nothing of it is on the task until I save its day-end card. */
 export type HomeProposal = { status: InaxStatus; note: string }
 
 export type HomeTaskNote = {
@@ -12,52 +12,53 @@ export type HomeTaskNote = {
   status: InaxStatus
   /** Who wrote it and who let it through: the agent's words as I confirmed them, or my own. */
   by: 'agentConfirmed' | 'me'
-  /** False for a note saved without a status change; absent on notes from a proposal, which always change it. */
+  /** False for a note saved without a status change. */
   statusChanged?: boolean
 }
 
-/** What inAX holds for a task beyond the sample: only confirmed changes get here. */
-export type HomeTaskRecord = { status?: InaxStatus; notes: HomeTaskNote[] }
-
-export type HomeLoopDecision = { kind: 'confirmed' | 'declined'; at: number }
+/** What inAX holds for a task beyond the sample: a status I set by hand, and what I saved at day end. */
+export type HomeTaskRecord = {
+  status?: InaxStatus
+  /** When the status last went to inAX. */
+  statusAt?: number
+  notes: HomeTaskNote[]
+}
 
 /** One task's conversation with its agent, as far as I have taken it. */
 export type HomeTaskLoop = {
   startedAt: number
-  /** My answer to the first proposal ("in progress"). */
-  start?: HomeLoopDecision
-  /** My answer to the agent's one question. */
-  answer?: { choiceId: string; at: number }
-  /** My answer to the closing proposal; saying something after "not yet" clears it. */
-  final?: HomeLoopDecision
-  /** What I typed, and which scripted reply it got. */
-  said: { at: number; text: string; reply: 'noted' | 'repropose' }[]
+  /** The folder made for the task when it started. */
+  folder?: string
+  /** My answer to the agent's one question: a choice, or my own words. */
+  answer?: { choiceId: string | null; text?: string; at: number }
+  /** Set when I saved the day-end card that held the agent's closing proposal. */
+  final?: { at: number }
+  /** What I typed in the conversation. */
+  said: { at: number; text: string }[]
 }
 
-export type HomeLoopPhase = 'working' | 'question' | 'proposal' | 'confirmed' | 'declined'
+/**
+ * Where a conversation stands. Only `question` waits on me, and it asks for information, never for
+ * permission; `result` is a finished draft whose proposal waits, unannounced, for the day-end cards.
+ */
+export type HomeLoopPhase = 'working' | 'question' | 'result' | 'confirmed'
 
 // shortcut: the scripted agent "works" for seconds, not minutes, so the loop can be walked in one sitting; a
 // real agent reports its own progress.
 export const HOME_LOOP_FIRST_WORK_MS = 25_000
 export const HOME_LOOP_SECOND_WORK_MS = 20_000
 
-/** The agent starts once I have answered its first proposal, either way; null until then. */
-export function homeLoopQuestionAt(loop: HomeTaskLoop): number | null {
-  return loop.start ? loop.start.at + HOME_LOOP_FIRST_WORK_MS : null
+export function homeLoopQuestionAt(loop: HomeTaskLoop): number {
+  return loop.startedAt + HOME_LOOP_FIRST_WORK_MS
 }
 
-/** When the draft and the closing proposal arrive; null until I have answered the question. */
+/** When the result arrives; null until I have answered the question. */
 export function homeLoopDraftAt(loop: HomeTaskLoop): number | null {
   return loop.answer ? loop.answer.at + HOME_LOOP_SECOND_WORK_MS : null
 }
 
 export function homeLoopPhase(loop: HomeTaskLoop, now: number): HomeLoopPhase {
-  const questionAt = homeLoopQuestionAt(loop)
-  if (questionAt === null) {
-    // Waiting on me is never shown as working.
-    return 'proposal'
-  }
-  if (now < questionAt) {
+  if (now < homeLoopQuestionAt(loop)) {
     return 'working'
   }
   const draftAt = homeLoopDraftAt(loop)
@@ -67,50 +68,5 @@ export function homeLoopPhase(loop: HomeTaskLoop, now: number): HomeLoopPhase {
   if (now < draftAt) {
     return 'working'
   }
-  return loop.final ? loop.final.kind : 'proposal'
-}
-
-/** The proposal waiting for my answer right now, if any: first "in progress", at the end the status and note. */
-export function homeLoopOpenProposal(
-  loop: HomeTaskLoop,
-  now: number,
-  finalNote: string
-): (HomeProposal & { step: 'start' | 'final' }) | null {
-  if (homeLoopPhase(loop, now) !== 'proposal') {
-    return null
-  }
-  return loop.start
-    ? { step: 'final', status: 'review', note: finalNote }
-    : { step: 'start', status: 'inProgress', note: '' }
-}
-
-/**
- * The only way an agent's proposal reaches a task: I confirmed it, as proposed or as I edited it. The status
- * changes, and a non-empty note is stored with who wrote it and who let it through.
- */
-export function confirmHomeProposal(
-  record: HomeTaskRecord | undefined,
-  proposal: HomeProposal,
-  at: number
-): HomeTaskRecord {
-  const note = proposal.note.trim()
-  return {
-    status: proposal.status,
-    notes: note
-      ? [
-          ...(record?.notes ?? []),
-          { id: `note-${at}`, at, text: note, status: proposal.status, by: 'agentConfirmed' }
-        ]
-      : (record?.notes ?? [])
-  }
-}
-
-/** Typing after "not yet" asks the agent to propose again; at any other time it is only noted. */
-export function sayToHomeLoop(loop: HomeTaskLoop, text: string, at: number): HomeTaskLoop {
-  const repropose = loop.final?.kind === 'declined'
-  return {
-    ...loop,
-    final: repropose ? undefined : loop.final,
-    said: [...loop.said, { at, text, reply: repropose ? 'repropose' : 'noted' }]
-  }
+  return loop.final ? 'confirmed' : 'result'
 }

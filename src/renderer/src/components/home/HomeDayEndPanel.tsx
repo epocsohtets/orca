@@ -10,6 +10,7 @@ import { BotItemStepper } from '@/components/bots/items/BotItemStepper'
 import { useBotItemChords } from '@/components/bots/items/use-bot-item-chords'
 import { personName } from '@/components/meetings/meeting-people'
 import { HOME_META_CLASS, HomeProjectDot } from './HomeCard'
+import { useSidePanelInset } from './use-side-panel-inset'
 import { HomeDayEndChipLine, HomeDayEndRecords, HomeDayEndTimeline } from './HomeDayEndParts'
 import type { HomeProjectId, HomeTask } from './home-board'
 import type { HomeProject } from './home-board-mock'
@@ -83,6 +84,7 @@ export function HomeDayEndPanel({
     }
   }
   useBotItemChords(root, { back: onClose, step })
+  useSidePanelInset()
   useEffect(() => {
     // A card with a line to write starts in the box; the others start on Save, so Enter saves either way.
     ;(box.current ?? saveButton.current)?.focus({ preventScroll: true })
@@ -121,7 +123,7 @@ export function HomeDayEndPanel({
       byAgent: text !== '' && text === card.suggestion,
       status,
       current,
-      answersProposal: task.proposalStep === 'final'
+      answersProposal: task.proposal !== undefined
     }
     shared =
       [
@@ -229,7 +231,7 @@ export function HomeDayEndPanel({
                   </p>
                 ) : undefined
               }
-              label={t('meetings.followUps.colOwner', 'Owner')}
+              label={t('home.dayEnd.oneOwner', 'Owner · pick one')}
               chips={card.peopleIds.map((id, index) => ({
                 id,
                 label: index === 0 ? me : personName(id),
@@ -337,11 +339,19 @@ export function HomeDayEndPanel({
           <label className="flex flex-col gap-0.5">
             <span className="flex items-center gap-2 px-2 pt-1 text-xs text-muted-foreground">
               <span className="min-w-0 flex-1">{progress}</span>
-              {/* The key that takes the line written ahead, shown while that line is. */}
-              {suggestion && !draft.text ? (
-                <ShortcutKeyCombo keys={['Tab']} size="compact" />
-              ) : null}
             </span>
+            {/* The line written ahead is named as the agent's, with the key that takes it: grey text alone read
+                as either a hint or a saved note. */}
+            {suggestion && !draft.text ? (
+              <span
+                className="flex items-center gap-1.5 px-2 text-xs text-muted-foreground"
+                data-home-day-end-ahead=""
+              >
+                {t('home.dayEnd.ahead', 'Written by the agent')}
+                <ShortcutKeyCombo keys={['Tab']} size="compact" />
+                {t('home.dayEnd.take', 'to edit')}
+              </span>
+            ) : null}
             <ImeTextarea
               ref={box}
               // Remounted per card, so one card's line never shows in the next.

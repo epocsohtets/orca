@@ -15,7 +15,7 @@ export type HomeProjectId = 'campaign' | 'promo' | 'support' | 'brand'
 export type HomeTaskTab = 'today' | 'waiting' | 'late' | 'done'
 export type HomeAgentState = 'waiting' | 'working' | 'blocked' | 'idle'
 
-export type HomeChoice = { id: string; label: string }
+export type HomeChoice = { id: string; label: string; recommended?: boolean }
 
 export type HomeTask = {
   id: string
@@ -46,11 +46,12 @@ export type HomeTask = {
   notes?: HomeTaskNote[]
   /** Where my conversation with its agent stands, when I started one. */
   loop?: HomeLoopPhase
-  /** The proposal waiting for my answer, and which of the two it is. */
+  /** When its status last went to inAX from my own hand. */
+  statusAt?: number
+  /** The folder made for it when I started it with an agent. */
+  folder?: string
+  /** What the agent would put on inAX for its finished draft; it shows only on the day-end card. */
   proposal?: HomeProposal
-  proposalStep?: 'start' | 'final'
-  /** Where the proposed note's claims come from. */
-  proposalBasis?: string[]
   /** The agent's draft exists and is attached to the task. */
   hasDraft?: boolean
 }

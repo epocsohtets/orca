@@ -1,6 +1,7 @@
 import type { AppState } from '@/store/types'
 import { useAppStore } from '@/store/index'
 import { useMeetings } from '@/components/meetings/meetings-store'
+import { useInaxSourceSelection } from '@/components/task-page/inax/inax-source-selection'
 import {
   shouldShowArtifactsButton,
   shouldShowAutomationsButton,
@@ -49,7 +50,11 @@ export function setRailDestinationShown(id: AppRailDestinationId, shown: boolean
 }
 
 const DESTINATION_OPEN: Record<AppRailDestinationId, (state: AppState) => void> = {
-  tasks: (state) => state.openTaskPage(),
+  // The rail opens the board; a task's conversation is reopened from the board or from Home.
+  tasks: (state) => {
+    useInaxSourceSelection.setState({ taskId: null })
+    state.openTaskPage()
+  },
   // The rail opens the list, as it does for Tasks; a meeting is reopened from the list or from Home.
   meetings: (state) => {
     useMeetings.setState({ selectedId: null, composing: null })

@@ -8,8 +8,8 @@ import {
   type InaxStatus
 } from './home-task-loop'
 
-// shortcut: no agent runs on this Mac's dev profile, so the task's agent speaks from this script; replace it
-// with a real agent session when one can read the task and propose through inAX.
+// shortcut: no agent runs behind a task on this build, so the task's agent speaks from this script; replace it
+// with a real agent session when one can read the task and ask through the item ask.
 
 export type HomeLoopScript = {
   plan: string
@@ -22,14 +22,9 @@ export type HomeLoopScript = {
   draft: string | null
   /** What the agent says after my answer when there is no draft. */
   next: string
-  /** The progress note the agent proposes, with what I asked for after "not yet". */
+  /** The progress note the agent writes ahead for the day-end card. */
   note: string
-  /** Where each claim of the note comes from, one line each. */
-  basis: string[]
 }
-
-/** The draft's row id ends with this; a running number comes before it. */
-export const HOME_LOOP_DRAFT_MESSAGE_ID = 'loop-draft'
 
 export function inaxStatusLabels(t: Translate): Record<InaxStatus, string> {
   return {
@@ -43,81 +38,64 @@ export function inaxStatusLabels(t: Translate): Record<InaxStatus, string> {
 /** "to <status>", worded per status so Korean gets the right particle. */
 export function inaxStatusTo(t: Translate): Record<InaxStatus, string> {
   return {
-    todo: t('taskLoop.statusTo.todo', 'to “To do”'),
-    inProgress: t('taskLoop.statusTo.inProgress', 'to “In progress”'),
-    review: t('taskLoop.statusTo.review', 'to “Review requested”'),
-    done: t('taskLoop.statusTo.done', 'to “Done”')
+    todo: t('taskLoop.statusTo.todo', 'to To do'),
+    inProgress: t('taskLoop.statusTo.inProgress', 'to In progress'),
+    review: t('taskLoop.statusTo.review', 'to Review requested'),
+    done: t('taskLoop.statusTo.done', 'to Done')
   }
 }
 
-/** The script for one task, as far as my answers have shaped it. */
+/** The Korean object particle for a title; empty for a title that does not end in Hangul. */
+function objectParticle(title: string): string {
+  const code = title.trim().charCodeAt(title.trim().length - 1) - 0xac00
+  return code < 0 || code > 11171 ? '' : code % 28 === 0 ? '를' : '을'
+}
+
+/** The line a status change by my own hand leaves: in the conversation, and nowhere else. */
+export function homeStatusMovedLine(t: Translate, title: string, status: InaxStatus): string {
+  return t('taskLoop.chat.moved', 'Moved {{title}} {{to}}', {
+    title,
+    particle: objectParticle(title),
+    to: inaxStatusTo(t)[status]
+  })
+}
+
+/** The script for one task, as far as my answer has shaped it. */
 export function buildHomeLoopScript(
   t: Translate,
   task: HomeTask,
   loop?: HomeTaskLoop
 ): HomeLoopScript {
   const second = loop?.answer?.choiceId === 'b'
-  const requests = (loop?.said ?? [])
-    .filter((said) => said.reply === 'repropose')
-    .map((said) => t('taskLoop.script.requested', 'You asked for: “{{text}}”', { text: said.text }))
-  const withRequests = (note: string): string => [note, ...requests].join('\n')
   if (task.id === 'report') {
     const numbers = t(
       'taskLoop.script.reportNumbers',
       '- Visitors: 112% of the target\n- Sign-up conversion: 3.4% (2.9% the month before)\n- Ad spend: 96% of the budget'
     )
-    const closing = t(
-      'taskLoop.script.reportClosing',
-      'Please read the report and leave your comments on this task.'
-    )
     return {
       plan: t(
         'taskLoop.script.reportPlan',
-        'The report is already written, so I will prepare what sharing it needs.\n\n1. Pull the three key numbers out of the report.\n2. Draft the message that shares it.\n3. Show you the draft, then propose a status and a progress note.'
+        'This is how I will do it.\n\n1. Collect last month’s campaign numbers: visitors, sign-up conversion, ad spend.\n2. Write the draft of the results report.\n3. Attach the draft to this conversation and to the task.'
       ),
-      question: t(
-        'taskLoop.script.reportQuestion',
-        'Who should the sharing message be written for?'
-      ),
+      question: t('taskLoop.script.reportQuestion', 'Should the report include the agency’s fee?'),
       choices: [
-        { id: 'a', label: t('taskLoop.script.reportA', 'Kim Jiwoo only · short') },
-        { id: 'b', label: t('taskLoop.script.reportB', 'The whole campaign team · with a summary') }
+        { id: 'a', label: t('taskLoop.script.reportA', 'Include it'), recommended: true },
+        { id: 'b', label: t('taskLoop.script.reportB', 'Leave it out') }
       ],
       next: '',
-      draft: second
-        ? `${t(
-            'taskLoop.script.reportDraftTeam',
-            '**Sharing message for last month’s campaign report (draft · to the whole campaign team)**\n\nCampaign team, here is last month’s campaign report.\n\n**Summary**\n\nMore people visited than we aimed for, and more of them signed up. Ad spend stayed inside the budget.'
-          )}\n\n${numbers}\n\n${closing}`
-        : `${t(
-            'taskLoop.script.reportDraftOne',
-            '**Sharing message for last month’s campaign report (draft · to Kim Jiwoo)**\n\nJiwoo, here is last month’s campaign report. Three numbers matter most.'
-          )}\n\n${numbers}\n\n${closing}`,
-      note: withRequests(
-        second
-          ? t(
-              'taskLoop.script.reportNoteTeam',
-              'Drafted the message that shares last month’s campaign report with the whole campaign team. It has a summary paragraph and three numbers copied from the report: visitors, sign-up conversion and ad spend. The message has not been sent.'
-            )
-          : t(
-              'taskLoop.script.reportNoteOne',
-              'Drafted the short message that shares last month’s campaign report with Kim Jiwoo. It has three numbers copied from the report: visitors, sign-up conversion and ad spend. The message has not been sent.'
-            )
-      ),
-      basis: [
-        t(
-          'taskLoop.script.reportBasis1',
-          'Visitors, 112% of the target: report page 2, “Visits” table, total row'
-        ),
-        t(
-          'taskLoop.script.reportBasis2',
-          'Sign-up conversion, 3.4% and 2.9%: report page 3, “Sign-ups” table, this month and last month'
-        ),
-        t(
-          'taskLoop.script.reportBasis3',
-          'Ad spend, 96% of the budget: report page 5, “Cost” table, spent ÷ budget'
-        )
-      ]
+      draft: `${t(
+        'taskLoop.script.reportDraft',
+        '**Last month’s campaign results report (draft)**\n\n**Summary**\n\nMore people visited than we aimed for, and more of them signed up. Ad spend stayed inside the budget.'
+      )}\n\n${numbers}${second ? '' : `\n${t('taskLoop.script.reportAgency', '- Agency fee: 18% of ad spend')}`}`,
+      note: second
+        ? t(
+            'taskLoop.script.reportNoteWithout',
+            'Wrote the draft of last month’s campaign results report: visitors, sign-up conversion and ad spend. The agency’s fee is left out. Please review it.'
+          )
+        : t(
+            'taskLoop.script.reportNote',
+            'Wrote the draft of last month’s campaign results report: visitors, sign-up conversion, ad spend and the agency’s fee. Please review it.'
+          )
     }
   }
   return {
@@ -127,7 +105,7 @@ export function buildHomeLoopScript(
     ),
     question: t('taskLoop.script.question', 'Who should the list be written for?'),
     choices: [
-      { id: 'a', label: t('taskLoop.script.choiceA', 'For me') },
+      { id: 'a', label: t('taskLoop.script.choiceA', 'For me'), recommended: true },
       { id: 'b', label: t('taskLoop.script.choiceB', 'For the project team') }
     ],
     draft: null,
@@ -140,22 +118,37 @@ export function buildHomeLoopScript(
           'taskLoop.script.next',
           'I am splitting the task into items now. When the list is ready I will put it in this conversation.'
         ),
-    note: '',
-    basis: []
+    note: ''
   }
 }
 
-/** The transcript says what was said, not when: the sample day keeps its own clock on Home and on notes. */
+export const HOME_LOOP_ASKED_ROW = 'loop-asked'
+export const HOME_LOOP_MOVED_ROW = 'loop-moved'
+export const HOME_LOOP_ANSWER_ROW = 'loop-answer'
+
 function message(
   id: string,
   role: NativeChatMessage['role'],
   at: number,
   text: string
-): NativeChatMessage & { at: number } {
-  return { id, role, source: 'transcript', timestamp: null, at, blocks: [{ type: 'text', text }] }
+): NativeChatMessage {
+  return { id, role, source: 'transcript', timestamp: at, blocks: [{ type: 'text', text }] }
 }
 
-/** The conversation so far: what the script has said by `now`, and what I answered. */
+/** My answer to the question, in my words or the choice's. */
+export function homeLoopAnswerText(script: HomeLoopScript, loop: HomeTaskLoop): string {
+  return (
+    loop.answer?.text ??
+    script.choices.find((entry) => entry.id === loop.answer?.choiceId)?.label ??
+    ''
+  )
+}
+
+/**
+ * The conversation so far: what the script has said by `now`, and what I said. The agent states its plan and
+ * starts; it asks for no permission at any point. Its question and my answer to it are item rows, drawn
+ * between these messages (homeLoopEventTimes).
+ */
 export function buildHomeLoopTranscript(
   t: Translate,
   task: HomeTask,
@@ -163,8 +156,6 @@ export function buildHomeLoopTranscript(
   now: number
 ): NativeChatMessage[] {
   const script = buildHomeLoopScript(t, task, loop)
-  const status = inaxStatusLabels(t)
-  const to = inaxStatusTo(t)
   const rows = [
     message(
       'loop-kickoff',
@@ -172,116 +163,11 @@ export function buildHomeLoopTranscript(
       loop.startedAt,
       t('taskLoop.chat.kickoff', 'Please take this task: {{title}}', { title: task.title })
     ),
-    message(
-      'loop-plan',
-      'assistant',
-      loop.startedAt + 1,
-      `${t('taskLoop.chat.read', 'I read the task: its description, its deadline ({{due}}) and its notes.', { due: task.dueLabel })}\n\n${script.plan}\n\n${t('taskLoop.chat.proposeStart', 'Before I start, may I change the status {{to}}?', { to: to.inProgress })}`
-    )
+    message('loop-plan', 'assistant', loop.startedAt + 2, script.plan)
   ]
-  const decided = (
-    id: string,
-    decision: HomeTaskLoop['start'],
-    statusName: string,
-    withNote: boolean
-  ): void => {
-    if (!decision) {
-      return
-    }
-    rows.push(
-      message(
-        id,
-        'user',
-        decision.at,
-        decision.kind === 'declined'
-          ? t('taskLoop.chat.declined', 'Not yet: the status and the notes stay as they are.')
-          : withNote
-            ? t(
-                'taskLoop.chat.confirmedNote',
-                'Confirmed: the status is “{{status}}” and the progress note is on the task.',
-                { status: statusName }
-              )
-            : t('taskLoop.chat.confirmed', 'Confirmed: the status is “{{status}}”.', {
-                status: statusName
-              })
-      )
-    )
-  }
-  decided('loop-start-decision', loop.start, status.inProgress, false)
-  if (loop.start) {
-    rows.push(
-      message(
-        'loop-started',
-        'assistant',
-        loop.start.at + 1,
-        t('taskLoop.chat.started', 'I am starting with step 1.')
-      )
-    )
-  }
-  const questionAt = homeLoopQuestionAt(loop)
-  if (questionAt !== null && now >= questionAt) {
-    rows.push(
-      message(
-        'loop-question',
-        'assistant',
-        questionAt,
-        t('taskLoop.chat.ask', 'I need one thing from you before I go on: {{question}}', {
-          question: script.question
-        })
-      )
-    )
-  }
-  if (loop.answer) {
-    const choice = script.choices.find((entry) => entry.id === loop.answer?.choiceId)
-    rows.push(
-      message('loop-answer', 'user', loop.answer.at, choice?.label ?? ''),
-      message(
-        'loop-answer-ack',
-        'assistant',
-        loop.answer.at + 1,
-        t('taskLoop.chat.answerAck', 'Thank you. I will go that way.')
-      )
-    )
-  }
   const draftAt = homeLoopDraftAt(loop)
   if (draftAt !== null && now >= draftAt) {
-    if (script.draft === null) {
-      // Nothing was prepared for this task: the agent says what it does next and asks for no confirmation.
-      rows.push(message('loop-next', 'assistant', draftAt, script.next))
-    } else {
-      rows.push(
-        message(HOME_LOOP_DRAFT_MESSAGE_ID, 'assistant', draftAt, script.draft),
-        message(
-          'loop-propose-final',
-          'assistant',
-          draftAt + 1,
-          t(
-            'taskLoop.chat.proposeFinal',
-            'The draft is ready. May I change the status {{to}} and leave a progress note?',
-            { to: to.review }
-          )
-        )
-      )
-    }
-  }
-  if (loop.final) {
-    decided('loop-final-decision', loop.final, status.review, true)
-    rows.push(
-      message(
-        'loop-final-reply',
-        'assistant',
-        loop.final.at + 1,
-        loop.final.kind === 'confirmed'
-          ? t(
-              'taskLoop.chat.done',
-              'The status and the note are on the task. Tell me if you need anything more.'
-            )
-          : t(
-              'taskLoop.chat.waiting',
-              'Understood. The status and the notes stay as they are. Tell me below what to change, and I will propose again.'
-            )
-      )
-    )
+    rows.push(message('loop-draft', 'assistant', draftAt, script.draft ?? script.next))
   }
   loop.said.forEach((said, index) => {
     rows.push(
@@ -290,20 +176,19 @@ export function buildHomeLoopTranscript(
         `loop-said-reply-${index}`,
         'assistant',
         said.at + 1,
-        said.reply === 'repropose'
-          ? t(
-              'taskLoop.chat.reproposed',
-              'I added your request to the progress note. Please confirm again.'
-            )
-          : t('taskLoop.chat.noted', 'Noted. I will apply it to what I am writing now.')
+        t('taskLoop.chat.noted', 'Noted. I will apply it to what I am writing now.')
       )
     )
   })
-  // Why the number: without timestamps the transcript orders rows by id.
-  return rows
-    .sort((a, b) => a.at - b.at)
-    .map(({ at: _at, ...row }, index) => ({
-      ...row,
-      id: `${String(index).padStart(3, '0')}-${row.id}`
-    }))
+  return rows.sort((a, b) => (a.timestamp ?? 0) - (b.timestamp ?? 0))
+}
+
+/** When the lines between messages fall: the status I moved at the start, and the agent's question. */
+export function homeLoopEventTimes(loop: HomeTaskLoop, now: number): Record<string, number> {
+  const asked = homeLoopQuestionAt(loop)
+  return {
+    [HOME_LOOP_MOVED_ROW]: loop.startedAt + 1,
+    ...(now >= asked ? { [HOME_LOOP_ASKED_ROW]: asked } : {}),
+    ...(loop.answer ? { [HOME_LOOP_ANSWER_ROW]: loop.answer.at } : {})
+  }
 }

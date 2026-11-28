@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { EMPTY_HOME_BOARD_STATE, type HomeBoardState, type HomeTask } from './home-board'
-import { applyHomeTaskLoops, decideHomeProposal } from './home-board-loops'
+import { applyHomeTaskLoops } from './home-board-loops'
+import { saveHomeDayEndTask, undoHomeDayEnd } from './home-day-end'
 import { HOME_LOOP_FIRST_WORK_MS, HOME_LOOP_SECOND_WORK_MS } from './home-task-loop'
 
 const TASK: HomeTask = {
@@ -14,102 +15,71 @@ const TASK: HomeTask = {
   detail: ''
 }
 const START = 1_000_000
-const STARTED_WORK = START + 1_000
-const ANSWERED = STARTED_WORK + HOME_LOOP_FIRST_WORK_MS + 5_000
-const PROPOSED = ANSWERED + HOME_LOOP_SECOND_WORK_MS
+const ASKED = START + HOME_LOOP_FIRST_WORK_MS
+const ANSWERED = ASKED + 5_000
+const RESULT = ANSWERED + HOME_LOOP_SECOND_WORK_MS
 const LABELS = {
   working: () => 'working',
   question: 'question',
-  proposal: 'proposal',
-  confirmed: () => 'confirmed',
-  declined: 'declined'
+  result: 'result',
+  confirmed: () => 'confirmed'
 }
-const script = () => ({
-  question: 'Which?',
-  choices: [],
-  draft: 'The message.',
-  note: 'Drafted the message.',
-  basis: ['Report page 2']
-})
-const board = (at: number, state: HomeBoardState = STARTED): HomeTask =>
-  applyHomeTaskLoops([TASK], state, at, script, LABELS)[0]
+const script = () => ({ question: 'Which?', choices: [], draft: 'The report.', note: 'Wrote it.' })
+// Starting is my own press: the status is "in progress" on inAX from that moment.
 const STARTED: HomeBoardState = {
   ...EMPTY_HOME_BOARD_STATE,
-  loops: {
-    report: {
-      startedAt: START,
-      said: [],
-      start: { kind: 'declined', at: STARTED_WORK },
-      answer: { choiceId: 'a', at: ANSWERED }
-    }
-  }
+  loops: { report: { startedAt: START, said: [] } },
+  inax: { report: { status: 'inProgress', statusAt: START, notes: [] } }
 }
+const ANSWERED_STATE: HomeBoardState = {
+  ...STARTED,
+  loops: { report: { startedAt: START, said: [], answer: { choiceId: 'a', at: ANSWERED } } }
+}
+const board = (at: number, state: HomeBoardState): HomeTask =>
+  applyHomeTaskLoops([TASK], state, at, script, LABELS)[0]
 
-describe('an agent proposal for inAX', () => {
-  it('waits on me, not "working", until I answer the first proposal; then the agent works', () => {
-    const fresh = { ...STARTED, loops: { report: { startedAt: START, said: [] } } }
-    const waiting = board(START + 60_000, fresh)
-    expect(waiting.loop).toBe('proposal')
-    expect(waiting.who).toBe('waiting')
-    expect(waiting.proposalStep).toBe('start')
-    expect(waiting.proposal).toEqual({ status: 'inProgress', note: '' })
-    expect(waiting.status).toBe('todo')
-
-    const declined = decideHomeProposal(
-      fresh,
-      'report',
-      'start',
-      { kind: 'declined' },
-      START + 61_000
-    )
-    const working = board(START + 62_000, { ...fresh, ...declined })
-    expect(working.loop).toBe('working')
-    expect(working.status).toBe('todo')
+describe('a task\u2019s loop with its agent', () => {
+  it('waits on me only for the information question, never for a permission', () => {
+    const waits = [
+      board(START + 1, STARTED),
+      board(ASKED, STARTED),
+      board(ANSWERED + 1, ANSWERED_STATE),
+      board(RESULT, ANSWERED_STATE),
+      board(RESULT + 3_600_000, ANSWERED_STATE)
+    ].map((task) => task.who === 'waiting')
+    expect(waits).toEqual([false, true, false, false, false])
+    expect(board(ASKED, STARTED).question).toBe('Which?')
   })
 
-  it('leaves the task as it was until I confirm, and when I say not yet', () => {
-    const waiting = board(PROPOSED)
-    expect(waiting.proposal).toEqual({ status: 'review', note: 'Drafted the message.' })
-    expect(waiting.status).toBe('todo')
-    expect(waiting.notes).toEqual([])
+  it('keeps the agent\u2019s closing proposal off inAX until its day-end card is saved, and undo takes it back', () => {
+    const result = board(RESULT, ANSWERED_STATE)
+    expect(result.status).toBe('inProgress')
+    expect(result.notes).toEqual([])
+    expect(result.proposal).toEqual({ status: 'review', note: 'Wrote it.' })
 
-    const declined = decideHomeProposal(STARTED, 'report', 'final', { kind: 'declined' }, PROPOSED)
-    expect(declined.inax).toEqual({})
-    expect(board(PROPOSED + 1, { ...STARTED, ...declined }).status).toBe('todo')
-  })
-
-  it('keeps working after my answer when nothing was prepared: no proposal, nothing to confirm', () => {
-    const unprepared = applyHomeTaskLoops(
-      [TASK],
-      STARTED,
-      PROPOSED,
-      () => ({ ...script(), draft: null, note: '' }),
-      LABELS
-    )[0]
-    expect(unprepared.loop).toBe('working')
-    expect(unprepared.proposal).toBeUndefined()
-    expect(unprepared.hasDraft).toBeUndefined()
-  })
-
-  it('applies what I confirmed, as I corrected it, and records who wrote and who confirmed', () => {
-    const confirmed = decideHomeProposal(
-      STARTED,
-      'report',
-      'final',
-      { kind: 'confirmed', proposal: { status: 'done', note: ' Shared with Jiwoo. ' } },
-      PROPOSED + 10
-    )
-    const task = board(PROPOSED + 11, { ...STARTED, ...confirmed })
-    expect(task.status).toBe('done')
-    expect(task.done).toBe(true)
-    expect(task.notes).toEqual([
+    const saved = saveHomeDayEndTask(
+      { ...ANSWERED_STATE },
       {
-        id: `note-${PROPOSED + 10}`,
-        at: PROPOSED + 10,
-        text: 'Shared with Jiwoo.',
-        status: 'done',
-        by: 'agentConfirmed'
+        taskId: 'report',
+        text: 'Wrote it.',
+        byAgent: true,
+        status: 'review',
+        current: 'inProgress',
+        answersProposal: true,
+        at: RESULT + 10
       }
+    )
+    const after = board(RESULT + 11, { ...ANSWERED_STATE, ...saved })
+    expect(after.status).toBe('review')
+    expect(after.notes?.map((note) => [note.text, note.by])).toEqual([
+      ['Wrote it.', 'agentConfirmed']
     ])
+    expect(after.loop).toBe('confirmed')
+
+    const undone = undoHomeDayEnd(saved, 0).state
+    const back = board(RESULT + 12, { ...ANSWERED_STATE, ...undone })
+    expect(back.status).toBe('inProgress')
+    expect(back.notes).toEqual([])
+    expect(back.loop).toBe('result')
   })
 })

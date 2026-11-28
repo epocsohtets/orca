@@ -13,6 +13,7 @@ import {
 import { planHomeDayEnd, type HomeDayEndCard } from './home-day-end'
 import { HOME_LOOP_AGENT_ID, applyHomeTaskLoops } from './home-board-loops'
 import { buildHomeLoopScript, inaxStatusLabels } from './home-task-loop-script'
+import { buildHomeLoopActivity } from './home-board-loop-activity'
 import { buildHomeAgents } from './home-board-agents-mock'
 import { buildHomeActivity, type HomeActivity } from './home-board-activity-mock'
 import { buildHomeTasks, type HomeSampleContext } from './home-board-mock'
@@ -39,8 +40,12 @@ const WEEKDAY_SHORT: Intl.DateTimeFormatOptions = { weekday: 'short' }
 
 export type HomeActivityRow = HomeActivity & { when: string }
 
+const BOARD_LABELS = { resumed: '', addedDue: '', addedAgent: '', doneReport: '' }
+
 export type HomeBoardView = {
   tasks: HomeTask[]
+  /** The work board's cards: my tasks, or 마코's as a colleague sees them. */
+  boardTasks: HomeTask[]
   /** Follow-up tasks of meetings I can see that belong to someone else. */
   otherTasks: HomeTask[]
   /** The meeting of mine being recorded now, if any. */
@@ -112,7 +117,6 @@ export function buildHomeBoardView(
     dayLabel,
     weekday
   })
-  const baseTasks = own ? buildHomeTasks(t, sample) : []
   const loopAgent = t('taskLoop.agent.name', 'Task agent')
   const withLoops = (list: readonly HomeTask[]): HomeTask[] =>
     applyHomeTaskLoops(list, board, args.now, (task, loop) => buildHomeLoopScript(t, task, loop), {
@@ -123,17 +127,16 @@ export function buildHomeBoardView(
       question: t('taskLoop.who.question', 'Waiting for my answer · {{agent}}', {
         agent: loopAgent
       }),
-      proposal: t('taskLoop.who.proposal', 'Waiting for my confirmation · {{agent}}', {
-        agent: loopAgent
-      }),
+      result: t('taskLoop.who.result', 'Result ready'),
       confirmed: (status) =>
         t('taskLoop.who.confirmed', '{{status}} · written by the agent, confirmed by me', {
           status: inaxStatusLabels(t)[status]
-        }),
-      declined: t('taskLoop.who.declined', 'Draft ready · waiting for my confirmation')
+        })
     })
+  // 마코's tasks as inAX holds them: her own list, and what a colleague sees of it on the board.
+  const sampleTasks = buildHomeTasks(t, sample)
   const tasks = withLoops([
-    ...applyHomeBoardState(baseTasks, board, {
+    ...applyHomeBoardState(own ? sampleTasks : [], board, {
       resumed: t('home.task.resumed', 'Agent working · picked up my answer'),
       addedDue: t('home.task.today', 'Today'),
       addedAgent: t('home.task.addedAgent', 'Agent working · just handed over'),
@@ -153,12 +156,7 @@ export function buildHomeBoardView(
             doing: task.title,
             state:
               task.loop === 'working' ? 'working' : task.who === 'waiting' ? 'waiting' : 'idle',
-            stage:
-              task.loop === 'working'
-                ? 2
-                : task.loop === 'question' || task.proposalStep === 'start'
-                  ? 1
-                  : 3,
+            stage: task.loop === 'working' ? 2 : task.loop === 'question' ? 1 : 3,
             last: t('home.agent.justNow', 'Just now'),
             lines: []
           }
@@ -183,7 +181,7 @@ export function buildHomeBoardView(
   const me = t('home.activity.me', 'I')
   const mine: HomeActivity[] = [
     ...Object.entries(board.answers).map(([taskId, choiceId]) => {
-      const task = baseTasks.find((entry) => entry.id === taskId)
+      const task = sampleTasks.find((entry) => entry.id === taskId)
       const choice = task?.choices?.find((entry) => entry.id === choiceId)
       return {
         id: `answer-${taskId}`,
@@ -195,28 +193,7 @@ export function buildHomeBoardView(
         taskId
       }
     }),
-    ...Object.entries(board.loops).flatMap(([taskId, loop]) =>
-      loop.final?.kind === 'confirmed'
-        ? [
-            {
-              id: `loop-confirmed-${taskId}`,
-              day: 0,
-              at: minutes,
-              who: loopAgent,
-              text: t(
-                'taskLoop.activity.confirmed',
-                '· drafted “{{title}}”; the status and the progress note I confirmed are on inAX',
-                { title: tasks.find((task) => task.id === taskId)?.title ?? '' }
-              ),
-              byAgent: true,
-              // Sent for review is work done, not work finished: only Done counts in the tile.
-              finished: board.inax[taskId]?.status === 'done',
-              confirmed: true,
-              taskId
-            }
-          ]
-        : []
-    ),
+    ...buildHomeLoopActivity(t, { board, tasks, minutes, me, agent: loopAgent }),
     ...(fromMeetings.recording
       ? [
           {
@@ -276,6 +253,17 @@ export function buildHomeBoardView(
     : []
   return {
     tasks,
+    // Someone else looking sees 마코's tasks as inAX shows them: status, saved notes, and that an agent is on it.
+    boardTasks: own
+      ? tasks.filter((task) => !task.meetingId)
+      : withLoops(applyHomeBoardState(sampleTasks, board, BOARD_LABELS)).map((task) => ({
+          ...task,
+          assignee: MAKO,
+          question: undefined,
+          proposal: undefined,
+          whoLabel: task.who === 'agentWorking' ? task.whoLabel : undefined,
+          who: task.who === 'agentWorking' ? task.who : null
+        })),
     otherTasks: withLoops(fromMeetings.otherTasks),
     recordingMeetingId: fromMeetings.recording?.id ?? null,
     openTasks: tasks.filter((task) => !task.done && !task.meetingId),

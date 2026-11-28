@@ -1,18 +1,11 @@
 import type { HomeBoardState, HomeChoice, HomeTask } from './home-board'
-import {
-  confirmHomeProposal,
-  homeLoopOpenProposal,
-  homeLoopPhase,
-  type HomeProposal,
-  type HomeTaskLoop,
-  type InaxStatus
-} from './home-task-loop'
+import { homeLoopPhase, type HomeTaskLoop, type InaxStatus } from './home-task-loop'
 
 export const HOME_LOOP_AGENT_ID = 'task-agent'
 
 /**
- * Tasks as inAX and my conversations leave them. A status comes only from the sample or from a proposal I
- * confirmed; a conversation changes who has the task, never its status.
+ * Tasks as inAX and my conversations leave them. A status comes from the sample, from my own hand (starting a
+ * task, moving its card) or from a day-end card I saved; an agent never changes it.
  */
 export function applyHomeTaskLoops(
   tasks: readonly HomeTask[],
@@ -27,14 +20,12 @@ export function applyHomeTaskLoops(
     /** Null when nothing was prepared for the task: the agent then has nothing to propose. */
     draft: string | null
     note: string
-    basis: string[]
   },
   labels: {
     working: (minutes: number) => string
     question: string
-    proposal: string
+    result: string
     confirmed: (status: InaxStatus) => string
-    declined: string
   }
 ): HomeTask[] {
   return tasks.map((task) => {
@@ -44,74 +35,50 @@ export function applyHomeTaskLoops(
       task.status ??
       (task.done ? 'done' : task.who === null || task.meetingId ? 'todo' : 'inProgress')
     const loop = state.loops[task.id]
-    const base = { ...task, status, done: status === 'done', notes: record?.notes ?? [] }
+    const base = {
+      ...task,
+      status,
+      statusAt: record?.statusAt,
+      done: status === 'done',
+      notes: record?.notes ?? []
+    }
     if (!loop) {
       return base
     }
     const scripted = script(task, loop)
     const reached = homeLoopPhase(loop, now)
-    // With no draft there is no closing proposal: after my answer the agent keeps working.
+    // With no draft there is no result: after my answer the agent keeps working.
     const phase =
       scripted.draft === null && loop.answer && reached !== 'question' ? 'working' : reached
     const mine = {
       ...base,
       loop: phase,
+      folder: loop.folder,
       agentId: `${HOME_LOOP_AGENT_ID}:${task.id}`,
       question: undefined
     }
     if (phase === 'working') {
-      const since = loop.answer?.at ?? loop.start?.at ?? loop.startedAt
+      const since = loop.answer?.at ?? loop.startedAt
       return {
         ...mine,
         who: 'agentWorking',
         whoLabel: labels.working(Math.floor((now - since) / 60_000))
       }
     }
-    const { question, choices, note, basis } = scripted
     if (phase === 'question') {
+      const { question, choices } = scripted
       return { ...mine, who: 'waiting', whoLabel: labels.question, question, choices }
     }
-    if (phase === 'proposal') {
-      const proposal = homeLoopOpenProposal(loop, now, note)
+    if (phase === 'result') {
+      // Not "waiting": the proposal asks nothing of me until I open the day-end cards.
       return {
         ...mine,
-        who: 'waiting',
-        whoLabel: labels.proposal,
-        proposal: proposal ? { status: proposal.status, note: proposal.note } : undefined,
-        proposalStep: proposal?.step,
-        proposalBasis: basis,
-        hasDraft: proposal?.step === 'final'
+        who: 'draft',
+        whoLabel: labels.result,
+        hasDraft: true,
+        proposal: { status: 'review', note: scripted.note }
       }
     }
-    return {
-      ...mine,
-      hasDraft: true,
-      who: 'draft',
-      whoLabel: phase === 'confirmed' ? labels.confirmed(status) : labels.declined
-    }
+    return { ...mine, hasDraft: true, who: 'draft', whoLabel: labels.confirmed(status) }
   })
-}
-
-/** My answer to a proposal. Only "confirmed" touches what inAX holds. */
-export function decideHomeProposal(
-  state: Pick<HomeBoardState, 'loops' | 'inax'>,
-  taskId: string,
-  step: 'start' | 'final',
-  decision: { kind: 'confirmed'; proposal: HomeProposal } | { kind: 'declined' },
-  at: number
-): Pick<HomeBoardState, 'loops' | 'inax'> {
-  const loop = state.loops[taskId]
-  if (!loop) {
-    return state
-  }
-  return {
-    loops: { ...state.loops, [taskId]: { ...loop, [step]: { kind: decision.kind, at } } },
-    inax:
-      decision.kind === 'confirmed'
-        ? {
-            ...state.inax,
-            [taskId]: confirmHomeProposal(state.inax[taskId], decision.proposal, at)
-          }
-        : state.inax
-  }
 }

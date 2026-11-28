@@ -12,6 +12,7 @@ import {
   BOT_ITEM_CHIP,
   BOT_ITEM_CHIP_ACTION,
   BOT_ITEM_CHIP_PICKED,
+  BOT_ITEM_CHIP_RECOMMENDED,
   BOT_ITEM_OPEN_QUESTION,
   BotItemChipWords
 } from '@/components/bots/items/BotItemQuestionStep'
@@ -27,6 +28,7 @@ export function HomeDayEndChipLine({
   question,
   note,
   label,
+  quiet = false,
   chips,
   picked,
   onPick,
@@ -36,18 +38,29 @@ export function HomeDayEndChipLine({
   note?: React.ReactNode
   /** What the chips choose, when the question's own words do not say it. */
   label?: string
+  /** The words name a field of the task, not a question to answer: they read as a label. */
+  quiet?: boolean
   chips: readonly Chip[]
   picked: string | undefined
   onPick: (id: string) => void
   children?: React.ReactNode
 }): React.JSX.Element {
+  const t = useTranslate()
   return (
     <div
       role="group"
       aria-label={question}
       className="border-t border-border pt-3 first:border-0 first:pt-0"
     >
-      <p className={cn('min-w-0 text-sm leading-5', BOT_ITEM_OPEN_QUESTION)}>{question}</p>
+      <p
+        className={
+          quiet
+            ? 'text-xs text-muted-foreground'
+            : cn('min-w-0 text-sm leading-5', BOT_ITEM_OPEN_QUESTION)
+        }
+      >
+        {question}
+      </p>
       {note}
       {label ? <p className="mt-2.5 text-xs text-muted-foreground">{label}</p> : null}
       {/* One answer per line: a radio group, so the pick is announced and the arrows move through it. */}
@@ -66,7 +79,12 @@ export function HomeDayEndChipLine({
               BOT_ITEM_CHIP,
               BOT_ITEM_CHIP_ACTION,
               'flex items-center gap-1.5',
-              picked === chip.id ? BOT_ITEM_CHIP_PICKED : 'text-foreground'
+              picked === chip.id
+                ? BOT_ITEM_CHIP_PICKED
+                : // An open ask fills the agent's pick, as Orca's item ask does.
+                  chip.recommended && picked === undefined
+                  ? BOT_ITEM_CHIP_RECOMMENDED
+                  : 'text-foreground'
             )}
             onClick={() => onPick(chip.id)}
           >
@@ -79,6 +97,15 @@ export function HomeDayEndChipLine({
         ))}
         {children}
       </div>
+      {/* The star is the agent's pick; a reader should not have to guess that. */}
+      {chips.some((chip) => chip.recommended) ? (
+        <p className="mt-2 text-xs text-muted-foreground" data-home-chip-legend="">
+          <span aria-hidden className="mr-1 text-[11px]">
+            ★
+          </span>
+          {t('home.dayEnd.starLegend', 'The agent’s pick')}
+        </p>
+      ) : null}
     </div>
   )
 }

@@ -18,8 +18,6 @@ import {
   type HomeTaskTab
 } from './home-board'
 import type { HomeProject } from './home-board-mock'
-import type { HomeProposal } from './home-task-loop'
-import { TaskProposalCard } from '@/components/task-page/inax/TaskProposalCard'
 
 const TABS: HomeTaskTab[] = ['today', 'waiting', 'late', 'done']
 
@@ -36,10 +34,9 @@ export function HomeTasksCard({
   openId,
   onOpenChange,
   onAnswer,
-  onDecide,
+  onStart,
   onOpenTask,
   onOpenMeeting,
-  onOpenOutput,
   onOpenTaskList
 }: {
   tasks: readonly HomeTask[]
@@ -49,14 +46,12 @@ export function HomeTasksCard({
   openId: string | null
   onOpenChange: (id: string | null) => void
   onAnswer: (taskId: string, choiceId: string) => void
-  /** My answer to an agent's proposal for inAX; null is "not yet". */
-  onDecide: (taskId: string, proposal: HomeProposal | null) => void
-  /** Opens the task's own page. */
+  /** Hands a task of mine that is not started to an agent. */
+  onStart: (task: HomeTask) => void
+  /** Opens the task's conversation, with the task and any question of its agent beside it. */
   onOpenTask: (taskId: string) => void
   /** Opens the meeting a waiting row is about. */
   onOpenMeeting: (meetingId: string) => void
-  /** Opens the task's conversation, where the agent's draft is. */
-  onOpenOutput: (taskId: string) => void
   onOpenTaskList: () => void
 }): React.JSX.Element {
   const t = useTranslate()
@@ -75,8 +70,10 @@ export function HomeTasksCard({
   const byTab = (key: HomeTaskTab): HomeTask[] =>
     sortHomeTasks(tasks.filter((task) => homeTaskTab(task).includes(key)))
   const shown = byTab(tab)
+  const startable = (task: HomeTask): boolean =>
+    task.who === null && !task.done && !task.assignee && !task.meetingId && task.status === 'todo'
   // One trailing slot for every row keeps the due column in line when only some rows have a button.
-  const anyWaiting = shown.some((task) => task.who === 'waiting')
+  const anyAction = shown.some((task) => task.who === 'waiting' || startable(task))
 
   return (
     <HomeCard title={t('home.tasks.title', 'My work')} data-home-card="tasks">
@@ -105,11 +102,11 @@ export function HomeTasksCard({
             <ul className="divide-y divide-border border-t border-border">
               {shown.map((task) => {
                 const waiting = task.who === 'waiting'
-                // Only what waits on me opens in place; every other row goes to the task's page.
+                // Only a meeting's offer opens in place; a task's row goes to its conversation.
                 const offer = task.meetingId !== undefined
                 // A meeting's row with nothing to answer here goes to the meeting.
                 const toMeeting = offer && !task.question ? task.meetingId : undefined
-                const open = openId === task.id && waiting && !toMeeting
+                const open = openId === task.id && waiting && offer && !toMeeting
                 return (
                   <li key={task.id} data-home-task={task.id}>
                     <div className="flex items-stretch">
@@ -142,22 +139,34 @@ export function HomeTasksCard({
                           {task.dueLabel}
                         </span>
                       </button>
-                      {anyWaiting ? (
-                        <div className="flex w-20 shrink-0 items-center justify-end pr-4">
+                      {anyAction ? (
+                        <div className="flex w-32 shrink-0 items-center justify-end pr-4">
                           {waiting && !open ? (
                             <Button
                               type="button"
                               variant="outline"
                               size="xs"
                               onClick={() =>
-                                toMeeting ? onOpenMeeting(toMeeting) : onOpenChange(task.id)
+                                toMeeting
+                                  ? onOpenMeeting(toMeeting)
+                                  : offer
+                                    ? onOpenChange(task.id)
+                                    : onOpenTask(task.id)
                               }
                             >
                               {toMeeting
                                 ? t('home.tasks.open', 'Open')
-                                : task.proposal
-                                  ? t('taskLoop.home.review', 'Review')
-                                  : t('home.tasks.answer', 'Answer')}
+                                : t('home.tasks.answer', 'Answer')}
+                            </Button>
+                          ) : startable(task) ? (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="xs"
+                              data-home-task-start=""
+                              onClick={() => onStart(task)}
+                            >
+                              {t('taskLoop.detail.start', 'Start with an agent')}
                             </Button>
                           ) : null}
                         </div>
@@ -165,56 +174,39 @@ export function HomeTasksCard({
                     </div>
                     {open ? (
                       <div className={HOME_ROW_DETAIL_CLASS}>
-                        {task.proposal ? (
-                          <TaskProposalCard
-                            proposal={task.proposal}
-                            project={projects[task.project].name}
-                            onConfirm={(proposal) => onDecide(task.id, proposal)}
-                            onDecline={() => onDecide(task.id, null)}
-                            basis={task.proposalBasis}
-                            onOpenOutput={task.hasDraft ? () => onOpenOutput(task.id) : undefined}
-                          />
-                        ) : (
-                          <>
-                            <p className="text-xs text-foreground">{task.detail}</p>
-                            {task.question && task.choices ? (
-                              <div
-                                role="group"
-                                aria-label={task.question}
-                                className="flex flex-col gap-2"
+                        <p className="text-xs text-foreground">{task.detail}</p>
+                        {task.question && task.choices ? (
+                          <div
+                            role="group"
+                            aria-label={task.question}
+                            className="flex flex-col gap-2"
+                          >
+                            <p className="text-[13px] font-medium text-foreground">
+                              {task.question}
+                            </p>
+                            <div className="flex flex-wrap gap-2">
+                              {task.choices.map((choice) => (
+                                <Button
+                                  key={choice.id}
+                                  type="button"
+                                  variant="outline"
+                                  size="xs"
+                                  onClick={() => onAnswer(task.id, choice.id)}
+                                >
+                                  {choice.label}
+                                </Button>
+                              ))}
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="xs"
+                                onClick={() => task.meetingId && onOpenMeeting(task.meetingId)}
                               >
-                                <p className="text-[13px] font-medium text-foreground">
-                                  {task.question}
-                                </p>
-                                <div className="flex flex-wrap gap-2">
-                                  {task.choices.map((choice) => (
-                                    <Button
-                                      key={choice.id}
-                                      type="button"
-                                      variant="outline"
-                                      size="xs"
-                                      onClick={() => onAnswer(task.id, choice.id)}
-                                    >
-                                      {choice.label}
-                                    </Button>
-                                  ))}
-                                  {task.meetingId ? (
-                                    <Button
-                                      type="button"
-                                      variant="ghost"
-                                      size="xs"
-                                      onClick={() =>
-                                        task.meetingId && onOpenMeeting(task.meetingId)
-                                      }
-                                    >
-                                      {t('home.tasks.openMinutes', 'Open the minutes')}
-                                    </Button>
-                                  ) : null}
-                                </div>
-                              </div>
-                            ) : null}
-                          </>
-                        )}
+                                {t('home.tasks.openMinutes', 'Open the minutes')}
+                              </Button>
+                            </div>
+                          </div>
+                        ) : null}
                       </div>
                     ) : null}
                   </li>

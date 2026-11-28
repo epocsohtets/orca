@@ -1,9 +1,10 @@
 import { toast } from 'sonner'
 import { translate } from '@/i18n/i18n'
-import { decideHomeProposal } from './home-board-loops'
+import { useAppStore } from '@/store'
+import { homeStatusMovedLine } from './home-task-loop-script'
 import { useHomeBoardStore } from './home-board-store'
-import type { HomeRecordAnswer } from './home-board'
-import { sayToHomeLoop, type HomeProposal } from './home-task-loop'
+import type { HomeBoardState, HomeRecordAnswer } from './home-board'
+import type { InaxStatus } from './home-task-loop'
 import {
   HOME_RECORD_NOT_WORK,
   saveHomeDayEndTask,
@@ -12,20 +13,75 @@ import {
 } from './home-day-end'
 import { assignFollowUps, useMeetings } from '@/components/meetings/meetings-store'
 
-/** Hands a task to its agent. Starting again keeps the conversation that exists. */
-export function startHomeLoop(taskId: string): void {
-  useHomeBoardStore.setState((state) =>
-    state.loops[taskId]
-      ? state
-      : { loops: { ...state.loops, [taskId]: { startedAt: Date.now(), said: [] } } }
-  )
+/** A status I set by hand goes to inAX at once: no card, no confirmation. */
+function withStatus(
+  state: HomeBoardState,
+  taskId: string,
+  status: InaxStatus,
+  at: number
+): Pick<HomeBoardState, 'inax' | 'doneTaskIds'> {
+  const done = state.doneTaskIds.filter((id) => id !== taskId)
+  return {
+    doneTaskIds: status === 'done' ? [...done, taskId] : done,
+    inax: {
+      ...state.inax,
+      [taskId]: { notes: state.inax[taskId]?.notes ?? [], status, statusAt: at }
+    }
+  }
 }
 
-export function answerHomeLoop(taskId: string, choiceId: string): void {
+/** Moves a task's card: the board's status is the task's status on inAX. */
+export function setHomeTaskStatus(taskId: string, status: InaxStatus, title?: string): void {
+  // shortcut: inAX is this window's sample store, so "sync" is this write; with a backend it is the call the
+  // board's Linear sync makes (workspace-board-task-status-sync), and a failure puts the card back.
+  useHomeBoardStore.setState((state) => withStatus(state, taskId, status, Date.now()))
+  if (title) {
+    toast.success(homeStatusMovedLine(translate, title, status))
+  }
+}
+
+/** A folder per task under the work folder location, made without asking. */
+async function makeTaskFolder(taskId: string, title: string): Promise<void> {
+  const root = useAppStore.getState().settings?.workspaceDir
+  if (!root) {
+    return
+  }
+  const folder = `${root}${root.includes('\\') ? '\\' : '/'}${title.replace(/[\\/:*?"<>|]/g, ' ').trim()}`
+  // An existing folder of that name is the task's folder from an earlier start.
+  await window.api.fs.createDir({ dirPath: folder }).catch(() => undefined)
+  useHomeBoardStore.setState((state) => {
+    const loop = state.loops[taskId]
+    return loop ? { loops: { ...state.loops, [taskId]: { ...loop, folder } } } : state
+  })
+}
+
+/**
+ * Hands a task to its agent: the conversation starts, a "to do" task is in progress at once, and its folder is
+ * made. Starting again keeps the conversation that exists.
+ */
+export function startHomeLoop(taskId: string, title: string, status: InaxStatus = 'todo'): void {
+  if (useHomeBoardStore.getState().loops[taskId]) {
+    return
+  }
+  const at = Date.now()
+  useHomeBoardStore.setState((state) => ({
+    loops: { ...state.loops, [taskId]: { startedAt: at, said: [] } },
+    ...(status === 'todo' ? withStatus(state, taskId, 'inProgress', at) : {})
+  }))
+  void makeTaskFolder(taskId, title)
+}
+
+/** My answer to the agent's question: one of its choices, or my own words. */
+export function answerHomeLoop(taskId: string, choiceId: string | null, text?: string): void {
   useHomeBoardStore.setState((state) => {
     const loop = state.loops[taskId]
     return loop
-      ? { loops: { ...state.loops, [taskId]: { ...loop, answer: { choiceId, at: Date.now() } } } }
+      ? {
+          loops: {
+            ...state.loops,
+            [taskId]: { ...loop, answer: { choiceId, text, at: Date.now() } }
+          }
+        }
       : state
   })
 }
@@ -34,53 +90,14 @@ export function sayHomeLoop(taskId: string, text: string): void {
   useHomeBoardStore.setState((state) => {
     const loop = state.loops[taskId]
     return loop
-      ? { loops: { ...state.loops, [taskId]: sayToHomeLoop(loop, text, Date.now()) } }
+      ? {
+          loops: {
+            ...state.loops,
+            [taskId]: { ...loop, said: [...loop.said, { at: Date.now(), text }] }
+          }
+        }
       : state
   })
-}
-
-/** My answer to a proposal; a confirmation says once where it went and who sees it. */
-export function decideHomeLoop(
-  taskId: string,
-  step: 'start' | 'final',
-  proposal: HomeProposal | null,
-  project: string
-): void {
-  useHomeBoardStore.setState((state) =>
-    decideHomeProposal(
-      state,
-      taskId,
-      step,
-      proposal ? { kind: 'confirmed', proposal } : { kind: 'declined' },
-      Date.now()
-    )
-  )
-  if (proposal) {
-    toast.success(translate('taskLoop.applied.title', 'It is on inAX now.'), {
-      description: proposal.note
-        ? translate(
-            'taskLoop.applied.note',
-            'The PM and the team of “{{project}}” can see the status and this progress note.',
-            { project }
-          )
-        : translate(
-            'taskLoop.applied.status',
-            'The PM and the team of “{{project}}” can see the new status.',
-            { project }
-          )
-    })
-  }
-}
-
-/** A task I finished myself. */
-export function finishHomeTask(taskId: string): void {
-  useHomeBoardStore.setState((state) => ({
-    doneTaskIds: [...state.doneTaskIds, taskId],
-    inax: {
-      ...state.inax,
-      [taskId]: { notes: state.inax[taskId]?.notes ?? [], status: 'done' }
-    }
-  }))
 }
 
 /** Saves one day-end card: from here colleagues see it. */

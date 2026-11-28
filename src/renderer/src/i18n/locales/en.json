@@ -31992,7 +31992,7 @@
       "noticeWho": "Awaiting a reply · logistics team",
       "noticeDetail": "The notice needs the new delivery dates. Lee Mina asked the logistics team again this morning.",
       "report": "Share last month’s campaign report",
-      "reportDetail": "The report is written. Kim Jiwoo asked for it this week.",
+      "reportDetail": "Put last month’s campaign results into a report and share it. Kim Jiwoo asked for it this week.",
       "newsletter": "Check this month’s newsletter mailing list",
       "finishedOn": "Finished {{day}}",
       "newsletterDetail": "You checked 1,240 addresses and removed 12.",
@@ -32042,69 +32042,49 @@
       "nowStatus": "Status {{status}}",
       "nowActivity": "Last activity {{when}}",
       "nowAgent": "Agent working",
-      "nowMeeting": "Minutes · {{count}} follow-up tasks"
+      "nowMeeting": "Minutes · {{count}} follow-up tasks",
+      "starLegend": "The agent’s pick",
+      "ahead": "Written by the agent ·",
+      "take": "takes it",
+      "oneOwner": "Owner · one person"
     }
   },
   "taskLoop": {
     "activity": {
-      "confirmed": "· drafted “{{title}}”; the status and the progress note I confirmed are on inAX"
+      "result": "· attached a draft to “{{title}}”",
+      "started": "· started with an agent: “{{title}}”"
     },
     "agent": {
       "name": "Task agent"
     },
-    "applied": {
-      "note": "The PM and the team of “{{project}}” can see the status and this progress note.",
-      "status": "The PM and the team of “{{project}}” can see the new status.",
-      "title": "It is on inAX now."
-    },
     "chat": {
-      "answerAck": "Thank you. I will go that way.",
-      "ask": "I need one thing from you before I go on: {{question}}",
-      "back": "The task",
-      "confirmed": "Confirmed: the status is “{{status}}”.",
-      "confirmedNote": "Confirmed: the status is “{{status}}” and the progress note is on the task.",
-      "declined": "Not yet: the status and the notes stay as they are.",
-      "done": "The status and the note are on the task. Tell me if you need anything more.",
-      "inputLabel": "Message to {{agent}}",
       "kickoff": "Please take this task: {{title}}",
-      "label": "Conversation about “{{title}}”",
       "noted": "Noted. I will apply it to what I am writing now.",
-      "placeholder": "For example: make the second line shorter",
-      "proposeFinal": "The draft is ready. May I change the status {{to}} and leave a progress note?",
-      "proposeStart": "Before I start, may I change the status {{to}}?",
-      "read": "I read the task: its description, its deadline ({{due}}) and its notes.",
-      "reproposed": "I added your request to the progress note. Please confirm again.",
-      "send": "Send",
-      "started": "I am starting with step 1.",
-      "waiting": "Understood. The status and the notes stay as they are. Tell me below what to change, and I will propose again."
+      "moved": "Moved {{title}} {{to}}",
+      "asked": "Asked you about {{items}}"
     },
     "demo": {
       "chip": "Demo"
     },
     "detail": {
-      "attached": "Attached",
-      "attachedDraft": "The agent’s draft. Only the people who review this task see it.",
       "description": "Description",
       "due": "Due",
-      "finish": "Mark as done",
       "notes": "Progress notes",
-      "notesEmpty": "Progress notes I confirm are kept here.",
-      "openChat": "Open the conversation",
       "project": "Project",
       "start": "Start with an agent",
       "status": "Status",
-      "who": "Who has it",
       "assignee": "Owner",
-      "origin": "Where it came from",
       "noteByAgent": "Written by the agent, confirmed by me",
       "noteByMe": "Written by me",
-      "noteStatus": "Changed status {{to}}"
+      "noteStatus": "Changed status {{to}}",
+      "activity": "Activity",
+      "folder": "Folder",
+      "notesNone": "None",
+      "output": "Result",
+      "outputDraft": "A draft, in the conversation"
     },
     "gate": {
       "line": "Sign in to inAX and your tasks appear here."
-    },
-    "home": {
-      "review": "Review"
     },
     "onboarding": {
       "found": "{{open}} tasks assigned to you · {{due}} due today",
@@ -32113,49 +32093,26 @@
       "subtitle": "Sign in and the work assigned to you appears in this app.",
       "title": "Sign in to inAX"
     },
-    "proposal": {
-      "audienceNote": "When you confirm, the PM and the team of “{{project}}” see this status change and this note on inAX.",
-      "audienceStatus": "When you confirm, the PM and the team of “{{project}}” see this status change on inAX. For now only I see it.",
-      "basisTitle": "What this note is based on",
-      "cancelEdit": "Cancel",
-      "confirm": "Confirm",
-      "confirmEdited": "Confirm as corrected",
-      "decline": "Not yet",
-      "edit": "Correct",
-      "heading": "The agent’s proposal for inAX",
-      "notDone": "Only the people who review this task see the draft.",
-      "noteError": "Write at least one line that says what was done, then confirm.",
-      "noteLabel": "Progress note",
-      "output": "Open the draft",
-      "pending": "Waiting for my confirmation",
-      "statusLabel": "Status",
-      "title": "Change the status {{to}}",
-      "titleNote": "Change the status {{to}} and leave this progress note"
-    },
     "question": {
-      "heading": "The agent’s question"
+      "ownWords": "My own answer",
+      "send": "Send"
     },
     "script": {
       "choiceA": "For me",
       "choiceB": "For the project team",
       "plan": "This is how I will do it.\n\n1. Read the task description.\n2. Split the task into items and put the list in this conversation.",
       "question": "Who should the list be written for?",
-      "reportA": "Kim Jiwoo only · short",
-      "reportB": "The whole campaign team · with a summary",
-      "reportBasis1": "Visitors, 112% of the target: report page 2, “Visits” table, total row",
-      "reportBasis2": "Sign-up conversion, 3.4% and 2.9%: report page 3, “Sign-ups” table, this month and last month",
-      "reportBasis3": "Ad spend, 96% of the budget: report page 5, “Cost” table, spent ÷ budget",
-      "reportClosing": "Please read the report and leave your comments on this task.",
-      "reportDraftOne": "**Sharing message for last month’s campaign report (draft · to Kim Jiwoo)**\n\nJiwoo, here is last month’s campaign report. Three numbers matter most.",
-      "reportDraftTeam": "**Sharing message for last month’s campaign report (draft · to the whole campaign team)**\n\nCampaign team, here is last month’s campaign report.\n\n**Summary**\n\nMore people visited than we aimed for, and more of them signed up. Ad spend stayed inside the budget.",
-      "reportNoteOne": "Drafted the short message that shares last month’s campaign report with Kim Jiwoo. It has three numbers copied from the report: visitors, sign-up conversion and ad spend. The message has not been sent.",
-      "reportNoteTeam": "Drafted the message that shares last month’s campaign report with the whole campaign team. It has a summary paragraph and three numbers copied from the report: visitors, sign-up conversion and ad spend. The message has not been sent.",
+      "reportA": "Include it",
+      "reportB": "Leave it out",
       "reportNumbers": "- Visitors: 112% of the target\n- Sign-up conversion: 3.4% (2.9% the month before)\n- Ad spend: 96% of the budget",
-      "reportPlan": "The report is already written, so I will prepare what sharing it needs.\n\n1. Pull the three key numbers out of the report.\n2. Draft the message that shares it.\n3. Show you the draft, then propose a status and a progress note.",
-      "reportQuestion": "Who should the sharing message be written for?",
-      "requested": "You asked for: “{{text}}”",
+      "reportPlan": "This is how I will do it.\n\n1. Collect last month’s campaign numbers: visitors, sign-up conversion, ad spend.\n2. Write the draft of the results report.\n3. Attach the draft to this conversation and to the task.",
+      "reportQuestion": "Should the report include the agency’s fee?",
       "next": "I am splitting the task into items now. When the list is ready I will put it in this conversation.",
-      "nextTeam": "I am splitting the task into items now. When the list is ready I will put it in this conversation, written for the project team to read."
+      "nextTeam": "I am splitting the task into items now. When the list is ready I will put it in this conversation, written for the project team to read.",
+      "reportDraft": "**Last month’s campaign results report (draft)**\n\n**Summary**\n\nMore people visited than we aimed for, and more of them signed up. Ad spend stayed inside the budget.",
+      "reportAgency": "- Agency fee: 18% of ad spend",
+      "reportNote": "Wrote the draft of last month’s campaign results report: visitors, sign-up conversion, ad spend and the agency’s fee. Please review it.",
+      "reportNoteWithout": "Wrote the draft of last month’s campaign results report: visitors, sign-up conversion and ad spend. The agency’s fee is left out. Please review it."
     },
     "settings": {
       "cardDescription": "Sign in and your tasks appear on Home and in Tasks.",
@@ -32177,17 +32134,22 @@
       "todo": "To do"
     },
     "statusTo": {
-      "done": "to “Done”",
-      "inProgress": "to “In progress”",
-      "review": "to “Review requested”",
-      "todo": "to “To do”"
+      "done": "to Done",
+      "inProgress": "to In progress",
+      "review": "to Review requested",
+      "todo": "to To do"
     },
     "who": {
       "confirmed": "{{status}} · written by the agent, confirmed by me",
-      "declined": "Draft ready · waiting for my confirmation",
       "justStarted": "Agent working · just started",
-      "proposal": "Waiting for my confirmation · {{agent}}",
-      "question": "Waiting for my answer · {{agent}}"
+      "question": "Waiting for my answer · {{agent}}",
+      "result": "Result ready"
+    },
+    "group": {
+      "needsYou": "Needs you",
+      "working": "In progress",
+      "waiting": "Waiting",
+      "closed": "Closed"
     }
   }
 }

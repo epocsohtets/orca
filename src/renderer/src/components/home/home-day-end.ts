@@ -190,7 +190,7 @@ export function saveHomeDayEndTask(
     ...state,
     loops:
       closedLoop && loop
-        ? { ...state.loops, [args.taskId]: { ...loop, final: { kind: 'confirmed', at: args.at } } }
+        ? { ...state.loops, [args.taskId]: { ...loop, final: { at: args.at } } }
         : state.loops,
     inax: {
       ...state.inax,

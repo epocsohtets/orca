@@ -18,13 +18,7 @@ import {
   openScheduleForm
 } from '@/components/meetings/meeting-navigation'
 import { MAKO, personName } from '@/components/meetings/meeting-people'
-import {
-  answerHomeLoop,
-  answerHomeRecord,
-  decideHomeLoop,
-  saveHomeDayEnd,
-  startHomeLoop
-} from './home-board-actions'
+import { answerHomeRecord, saveHomeDayEnd, startHomeLoop } from './home-board-actions'
 import { useHomeBoard } from './use-home-board'
 import type { HomePhase } from './home-day'
 import { HomeCard } from './HomeCard'
@@ -108,9 +102,9 @@ export default function HomePage(): React.JSX.Element {
     const id = `added-${Date.now()}`
     useHomeBoardStore.setState((state) => ({ addedTasks: [...state.addedTasks, { id, title }] }))
     if (agent) {
-      // Handing over is the same path as "Start with an agent" on the task's page.
-      startHomeLoop(id)
-      openInaxTask(id, 'chat')
+      // Handing over is the same path as "Start with an agent" on a task's row.
+      startHomeLoop(id, title)
+      openInaxTask(id)
       return
     }
     setTab('today')
@@ -125,7 +119,7 @@ export default function HomePage(): React.JSX.Element {
     const agent = view.agents.find((entry) => entry.id === agentId)
     const task = tasks.find((entry) => entry.id === agent?.taskId)
     if (task && !task.meetingId) {
-      openInaxTask(task.id, 'chat')
+      openInaxTask(task.id)
     } else {
       setOpenAgentId(openAgentId === agentId ? null : agentId)
     }
@@ -252,28 +246,16 @@ export default function HomePage(): React.JSX.Element {
                           onOpenChange={setOpenTaskId}
                           onOpenTask={(taskId) => openInaxTask(taskId)}
                           onOpenMeeting={(meetingId) => openMeeting(meetingId)}
-                          onOpenOutput={(taskId) => openInaxTask(taskId, 'chat')}
-                          onDecide={(taskId, proposal) => {
-                            const task = tasks.find((entry) => entry.id === taskId)
-                            decideHomeLoop(
-                              taskId,
-                              task?.proposalStep ?? 'final',
-                              proposal,
-                              task ? projects[task.project].name : ''
-                            )
-                            setOpenTaskId(null)
-                            focusRow(`[data-home-tab="${tab}"]`)
+                          onStart={(task) => {
+                            startHomeLoop(task.id, task.title, task.status)
+                            openInaxTask(task.id)
                           }}
                           onAnswer={(taskId, choiceId) => {
-                            if (board.loops[taskId]) {
-                              answerHomeLoop(taskId, choiceId)
-                            } else {
-                              useHomeBoardStore.setState((state) => ({
-                                answers: { ...state.answers, [taskId]: choiceId }
-                              }))
-                            }
+                            // Only a meeting's offer is answered in place.
+                            useHomeBoardStore.setState((state) => ({
+                              answers: { ...state.answers, [taskId]: choiceId }
+                            }))
                             setOpenTaskId(null)
-                            // The answered row may leave this tab; the keyboard goes back to the tab itself.
                             focusRow(`[data-home-tab="${tab}"]`)
                           }}
                           onOpenTaskList={() => openInaxTask(null)}
