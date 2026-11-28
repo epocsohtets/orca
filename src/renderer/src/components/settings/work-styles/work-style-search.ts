@@ -6,7 +6,7 @@ export const getWorkStyleSearchEntries = createLocalizedCatalog(() => [
     title: translate('workStyles.title', 'How you work'),
     description: translate(
       'workStyles.description',
-      'Choose every way you work. Orca hides the settings and setup steps you do not need. With nothing chosen, everything shows.'
+      'Choose every way you work. You see only the settings those ways need.'
     ),
     keywords: [
       translate('workStyles.options.code.label', 'Code'),
@@ -16,10 +16,6 @@ export const getWorkStyleSearchEntries = createLocalizedCatalog(() => [
     ]
   },
   {
-    title: translate('workStyles.showAll.label', 'Show all settings'),
-    description: translate(
-      'workStyles.showAll.description',
-      'Show every Settings page, including the pages hidden for your work style.'
-    )
+    title: translate('workStyles.showAll.label', 'Show all settings')
   }
 ])

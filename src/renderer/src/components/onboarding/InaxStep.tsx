@@ -20,20 +20,17 @@ export function InaxStep({ signedIn }: { signedIn: boolean }): React.JSX.Element
           <p className="text-sm font-semibold text-foreground">
             {t('auto.components.TaskPage.inaxSource', 'inAX')}
           </p>
-          <p className="text-xs text-muted-foreground">
-            {signedIn
-              ? INAX_MOCK_ACCOUNT.email
-              : t('taskLoop.onboarding.signedOut', 'Not signed in yet')}
-          </p>
+          {signedIn ? (
+            <p className="text-xs text-muted-foreground">{INAX_MOCK_ACCOUNT.email}</p>
+          ) : null}
         </div>
       </div>
       {signedIn ? (
         <p role="status" className="text-[15px] leading-relaxed text-foreground">
-          {t(
-            'taskLoop.onboarding.found',
-            'Found {{open}} tasks assigned to you · {{due}} due today. They are on Home when you start.',
-            { open: counts.open, due: counts.dueToday }
-          )}
+          {t('taskLoop.onboarding.found', '{{open}} tasks assigned to you · {{due}} due today', {
+            open: counts.open,
+            due: counts.dueToday
+          })}
         </p>
       ) : (
         <Button type="button" data-inax-sign-in="" onClick={signInInaxMock}>

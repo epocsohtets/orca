@@ -3,15 +3,11 @@ import { useTranslate } from '@/i18n/use-translate'
 import { useAppStore } from '@/store/index'
 import { INAX_INTEGRATION_SECTION_ID } from './task-provider-integration-section-ids'
 
-/** One quiet line on the Orca account page for someone who came looking for their inAX sign-in. */
+/** A link on the Orca account page for someone who came looking for their inAX sign-in. */
 export function InaxAccountPointer(): React.JSX.Element {
   const t = useTranslate()
   return (
     <p className="mt-4 text-xs text-muted-foreground" data-inax-account-pointer="">
-      {t(
-        'taskLoop.settings.pointer',
-        'Looking for inAX (the team’s work tracker)? Its account is a different one.'
-      )}{' '}
       <Button
         type="button"
         variant="link"
@@ -26,7 +22,7 @@ export function InaxAccountPointer(): React.JSX.Element {
           state.openSettingsPage()
         }}
       >
-        {t('taskLoop.settings.pointerLink', 'Go to the inAX account')}
+        {t('taskLoop.settings.pointerLink', 'inAX account')}
       </Button>
     </p>
   )

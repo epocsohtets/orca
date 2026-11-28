@@ -233,7 +233,7 @@ export function buildHomeMeetings(
                 : t('home.upcoming.minutesWaiting', 'Minutes arrived · waiting for me')
               : meeting.outline || meeting.materials.length > 0
                 ? t('home.upcoming.prepReady', 'Prep ready')
-                : t('home.upcoming.noPrep', 'No prep yet')
+                : ''
       }
     })
   }

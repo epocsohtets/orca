@@ -19,7 +19,7 @@ export const stepCopy = {
     get subtitle() {
       return translate(
         'taskLoop.onboarding.subtitle',
-        'inAX is the team’s work tracker. Sign in and the work assigned to you appears in this app.'
+        'Sign in and the work assigned to you appears in this app.'
       )
     }
   },

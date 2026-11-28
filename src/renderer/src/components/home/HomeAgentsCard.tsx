@@ -44,20 +44,13 @@ export function HomeAgentsCard({
   ]
 
   return (
-    <HomeCard
-      title={t('home.agents.title', 'Agents and bots')}
-      aside={t(
-        'home.agents.aside',
-        'An agent takes a task and works on it. A bot does one set job each time it comes up.'
-      )}
-      data-home-card="agents"
-    >
+    <HomeCard title={t('home.agents.title', 'Agents and bots')} data-home-card="agents">
       <div className="scrollbar-sleek overflow-x-auto border-t border-border">
         <table className="w-full min-w-[40rem] border-collapse text-[13px]">
           <thead>
             <tr className="border-b border-border text-muted-foreground">
               <th scope="col" className={HEAD_CLASS}>
-                {t('home.agents.colWho', 'Who')}
+                {t('home.agents.colWho', 'Name')}
               </th>
               <th scope="col" className={HEAD_CLASS}>
                 {t('home.agents.colDoing', 'Doing now')}
@@ -109,7 +102,7 @@ export function HomeAgentsCard({
                       <span className="flex items-center gap-2">
                         <Progress
                           value={(agent.stage / 3) * 100}
-                          aria-label={t('home.agents.stageOf', '{{stage}}, step {{step}} of 3', {
+                          aria-label={t('home.agents.stageOf', '{{stage}} · {{step}} of 3', {
                             stage: stageLabels[agent.stage],
                             step: agent.stage
                           })}
@@ -157,12 +150,6 @@ export function HomeAgentsCard({
                                 {t('home.agents.showTask', 'Show its task')}
                               </Button>
                             ) : null}
-                            <span className={HOME_META_CLASS}>
-                              {t(
-                                'home.agents.sampleChat',
-                                'Sample agent: these are the last lines of its conversation.'
-                              )}
-                            </span>
                           </div>
                         </div>
                       </td>

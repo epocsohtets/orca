@@ -55,20 +55,20 @@ export function MeetingWhisperLine({
         </Badge>
       </div>
       <p className="max-w-prose text-[13px] leading-relaxed text-foreground">
-        {t('meetings.whisper.lead', 'This looks like setting up a meeting.')} {before}
+        {before}
         <strong className="font-semibold">
           {text.whenWithWeekday(draft)}, {who}
         </strong>
+        {whisper.talk.timeGuessed ? (
+          <>
+            {' '}
+            <Badge variant="outline">{t('meetings.whisper.guessed', 'Suggested time')}</Badge>
+          </>
+        ) : null}
         {after}
       </p>
       <p className="text-xs text-muted-foreground">
-        {t('meetings.whisper.title', 'Title: “{{title}}”.', { title: draft.title })}{' '}
-        {whisper.talk.timeGuessed
-          ? t(
-              'meetings.whisper.guessed',
-              'The line gave no time, so this time is only a first offer.'
-            )
-          : null}
+        {t('meetings.whisper.title', 'Title: “{{title}}”.', { title: draft.title })}
       </p>
       <div className="flex flex-wrap gap-2">
         <Button

@@ -7,6 +7,7 @@ import { HOME_META_CLASS, HOME_ROW_BUTTON_CLASS, HomeCard } from '@/components/h
 import { openMeeting } from './meeting-navigation'
 import { MeetingAsk } from './MeetingAsk'
 import { MeetingMyPart } from './MeetingFollowUps'
+import { useMeetingText } from './MeetingParts'
 import { MeetingTranscript } from './MeetingTranscript'
 import type { Meeting, MeetingMinutes as Minutes } from './meeting-types'
 import { useMeetings, type MinutesDepth } from './meetings-store'
@@ -23,6 +24,7 @@ export function MeetingMinutes({
   minutes: Minutes
 }): React.JSX.Element {
   const t = useTranslate()
+  const text = useMeetingText()
   const depth = useMeetings((state) => state.depth)
   const focus = useMeetings((state) => state.focus)
   const [query, setQuery] = useState('')
@@ -32,6 +34,10 @@ export function MeetingMinutes({
   const source = (turnId: string): void => {
     setQuery('')
     openMeeting(meeting.id, { turnId })
+  }
+  const saidAt = (turnId: string): string => {
+    const turn = minutes.transcript.find((entry) => entry.id === turnId)
+    return turn ? text.time(meeting.startsAt + turn.at * 1000) : ''
   }
   const markedTurnId = focus?.meetingId === meeting.id ? focus.turnId : null
   const labels: Record<MinutesDepth, string> = {
@@ -104,12 +110,6 @@ export function MeetingMinutes({
         </TabsContent>
         <TabsContent value="summary">
           <div className="flex flex-col gap-2">
-            <p className={`px-4 ${HOME_META_CLASS}`}>
-              {t(
-                'meetings.minutes.summaryHelp',
-                'Select a sentence to go to the moment it was said.'
-              )}
-            </p>
             {minutes.topics.map((topic) => (
               <section key={topic.title} aria-label={topic.title}>
                 <h3 className={`flex items-baseline gap-2 ${GROUP_HEADING}`}>
@@ -122,10 +122,14 @@ export function MeetingMinutes({
                       <button
                         type="button"
                         data-meeting-summary-point={point.turnId}
-                        className={`${HOME_ROW_BUTTON_CLASS} text-[13px] text-foreground`}
+                        className={`${HOME_ROW_BUTTON_CLASS} flex items-baseline gap-3 text-[13px] text-foreground`}
                         onClick={() => source(point.turnId)}
                       >
-                        {point.text}
+                        <span className="min-w-0 flex-1">{point.text}</span>
+                        {/* The time it was said, as on the transcript: it is where the row leads. */}
+                        <span className={`shrink-0 tabular-nums underline ${HOME_META_CLASS}`}>
+                          {saidAt(point.turnId)}
+                        </span>
                       </button>
                     </li>
                   ))}
@@ -147,11 +151,11 @@ export function MeetingMinutes({
               />
               <p className={`tabular-nums ${HOME_META_CLASS}`} role="status">
                 {query.trim()
-                  ? t('meetings.minutes.found', '{{count}} of {{total}} turns', {
+                  ? t('meetings.minutes.found', '{{count}} of {{total}} remarks', {
                       count: found.length,
                       total: minutes.transcript.length
                     })
-                  : t('meetings.minutes.turns', '{{total}} turns', {
+                  : t('meetings.minutes.turns', '{{total}} remarks', {
                       total: minutes.transcript.length
                     })}
               </p>

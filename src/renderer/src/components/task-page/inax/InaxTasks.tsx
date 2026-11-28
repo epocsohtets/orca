@@ -99,10 +99,7 @@ export function TaskPageInax(): React.JSX.Element {
         data-task-list="inax-signed-out"
       >
         <p className="max-w-md text-center text-sm text-foreground">
-          {t(
-            'taskLoop.gate.line',
-            'Sign in with inAX (the team’s work tracker) and your tasks appear here.'
-          )}
+          {t('taskLoop.gate.line', 'Sign in to inAX and your tasks appear here.')}
         </p>
         <Button type="button" size="sm" data-inax-sign-in="" onClick={signInInaxMock}>
           {t('auto.components.settings.inaxAccount.signIn', 'Sign in with inAX')}

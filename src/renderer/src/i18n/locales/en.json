@@ -1204,7 +1204,7 @@
       },
       "activitySuggestions": {
         "title": "Activity suggestions",
-        "description": "Records the pages you open in the built-in browser (time, address without query, title) to suggest handing repeated web work to an agent. The record stays in memory on this device.",
+        "description": "Records the address, title and time of pages you open in this app’s browser, and suggests handing repeated work to an agent. The record stays on this computer.",
         "searchKeywords": {
           "activity": "activity",
           "suggestions": "suggestions",
@@ -2266,15 +2266,15 @@
       "add": "Add app",
       "registered": "Registered apps",
       "searchPlaceholder": "Search installed apps…",
-      "noMatches": "No apps found.",
+      "noMatches": "No app has that name. Check the name.",
       "emptyTitle": "No apps registered",
-      "emptyDescription": "Add the apps you work in to watch them.",
+      "emptyDescription": "Add the apps you work in and their time collects in My day.",
       "paused": "Paused",
-      "watching": "Watching",
-      "watchToggle": "Watch {{name}}",
+      "watching": "Recording time",
+      "watchToggle": "Record time in {{name}}",
       "remove": "Remove",
       "title": "My apps",
-      "description": "The apps you work in. Orca watches the ones you register.",
+      "description": "The apps you work in. Orca records the time you spend in the ones you register.",
       "removeTitle": "Remove {{name}}?",
       "removeDescription": "This removes the app from your registered apps. The app stays installed on this Mac."
     }
@@ -26597,7 +26597,7 @@
   },
   "workStyles": {
     "title": "How you work",
-    "description": "Choose every way you work. Orca hides the settings and setup steps you do not need. With nothing chosen, everything shows.",
+    "description": "Choose every way you work. You see only the settings those ways need.",
     "hiddenHint": "Hidden for your work style",
     "options": {
       "code": {
@@ -26614,12 +26614,11 @@
       },
       "meetings": {
         "label": "Meetings",
-        "description": "Calls, notes and dictation"
+        "description": "Calls, minutes and dictation"
       }
     },
     "showAll": {
-      "label": "Show all settings",
-      "description": "Show every Settings page, including the pages hidden for your work style."
+      "label": "Show all settings"
     },
     "onboarding": {
       "title": "How do you work?",
@@ -31449,22 +31448,17 @@
   },
   "meetings": {
     "recording": {
-      "statusAria": "{{title}} is being recorded. Open the meeting.",
+      "statusAria": "Open the meeting being recorded: {{title}}",
       "on": "Recording",
       "everyoneSees": "All {{count}} people in the meeting see this.",
-      "hostIdle": "Start recording when the meeting begins.",
-      "attendeeIdle": "When the host starts recording, it shows here and in the status bar.",
+      "attendeeIdle": "When the host starts recording, everyone in the meeting sees the recording mark.",
       "start": "Start recording",
       "sent": "The meeting agent sent the minutes to all {{count}} people in the meeting.",
       "stop": "End recording",
-      "simulated": "This build does not capture sound. When you end the recording, prepared sample minutes are made and sent to the attendees.",
       "card": "Recording"
     },
     "title": "Meetings",
     "schedule": "Create meeting",
-    "demo": "Demo",
-    "viewer": "Seen as {{name}}",
-    "reset": "Start the sample data over",
     "pane": {
       "agenda": "Schedule",
       "upcoming": "Coming up",
@@ -31474,7 +31468,7 @@
       "titleRequired": "Enter a title so attendees know what the meeting is for.",
       "titleTooLong": "Use {{max}} characters or fewer.",
       "attendeesRequired": "Add at least one person besides the host.",
-      "fromChat": "From the chat “{{name}}”. The meeting links back to it; it stays its own item.",
+      "fromChat": "From the chat “{{name}}”",
       "title": "Title",
       "when": "When",
       "now": "Start now and record",
@@ -31482,7 +31476,7 @@
       "place": "Place",
       "optional": "Optional.",
       "outline": "Outline",
-      "outlineHelp": "What the meeting must settle. Start a line with “1.” and the numbers continue.",
+      "outlineHelp": "What the meeting must settle.",
       "materials": "Materials",
       "materialsHelp": "Files and links attendees should read first. Optional.",
       "submit": "Create",
@@ -31500,15 +31494,14 @@
       "endDate": "End date",
       "endTime": "End time",
       "timeInvalid": "“{{typed}}” is not a time. Write it like 15:30, or pick one from the list.",
-      "endBeforeStart": "The end is not after the start. Move the end time or the end date later.",
+      "endBeforeStart": "The end must be after the start. Move the end time or the end date later.",
       "rangeTooLong": "This is longer than 14 days. Check the end date.",
       "fromWhisper": "The meeting agent filled this in from the chat “{{name}}”. Change what is wrong.",
       "spansDays": "Runs over {{count}} days.",
-      "lengthHours": "{{h}} hr {{m}} min long.",
-      "lengthMinutes": "{{count}} min long.",
+      "lengthHours": "{{h}} hr {{m}} min long",
+      "lengthMinutes": "{{count}} min long",
       "recentPlaces": "Used recently",
       "attendeesFromChat": "The people of “{{name}}” are in. Take out anyone who need not come.",
-      "attendeesHelp": "Find people by name. The meeting goes on their schedule.",
       "saving": "Creating",
       "submitNow": "Create and record",
       "removePerson": "Remove {{name}}",
@@ -31518,7 +31511,7 @@
       "noPerson": "Nobody is called “{{query}}”. Check the name.",
       "everyoneIn": "Everyone is already in.",
       "inChat": "In this chat",
-      "line": "Attendees get it on their own schedule, with the outline and the materials.",
+      "line": "The meeting goes on each attendee’s schedule, with the outline and the materials.",
       "card": "New meeting"
     },
     "cancel": "Cancel",
@@ -31546,24 +31539,19 @@
     "prep": {
       "outline": "Outline",
       "edit": "Edit outline and materials",
-      "noOutlineHost": "No outline yet. Write what the meeting must settle so attendees can read it first.",
-      "noOutline": "The host has not added an outline yet.",
+      "noOutlineHost": "Write what the meeting must settle, so attendees can read it first.",
       "materials": "Materials",
-      "editShort": "Edit",
-      "noMaterials": "Nothing is attached."
+      "editShort": "Edit"
     },
     "bot": {
       "minutesReady": "The minutes of **{{title}}** are ready.",
-      "proposalsFollow": "Below is what looks like yours. Take it and it becomes your task in To do.",
       "noProposals": "Nothing in this meeting looks like yours.",
-      "sharedMessage": "{{name}} shared the full minutes of **{{title}}** with you. You were not in the meeting.",
-      "assignedMessage": "{{name}} assigned you a task from **{{title}}**. You were not in the meeting, so I am sending the part it came from.",
+      "sharedMessage": "{{name}} shared the full minutes of **{{title}}** with you.",
+      "assignedMessage": "{{name}} assigned you a task from **{{title}}**. Here is the part it came from.",
       "name": "Meeting agent",
       "askAbout": "Ask about “{{title}}”",
-      "askNone": "You can ask once you have minutes",
-      "about": "Sends {{name}} the minutes and the tasks that look like theirs",
-      "aboutOutside": "Sends {{name}} assigned tasks and the part they came from. Ask on a card to see the full minutes.",
-      "sample": "Sample conversation",
+      "about": "Sends you the minutes and the items that look like yours",
+      "aboutOutside": "Sends you assigned tasks and the part they came from",
       "emptyTitle": "No messages yet",
       "emptyDetail": "When a meeting you are in ends its recording, the minutes come here. So do tasks assigned to you from a meeting.",
       "minutesCard": "Minutes",
@@ -31575,9 +31563,7 @@
       "assignedByHost": "Assigned by {{name}} · {{status}}",
       "declined": "You said this is not yours",
       "proposalCard": "This looks like yours",
-      "choiceHelp": "“Take it” makes it your task in To do. “Not mine” shows {{name}} that it is not yours, so the host can give it to someone else.",
-      "declinedHelp": "{{name}} sees it as “not theirs” on the minutes.",
-      "assignedHelp": "{{name}} assigned this as the host, so there is nothing to accept.",
+      "declinedHelp": "{{name}} sees your answer: “Not mine”.",
       "assignedCard": "A task for you from “{{title}}”",
       "rowMinutes": "Minutes: {{title}}",
       "rowShared": "Shared minutes: {{title}}",
@@ -31593,44 +31579,40 @@
     },
     "followUps": {
       "title": "Follow-up tasks",
-      "counts": "{{total}} in all · To do {{todo}} · In progress {{inProgress}} · Done {{done}} · Not a task yet {{open}}",
+      "counts": "{{total}} in all · To do {{todo}} · In progress {{inProgress}} · Done {{done}} · Not settled yet {{open}}",
       "include": "Make “{{text}}” a task",
       "mine": "Mine",
       "accepted": "Taken by the owner",
-      "assigned": "Assigned by the host",
-      "proposedTo": "Proposed to {{name}}",
+      "proposedTo": "Offered by the meeting agent",
       "stateDeclined": "Says not theirs",
-      "stateWaiting": "No answer yet",
+      "stateWaiting": "Waiting for {{name}}’s answer",
       "owner": "Owner of “{{text}}”",
       "chooseOwner": "Choose owner",
-      "assignedToast": "{{count}} tasks created in To do. The meeting agent told {{people}} owners.",
+      "assignedToast": "{{count}} tasks created. {{people}} owners were told.",
       "assignAll": "Create {{count}} tasks and assign",
-      "assignWho": "The meeting agent tells the {{people}} owners. The agent drafted these: change an owner or untick a line that is wrong.",
+      "assignWho": "The meeting agent tells the {{people}} owners. Change the owner of a wrong line, or untick it.",
       "colTask": "Task",
       "colOwner": "Owner",
       "colActions": "Actions",
-      "stateUnasked": "Waiting for the host to assign",
-      "suggestedOutside": "{{name}} was not in the meeting; not asked yet"
+      "stateUnasked": "Not assigned yet",
+      "suggestedOutside": "{{name}} was not in the meeting",
+      "assignedByMe": "Assigned by me"
     },
     "openTask": "Open task",
-    "notMine": "Not mine",
-    "accept": "Take it",
-    "acceptAfterAll": "Take it after all",
     "excerpt": {
-      "scope": "You were not in this meeting, so you see your task and the part of the meeting it came from. The host or an attendee can share the full minutes with you.",
       "task": "My task",
       "assignedBy": "Assigned by {{name}}",
       "where": "The part of the meeting it came from"
     },
     "detail": {
       "attendees": "People",
-      "originLabel": "Set up in",
+      "originLabel": "Created in",
       "originChat": "Chat “{{name}}”"
     },
     "response": {
       "yes": "Coming",
       "no": "Not coming",
-      "none": "No answer",
+      "none": "Not answered",
       "label": "Will you come to “{{title}}”?"
     },
     "minutes": {
@@ -31640,25 +31622,25 @@
       "full": "Transcript",
       "ask": "Ask",
       "decisions": "Decisions",
-      "summaryHelp": "Select a sentence to go to the moment it was said.",
       "find": "Find in the transcript",
-      "found": "{{count}} of {{total}} turns",
-      "turns": "{{total}} turns",
+      "found": "{{count}} of {{total}} remarks",
+      "turns": "{{total}} remarks",
       "notFound": "Nothing said matches. Try a shorter word.",
       "card": "Minutes"
     },
     "share": {
       "done": "The meeting agent sent {{name}} the link to the full minutes.",
-      "scope": "The {{count}} people who were in the meeting see the full minutes. An assignee who was not there sees only their task and the sentence it came from.",
-      "sharedWith": "Shared by link with {{names}}.",
+      "scope": "The {{count}} people who were in the meeting see the full minutes.",
+      "sharedWith": "Got the link: {{names}}",
       "button": "Share link",
       "request": "{{name}} asks to see the full minutes.",
-      "decline": "Not now",
+      "decline": "Decline",
       "approve": "Approve",
       "requestDeclined": "{{name}} did not share the full minutes.",
-      "requested": "Asked. {{name}} sees your request on the minutes.",
+      "requested": "Asked {{name}}.",
       "requestButton": "Ask to see the full minutes",
-      "card": "Who sees what"
+      "card": "Who sees what",
+      "scopeOutside": "{{names}} see only their own task and the part it came from."
     },
     "agenda": {
       "previousWeek": "Previous week",
@@ -31673,17 +31655,17 @@
       "minutesFollowUps": "Minutes ready · {{done}} of {{total}} follow-ups done",
       "myTasks": "My tasks from it: {{count}}",
       "scheduledPrep": "Scheduled · prep ready",
-      "scheduledNoPrep": "Scheduled · no prep yet",
+      "scheduledNoPrep": "Scheduled",
       "waitingMine": "Needs me · {{count}} items for me",
       "waitingSort": "Needs me · {{count}} follow-ups to sort"
     },
     "list": {
-      "emptyUpcoming": "Nothing is scheduled. A meeting you are invited to appears here.",
+      "emptyUpcoming": "Nothing is scheduled. A meeting you create or are invited to appears here.",
       "emptyPast": "No minutes yet. They arrive when a recording ends."
     },
     "notice": {
       "recordingTitle": "Recording has started",
-      "recordingBody": "{{name}} is recording “{{title}}”. It stays in the status bar until it ends.",
+      "recordingBody": "{{name}} is recording “{{title}}”.",
       "minutesTitle": "Meeting agent: the minutes are here",
       "sharedTitle": "Meeting agent: minutes were shared with you",
       "taskTitle": "Meeting agent: a task was assigned to you",
@@ -31703,9 +31685,8 @@
       "whoDm": "{{name}} and me",
       "question": "Create a meeting for {{details}}?",
       "onlyMe": "Only I see this",
-      "lead": "This looks like setting up a meeting.",
       "title": "Title: “{{title}}”.",
-      "guessed": "The line gave no time, so this time is only a first offer.",
+      "guessed": "Suggested time",
       "created": "Meeting created. It is on {{count}} people’s schedule.",
       "create": "Create",
       "edit": "Edit, then create",
@@ -31718,25 +31699,22 @@
       "waitingSub": "The meeting agent is waiting",
       "week": "This week",
       "weekSub": "I host {{host}} · I attend {{attend}}",
-      "followUpsSub": "Done {{done}} · in progress {{inProgress}} · to do {{todo}}",
-      "decisionsSub": "Each one opens where it was said",
-      "notTasksYet": "{{count}} not a task yet",
-      "allTasks": "All are tasks",
-      "doneSub": "In progress {{inProgress}} · to do {{todo}}",
+      "followUpsSub": "Done {{done}} · in progress {{inProgress}} · to do {{todo}} · not settled {{open}}",
+      "notTasksYet": "{{count}} not settled yet",
+      "allTasks": "All are settled",
+      "doneSub": "Of {{total}} follow-up tasks",
       "mineOpen": "{{count}} waiting for my answer",
-      "mineNone": "Nothing waiting for my answer"
+      "mineOpenOne": "Waiting for my answer",
+      "done": "Tasks done",
+      "mineTaken": "In My work",
+      "ended": "Ended {{count}}"
     },
-    "line": "My meetings, and what the meeting agent made of them.",
     "mine": "My meetings",
-    "viewerLabel": "Seen as",
+    "viewerLabel": "Signed in as",
     "agent": {
       "aside": "What it sent me",
       "open": "Open the conversation",
-      "proposals": "{{count}} items looked like mine",
-      "willDo": "What the meeting agent does",
-      "plan1": "Records while the host has recording on.",
-      "plan2": "Writes the minutes and sends the link to everyone in the meeting.",
-      "plan3": "Offers each person the follow-ups that look like theirs. Nothing becomes a task until someone takes or assigns it."
+      "proposals": "{{count}} items look like mine"
     },
     "role": {
       "host": "I host",
@@ -31818,10 +31796,10 @@
       "aside": "This week",
       "less": "Show fewer",
       "all": "View all {{count}}",
-      "filter": "Which activity",
+      "filter": "Activity type",
       "filterAll": "Everything",
       "filterFinished": "Finished by agents",
-      "empty": "Nothing has happened yet this week.",
+      "empty": "Hand a task to an agent and this week’s activity collects here.",
       "confirmed": "Confirmed by me",
       "unconfirmed": "Not confirmed by me yet",
       "budgetDone": "updated the campaign budget sheet",
@@ -31852,23 +31830,20 @@
       "stageWork": "Work",
       "stageReview": "Review",
       "title": "Agents and bots",
-      "aside": "An agent takes a task and works on it. A bot does one set job each time it comes up.",
-      "colWho": "Who",
+      "colWho": "Name",
       "colDoing": "Doing now",
       "colState": "State",
       "colProgress": "Progress",
       "colLast": "Last activity",
-      "stageOf": "{{stage}}, step {{step}} of 3",
+      "stageOf": "{{stage}} · {{step}} of 3",
       "answerInTask": "Answer it",
-      "showTask": "Show its task",
-      "sampleChat": "Sample agent: these are the last lines of its conversation."
+      "showTask": "Show its task"
     },
     "header": {
       "morning": "Good morning, {{name}}",
       "day": "Hello, {{name}}",
       "evening": "Good work today, {{name}}",
       "handOff": "Hand to an agent",
-      "line": "My work today, and what my agents did.",
       "startMeeting": "Start meeting",
       "newTask": "New task",
       "me": "Mako",
@@ -31882,33 +31857,32 @@
       "agentDone": "Finished by agents",
       "agentDoneSub": "This week · {{confirmed}} of {{total}} confirmed by me",
       "late": "Late · awaiting others",
-      "lateSub": "Needs a look",
-      "lateNone": "Nothing is stuck"
+      "lateNone": "Nothing is late or blocked"
     },
     "firstRun": {
       "title": "Start here",
-      "inax": "Sign in with inAX (the team’s work tracker) so your work appears here",
+      "inax": "Sign in to inAX",
       "inaxDetail": "Your tasks, their deadlines and what waits on you",
-      "app": "Register an app you work in",
-      "appDetail": "Optional. Its time joins My day, which only you see",
+      "app": "Register an app you work in (optional)",
+      "appDetail": "Its time collects in My day. Only I see it",
       "register": "Register"
     },
     "day": {
       "title": "My day",
       "privacy": "Only I see this. Only what I confirm in Wrap up today is reported to the team.",
-      "manage": "Manage recording",
+      "manage": "Manage records",
       "manageApps": "Apps that are recorded",
       "manageBrowser": "Browser activity record",
-      "nothing": "Nothing recorded yet today.",
-      "scope": "Recorded: time in apps I registered, page titles in this app’s browser, and meeting times. Never screen content. I can turn each one off in Manage recording.",
-      "noApp": "No app is registered, so app time is not recorded.",
+      "nothing": "Use a registered app or hold a meeting and today’s records collect here.",
+      "scope": "Only time in registered apps, the address and title of pages in this app’s browser, and meeting times are recorded. Never screen content.",
+      "noApp": "Register an app you work in and its time collects here.",
       "unconfirmed": "Records to check",
-      "unconfirmedHint": "The app is not sure these were work.",
-      "wrapUpHint": "See what would be reported before anything is.",
+      "unconfirmedHint": "Choose whether these were work.",
+      "wrapUpHint": "I choose what is reported.",
       "wrappedUp": "Wrapped up: {{count}} updates confirmed.",
       "hours": "{{count}} hr",
       "minutes": "{{count}} min",
-      "excluded": "Not work. It is never reported.",
+      "excluded": "Not work · only I see it",
       "linked": "Linked to “{{task}}”",
       "undo": "Undo",
       "pickTask": "Task to link this record to",
@@ -31924,13 +31898,12 @@
     "wrapUp": {
       "title": "Wrap up today",
       "errorEmpty": "Write the update, or clear “Report this” to leave it out.",
-      "linkedRecords": "{{count}} record(s) from My day are linked to this task. The records themselves are not reported.",
+      "linkedRecords": "Records linked from My day: {{count}} · only I see the records",
       "include": "Report this",
-      "destination": "Nothing is chosen yet. Each update you check becomes a comment on its task in inAX (the team’s work tracker). The project’s members and Kim Jiwoo (team lead) see it. Unchecked updates go nowhere.",
+      "destination": "Only the updates you check become comments on their tasks in inAX. The project’s members and the team lead see them.",
       "done": "{{count}} updates reported.",
       "unanswered": "Records not checked yet",
-      "unansweredTitle": "{{count}} record(s) not checked yet · not reported",
-      "unansweredHint": "Link one to a task and it counts toward that task’s update; say “Not work” and it is dropped.",
+      "unansweredTitle": "Records not checked yet: {{count}} · only I see them",
       "cancel": "Cancel",
       "confirm": "Report {{count}} updates",
       "close": "Close",
@@ -31939,37 +31912,36 @@
     "newTask": {
       "label": "Task title",
       "placeholder": "For example: book the photo studio",
-      "error": "Type a title for the task, then press Add.",
-      "hintAgent": "The task joins My work, and its conversation with the agent opens.",
-      "hint": "It is added to My work, due today.",
-      "add": "Add"
+      "error": "Type a title for the task.",
+      "add": "Add",
+      "due": "Due"
     },
     "tasks": {
       "title": "My work",
-      "today": "Open",
+      "today": "Remaining",
       "waiting": "Needs me",
       "late": "Late",
       "done": "Done",
-      "emptyToday": "No open tasks.",
+      "emptyToday": "No tasks remain. Add a new task or hand one to an agent.",
       "emptyWaiting": "Nothing is waiting for you.",
       "emptyLate": "Nothing is late or blocked.",
-      "emptyDone": "Nothing finished yet.",
+      "emptyDone": "Tasks you finish collect here.",
       "answer": "Answer",
       "openList": "Open the task list",
       "open": "Open",
       "openMinutes": "Open the minutes"
     },
     "signedOut": {
-      "line": "Sign in with inAX (the team’s work tracker) to see your work, what waits on you, and what your agents are doing."
+      "line": "Sign in to inAX to see your work, what waits on you, and what your agents are doing."
     },
     "preview": {
-      "label": "Sample preview",
-      "auto": "Follow the clock",
+      "label": "Time of day",
+      "auto": "Now",
       "morning": "Morning",
       "day": "Midday",
       "evening": "Evening",
-      "firstRun": "First run",
-      "reset": "Start the sample over"
+      "firstRun": "Before sign-in",
+      "reset": "Start over"
     },
     "upcoming": {
       "today": "Today",
@@ -31981,7 +31953,6 @@
       "deadline": "Deadline",
       "prepReady": "Prep ready",
       "endOfDay": "End of day",
-      "noPrep": "No prep yet",
       "recording": "Recording now",
       "minutesMine": "Minutes arrived · {{count}} items for me",
       "minutesWaiting": "Minutes arrived · waiting for me"
@@ -32045,7 +32016,6 @@
       "finishedConfirmed": "Finished {{day}} · confirmed by me",
       "budgetDetail": "The writing agent updated it; you confirmed the numbers.",
       "resumed": "Agent working · picked up my answer",
-      "addedDetail": "A task I added here.",
       "addedAgent": "Agent working · just handed over",
       "fromMeetingAccepted": "A follow-up from the meeting “{{title}}”. The meeting agent offered it and {{name}} took it.",
       "fromMeetingAssigned": "A follow-up from the meeting “{{title}}”. {{host}} assigned it to {{name}}.",
@@ -32061,29 +32031,29 @@
       "promo": "Year-end promotion"
     },
     "report": {
-      "copy": "The writing agent drafted two headlines. I have not chosen one yet.",
-      "researchDone": "The research agent put three competitors’ promotions into a table. I have not checked it yet.",
-      "research": "The research agent has two of three competitors’ promotions in a table. I have not checked it yet.",
-      "inquiries": "The inquiry agent drafted 214 inquiries sorted into 6 types. I have not reviewed it yet.",
+      "copy": "The writing agent drafted two headlines. It is my turn to choose.",
+      "researchDone": "The research agent put three competitors’ promotions into a table. My check is left.",
+      "research": "The research agent has two of three competitors’ promotions in a table. My check is left.",
+      "inquiries": "The inquiry agent drafted 214 inquiries sorted into 6 types. My review is left.",
       "notice": "The inquiry agent cannot continue until the logistics team sends the new delivery dates. The deadline has passed.",
       "done": "I finished this task.",
       "copyChosen": "The writing agent drafted two headlines and I chose one. It is matching the body text and the button to it.",
       "mine": "I worked on this task today."
     },
     "offer": {
-      "declined": "The host now sees these as not mine.",
+      "declined": "The host was told these are not mine.",
       "undo": "Undo"
     }
   },
   "taskLoop": {
     "activity": {
-      "confirmed": "· drafted “{{title}}”; I confirmed its status and note onto inAX"
+      "confirmed": "· drafted “{{title}}”; the status and the progress note I confirmed are on inAX"
     },
     "agent": {
       "name": "Task agent"
     },
     "applied": {
-      "note": "The PM and the team of “{{project}}” can see the status and this note.",
+      "note": "The PM and the team of “{{project}}” can see the status and this progress note.",
       "status": "The PM and the team of “{{project}}” can see the new status.",
       "title": "It is on inAX now."
     },
@@ -32094,34 +32064,32 @@
       "confirmed": "Confirmed: the status is “{{status}}”.",
       "confirmedNote": "Confirmed: the status is “{{status}}” and the progress note is on the task.",
       "declined": "Not yet: the status and the notes stay as they are.",
-      "done": "The status and the note are on the task. I am finished with it unless you tell me more.",
+      "done": "The status and the note are on the task. Tell me if you need anything more.",
       "inputLabel": "Message to {{agent}}",
       "kickoff": "Please take this task: {{title}}",
       "label": "Conversation about “{{title}}”",
-      "noted": "Noted. I will apply it to the step I am on.",
+      "noted": "Noted. I will apply it to what I am writing now.",
       "placeholder": "For example: make the second line shorter",
-      "proposeFinal": "The draft is above. I propose changing the status {{to}} and leaving a progress note. Read the card below: you can confirm it, correct it, or say not yet.",
-      "proposeStart": "First I propose changing the status {{to}}. Answer the card below and I start; the status changes only if you confirm.",
+      "proposeFinal": "The draft is ready. May I change the status {{to}} and leave a progress note?",
+      "proposeStart": "Before I start, may I change the status {{to}}?",
       "read": "I read the task: its description, its deadline ({{due}}) and its notes.",
-      "readOnly": "This conversation can only be read here.",
-      "reproposed": "I wrote your request into the progress note and propose again. The draft message itself is unchanged.",
+      "reproposed": "I added your request to the progress note. Please confirm again.",
       "send": "Send",
       "started": "I am starting with step 1.",
       "waiting": "Understood. The status and the notes stay as they are. Tell me below what to change, and I will propose again."
     },
     "demo": {
-      "chip": "Demo",
-      "line": "This build uses sample inAX data and prepared agent replies inside the app. Nothing leaves this computer."
+      "chip": "Demo"
     },
     "detail": {
       "attached": "Attached",
-      "attachedDraft": "The agent’s draft. It has not been sent to anyone; the reviewer reads it here.",
+      "attachedDraft": "The agent’s draft. Only the people who review this task see it.",
       "description": "Description",
       "due": "Due",
-      "finish": "I finished it myself: move to Done",
-      "noteBy": "Written by the agent, confirmed by Mako · {{when}} · status changed {{to}}",
+      "finish": "Mark as done",
+      "noteBy": "Written by the agent, confirmed by me · {{when}} · status changed {{to}}",
       "notes": "Progress notes",
-      "notesEmpty": "No notes yet. A note an agent writes is kept here once you confirm it.",
+      "notesEmpty": "Progress notes I confirm are kept here.",
       "openChat": "Open the conversation",
       "project": "Project",
       "start": "Start with an agent",
@@ -32131,22 +32099,21 @@
       "origin": "Where it came from"
     },
     "gate": {
-      "line": "Sign in with inAX (the team’s work tracker) and your tasks appear here."
+      "line": "Sign in to inAX and your tasks appear here."
     },
     "home": {
       "review": "Review"
     },
     "onboarding": {
-      "found": "Found {{open}} tasks assigned to you · {{due}} due today. They are on Home when you start.",
-      "signedOut": "Not signed in yet",
+      "found": "{{open}} tasks assigned to you · {{due}} due today",
       "skip": "Skip for now",
       "start": "Start",
-      "subtitle": "inAX is the team’s work tracker. Sign in and the work assigned to you appears in this app.",
+      "subtitle": "Sign in and the work assigned to you appears in this app.",
       "title": "Sign in to inAX"
     },
     "proposal": {
-      "audienceNote": "When you confirm, this status change and this note become visible on inAX to the PM and the team of “{{project}}”. Only these two are waiting for you.",
-      "audienceStatus": "When you confirm, this status change becomes visible on inAX to the PM and the team of “{{project}}”. It is not visible yet.",
+      "audienceNote": "When you confirm, the PM and the team of “{{project}}” see this status change and this note on inAX.",
+      "audienceStatus": "When you confirm, the PM and the team of “{{project}}” see this status change on inAX. For now only I see it.",
       "basisTitle": "What this note is based on",
       "cancelEdit": "Cancel",
       "confirm": "Confirm",
@@ -32154,11 +32121,11 @@
       "decline": "Not yet",
       "edit": "Correct",
       "heading": "The agent’s proposal for inAX",
-      "notDone": "Confirming does not send the draft to anyone. The draft stays attached to this task for the reviewer.",
+      "notDone": "Only the people who review this task see the draft.",
       "noteError": "Write at least one line that says what was done, then confirm.",
       "noteLabel": "Progress note",
       "output": "Open the draft",
-      "pending": "Not on inAX yet",
+      "pending": "Waiting for my confirmation",
       "statusLabel": "Status",
       "title": "Change the status {{to}}",
       "titleNote": "Change the status {{to}} and leave this progress note"
@@ -32170,8 +32137,8 @@
       "basis": "The task description: “{{detail}}”",
       "choiceA": "Short · the main points only",
       "choiceB": "Detailed · with the reasons",
-      "draft": "**{{title}} (draft · short)**\n\n- What the task asks for: {{detail}}\n- What is left for you: read it and correct what is wrong.",
-      "draftLong": "**{{title}} (draft · detailed)**\n\n- What the task asks for: {{detail}}\n- What I prepared: a first draft that follows the task description, with the reason for each point.\n- Why this order: the task description names these points in this order.\n- What is left for you: read it and correct what is wrong.",
+      "draft": "**{{title}}**\n\n{{detail}}",
+      "draftLong": "**{{title}}**\n\n{{detail}}\n\nTo check when you read it:\n- Is anything missing?\n- Is the order right?",
       "note": "Wrote a short first draft for “{{title}}”. It follows the task description. It needs a review before it is used.",
       "noteLong": "Wrote a detailed first draft for “{{title}}”, with the reason for each point. It follows the task description. It needs a review before it is used.",
       "plan": "This is how I will do it.\n\n1. Put the task description and its earlier notes in order.\n2. Write a draft.\n3. Show you the draft, then propose a status and a progress note.",
@@ -32192,18 +32159,17 @@
       "requested": "You asked for: “{{text}}”"
     },
     "settings": {
-      "cardDescription": "inAX is the team’s work tracker. Sign in and your tasks appear on Home and in Tasks.",
+      "cardDescription": "Sign in and your tasks appear on Home and in Tasks.",
       "keywordInax": "inax",
       "keywordSignIn": "sign in",
       "keywordTasks": "my work",
-      "pointer": "Looking for inAX (the team’s work tracker)? Its account is a different one.",
-      "pointerLink": "Go to the inAX account",
+      "pointerLink": "inAX account",
       "searchDescription": "Sign in to inAX, see the connected account, or disconnect it.",
       "searchTitle": "inAX account",
       "viewTasks": "See my work"
     },
     "source": {
-      "chip": "inAX (the team’s work tracker) · my work"
+      "chip": "inAX · my work"
     },
     "status": {
       "done": "Done",
@@ -32219,7 +32185,7 @@
     },
     "who": {
       "confirmed": "{{status}} · written by the agent, confirmed by me",
-      "declined": "Draft ready · not on inAX yet",
+      "declined": "Draft ready · waiting for my confirmation",
       "justStarted": "Agent working · just started",
       "proposal": "Waiting for my confirmation · {{agent}}",
       "question": "Waiting for my answer · {{agent}}"

@@ -91,7 +91,7 @@ export function HomeNewTaskButton({
           />
           {error ? (
             <p id={errorId} role="alert" className="text-xs text-destructive">
-              {t('home.newTask.error', 'Type a title for the task, then press Add.')}
+              {t('home.newTask.error', 'Type a title for the task.')}
             </p>
           ) : null}
           {/* Why min-h-6: the label is the 24px target for its 16px box. */}
@@ -103,14 +103,10 @@ export function HomeNewTaskButton({
             />
             {t('home.header.handOff', 'Hand to an agent')}
           </Label>
-          <p className={HOME_META_CLASS}>
-            {agent
-              ? t(
-                  'home.newTask.hintAgent',
-                  'The task joins My work, and its conversation with the agent opens.'
-                )
-              : t('home.newTask.hint', 'It is added to My work, due today.')}
-          </p>
+          <dl className={`flex gap-2 ${HOME_META_CLASS}`}>
+            <dt>{t('home.newTask.due', 'Due')}</dt>
+            <dd className="text-foreground">{t('home.task.today', 'Today')}</dd>
+          </dl>
           <Button type="submit" size="sm" className="self-end">
             {t('home.newTask.add', 'Add')}
           </Button>

@@ -63,19 +63,36 @@ export function MinutesScopeCard({ meeting }: { meeting: Meeting }): React.JSX.E
   const viewerId = useMeetings((state) => state.viewerId)
   const share = useShare(meeting)
   const pending = meeting.requests.filter((request) => !request.declined)
+  // People with a task from this meeting who were not in it and have not been given the minutes.
+  const outside = useMeetings((state) => state.tasks)
+    .filter((task) => task.meetingId === meeting.id)
+    .map((task) => task.assigneeId)
+    .filter(
+      (id, index, all) =>
+        all.indexOf(id) === index &&
+        !isParticipant(meeting, id) &&
+        !meeting.shares.some((entry) => entry.personId === id)
+    )
   return (
     <HomeCard title={t('meetings.share.card', 'Who sees what')} data-meeting-card="scope">
       <div className="flex flex-col gap-2" data-meeting-sharing="">
         <p className="px-4 text-xs text-foreground">
           {t(
             'meetings.share.scope',
-            'The {{count}} people who were in the meeting see the full minutes. An assignee who was not there sees only their task and the sentence it came from.',
+            'The {{count}} people who were in the meeting see the full minutes.',
             { count: meeting.attendeeIds.length + 1 }
           )}
+          {outside.length > 0
+            ? ` ${t(
+                'meetings.share.scopeOutside',
+                '{{names}} see only their own task and the part it came from.',
+                { names: outside.map(personName).join(', ') }
+              )}`
+            : null}
         </p>
         {meeting.shares.length > 0 ? (
           <p className={`px-4 ${HOME_META_CLASS}`}>
-            {t('meetings.share.sharedWith', 'Shared by link with {{names}}.', {
+            {t('meetings.share.sharedWith', 'Got the link: {{names}}', {
               names: meeting.shares.map((entry) => personName(entry.personId)).join(', ')
             })}
           </p>
@@ -103,7 +120,7 @@ export function MinutesScopeCard({ meeting }: { meeting: Meeting }): React.JSX.E
                     size="xs"
                     onClick={() => declineMinutesRequest(meeting.id, request.personId)}
                   >
-                    {t('meetings.share.decline', 'Not now')}
+                    {t('meetings.share.decline', 'Decline')}
                   </Button>
                   <Button
                     type="button"
@@ -135,7 +152,7 @@ export function MinutesRequestControl({ meeting }: { meeting: Meeting }): React.
         ? t('meetings.share.requestDeclined', '{{name}} did not share the full minutes.', {
             name: host
           })
-        : t('meetings.share.requested', 'Asked. {{name}} sees your request on the minutes.', {
+        : t('meetings.share.requested', 'Asked {{name}}.', {
             name: host
           })}
     </p>

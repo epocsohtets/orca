@@ -142,7 +142,7 @@ export default function HomePage(): React.JSX.Element {
     }
     if (choiceId !== HOME_ACCEPT_FOLLOW_UPS && offered.length > 0) {
       // The row leaves the board with the answer, so the way back comes with the message.
-      toast(t('home.offer.declined', 'The host now sees these as not mine.'), {
+      toast(t('home.offer.declined', 'The host was told these are not mine.'), {
         action: {
           label: t('home.offer.undo', 'Undo'),
           onClick: () => {
@@ -197,7 +197,6 @@ export default function HomePage(): React.JSX.Element {
             phase={phase}
             name={viewerId === MAKO ? t('home.header.me', 'Mako') : personName(viewerId)}
             date={uiDateTimeFormat(DATE_OPTIONS, intlLocale).format(sampleDay)}
-            line={t('home.header.line', 'My work today, and what my agents did.')}
           >
             <Button
               type="button"
@@ -240,10 +239,7 @@ export default function HomePage(): React.JSX.Element {
               steps={[
                 {
                   id: 'inax',
-                  title: t(
-                    'home.firstRun.inax',
-                    'Sign in with inAX (the team’s work tracker) so your work appears here'
-                  ),
+                  title: t('home.firstRun.inax', 'Sign in to inAX'),
                   detail: t(
                     'home.firstRun.inaxDetail',
                     'Your tasks, their deadlines and what waits on you'
@@ -253,10 +249,10 @@ export default function HomePage(): React.JSX.Element {
                 },
                 {
                   id: 'app',
-                  title: t('home.firstRun.app', 'Register an app you work in'),
+                  title: t('home.firstRun.app', 'Register an app you work in (optional)'),
                   detail: t(
                     'home.firstRun.appDetail',
-                    'Optional. Its time joins My day, which only you see'
+                    'Its time collects in My day. Only I see it'
                   ),
                   action: t('home.firstRun.register', 'Register'),
                   run: () => openSettings('my-apps')
@@ -332,7 +328,7 @@ export default function HomePage(): React.JSX.Element {
                         <p className="text-[13px] text-foreground">
                           {t(
                             'home.signedOut.line',
-                            'Sign in with inAX (the team’s work tracker) to see your work, what waits on you, and what your agents are doing.'
+                            'Sign in to inAX to see your work, what waits on you, and what your agents are doing.'
                           )}
                         </p>
                         <Button

@@ -17,7 +17,7 @@ import {
 } from '@/components/native-chat/appearance/native-chat-appearance-style'
 import type { NativeChatLiveSession } from '@/components/native-chat/session/terminal/read/native-chat-live-session-contract'
 import type { NativeChatMessage } from '../../../../../shared/native-chat/native-chat-types'
-import { HOME_META_CLASS, HomeWhoMarker } from '@/components/home/HomeCard'
+import { HomeWhoMarker } from '@/components/home/HomeCard'
 import type { HomeChoice, HomeTask } from '@/components/home/home-board'
 import type { HomeProposal } from '@/components/home/home-task-loop'
 import { HOME_LOOP_DRAFT_MESSAGE_ID } from '@/components/home/home-task-loop-script'
@@ -113,11 +113,6 @@ export function TaskPageInaxConversation({
           ) : null}
         </div>
         <InaxDemoNote />
-        {onSay ? null : (
-          <p className={HOME_META_CLASS}>
-            {t('taskLoop.chat.readOnly', 'This conversation can only be read here.')}
-          </p>
-        )}
       </header>
       <div
         className={`${NATIVE_CHAT_APPEARANCE_ROOT_CLASS} flex min-h-0 flex-1 flex-col`}

@@ -52,7 +52,7 @@ export function decideHomeLoop(
       description: proposal.note
         ? translate(
             'taskLoop.applied.note',
-            'The PM and the team of “{{project}}” can see the status and this note.',
+            'The PM and the team of “{{project}}” can see the status and this progress note.',
             { project }
           )
         : translate(

@@ -39,7 +39,7 @@ export function HomeRecordRow({
         <div className="flex flex-wrap items-center gap-2" role="status">
           <span className={HOME_META_CLASS}>
             {answer === 'notWork'
-              ? t('home.day.excluded', 'Not work. It is never reported.')
+              ? t('home.day.excluded', 'Not work · only I see it')
               : t('home.day.linked', 'Linked to “{{task}}”', { task: linked?.title ?? '' })}
           </span>
           <Button type="button" variant="ghost-muted" size="xs" onClick={() => onAnswer(null)}>

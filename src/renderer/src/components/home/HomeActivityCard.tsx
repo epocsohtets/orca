@@ -57,7 +57,7 @@ export function HomeActivityCard({
           value={filter}
           onValueChange={(value) => onFilterChange(value === 'finished' ? 'finished' : 'all')}
         >
-          <TabsList aria-label={t('home.activity.filter', 'Which activity')}>
+          <TabsList aria-label={t('home.activity.filter', 'Activity type')}>
             <TabsTrigger value="all">
               {t('home.activity.filterAll', 'Everything')}
               <span className="tabular-nums">{entries.length}</span>
@@ -71,7 +71,10 @@ export function HomeActivityCard({
       </div>
       {shown.length === 0 ? (
         <p className={`px-4 py-3 ${HOME_META_CLASS}`}>
-          {t('home.activity.empty', 'Nothing has happened yet this week.')}
+          {t(
+            'home.activity.empty',
+            'Hand a task to an agent and this week’s activity collects here.'
+          )}
         </p>
       ) : (
         <ol className="border-t border-border" data-home-activity-list="">

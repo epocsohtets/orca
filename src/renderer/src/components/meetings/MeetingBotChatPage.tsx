@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Bot, SendHorizontal } from 'lucide-react'
 import { useTranslate } from '@/i18n/use-translate'
-import { Badge } from '@/components/ui/badge'
+import { InaxDemoNote } from '@/components/task-page/inax/InaxDemoNote'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { homeSampleMoment } from '@/components/home/home-day'
@@ -80,22 +80,20 @@ export default function MeetingBotChatPage(): React.JSX.Element {
           ? `${t('meetings.bot.minutesReady', 'The minutes of **{{title}}** are ready.', {
               title: item.meeting.title
             })}\n\n${(item.meeting.minutes?.summary ?? []).map((line) => `- ${line}`).join('\n')}\n\n${
+              // The offers below carry their own heading.
               item.proposals.length > 0
-                ? t(
-                    'meetings.bot.proposalsFollow',
-                    'Below is what looks like yours. Take it and it becomes your task in To do.'
-                  )
+                ? ''
                 : t('meetings.bot.noProposals', 'Nothing in this meeting looks like yours.')
             }`
           : item.kind === 'shared'
             ? t(
                 'meetings.bot.sharedMessage',
-                '{{name}} shared the full minutes of **{{title}}** with you. You were not in the meeting.',
+                '{{name}} shared the full minutes of **{{title}}** with you.',
                 { name: personName(item.byId), title: item.meeting.title }
               )
             : t(
                 'meetings.bot.assignedMessage',
-                '{{name}} assigned you a task from **{{title}}**. You were not in the meeting, so I am sending the part it came from.',
+                '{{name}} assigned you a task from **{{title}}**. Here is the part it came from.',
                 { name: personName(item.meeting.hostId), title: item.meeting.title }
               )
       rows.push(message(item.key, 'assistant', item.at, `${heading}\n\n${body}`))
@@ -176,7 +174,7 @@ export default function MeetingBotChatPage(): React.JSX.Element {
   const name = t('meetings.bot.name', 'Meeting agent')
   const askLabel = askable
     ? t('meetings.bot.askAbout', 'Ask about “{{title}}”', { title: askable.title })
-    : t('meetings.bot.askNone', 'You can ask once you have minutes')
+    : ''
 
   return (
     <RailPage as="main" aria-label={name}>
@@ -189,21 +187,14 @@ export default function MeetingBotChatPage(): React.JSX.Element {
           <span className="min-w-0 truncate text-xs text-muted-foreground">
             {/* Says what this person actually gets: someone outside a meeting has no minutes yet. */}
             {items.some((item) => item.kind !== 'assigned') || items.length === 0
-              ? t(
-                  'meetings.bot.about',
-                  'Sends {{name}} the minutes and the tasks that look like theirs',
-                  {
-                    name: personName(viewerId)
-                  }
-                )
+              ? t('meetings.bot.about', 'Sends you the minutes and the items that look like yours')
               : t(
                   'meetings.bot.aboutOutside',
-                  'Sends {{name}} assigned tasks and the part they came from. Ask on a card to see the full minutes.',
-                  { name: personName(viewerId) }
+                  'Sends you assigned tasks and the part they came from'
                 )}
           </span>
         </div>
-        <Badge variant="outline">{t('meetings.bot.sample', 'Sample conversation')}</Badge>
+        <InaxDemoNote className="self-center" />
       </RailPageBand>
       {items.length === 0 ? (
         <div className="flex flex-1 flex-col items-start gap-1 p-6">
@@ -234,38 +225,40 @@ export default function MeetingBotChatPage(): React.JSX.Element {
           </NativeChatClockContext.Provider>
         </div>
       )}
-      <form
-        // Why pr-20: the floating workspace button sits over this corner on every page.
-        className="flex shrink-0 items-end gap-2 border-t border-border py-3 pr-20 pl-(--rail-page-gutter)"
-        onSubmit={(event) => {
-          event.preventDefault()
-          send()
-        }}
-      >
-        <Textarea
-          rows={1}
-          className="max-h-40 min-h-9 resize-none"
-          value={draft}
-          disabled={!askable}
-          placeholder={askLabel}
-          aria-label={askLabel}
-          onChange={(event) => setDraft(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) {
-              event.preventDefault()
-              send()
-            }
+      {askable ? (
+        <form
+          // Why pr-20: the floating workspace button sits over this corner on every page.
+          className="flex shrink-0 items-end gap-2 border-t border-border py-3 pr-20 pl-(--rail-page-gutter)"
+          onSubmit={(event) => {
+            event.preventDefault()
+            send()
           }}
-        />
-        <Button
-          type="submit"
-          size="icon"
-          disabled={!askable || !draft.trim()}
-          aria-label={t('meetings.ask.send', 'Ask')}
         >
-          <SendHorizontal aria-hidden />
-        </Button>
-      </form>
+          <Textarea
+            rows={1}
+            className="max-h-40 min-h-9 resize-none"
+            value={draft}
+            disabled={!askable}
+            placeholder={askLabel}
+            aria-label={askLabel}
+            onChange={(event) => setDraft(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) {
+                event.preventDefault()
+                send()
+              }
+            }}
+          />
+          <Button
+            type="submit"
+            size="icon"
+            disabled={!askable || !draft.trim()}
+            aria-label={t('meetings.ask.send', 'Ask')}
+          >
+            <SendHorizontal aria-hidden />
+          </Button>
+        </form>
+      ) : null}
     </RailPage>
   )
 }

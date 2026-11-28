@@ -11,7 +11,7 @@ export const getBrowserActivitySearchEntry = createLocalizedCatalog((): Settings
   title: translate('settings.browser.activitySuggestions.title', 'Activity suggestions'),
   description: translate(
     'settings.browser.activitySuggestions.description',
-    'Records the pages you open in the built-in browser (time, address without query, title) to suggest handing repeated web work to an agent. The record stays in memory on this device.'
+    'Records the address, title and time of pages you open in this app’s browser, and suggests handing repeated work to an agent. The record stays on this computer.'
   ),
   keywords: [
     ...translateSearchKeyword('auto.components.settings.browser.search.2d2d995c58', 'browser'),

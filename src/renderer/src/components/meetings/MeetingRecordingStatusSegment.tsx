@@ -25,13 +25,9 @@ export function MeetingRecordingStatusSegment(): React.JSX.Element | null {
       data-meeting-recording-status=""
       onClick={() => openMeeting(meeting.id)}
       className="inline-flex h-6 cursor-pointer items-center gap-1.5 rounded-md border border-destructive/50 bg-destructive/10 px-2 text-xs text-foreground outline-none hover:bg-destructive/15 focus-visible:ring-2 focus-visible:ring-ring"
-      aria-label={t(
-        'meetings.recording.statusAria',
-        '{{title}} is being recorded. Open the meeting.',
-        {
-          title: meeting.title
-        }
-      )}
+      aria-label={t('meetings.recording.statusAria', 'Open the meeting being recorded: {{title}}', {
+        title: meeting.title
+      })}
     >
       <span
         aria-hidden

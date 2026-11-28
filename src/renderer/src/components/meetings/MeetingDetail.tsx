@@ -2,12 +2,7 @@ import React from 'react'
 import { useTranslate } from '@/i18n/use-translate'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import {
-  HOME_META_CLASS,
-  HomeCard,
-  HomeProjectDot,
-  HomeWhoMarker
-} from '@/components/home/HomeCard'
+import { HOME_META_CLASS, HomeCard, HomeProjectDot } from '@/components/home/HomeCard'
 import { HomePageHeading, HomeTileRow, type HomeTile } from '@/components/home/HomeHeader'
 import type { HomeProjectId } from '@/components/home/home-board'
 import type { HomeProject } from '@/components/home/home-board-mock'
@@ -91,12 +86,6 @@ function MeetingExcerpt({ meeting }: { meeting: Meeting }): React.JSX.Element {
       </div>
       <HomeCard title={t('meetings.share.card', 'Who sees what')} data-meeting-card="scope">
         <div className="flex flex-col items-start gap-2 px-4 pb-2">
-          <p className="text-xs text-foreground">
-            {t(
-              'meetings.excerpt.scope',
-              'You were not in this meeting, so you see your task and the part of the meeting it came from. The host or an attendee can share the full minutes with you.'
-            )}
-          </p>
           <MinutesRequestControl meeting={meeting} />
         </div>
       </HomeCard>
@@ -122,7 +111,7 @@ function MeetingFacts({
       ? t('meetings.response.yes', 'Coming')
       : meeting.responses[id] === 'no'
         ? t('meetings.response.no', 'Not coming')
-        : t('meetings.response.none', 'No answer')
+        : t('meetings.response.none', 'Not answered')
   return (
     <Card size="sm" data-meeting-facts="">
       <dl className="flex flex-wrap items-center gap-x-6 gap-y-2 px-4 text-xs">
@@ -145,7 +134,7 @@ function MeetingFacts({
         {origin && showOrigin ? (
           <div className="flex min-w-0 items-center gap-2">
             <dt className="text-muted-foreground">
-              {t('meetings.detail.originLabel', 'Set up in')}
+              {t('meetings.detail.originLabel', 'Created in')}
             </dt>
             <dd>
               <Button
@@ -196,7 +185,7 @@ export function MeetingDetail({
       id: 'decisions',
       label: t('meetings.minutes.decisions', 'Decisions'),
       value: meeting.minutes?.decisions.length ?? 0,
-      sub: t('meetings.tiles.decisionsSub', 'Each one opens where it was said')
+      sub: ''
     },
     {
       id: 'followUps',
@@ -204,14 +193,14 @@ export function MeetingDetail({
       value: counts.total,
       sub:
         counts.open > 0
-          ? t('meetings.tiles.notTasksYet', '{{count}} not a task yet', { count: counts.open })
-          : t('meetings.tiles.allTasks', 'All are tasks')
+          ? t('meetings.tiles.notTasksYet', '{{count}} not settled yet', { count: counts.open })
+          : t('meetings.tiles.allTasks', 'All are settled')
     },
     {
       id: 'done',
-      label: t('meetings.status.done', 'Done'),
+      label: t('meetings.tiles.done', 'Tasks done'),
       value: counts.done,
-      sub: t('meetings.tiles.doneSub', 'In progress {{inProgress}} · to do {{todo}}', counts)
+      sub: t('meetings.tiles.doneSub', 'Of {{total}} follow-up tasks', counts)
     },
     {
       id: 'mine',
@@ -222,7 +211,9 @@ export function MeetingDetail({
           ? t('meetings.tiles.mineOpen', '{{count}} waiting for my answer', {
               count: mineOpen.length
             })
-          : t('meetings.tiles.mineNone', 'Nothing waiting for my answer')
+          : mine.length > 0
+            ? t('meetings.tiles.mineTaken', 'In My work')
+            : ''
     }
   ]
   const state =
@@ -278,34 +269,9 @@ export function MeetingDetail({
           data-meeting-state={state}
         >
           <div className="flex min-w-0 flex-col gap-4">
-            <MeetingRecordingCard meeting={meeting} isHost={isHost} />
             <MeetingPrep meeting={meeting} isHost={isHost} />
           </div>
-          <HomeCard
-            title={t('meetings.agent.willDo', 'What the meeting agent does')}
-            data-meeting-card="agent-plan"
-          >
-            <ul className="flex flex-col gap-2 px-4 pb-2">
-              {[
-                t('meetings.agent.plan1', 'Records while the host has recording on.'),
-                t(
-                  'meetings.agent.plan2',
-                  'Writes the minutes and sends the link to everyone in the meeting.'
-                ),
-                t(
-                  'meetings.agent.plan3',
-                  'Offers each person the follow-ups that look like theirs. Nothing becomes a task until someone takes or assigns it.'
-                )
-              ].map((line) => (
-                <li key={line} className="flex items-start gap-2">
-                  <span className="pt-0.5">
-                    <HomeWhoMarker who="idle" label="" />
-                  </span>
-                  <span className="text-xs text-foreground">{line}</span>
-                </li>
-              ))}
-            </ul>
-          </HomeCard>
+          <MeetingRecordingCard meeting={meeting} isHost={isHost} />
         </div>
       )}
     </>

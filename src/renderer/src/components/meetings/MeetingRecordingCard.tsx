@@ -60,14 +60,12 @@ export function MeetingRecordingCard({
                 {text.elapsed(elapsed)}
               </span>
             </p>
-          ) : (
+          ) : isHost ? null : (
             <p className="text-[13px] text-foreground">
-              {isHost
-                ? t('meetings.recording.hostIdle', 'Start recording when the meeting begins.')
-                : t(
-                    'meetings.recording.attendeeIdle',
-                    'When the host starts recording, it shows here and in the status bar.'
-                  )}
+              {t(
+                'meetings.recording.attendeeIdle',
+                'When the host starts recording, everyone in the meeting sees the recording mark.'
+              )}
             </p>
           )}
           <p className={HOME_META_CLASS}>
@@ -79,12 +77,7 @@ export function MeetingRecordingCard({
                     count: people
                   }
                 )
-              : isHost
-                ? t(
-                    'meetings.recording.simulated',
-                    'This build does not capture sound. When you end the recording, prepared sample minutes are made and sent to the attendees.'
-                  )
-                : null}
+              : null}
           </p>
         </div>
         {isHost && !recording ? (

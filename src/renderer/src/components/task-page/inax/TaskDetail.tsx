@@ -116,12 +116,14 @@ export function TaskPageInaxTaskDetail({
       </header>
       <div className="scrollbar-sleek min-h-0 flex-1 overflow-y-auto px-5 py-4">
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
-          <section className="flex flex-col gap-2">
-            <h3 className="text-sm font-semibold text-foreground">
-              {t('taskLoop.detail.description', 'Description')}
-            </h3>
-            <p className="text-[13px] leading-relaxed text-foreground">{task.detail}</p>
-          </section>
+          {task.detail ? (
+            <section className="flex flex-col gap-2">
+              <h3 className="text-sm font-semibold text-foreground">
+                {t('taskLoop.detail.description', 'Description')}
+              </h3>
+              <p className="text-[13px] leading-relaxed text-foreground">{task.detail}</p>
+            </section>
+          ) : null}
           {task.origin ? (
             <section className="flex flex-col gap-2" data-inax-origin="">
               <h3 className="text-sm font-semibold text-foreground">
@@ -136,10 +138,7 @@ export function TaskPageInaxTaskDetail({
             </h3>
             {notes.length === 0 ? (
               <p className={HOME_META_CLASS}>
-                {t(
-                  'taskLoop.detail.notesEmpty',
-                  'No notes yet. A note an agent writes is kept here once you confirm it.'
-                )}
+                {t('taskLoop.detail.notesEmpty', 'Progress notes I confirm are kept here.')}
               </p>
             ) : (
               <ol className="flex flex-col gap-3">
@@ -155,7 +154,7 @@ export function TaskPageInaxTaskDetail({
                     <p className={HOME_META_CLASS}>
                       {t(
                         'taskLoop.detail.noteBy',
-                        'Written by the agent, confirmed by Mako · {{when}} · status changed {{to}}',
+                        'Written by the agent, confirmed by me · {{when}} · status changed {{to}}',
                         {
                           when: uiDateTimeFormat(NOTE_TIME, intlLocale).format(
                             homeSampleMoment(note.at)
@@ -177,7 +176,7 @@ export function TaskPageInaxTaskDetail({
               <p className="text-[13px] text-foreground">
                 {t(
                   'taskLoop.detail.attachedDraft',
-                  'The agent’s draft. It has not been sent to anyone; the reviewer reads it here.'
+                  'The agent’s draft. Only the people who review this task see it.'
                 )}{' '}
                 <Button type="button" variant="link" size="inlineText" onClick={onOpenChat}>
                   {t('taskLoop.proposal.output', 'Open the draft')}
@@ -193,7 +192,7 @@ export function TaskPageInaxTaskDetail({
               className="self-start"
               onClick={onFinish}
             >
-              {t('taskLoop.detail.finish', 'I finished it myself: move to Done')}
+              {t('taskLoop.detail.finish', 'Mark as done')}
             </Button>
           ) : null}
         </div>

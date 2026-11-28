@@ -3,10 +3,8 @@ import { CalendarPlus, ChevronLeft } from 'lucide-react'
 import { useIntlLocale, useTranslate } from '@/i18n/use-translate'
 import { uiDateTimeFormat } from '@/i18n/ui-intl-formatters'
 import { Button } from '@/components/ui/button'
-import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { RailPage, RailPageScroll } from '@/components/rail-page/RailPage'
-import { RailPageMoreMenu } from '@/components/rail-page/RailPageHeader'
 import { HomeCard } from '@/components/home/HomeCard'
 import { HomePageHeading, HomeTileRow, type HomeTile } from '@/components/home/HomeHeader'
 import { useHomeBoard } from '@/components/home/use-home-board'
@@ -68,17 +66,23 @@ export default function MeetingsPage(): React.JSX.Element {
     past.filter((m) => meetingAccess(m, viewerId, tasks) === 'full').flatMap((m) => m.followUps),
     tasks
   )
+  const endedToday = today.filter((m) => m.minutes).length
   const tiles: HomeTile<TileId>[] = [
     {
       id: 'today',
       label: t('meetings.tiles.today', 'Today’s meetings'),
       value: today.length,
-      sub: next
-        ? t('meetings.tiles.next', 'Next {{time}} · {{title}}', {
-            time: text.time(next.startsAt),
-            title: next.title
-          })
-        : t('meetings.tiles.noNext', 'None left today')
+      sub: [
+        endedToday > 0 ? t('meetings.tiles.ended', 'Ended {{count}}', { count: endedToday }) : null,
+        next
+          ? t('meetings.tiles.next', 'Next {{time}} · {{title}}', {
+              time: text.time(next.startsAt),
+              title: next.title
+            })
+          : t('meetings.tiles.noNext', 'None left today')
+      ]
+        .filter(Boolean)
+        .join(' · ')
     },
     {
       id: 'waiting',
@@ -104,11 +108,12 @@ export default function MeetingsPage(): React.JSX.Element {
       value: counts.total,
       sub: t(
         'meetings.tiles.followUpsSub',
-        'Done {{done}} · in progress {{inProgress}} · to do {{todo}}',
+        'Done {{done}} · in progress {{inProgress}} · to do {{todo}} · not settled {{open}}',
         {
           done: counts.done,
           inProgress: counts.inProgress,
-          todo: counts.todo
+          todo: counts.todo,
+          open: counts.open
         }
       )
     }
@@ -147,7 +152,7 @@ export default function MeetingsPage(): React.JSX.Element {
                 title={createLabel}
                 line={t(
                   'meetings.form.line',
-                  'Attendees get it on their own schedule, with the outline and the materials.'
+                  'The meeting goes on each attendee’s schedule, with the outline and the materials.'
                 )}
                 before={back}
               />
@@ -167,12 +172,9 @@ export default function MeetingsPage(): React.JSX.Element {
             <>
               <HomePageHeading
                 title={t('meetings.title', 'Meetings')}
-                line={`${uiDateTimeFormat(DATE_OPTIONS, intlLocale).format(day)} · ${t(
-                  'meetings.line',
-                  'My meetings, and what the meeting agent made of them.'
-                )}`}
+                line={uiDateTimeFormat(DATE_OPTIONS, intlLocale).format(day)}
               >
-                <MeetingViewerMenu />
+                <MeetingViewerMenu onReset={resetMeetingsSample} />
                 <Button
                   type="button"
                   size="sm"
@@ -182,11 +184,6 @@ export default function MeetingsPage(): React.JSX.Element {
                   <CalendarPlus aria-hidden />
                   {createLabel}
                 </Button>
-                <RailPageMoreMenu>
-                  <DropdownMenuItem onSelect={resetMeetingsSample}>
-                    {t('meetings.reset', 'Start the sample data over')}
-                  </DropdownMenuItem>
-                </RailPageMoreMenu>
               </HomePageHeading>
               <HomeTileRow
                 tiles={tiles}
@@ -237,7 +234,7 @@ export default function MeetingsPage(): React.JSX.Element {
                             pane === 'upcoming'
                               ? t(
                                   'meetings.list.emptyUpcoming',
-                                  'Nothing is scheduled. A meeting you are invited to appears here.'
+                                  'Nothing is scheduled. A meeting you create or are invited to appears here.'
                                 )
                               : t(
                                   'meetings.list.emptyPast',

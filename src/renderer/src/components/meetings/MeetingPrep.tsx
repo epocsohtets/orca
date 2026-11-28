@@ -45,10 +45,7 @@ export function MeetingPrep({
           <MeetingFormField
             id={ID(meeting.id, 'outline')}
             label={t('meetings.form.outline', 'Outline')}
-            description={t(
-              'meetings.form.outlineHelp',
-              'What the meeting must settle. Start a line with “1.” and the numbers continue.'
-            )}
+            description={t('meetings.form.outlineHelp', 'What the meeting must settle.')}
           >
             <MeetingOutlineField
               id={ID(meeting.id, 'outline')}
@@ -86,55 +83,53 @@ export function MeetingPrep({
 
   return (
     <>
-      <HomeCard
-        title={t('meetings.prep.outline', 'Outline')}
-        data-meeting-card="outline"
-        action={
-          isHost ? (
-            <Button
-              type="button"
-              variant="ghost-muted"
-              size="xs"
-              data-meeting-prep-edit=""
-              onClick={edit}
-            >
-              {t('meetings.prep.editShort', 'Edit')}
-            </Button>
-          ) : null
-        }
-      >
-        <div className="px-4 pb-2">
-          {meeting.outline ? (
-            <p className="max-w-prose text-[13px] leading-relaxed whitespace-pre-line text-foreground">
-              {meeting.outline}
-            </p>
-          ) : (
-            <p className={HOME_META_CLASS}>
-              {isHost
-                ? t(
-                    'meetings.prep.noOutlineHost',
-                    'No outline yet. Write what the meeting must settle so attendees can read it first.'
-                  )
-                : t('meetings.prep.noOutline', 'The host has not added an outline yet.')}
-            </p>
-          )}
-        </div>
-      </HomeCard>
-      <HomeCard
-        title={t('meetings.prep.materials', 'Materials')}
-        aside={<span className="tabular-nums">{meeting.materials.length}</span>}
-        data-meeting-card="materials"
-      >
-        <div className="px-4 pb-2">
-          {meeting.materials.length > 0 ? (
+      {/* An attendee can do nothing about a missing outline, so the card is the host's alone until there is one. */}
+      {meeting.outline || isHost ? (
+        <HomeCard
+          title={t('meetings.prep.outline', 'Outline')}
+          data-meeting-card="outline"
+          action={
+            isHost ? (
+              <Button
+                type="button"
+                variant="ghost-muted"
+                size="xs"
+                data-meeting-prep-edit=""
+                onClick={edit}
+              >
+                {t('meetings.prep.editShort', 'Edit')}
+              </Button>
+            ) : null
+          }
+        >
+          <div className="px-4 pb-2">
+            {meeting.outline ? (
+              <p className="max-w-prose text-[13px] leading-relaxed whitespace-pre-line text-foreground">
+                {meeting.outline}
+              </p>
+            ) : (
+              <p className={HOME_META_CLASS}>
+                {t(
+                  'meetings.prep.noOutlineHost',
+                  'Write what the meeting must settle, so attendees can read it first.'
+                )}
+              </p>
+            )}
+          </div>
+        </HomeCard>
+      ) : null}
+      {/* No materials: nothing to read, so no card; the host adds them from the outline's Edit. */}
+      {meeting.materials.length > 0 ? (
+        <HomeCard
+          title={t('meetings.prep.materials', 'Materials')}
+          aside={<span className="tabular-nums">{meeting.materials.length}</span>}
+          data-meeting-card="materials"
+        >
+          <div className="px-4 pb-2">
             <MeetingMaterialList materials={meeting.materials} />
-          ) : (
-            <p className={HOME_META_CLASS}>
-              {t('meetings.prep.noMaterials', 'Nothing is attached.')}
-            </p>
-          )}
-        </div>
-      </HomeCard>
+          </div>
+        </HomeCard>
+      ) : null}
     </>
   )
 }

@@ -64,7 +64,7 @@ export function HomeMyDayCard({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button type="button" variant="ghost-muted" size="xs" data-home-manage-records="">
-              {t('home.day.manage', 'Manage recording')}
+              {t('home.day.manage', 'Manage records')}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -106,18 +106,21 @@ export function HomeMyDayCard({
           </>
         ) : (
           <p className="text-[13px] font-medium text-foreground">
-            {t('home.day.nothing', 'Nothing recorded yet today.')}
+            {t(
+              'home.day.nothing',
+              'Use a registered app or hold a meeting and today’s records collect here.'
+            )}
           </p>
         )}
         <p className={HOME_META_CLASS}>
           {t(
             'home.day.scope',
-            'Recorded: time in apps I registered, page titles in this app’s browser, and meeting times. Never screen content. I can turn each one off in Manage recording.'
+            'Only time in registered apps, the address and title of pages in this app’s browser, and meeting times are recorded. Never screen content.'
           )}
         </p>
         {hasApp ? null : (
           <p className={HOME_META_CLASS}>
-            {t('home.day.noApp', 'No app is registered, so app time is not recorded.')}
+            {t('home.day.noApp', 'Register an app you work in and its time collects here.')}
           </p>
         )}
       </div>
@@ -129,7 +132,7 @@ export function HomeMyDayCard({
               {open}
             </span>
             <span className={`font-normal ${HOME_META_CLASS}`}>
-              {t('home.day.unconfirmedHint', 'The app is not sure these were work.')}
+              {t('home.day.unconfirmedHint', 'Choose whether these were work.')}
             </span>
           </h3>
           <ul className="px-4">
@@ -157,7 +160,7 @@ export function HomeMyDayCard({
         </Button>
         <span className={HOME_META_CLASS}>
           {wrappedUp === null
-            ? t('home.day.wrapUpHint', 'See what would be reported before anything is.')
+            ? t('home.day.wrapUpHint', 'I choose what is reported.')
             : t('home.day.wrappedUp', 'Wrapped up: {{count}} updates confirmed.', {
                 count: wrappedUp
               })}

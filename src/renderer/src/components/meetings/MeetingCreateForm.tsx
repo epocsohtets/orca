@@ -98,7 +98,7 @@ export function MeetingCreateForm({
       return problem === 'endBeforeStart'
         ? t(
             'meetings.form.endBeforeStart',
-            'The end is not after the start. Move the end time or the end date later.'
+            'The end must be after the start. Move the end time or the end date later.'
           )
         : problem === 'tooLong'
           ? t('meetings.form.rangeTooLong', 'This is longer than 14 days. Check the end date.')
@@ -169,11 +169,7 @@ export function MeetingCreateForm({
                 'The meeting agent filled this in from the chat “{{name}}”. Change what is wrong.',
                 { name: origin?.name ?? '' }
               )
-            : t(
-                'meetings.form.fromChat',
-                'From the chat “{{name}}”. The meeting links back to it; it stays its own item.',
-                { name: origin?.name ?? '' }
-              )}
+            : t('meetings.form.fromChat', 'From the chat “{{name}}”', { name: origin?.name ?? '' })}
         </p>
       ) : null}
 
@@ -233,11 +229,11 @@ export function MeetingCreateForm({
             {days > 0
               ? t('meetings.form.spansDays', 'Runs over {{count}} days.', { count: days + 1 })
               : lengthMinutes >= 60
-                ? t('meetings.form.lengthHours', '{{h}} hr {{m}} min long.', {
+                ? t('meetings.form.lengthHours', '{{h}} hr {{m}} min long', {
                     h: Math.floor(lengthMinutes / 60),
                     m: lengthMinutes % 60
                   })
-                : t('meetings.form.lengthMinutes', '{{count}} min long.', {
+                : t('meetings.form.lengthMinutes', '{{count}} min long', {
                     count: Math.max(0, lengthMinutes)
                   })}
           </p>
@@ -286,10 +282,7 @@ export function MeetingCreateForm({
                 'The people of “{{name}}” are in. Take out anyone who need not come.',
                 { name: origin.name }
               )
-            : t(
-                'meetings.form.attendeesHelp',
-                'Find people by name. The meeting goes on their schedule.'
-              )
+            : undefined
         }
         error={errors.attendees}
       >
@@ -332,10 +325,7 @@ export function MeetingCreateForm({
       <MeetingFormField
         id={ID('outline')}
         label={t('meetings.form.outline', 'Outline')}
-        description={t(
-          'meetings.form.outlineHelp',
-          'What the meeting must settle. Start a line with “1.” and the numbers continue.'
-        )}
+        description={t('meetings.form.outlineHelp', 'What the meeting must settle.')}
       >
         <MeetingOutlineField
           id={ID('outline')}

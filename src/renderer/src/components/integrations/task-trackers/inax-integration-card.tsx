@@ -27,7 +27,7 @@ export function InaxIntegrationCard(): React.JSX.Element {
           ? t('auto.components.settings.inaxAccount.providerConnected', '1 account connected')
           : t(
               'taskLoop.settings.cardDescription',
-              'inAX is the team’s work tracker. Sign in and your tasks appear on Home and in Tasks.'
+              'Sign in and your tasks appear on Home and in Tasks.'
             )
       }
       statusTone={connected ? 'connected' : 'attention'}

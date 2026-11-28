@@ -38,7 +38,7 @@ export function useMeetingState(): (meeting: Meeting) => MeetingState {
         label:
           meeting.outline || meeting.materials.length > 0
             ? t('meetings.state.scheduledPrep', 'Scheduled · prep ready')
-            : t('meetings.state.scheduledNoPrep', 'Scheduled · no prep yet')
+            : t('meetings.state.scheduledNoPrep', 'Scheduled')
       }
     }
     if (meetingAccess(meeting, viewerId, tasks) === 'excerpt') {

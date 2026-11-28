@@ -63,7 +63,7 @@ export function TaskProposalCard({
         heading={t('taskLoop.proposal.heading', 'The agent’s proposal for inAX')}
         status={
           <NativeChatCardStatus tone="warning">
-            {t('taskLoop.proposal.pending', 'Not on inAX yet')}
+            {t('taskLoop.proposal.pending', 'Waiting for my confirmation')}
           </NativeChatCardStatus>
         }
         title={
@@ -213,12 +213,12 @@ export function TaskProposalCard({
             {withNote
               ? t(
                   'taskLoop.proposal.audienceNote',
-                  'When you confirm, this status change and this note become visible on inAX to the PM and the team of “{{project}}”. Only these two are waiting for you.',
+                  'When you confirm, the PM and the team of “{{project}}” see this status change and this note on inAX.',
                   { project }
                 )
               : t(
                   'taskLoop.proposal.audienceStatus',
-                  'When you confirm, this status change becomes visible on inAX to the PM and the team of “{{project}}”. It is not visible yet.',
+                  'When you confirm, the PM and the team of “{{project}}” see this status change on inAX. For now only I see it.',
                   { project }
                 )}
           </p>
@@ -226,7 +226,7 @@ export function TaskProposalCard({
             <p className="text-xs text-foreground" data-task-proposal-not-done="">
               {t(
                 'taskLoop.proposal.notDone',
-                'Confirming does not send the draft to anyone. The draft stays attached to this task for the reviewer.'
+                'Only the people who review this task see the draft.'
               )}
             </p>
           ) : null}

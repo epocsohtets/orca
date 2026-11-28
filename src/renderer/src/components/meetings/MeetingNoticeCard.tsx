@@ -52,11 +52,10 @@ export function MeetingNoticeCard(): React.JSX.Element | null {
         key: `notice:recording:${recording.id}:${recording.recordingStartedAt}`,
         icon: <span aria-hidden className="size-2 rounded-full bg-destructive" />,
         title: t('meetings.notice.recordingTitle', 'Recording has started'),
-        body: t(
-          'meetings.notice.recordingBody',
-          '{{name}} is recording “{{title}}”. It stays in the status bar until it ends.',
-          { name: personName(recording.hostId), title: recording.title }
-        ),
+        body: t('meetings.notice.recordingBody', '{{name}} is recording “{{title}}”.', {
+          name: personName(recording.hostId),
+          title: recording.title
+        }),
         action: t('meetings.chat.open', 'Open the meeting'),
         run: () => openMeeting(recording.id)
       }

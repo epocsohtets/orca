@@ -58,7 +58,7 @@ export function buildHomeTasks(t: Translate, sample: HomeSampleContext): HomeTas
       ),
       report: t(
         'home.report.copy',
-        'The writing agent drafted two headlines. I have not chosen one yet.'
+        'The writing agent drafted two headlines. It is my turn to choose.'
       )
     },
     {
@@ -85,11 +85,11 @@ export function buildHomeTasks(t: Translate, sample: HomeSampleContext): HomeTas
       report: researchDone
         ? t(
             'home.report.researchDone',
-            'The research agent put three competitors’ promotions into a table. I have not checked it yet.'
+            'The research agent put three competitors’ promotions into a table. My check is left.'
           )
         : t(
             'home.report.research',
-            'The research agent has two of three competitors’ promotions in a table. I have not checked it yet.'
+            'The research agent has two of three competitors’ promotions in a table. My check is left.'
           )
     },
     {
@@ -120,7 +120,7 @@ export function buildHomeTasks(t: Translate, sample: HomeSampleContext): HomeTas
       ),
       report: t(
         'home.report.inquiries',
-        'The inquiry agent drafted 214 inquiries sorted into 6 types. I have not reviewed it yet.'
+        'The inquiry agent drafted 214 inquiries sorted into 6 types. My review is left.'
       )
     },
     {

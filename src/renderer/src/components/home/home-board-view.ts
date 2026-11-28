@@ -130,13 +130,12 @@ export function buildHomeBoardView(
         t('taskLoop.who.confirmed', '{{status}} · written by the agent, confirmed by me', {
           status: inaxStatusLabels(t)[status]
         }),
-      declined: t('taskLoop.who.declined', 'Draft ready · not on inAX yet')
+      declined: t('taskLoop.who.declined', 'Draft ready · waiting for my confirmation')
     })
   const tasks = withLoops([
     ...applyHomeBoardState(baseTasks, board, {
       resumed: t('home.task.resumed', 'Agent working · picked up my answer'),
       addedDue: t('home.task.today', 'Today'),
-      addedDetail: t('home.task.addedDetail', 'A task I added here.'),
       addedAgent: t('home.task.addedAgent', 'Agent working · just handed over'),
       doneReport: t('home.report.done', 'I finished this task.')
     }),
@@ -206,7 +205,7 @@ export function buildHomeBoardView(
               who: loopAgent,
               text: t(
                 'taskLoop.activity.confirmed',
-                '· drafted “{{title}}”; I confirmed its status and note onto inAX',
+                '· drafted “{{title}}”; the status and the progress note I confirmed are on inAX',
                 { title: tasks.find((task) => task.id === taskId)?.title ?? '' }
               ),
               byAgent: true,

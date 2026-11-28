@@ -1,16 +1,14 @@
 import React from 'react'
 import { useTranslate } from '@/i18n/use-translate'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import {
-  DropdownMenu,
-  DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
-  DropdownMenuTrigger
+  DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu'
-import { MEETING_PEOPLE, personName } from './meeting-people'
+import { DemoMenu } from '@/components/task-page/inax/InaxDemoNote'
+import { MEETING_PEOPLE } from './meeting-people'
 import { setViewer, useMeetings } from './meetings-store'
 
 /** Not part of the product: the PoC's way to be another person of the sample team on one machine. */
@@ -19,7 +17,7 @@ export function MeetingViewerRadioGroup(): React.JSX.Element {
   const viewerId = useMeetings((state) => state.viewerId)
   return (
     <>
-      <DropdownMenuLabel>{t('meetings.viewerLabel', 'Seen as')}</DropdownMenuLabel>
+      <DropdownMenuLabel>{t('meetings.viewerLabel', 'Signed in as')}</DropdownMenuLabel>
       <DropdownMenuRadioGroup value={viewerId} onValueChange={setViewer}>
         {MEETING_PEOPLE.map((person) => (
           <DropdownMenuRadioItem
@@ -36,20 +34,16 @@ export function MeetingViewerRadioGroup(): React.JSX.Element {
   )
 }
 
-export function MeetingViewerMenu(): React.JSX.Element {
+/** Meetings' demo chip: be another person of the team, or start over. */
+export function MeetingViewerMenu({ onReset }: { onReset: () => void }): React.JSX.Element {
   const t = useTranslate()
-  const viewerId = useMeetings((state) => state.viewerId)
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button type="button" variant="ghost" size="sm" data-meeting-viewer="">
-          <Badge variant="outline">{t('meetings.demo', 'Demo')}</Badge>
-          {t('meetings.viewer', 'Seen as {{name}}', { name: personName(viewerId) })}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <MeetingViewerRadioGroup />
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <DemoMenu>
+      <MeetingViewerRadioGroup />
+      <DropdownMenuSeparator />
+      <DropdownMenuItem onSelect={onReset}>
+        {t('home.preview.reset', 'Start over')}
+      </DropdownMenuItem>
+    </DemoMenu>
   )
 }

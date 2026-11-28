@@ -1,4 +1,3 @@
-import { InaxDemoNote } from '@/components/task-page/inax/InaxDemoNote'
 import React from 'react'
 import { useTranslate } from '@/i18n/use-translate'
 import { Button } from '@/components/ui/button'
@@ -7,18 +6,16 @@ import { HOME_FOCUS_RING_CLASS, HOME_META_CLASS } from './HomeCard'
 import type { HomeBoardCounts } from './home-board'
 import type { HomePhase } from './home-day'
 
-/** Greeting, date and the one line that says what this page is; the actions sit at the right. */
+/** Greeting and date; the actions sit at the right. */
 export function HomeGreeting({
   phase,
   name,
   date,
-  line,
   children
 }: {
   phase: HomePhase
   name: string
   date: string
-  line: string
   children: React.ReactNode
 }): React.JSX.Element {
   const t = useTranslate()
@@ -28,13 +25,13 @@ export function HomeGreeting({
     evening: t('home.header.evening', 'Good work today, {{name}}', { name })
   }[phase]
   return (
-    <HomePageHeading title={greeting} line={`${date} · ${line}`}>
+    <HomePageHeading title={greeting} line={date}>
       {children}
     </HomePageHeading>
   )
 }
 
-/** The top of a board page: its name, one line that says what it holds, the demo note, actions at the right. */
+/** The top of a board page: its name, the date, actions at the right. */
 export function HomePageHeading({
   title,
   line,
@@ -59,7 +56,6 @@ export function HomePageHeading({
           {title}
         </h1>
         <p className="text-[13px] text-muted-foreground">{line}</p>
-        <InaxDemoNote />
       </div>
       <div className="flex flex-wrap items-center gap-2">{children}</div>
     </header>
@@ -110,10 +106,7 @@ export function HomeTiles({
       id: 'late',
       label: t('home.tiles.late', 'Late · awaiting others'),
       value: counts.late,
-      sub:
-        counts.late > 0
-          ? t('home.tiles.lateSub', 'Needs a look')
-          : t('home.tiles.lateNone', 'Nothing is stuck'),
+      sub: counts.late > 0 ? '' : t('home.tiles.lateNone', 'Nothing is late or blocked'),
       alert: counts.late > 0
     }
   ]

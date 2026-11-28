@@ -61,16 +61,16 @@ export function HomeTasksCard({
 }): React.JSX.Element {
   const t = useTranslate()
   const labels: Record<HomeTaskTab, string> = {
-    today: t('home.tasks.today', 'Open'),
+    today: t('home.tasks.today', 'Remaining'),
     waiting: t('home.tasks.waiting', 'Needs me'),
     late: t('home.tasks.late', 'Late'),
     done: t('home.tasks.done', 'Done')
   }
   const empty: Record<HomeTaskTab, string> = {
-    today: t('home.tasks.emptyToday', 'No open tasks.'),
+    today: t('home.tasks.emptyToday', 'No tasks remain. Add a new task or hand one to an agent.'),
     waiting: t('home.tasks.emptyWaiting', 'Nothing is waiting for you.'),
     late: t('home.tasks.emptyLate', 'Nothing is late or blocked.'),
-    done: t('home.tasks.emptyDone', 'Nothing finished yet.')
+    done: t('home.tasks.emptyDone', 'Tasks you finish collect here.')
   }
   const byTab = (key: HomeTaskTab): HomeTask[] =>
     sortHomeTasks(tasks.filter((task) => homeTaskTab(task).includes(key)))

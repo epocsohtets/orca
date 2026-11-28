@@ -61,7 +61,7 @@ function WrapUpField({
         <p className={HOME_META_CLASS}>
           {t(
             'home.wrapUp.linkedRecords',
-            '{{count}} record(s) from My day are linked to this task. The records themselves are not reported.',
+            'Records linked from My day: {{count}} · only I see the records',
             { count: update.linkedRecords }
           )}
         </p>
@@ -132,7 +132,7 @@ export function HomeWrapUpDialog({
             {done === null
               ? t(
                   'home.wrapUp.destination',
-                  'Nothing is chosen yet. Each update you check becomes a comment on its task in inAX (the team’s work tracker). The project’s members and Kim Jiwoo (team lead) see it. Unchecked updates go nowhere.'
+                  'Only the updates you check become comments on their tasks in inAX. The project’s members and the team lead see them.'
                 )
               : t('home.wrapUp.done', '{{count}} updates reported.', { count: done.length })}
           </DialogDescription>
@@ -173,16 +173,10 @@ export function HomeWrapUpDialog({
                 <h3 className="text-[13px] font-medium text-foreground">
                   {t(
                     'home.wrapUp.unansweredTitle',
-                    '{{count}} record(s) not checked yet · not reported',
+                    'Records not checked yet: {{count}} · only I see them',
                     { count: unanswered.length }
                   )}
                 </h3>
-                <p className={HOME_META_CLASS}>
-                  {t(
-                    'home.wrapUp.unansweredHint',
-                    'Link one to a task and it counts toward that task’s update; say “Not work” and it is dropped.'
-                  )}
-                </p>
                 <ul>
                   {unanswered.map((record) => (
                     <HomeRecordRow

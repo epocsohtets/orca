@@ -163,7 +163,7 @@ export function TaskPageSourceBar({
               className="min-w-0 truncate px-1 text-xs text-muted-foreground"
               data-inax-source-note=""
             >
-              {t('taskLoop.source.chip', 'inAX (the team’s work tracker) · my work')}
+              {t('taskLoop.source.chip', 'inAX · my work')}
             </p>
             <InaxDemoNote />
           </>

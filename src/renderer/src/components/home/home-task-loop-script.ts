@@ -127,14 +127,13 @@ export function buildHomeLoopScript(
     draft: second
       ? t(
           'taskLoop.script.draftLong',
-          '**{{title}} (draft · detailed)**\n\n- What the task asks for: {{detail}}\n- What I prepared: a first draft that follows the task description, with the reason for each point.\n- Why this order: the task description names these points in this order.\n- What is left for you: read it and correct what is wrong.',
+          '**{{title}}**\n\n{{detail}}\n\nTo check when you read it:\n- Is anything missing?\n- Is the order right?',
           { title: task.title, detail: task.detail }
         )
-      : t(
-          'taskLoop.script.draft',
-          '**{{title}} (draft · short)**\n\n- What the task asks for: {{detail}}\n- What is left for you: read it and correct what is wrong.',
-          { title: task.title, detail: task.detail }
-        ),
+      : t('taskLoop.script.draft', '**{{title}}**\n\n{{detail}}', {
+          title: task.title,
+          detail: task.detail
+        }),
     note: withRequests(
       second
         ? t(
@@ -185,7 +184,7 @@ export function buildHomeLoopTranscript(
       'loop-plan',
       'assistant',
       loop.startedAt + 1,
-      `${t('taskLoop.chat.read', 'I read the task: its description, its deadline ({{due}}) and its notes.', { due: task.dueLabel })}\n\n${script.plan}\n\n${t('taskLoop.chat.proposeStart', 'First I propose changing the status {{to}}. Answer the card below and I start; the status changes only if you confirm.', { to: to.inProgress })}`
+      `${t('taskLoop.chat.read', 'I read the task: its description, its deadline ({{due}}) and its notes.', { due: task.dueLabel })}\n\n${script.plan}\n\n${t('taskLoop.chat.proposeStart', 'Before I start, may I change the status {{to}}?', { to: to.inProgress })}`
     )
   ]
   const decided = (
@@ -262,7 +261,7 @@ export function buildHomeLoopTranscript(
         draftAt + 1,
         t(
           'taskLoop.chat.proposeFinal',
-          'The draft is above. I propose changing the status {{to}} and leaving a progress note. Read the card below: you can confirm it, correct it, or say not yet.',
+          'The draft is ready. May I change the status {{to}} and leave a progress note?',
           { to: to.review }
         )
       )
@@ -278,7 +277,7 @@ export function buildHomeLoopTranscript(
         loop.final.kind === 'confirmed'
           ? t(
               'taskLoop.chat.done',
-              'The status and the note are on the task. I am finished with it unless you tell me more.'
+              'The status and the note are on the task. Tell me if you need anything more.'
             )
           : t(
               'taskLoop.chat.waiting',
@@ -297,9 +296,9 @@ export function buildHomeLoopTranscript(
         said.reply === 'repropose'
           ? t(
               'taskLoop.chat.reproposed',
-              'I wrote your request into the progress note and propose again. The draft message itself is unchanged.'
+              'I added your request to the progress note. Please confirm again.'
             )
-          : t('taskLoop.chat.noted', 'Noted. I will apply it to the step I am on.')
+          : t('taskLoop.chat.noted', 'Noted. I will apply it to what I am writing now.')
       )
     )
   })

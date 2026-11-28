@@ -151,7 +151,7 @@ export function ProposalCard({
                   size="sm"
                   onClick={() => setFollowUpDeclined(meeting.id, followUp.id, true)}
                 >
-                  {t('meetings.notMine', 'Not mine')}
+                  {t('home.task.offerDecline', 'Not mine')}
                 </Button>
                 <Button
                   type="button"
@@ -159,7 +159,7 @@ export function ProposalCard({
                   data-meeting-bot-accept={followUp.id}
                   onClick={() => acceptFollowUp(meeting.id, followUp.id)}
                 >
-                  {t('meetings.accept', 'Take it')}
+                  {t('home.task.offerAccept', 'Add to My work')}
                 </Button>
               </>
             ) : state.kind === 'declined' ? (
@@ -169,7 +169,7 @@ export function ProposalCard({
                 size="sm"
                 onClick={() => acceptFollowUp(meeting.id, followUp.id)}
               >
-                {t('meetings.acceptAfterAll', 'Take it after all')}
+                {t('home.task.offerAccept', 'Add to My work')}
               </Button>
             ) : null}
           </NativeChatCardActions>
@@ -177,27 +177,11 @@ export function ProposalCard({
       >
         <p className="text-xs text-muted-foreground">{text.due(followUp.due)}</p>
         <SourceQuote meeting={meeting} turnId={followUp.turnId} />
-        {state.kind === 'proposed' ? (
-          <p className="mt-2 text-xs text-muted-foreground" data-meeting-bot-choice-help="">
-            {t(
-              'meetings.bot.choiceHelp',
-              '“Take it” makes it your task in To do. “Not mine” shows {{name}} that it is not yours, so the host can give it to someone else.',
-              { name: personName(meeting.hostId) }
-            )}
-          </p>
-        ) : state.kind === 'declined' ? (
+        {state.kind === 'declined' ? (
           <p className="mt-2 text-xs text-muted-foreground">
-            {t('meetings.bot.declinedHelp', '{{name}} sees it as “not theirs” on the minutes.', {
+            {t('meetings.bot.declinedHelp', '{{name}} sees your answer: “Not mine”.', {
               name: personName(meeting.hostId)
             })}
-          </p>
-        ) : state.kind === 'task' && state.task.route === 'assigned' ? (
-          <p className="mt-2 text-xs text-muted-foreground">
-            {t(
-              'meetings.bot.assignedHelp',
-              '{{name}} assigned this as the host, so there is nothing to accept.',
-              { name: personName(meeting.hostId) }
-            )}
           </p>
         ) : null}
       </NativeChatCardFrame>
@@ -252,13 +236,6 @@ export function AssignedTaskCard({
           {text.due(task.due)}
         </p>
         <SourceQuote meeting={meeting} turnId={turnId} />
-        <p className="mt-2 text-xs text-muted-foreground">
-          {t(
-            'meetings.bot.assignedHelp',
-            '{{name}} assigned this as the host, so there is nothing to accept.',
-            { name: personName(meeting.hostId) }
-          )}
-        </p>
         {access === 'excerpt' ? (
           <div className="mt-2">
             <MinutesRequestControl meeting={meeting} />

@@ -8,7 +8,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu'
-import { RailPageMoreMenu } from '@/components/rail-page/RailPageHeader'
+import { DemoMenu } from '@/components/task-page/inax/InaxDemoNote'
 import { MeetingViewerRadioGroup } from '@/components/meetings/MeetingViewerMenu'
 import { resetHomeBoard } from './home-board-store'
 import type { HomePhase } from './home-day'
@@ -26,10 +26,9 @@ export function HomePreviewMenu({
   onFirstRunChange: (firstRun: boolean) => void
 }): React.JSX.Element {
   const t = useTranslate()
-  const label = t('home.preview.label', 'Sample preview')
   return (
-    <RailPageMoreMenu label={label}>
-      <DropdownMenuLabel>{label}</DropdownMenuLabel>
+    <DemoMenu>
+      <DropdownMenuLabel>{t('home.preview.label', 'Time of day')}</DropdownMenuLabel>
       <DropdownMenuRadioGroup
         value={preview}
         onValueChange={(value) => {
@@ -38,9 +37,7 @@ export function HomePreviewMenu({
           }
         }}
       >
-        <DropdownMenuRadioItem value="auto">
-          {t('home.preview.auto', 'Follow the clock')}
-        </DropdownMenuRadioItem>
+        <DropdownMenuRadioItem value="auto">{t('home.preview.auto', 'Now')}</DropdownMenuRadioItem>
         <DropdownMenuRadioItem value="morning">
           {t('home.preview.morning', 'Morning')}
         </DropdownMenuRadioItem>
@@ -53,11 +50,11 @@ export function HomePreviewMenu({
       <MeetingViewerRadioGroup />
       <DropdownMenuSeparator />
       <DropdownMenuCheckboxItem checked={firstRun} onCheckedChange={onFirstRunChange}>
-        {t('home.preview.firstRun', 'First run')}
+        {t('home.preview.firstRun', 'Before sign-in')}
       </DropdownMenuCheckboxItem>
       <DropdownMenuItem onSelect={resetHomeBoard}>
-        {t('home.preview.reset', 'Start the sample over')}
+        {t('home.preview.reset', 'Start over')}
       </DropdownMenuItem>
-    </RailPageMoreMenu>
+    </DemoMenu>
   )
 }

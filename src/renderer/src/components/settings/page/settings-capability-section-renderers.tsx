@@ -213,7 +213,7 @@ export function renderDesktopCapabilitySettingsSections(
         title={t('settings.myApps.title', 'My apps')}
         description={t(
           'settings.myApps.description',
-          'The apps you work in. Orca watches the ones you register.'
+          'The apps you work in. Orca records the time you spend in the ones you register.'
         )}
         searchEntries={navigation.getSectionSearchEntries('my-apps')}
       >
