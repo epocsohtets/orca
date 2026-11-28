@@ -306,6 +306,10 @@ export function HomeDayEndPanel({
       <div className="scrollbar-sleek flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pb-3">
         <div className="px-3.5">{header}</div>
         <dl className="grid grid-cols-[104px_minmax(0,1fr)] gap-x-2 gap-y-1 px-3.5 text-xs">
+          <dt className="text-muted-foreground">{t('home.dayEnd.viewers', 'Who sees it')}</dt>
+          <dd className="text-foreground" data-home-day-end-viewers="">
+            {viewers}
+          </dd>
           {visibleNow === null ? null : (
             <>
               <dt className="text-muted-foreground">{t('home.dayEnd.visibleNow', 'Shown now')}</dt>
@@ -324,10 +328,6 @@ export function HomeDayEndPanel({
               </dd>
             </>
           )}
-          <dt className="text-muted-foreground">{t('home.dayEnd.viewers', 'Who sees it')}</dt>
-          <dd className="text-foreground" data-home-day-end-viewers="">
-            {viewers}
-          </dd>
         </dl>
         {body}
       </div>

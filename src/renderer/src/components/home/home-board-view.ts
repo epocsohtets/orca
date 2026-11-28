@@ -224,10 +224,7 @@ export function buildHomeBoardView(
             day: 0,
             at: minutes,
             who: me,
-            text: t(
-              'home.activity.meetingStarted',
-              'started a meeting; the meeting agent is recording'
-            ),
+            text: t('home.activity.meetingStarted', 'started a recorded meeting'),
             byAgent: false,
             meetingId: fromMeetings.recording.id
           }

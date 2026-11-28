@@ -101,7 +101,10 @@ export function MeetingCreateForm({
             'The end must be after the start. Move the end time or the end date later.'
           )
         : problem === 'tooLong'
-          ? t('meetings.form.rangeTooLong', 'This is longer than 14 days. Check the end date.')
+          ? t(
+              'meetings.form.rangeTooLong',
+              'This is longer than 14 days. Move the end date earlier.'
+            )
           : undefined
     },
     attendees: (ids = attendeeIds): string | undefined =>

@@ -96,7 +96,7 @@ export function buildHomeMeetings(
         task.route === 'heard'
           ? t(
               'home.task.fromMeetingHeard',
-              'A follow-up from the meeting “{{title}}”. The meeting named {{name}} for it.',
+              'A follow-up task from the meeting “{{title}}”. {{name}} agreed to take it in the meeting.',
               { title: meeting.title, name: args.personName(task.assigneeId) }
             )
           : task.route === 'accepted'

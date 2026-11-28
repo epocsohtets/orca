@@ -29122,7 +29122,7 @@
       "endTime": "끝 시각",
       "timeInvalid": "입력한 “{{typed}}” 값은 시각이 아닙니다. 15:30처럼 적거나 목록에서 고르세요.",
       "endBeforeStart": "끝이 시작보다 늦어야 합니다. 끝 시각이나 끝 날짜를 뒤로 옮기세요.",
-      "rangeTooLong": "14일이 넘습니다. 끝 날짜를 앞당기세요.",
+      "rangeTooLong": "기간이 14일을 넘습니다. 끝 날짜를 앞당기세요.",
       "fromWhisper": "회의 에이전트가 채팅 「{{name}}」에서 읽은 내용으로 채웠습니다. 틀린 곳만 고치세요.",
       "spansDays": "{{count}}일에 걸친 회의입니다.",
       "lengthHours": "회의 길이 {{h}}시간 {{m}}분",
@@ -29135,7 +29135,7 @@
       "host": "주최자",
       "findPerson": "이름 검색",
       "people": "사람",
-      "noPerson": "“{{query}}”라는 이름이 없습니다. 이름을 다시 입력하세요.",
+      "noPerson": "“{{query}}” 이름이 없습니다. 이름을 다시 입력하세요.",
       "everyoneIn": "모두 들어 있습니다.",
       "inChat": "이 채팅",
       "line": "회의가 참석자의 일정에 개요, 자료와 함께 들어갑니다.",
@@ -29196,7 +29196,7 @@
       "rowShared": "공유받은 회의록: {{title}}",
       "rowTask": "새 업무: {{title}}",
       "rowEmpty": "회의록과 내 업무가 여기로 옵니다",
-      "heardMessage": "**{{title}}**에서 내 업무가 나왔습니다. 이 업무가 나온 부분을 함께 보냅니다."
+      "heardMessage": "**{{title}}**에서 나온 업무를 보냅니다. 이 업무가 나온 부분도 함께 보냅니다."
     },
     "source": "나온 부분 보기",
     "ask": {
@@ -29207,7 +29207,7 @@
     },
     "followUps": {
       "title": "후속 업무",
-      "counts": "모두 {{total}}건 · 할 일 {{todo}} · 진행 중 {{inProgress}} · 끝남 {{done}} · 확정 전 {{open}}",
+      "counts": "모두 {{total}}건 · 할 일 {{todo}} · 진행 중 {{inProgress}} · 끝남 {{done}} · 담당자 없음 {{open}}",
       "mine": "내 몫",
       "accepted": "본인이 받음",
       "stateDeclined": "본인 몫이 아니라고 답함",
@@ -29216,9 +29216,10 @@
       "colTask": "업무",
       "colOwner": "담당자",
       "colActions": "동작",
-      "stateUnasked": "할당 전",
+      "stateUnasked": "담당자 없음",
       "assignedByMe": "내가 할당함",
-      "heard": "회의 에이전트가 생성함"
+      "heard": "회의 에이전트가 만듦",
+      "unassign": "담당자 해제"
     },
     "openTask": "업무 열기",
     "excerpt": {
@@ -29319,9 +29320,9 @@
       "waitingSub": "회의 에이전트가 기다립니다",
       "week": "이번 주",
       "weekSub": "주최 {{host}} · 참석 {{attend}}",
-      "followUpsSub": "끝남 {{done}} · 진행 중 {{inProgress}} · 할 일 {{todo}} · 확정 전 {{open}}",
-      "notTasksYet": "확정 전 {{count}}건",
-      "allTasks": "모두 확정했습니다",
+      "followUpsSub": "끝남 {{done}} · 진행 중 {{inProgress}} · 할 일 {{todo}} · 담당자 없음 {{open}}",
+      "notTasksYet": "담당자 없음 {{count}}건",
+      "allTasks": "모두 담당자가 있습니다",
       "doneSub": "후속 업무 {{total}}건 중",
       "mineOpen": "내 답을 기다리는 것 {{count}}건",
       "done": "끝난 업무",
@@ -29433,7 +29434,7 @@
       "researchDone": "· “경쟁사 프로모션 조사”를 끝냈습니다",
       "me": "나",
       "answered": "· 답을 골랐습니다: {{choice}}",
-      "meetingStarted": "· 회의를 시작했습니다. 회의 에이전트가 녹음하고 있습니다",
+      "meetingStarted": "· 녹음하는 회의를 시작했습니다",
       "minutesSent": "· 「{{title}}」의 회의록을 {{count}}명에게 보냈습니다",
       "tookFollowUp": "· 회의 「{{title}}」에서 「{{task}}」 업무를 내 업무로 받았습니다",
       "assignedFollowUp": "· 회의 「{{title}}」에서 「{{task}}」 업무를 나에게 할당했습니다",
@@ -29757,10 +29758,10 @@
       "heading": "에이전트의 질문"
     },
     "script": {
-      "choiceA": "나에게 먼저",
-      "choiceB": "프로젝트 팀에 바로",
-      "plan": "이렇게 진행하겠습니다.\n\n1. 업무 설명과 지난 진행 기록을 읽습니다.\n2. 진행에 필요한 것 한 가지를 여쭙니다.\n3. 업무를 항목으로 나누고, 그 목록을 이 대화에 올립니다.",
-      "question": "결과를 누구에게 먼저 보일까요?",
+      "choiceA": "내가 읽게",
+      "choiceB": "프로젝트 팀이 읽게",
+      "plan": "이렇게 진행하겠습니다.\n\n1. 업무 설명을 읽습니다.\n2. 업무를 항목으로 나누고, 그 목록을 이 대화에 올립니다.",
+      "question": "목록은 누가 읽게 쓸까요?",
       "reportA": "김지우 님에게만 · 짧게",
       "reportB": "캠페인 팀 전체 · 요약 포함",
       "reportBasis1": "방문자, 목표의 112%: 보고서 2쪽 “방문” 표의 합계 줄",
@@ -29775,7 +29776,7 @@
       "reportPlan": "보고서는 이미 써 두셨으니, 저는 공유에 필요한 것을 준비하겠습니다.\n\n1. 보고서에서 핵심 숫자 세 가지를 뽑습니다.\n2. 보고서를 공유하는 글의 초안을 씁니다.\n3. 초안을 보여 드리고, 상태와 진행 기록을 제안합니다.",
       "reportQuestion": "공유 글을 누구에게 맞춰 쓸까요?",
       "requested": "요청하신 것: “{{text}}”",
-      "next": "지금 업무 설명을 항목으로 나누고 있습니다. 목록이 준비되면 먼저 보실 수 있게 이 대화에 올리겠습니다.",
+      "next": "지금 업무 설명을 항목으로 나누고 있습니다. 목록이 준비되면 이 대화에 올리겠습니다.",
       "nextTeam": "지금 업무 설명을 항목으로 나누고 있습니다. 목록이 준비되면 프로젝트 팀이 읽을 수 있게 써서 이 대화에 올리겠습니다."
     },
     "settings": {

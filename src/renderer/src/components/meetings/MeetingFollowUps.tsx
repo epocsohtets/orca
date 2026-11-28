@@ -31,7 +31,7 @@ function FollowUpStateCell({ state }: { state: FollowUpState }): React.JSX.Eleme
   ) : state.kind === 'declined' ? (
     <Badge variant="warning">{t('meetings.followUps.stateDeclined', 'Says not theirs')}</Badge>
   ) : (
-    <HomeWhoMarker who="waiting" label={t('meetings.followUps.stateUnasked', 'Not assigned yet')} />
+    <HomeWhoMarker who="waiting" label={t('meetings.followUps.stateUnasked', 'No owner')} />
   )
 }
 
@@ -67,7 +67,9 @@ function TakeBack({
       data-meeting-take-back={state.task.id}
       onClick={() => takeBackTask(state.task.id, mine)}
     >
-      {mine ? t('home.task.offerDecline', 'Not mine') : t('home.day.undo', 'Undo')}
+      {mine
+        ? t('home.task.offerDecline', 'Not mine')
+        : t('meetings.followUps.unassign', 'Remove owner')}
     </Button>
   ) : null
 }
@@ -173,7 +175,7 @@ export function MeetingFollowUps({ meeting }: { meeting: Meeting }): React.JSX.E
         <span data-meeting-follow-up-counts="">
           {t(
             'meetings.followUps.counts',
-            '{{total}} in all · To do {{todo}} · In progress {{inProgress}} · Done {{done}} · Not settled yet {{open}}',
+            '{{total}} in all · To do {{todo}} · In progress {{inProgress}} · Done {{done}} · No owner {{open}}',
             counts
           )}
         </span>
@@ -212,7 +214,7 @@ export function MeetingFollowUps({ meeting }: { meeting: Meeting }): React.JSX.E
                       {state.kind === 'task' ? (
                         <span className={HOME_META_CLASS}>
                           {state.task.route === 'heard'
-                            ? t('meetings.followUps.heard', 'Created by the meeting agent')
+                            ? t('meetings.followUps.heard', 'Made by the meeting agent')
                             : state.task.route === 'accepted'
                               ? t('meetings.followUps.accepted', 'Taken by the owner')
                               : isHost

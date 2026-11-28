@@ -228,7 +228,7 @@ export function AssignedTaskCard({
       >
         <p className="text-xs text-muted-foreground">
           {task.route === 'heard'
-            ? t('meetings.followUps.heard', 'Created by the meeting agent')
+            ? t('meetings.followUps.heard', 'Made by the meeting agent')
             : t('meetings.excerpt.assignedBy', 'Assigned by {{name}}', {
                 name: personName(meeting.hostId)
               })}

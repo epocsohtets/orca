@@ -123,12 +123,12 @@ export function buildHomeLoopScript(
   return {
     plan: t(
       'taskLoop.script.plan',
-      'This is how I will do it.\n\n1. Read the task description and its earlier notes.\n2. Ask you the one thing I need to know.\n3. Split the work into items and put the list in this conversation.'
+      'This is how I will do it.\n\n1. Read the task description.\n2. Split the task into items and put the list in this conversation.'
     ),
-    question: t('taskLoop.script.question', 'Who should see the result first?'),
+    question: t('taskLoop.script.question', 'Who should the list be written for?'),
     choices: [
-      { id: 'a', label: t('taskLoop.script.choiceA', 'Me first') },
-      { id: 'b', label: t('taskLoop.script.choiceB', 'The project team at once') }
+      { id: 'a', label: t('taskLoop.script.choiceA', 'For me') },
+      { id: 'b', label: t('taskLoop.script.choiceB', 'For the project team') }
     ],
     draft: null,
     next: second
@@ -138,7 +138,7 @@ export function buildHomeLoopScript(
         )
       : t(
           'taskLoop.script.next',
-          'I am splitting the task description into items now. When the list is ready I will put it in this conversation for you to read first.'
+          'I am splitting the task description into items now. When the list is ready I will put it in this conversation.'
         ),
     note: '',
     basis: []

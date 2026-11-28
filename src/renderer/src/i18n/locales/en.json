@@ -31495,7 +31495,7 @@
       "endTime": "End time",
       "timeInvalid": "“{{typed}}” is not a time. Write it like 15:30, or pick one from the list.",
       "endBeforeStart": "The end must be after the start. Move the end time or the end date later.",
-      "rangeTooLong": "This is longer than 14 days. Check the end date.",
+      "rangeTooLong": "This is longer than 14 days. Move the end date earlier.",
       "fromWhisper": "The meeting agent filled this in from the chat “{{name}}”. Change what is wrong.",
       "spansDays": "Runs over {{count}} days.",
       "lengthHours": "{{h}} hr {{m}} min long",
@@ -31580,7 +31580,7 @@
     },
     "followUps": {
       "title": "Follow-up tasks",
-      "counts": "{{total}} in all · To do {{todo}} · In progress {{inProgress}} · Done {{done}} · Not settled yet {{open}}",
+      "counts": "{{total}} in all · To do {{todo}} · In progress {{inProgress}} · Done {{done}} · No owner {{open}}",
       "mine": "Mine",
       "accepted": "Taken by the owner",
       "stateDeclined": "Says not theirs",
@@ -31589,9 +31589,10 @@
       "colTask": "Task",
       "colOwner": "Owner",
       "colActions": "Actions",
-      "stateUnasked": "Not assigned yet",
+      "stateUnasked": "No owner",
       "assignedByMe": "Assigned by me",
-      "heard": "Created by the meeting agent"
+      "heard": "Made by the meeting agent",
+      "unassign": "Remove owner"
     },
     "openTask": "Open task",
     "excerpt": {
@@ -31692,9 +31693,9 @@
       "waitingSub": "The meeting agent is waiting",
       "week": "This week",
       "weekSub": "I host {{host}} · I attend {{attend}}",
-      "followUpsSub": "Done {{done}} · in progress {{inProgress}} · to do {{todo}} · not settled {{open}}",
-      "notTasksYet": "{{count}} not settled yet",
-      "allTasks": "All are settled",
+      "followUpsSub": "Done {{done}} · in progress {{inProgress}} · to do {{todo}} · no owner {{open}}",
+      "notTasksYet": "{{count}} without an owner",
+      "allTasks": "All have an owner",
       "doneSub": "Of {{total}} follow-up tasks",
       "mineOpen": "{{count}} waiting for my answer",
       "done": "Tasks done",
@@ -31806,7 +31807,7 @@
       "researchDone": "finished “Survey competitors’ promotions”",
       "me": "I",
       "answered": "answered: {{choice}}",
-      "meetingStarted": "started a meeting; the meeting agent is recording",
+      "meetingStarted": "started a recorded meeting",
       "minutesSent": "sent the minutes of “{{title}}” to {{count}} people",
       "tookFollowUp": "took “{{task}}” from the meeting “{{title}}”",
       "assignedFollowUp": "assigned me “{{task}}” from the meeting “{{title}}”",
@@ -31949,7 +31950,7 @@
       "writerLine2": "When you choose, I will match the body text and the button to it.",
       "triageLine1": "I need the new delivery dates to revise the notice.",
       "triageLine2": "Lee Mina asked the logistics team again. I continue when they reply.",
-      "calendar": "Schedule agent",
+      "calendar": "Calendar agent",
       "calendarDoing": "Nothing assigned",
       "calendarLine": "I will tell you when next week’s schedule changes.",
       "recording": "Recording “{{title}}”"
@@ -31999,7 +32000,7 @@
       "fromMeetingAssigned": "A follow-up from the meeting “{{title}}”. {{host}} assigned it to {{name}}.",
       "request": "{{name}} asks to see the minutes of “{{title}}”",
       "requestWho": "Waiting for my approval",
-      "fromMeetingHeard": "A follow-up from the meeting “{{title}}”. The meeting named {{name}} for it."
+      "fromMeetingHeard": "A follow-up task from the meeting “{{title}}”. {{name}} agreed to take it in the meeting."
     },
     "project": {
       "campaign": "Product launch campaign",
@@ -32130,10 +32131,10 @@
       "heading": "The agent’s question"
     },
     "script": {
-      "choiceA": "Me first",
-      "choiceB": "The project team at once",
-      "plan": "This is how I will do it.\n\n1. Read the task description and its earlier notes.\n2. Ask you the one thing I need to know.\n3. Split the work into items and put the list in this conversation.",
-      "question": "Who should see the result first?",
+      "choiceA": "For me",
+      "choiceB": "For the project team",
+      "plan": "This is how I will do it.\n\n1. Read the task description.\n2. Split the task into items and put the list in this conversation.",
+      "question": "Who should the list be written for?",
       "reportA": "Kim Jiwoo only · short",
       "reportB": "The whole campaign team · with a summary",
       "reportBasis1": "Visitors, 112% of the target: report page 2, “Visits” table, total row",
@@ -32148,7 +32149,7 @@
       "reportPlan": "The report is already written, so I will prepare what sharing it needs.\n\n1. Pull the three key numbers out of the report.\n2. Draft the message that shares it.\n3. Show you the draft, then propose a status and a progress note.",
       "reportQuestion": "Who should the sharing message be written for?",
       "requested": "You asked for: “{{text}}”",
-      "next": "I am splitting the task description into items now. When the list is ready I will put it in this conversation for you to read first.",
+      "next": "I am splitting the task description into items now. When the list is ready I will put it in this conversation.",
       "nextTeam": "I am splitting the task description into items now. When the list is ready I will put it in this conversation, written for the project team to read."
     },
     "settings": {

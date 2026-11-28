@@ -108,7 +108,7 @@ export default function MeetingsPage(): React.JSX.Element {
       value: counts.total,
       sub: t(
         'meetings.tiles.followUpsSub',
-        'Done {{done}} · in progress {{inProgress}} · to do {{todo}} · not settled {{open}}',
+        'Done {{done}} · in progress {{inProgress}} · to do {{todo}} · no owner {{open}}',
         {
           done: counts.done,
           inProgress: counts.inProgress,

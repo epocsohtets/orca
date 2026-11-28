@@ -193,8 +193,8 @@ export function MeetingDetail({
       value: counts.total,
       sub:
         counts.open > 0
-          ? t('meetings.tiles.notTasksYet', '{{count}} not settled yet', { count: counts.open })
-          : t('meetings.tiles.allTasks', 'All are settled')
+          ? t('meetings.tiles.notTasksYet', '{{count}} without an owner', { count: counts.open })
+          : t('meetings.tiles.allTasks', 'All have an owner')
     },
     {
       id: 'done',
