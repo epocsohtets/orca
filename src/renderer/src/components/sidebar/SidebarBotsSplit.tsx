@@ -185,6 +185,8 @@ export function SidebarBotsSplit({
         projectsFirst ? 'scroll-mt-1 border-t' : 'scroll-mb-1 border-b',
         '[[data-sidebar-content-viewport]>&]:-mr-1 [[data-sidebar-content-viewport]>&]:pr-1',
         'has-[[data-bot-sidebar-search=single-row]]:min-h-34 has-[[data-bot-sidebar-search=multiple-rows]]:min-h-47',
+        // The card that makes the first bot is never cut: the list below gives up its height first.
+        'has-[[data-sidebar-bots-empty]]:shrink-0',
         SPLIT_SCROLL_GUTTER,
         fillsSidebar ? 'flex-1' : 'max-h-[40%]'
       )}
