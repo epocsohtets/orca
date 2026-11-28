@@ -117,7 +117,7 @@ function SidebarChatConversationView({
     >
       <div
         // The tab strip under this header is a window drag region; hit-testing ignores z-index.
-        className="flex h-13 shrink-0 items-center gap-3 border-b border-border px-(--rail-page-gutter) [-webkit-app-region:no-drag]"
+        className="flex h-13 shrink-0 items-center gap-3 border-b border-border px-4 [-webkit-app-region:no-drag]"
       >
         <div className="flex min-w-0 flex-1 items-baseline gap-2">
           <span className="min-w-0 truncate text-[15px] font-semibold tracking-tight">{title}</span>

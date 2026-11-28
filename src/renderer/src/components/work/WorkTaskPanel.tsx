@@ -167,7 +167,7 @@ export function WorkTaskPanel({
           ) : null}
           {task.who === 'agentWorking' && task.whoLabel ? (
             <>
-              <dt className="text-muted-foreground">{t('taskLoop.detail.activity', 'Activity')}</dt>
+              <dt className="text-muted-foreground">{t('taskLoop.detail.activity', 'Now')}</dt>
               <dd className="text-foreground">{task.whoLabel}</dd>
             </>
           ) : null}

@@ -29678,7 +29678,7 @@
   },
   "taskLoop": {
     "activity": {
-      "result": "· “{{title}}”에 초안을 붙였습니다",
+      "result": "· “{{title}}”에 결과물을 붙였습니다",
       "started": "· 에이전트와 “{{title}}” 업무를 시작했습니다"
     },
     "agent": {
@@ -29704,7 +29704,7 @@
       "noteByAgent": "에이전트가 쓰고 내가 확인함",
       "noteByMe": "내가 씀",
       "noteStatus": "상태를 {{to}} 바꿈",
-      "activity": "활동",
+      "activity": "지금",
       "folder": "폴더",
       "output": "결과물"
     },

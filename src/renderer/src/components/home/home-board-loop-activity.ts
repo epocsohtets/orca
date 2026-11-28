@@ -36,7 +36,7 @@ export function buildHomeLoopActivity(
               ...line(
                 'result',
                 args.agent,
-                t('taskLoop.activity.result', '· attached a draft to “{{title}}”', {
+                t('taskLoop.activity.result', '· attached the result to “{{title}}”', {
                   title: task.title
                 }),
                 true

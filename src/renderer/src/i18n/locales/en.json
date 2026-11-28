@@ -32048,7 +32048,7 @@
   },
   "taskLoop": {
     "activity": {
-      "result": "· attached a draft to “{{title}}”",
+      "result": "· attached the result to “{{title}}”",
       "started": "· started the task “{{title}}” with an agent"
     },
     "agent": {
@@ -32074,7 +32074,7 @@
       "noteByAgent": "Written by the agent, confirmed by me",
       "noteByMe": "Written by me",
       "noteStatus": "Changed status {{to}}",
-      "activity": "Activity",
+      "activity": "Now",
       "folder": "Folder",
       "output": "Result"
     },
