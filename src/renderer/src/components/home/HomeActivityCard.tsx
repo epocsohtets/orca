@@ -94,7 +94,9 @@ export function HomeActivityCard({
             data-home-activity-all=""
             onClick={() => onShowAllChange(!showAll)}
           >
-            {showAll ? t('home.activity.less', 'Show fewer') : t('home.activity.all', 'View all')}
+            {showAll
+              ? t('home.activity.less', 'Show fewer')
+              : t('home.activity.all', 'View all {{count}}', { count: filtered.length })}
           </Button>
         ) : undefined
       }

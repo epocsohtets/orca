@@ -49,6 +49,7 @@ export function HomeMyDayCard({
 }): React.JSX.Element {
   const t = useTranslate()
   const total = segments.reduce((sum, segment) => sum + segment.minutes, 0)
+  const open = records.filter((record) => !answers[record.id]).length
 
   return (
     <HomeCard
@@ -104,6 +105,10 @@ export function HomeMyDayCard({
         <section aria-label={t('home.day.unconfirmed', 'Records without a task')}>
           <h3 className={HOME_GROUP_RULED_CLASS}>
             {t('home.day.unconfirmed', 'Records without a task')}
+            <span aria-hidden>·</span>
+            <span className="tabular-nums" data-home-records-open="">
+              {open}
+            </span>
           </h3>
           <ul className="mx-4">
             {records.map((record) => (
