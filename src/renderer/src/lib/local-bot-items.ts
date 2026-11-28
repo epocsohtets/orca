@@ -1,7 +1,7 @@
 // A bot whose items this window serves itself instead of a bot host: the item panel's components read
 // and write it through the usual bot calls, and its chat opens wherever the server says.
 export type LocalBotItems = {
-  call: (method: string, params: Record<string, unknown>) => Promise<unknown>
+  call: (method: string, params: unknown) => Promise<unknown>
   openChat: (chatId: string) => void
 }
 

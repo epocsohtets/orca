@@ -311,9 +311,10 @@ function BotItemGroup({
       <BotPanelSectionHeader
         title={botItemGroupName(id, t)}
         fold={{ open, onOpenChange: setOpen }}
-        // Open, the rows count themselves; folded, nothing else says what it hides.
+        // Open, the rows count themselves; folded, nothing else says what it hides. Needs you always says how
+        // many: the number the owner checks against the badge.
         summary={
-          open ? null : (
+          open && id !== 'needs_you' ? null : (
             <>
               {count}
               {fresh.length > 0 ? (

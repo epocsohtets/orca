@@ -73,10 +73,17 @@ export function callBotRpc<TResult>(
   method: string,
   ...rest: [params?: unknown, options?: Parameters<typeof callRuntimeRpc>[3]]
 ): Promise<TResult> {
-  const params = rest[0] as Record<string, unknown> | undefined
-  const local = localBotItems('id' in bot ? bot.id : params?.botId)
+  const params = rest[0]
+  const local = localBotItems(
+    'id' in bot
+      ? bot.id
+      : typeof params === 'object' && params !== null && 'botId' in params
+        ? params.botId
+        : undefined
+  )
   if (local) {
-    return local.call(method, params ?? {}) as Promise<TResult>
+    // oxlint-disable-next-line typescript/consistent-type-assertions -- SAFETY: a local server answers each method with the shape its bot host does
+    return local.call(method, params) as Promise<TResult>
   }
   return callRuntimeRpc<TResult>(botTarget(bot), method, ...rest)
 }

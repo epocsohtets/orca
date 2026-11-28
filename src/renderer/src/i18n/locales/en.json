@@ -30616,7 +30616,6 @@
         "made": "added this item",
         "madeNeedsYou": "added this item as Needs you",
         "moved": "moved this to",
-        "noComments": "No comments yet.",
         "notSent": "Not sent.",
         "retry": "Retry",
         "discard": "Discard",
@@ -31847,8 +31846,7 @@
       "pick": "Pick a task"
     },
     "wrapUp": {
-      "title": "Wrap-up",
-      "close": "Close"
+      "title": "Wrap-up"
     },
     "newTask": {
       "label": "Task title",
@@ -31864,8 +31862,7 @@
       "late": "Late",
       "done": "Done",
       "answer": "Answer",
-      "openList": "Task list",
-      "openMinutes": "Open the minutes"
+      "openList": "Task list"
     },
     "signedOut": {
       "line": "Sign in to inAX to see your work, what waits on you, and what your agents are doing."
@@ -31971,16 +31968,8 @@
     },
     "dayEnd": {
       "progress": "Progress note",
-      "status": "Status",
-      "save": "Save",
       "sharedOwners": "Owners of {{count}} follow-ups",
-      "task": "Task",
-      "resultTitle": "Saved today",
-      "ahead": "Agent’s suggestion",
-      "take": "Use",
-      "skip": "Skip",
-      "guess": "Agent’s pick: {{status}}",
-      "guessDraft": "Agent’s pick: {{status}} · a draft is attached"
+      "resultTitle": "Saved today"
     },
     "chip": {
       "waiting": "Needs me",
@@ -32018,19 +32007,10 @@
       "chip": "Demo"
     },
     "detail": {
-      "description": "Description",
       "due": "Due",
-      "notes": "Progress notes",
       "project": "Project",
       "start": "Start with an agent",
-      "status": "Status",
-      "assignee": "Owner",
-      "noteByAgent": "Written by the agent, confirmed by me",
-      "noteByMe": "Written by me",
-      "noteStatus": "Changed status {{to}}",
-      "activity": "Now",
-      "noteByAgentOf": "Written by the agent, confirmed by {{name}}",
-      "noteBy": "Written by {{name}}"
+      "status": "Status"
     },
     "gate": {
       "line": "Sign in to inAX and your tasks appear here."
@@ -32041,10 +32021,6 @@
       "start": "Start",
       "subtitle": "Sign in and the work assigned to you appears in this app.",
       "title": "Sign in to inAX"
-    },
-    "question": {
-      "ownWords": "My own answer",
-      "send": "Send"
     },
     "script": {
       "choiceA": "For me",
@@ -32106,9 +32082,6 @@
       "question": "Needs me · {{agent}}",
       "result": "Result ready",
       "confirmedBy": "{{status}} · written by the agent, confirmed by {{name}}"
-    },
-    "group": {
-      "needsYou": "Needs me"
     },
     "notice": {
       "title": "Needs your answer",
