@@ -50,6 +50,8 @@ export type HomeItemEntry = {
   } | null
   /** The task it is; null for a decision of its own. */
   taskId: string | null
+  /** The task's own status (one of inAX's four) as an item status; Orca's `item.status` groups it. */
+  own?: BotItemStatus
   /** Where its chat row goes: the task's conversation, the meeting, or Home. */
   chat: { kind: 'task'; taskId: string } | { kind: 'meeting'; meetingId: string } | { kind: 'home' }
   /** Opened from elsewhere only, never a row of the list: the day's records, a colleague's view of a task. */

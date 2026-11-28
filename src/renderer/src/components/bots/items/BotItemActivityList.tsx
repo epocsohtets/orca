@@ -43,6 +43,7 @@ import {
   botItemPendingWordsBesideAnswers
 } from '../../../../../shared/bots/bot-item-sent-answers'
 import { NATIVE_CHAT_QUOTE_SOURCE_PROPS } from '../../../../../shared/native-chat/input/quotes/native-chat-quote-selection'
+import { localBotItemStatus, localBotItems } from '@/lib/local-bot-items'
 
 const ACTOR = 'font-medium text-foreground/80'
 // Where a linked event's refs go in its translated sentence.
@@ -52,9 +53,11 @@ function str(value: unknown): string {
   return typeof value === 'string' ? value : ''
 }
 
-function statusWord(value: unknown, t: Translate): string {
+function statusWord(value: unknown, t: Translate, item: BotItem): string {
   const status = BOT_ITEM_STATUSES.find((entry) => entry === value)
-  return status ? botItemStatusName(status, t) : str(value)
+  // A server with statuses of its own names a move by them, as its status menu does.
+  const own = localBotItems(item.owner.botId)?.statuses?.find((entry) => entry.status === status)
+  return own?.label ?? (status ? botItemStatusName(status, t) : str(value))
 }
 
 function fieldName(field: string, t: Translate): string {
@@ -150,7 +153,7 @@ function EventBody({ event, item }: { event: BotItemEvent; item: BotItem }): Rea
           {closed(data.to) || reopened ? null : (
             <>
               {' '}
-              <b className={ACTOR}>{statusWord(data.to, t)}</b>
+              <b className={ACTOR}>{statusWord(data.to, t, item)}</b>
             </>
           )}
           {note ? `: ${note}` : null}
@@ -285,7 +288,13 @@ export function BotItemActivityList({
   quickReplies?: BotItemQuickReplyActions
 }): React.JSX.Element {
   const entries = botItemActivity(item, events)
-  const waitKey = botItemWaitEntryKey(item, entries)
+  // The Waiting card stands in for the move to Waiting; not when it only repeats the status the header
+  // names, so the move shows as itself.
+  const wait =
+    item.status === 'waiting' && item.wait && item.wait.text !== localBotItemStatus(item)?.label
+      ? item.wait
+      : null
+  const waitKey = wait ? botItemWaitEntryKey(item, entries) : null
   const liveAskId = botItemLiveAskKey(entries)
   const list = useRef<HTMLDivElement | null>(null)
   // A reply's quote leads to its question, focused so Tab goes on from there.
@@ -354,9 +363,7 @@ export function BotItemActivityList({
             </div>
           )
         })}
-        {item.status === 'waiting' && item.wait ? (
-          <BotItemWaitCard text={item.wait.text} at={item.wait.at} />
-        ) : null}
+        {wait ? <BotItemWaitCard text={wait.text} at={wait.at} /> : null}
         {/* Last, as sent: never placed by this machine's clock among the host's events. */}
         {pending?.shown.map((sending) => {
           const { event, failed, intent } = sending

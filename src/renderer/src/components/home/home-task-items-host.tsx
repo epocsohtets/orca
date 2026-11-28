@@ -12,7 +12,7 @@ import { declineMinutesRequest, shareMinutes } from '@/components/meetings/meeti
 import { useAppStore } from '@/store'
 import { mascotAvatar } from '../../../../shared/bot-avatar'
 import type { Bot } from '../../../../shared/bot-types'
-import type { BotItem, BotItemEvent } from '../../../../shared/bots/bot-items'
+import type { BotItem, BotItemEvent, BotItemStatus } from '../../../../shared/bots/bot-items'
 import { BOT_ITEM_STATUSES, parseBotItemEventId } from '../../../../shared/bots/bot-items'
 import { isRecord } from '../../../../shared/agent-status/child-work/agent-status-child-work-value-guards'
 import { LOCAL_EXECUTION_HOST_ID } from '../../../../shared/execution-host/execution-host'
@@ -382,12 +382,19 @@ export function HomeTaskItemsHost(): null {
       status: BOT_STATUS[status],
       label: labels[status]
     }))
-    return serveLocalBotItems(HOME_TASKS_BOT_ID, { call, openChat, statuses })
+    // The chip names the task's own status; Orca's status (Needs you, Waiting for 검토 요청) keeps grouping it.
+    const statusOf = (item: BotItem): BotItemStatus | undefined =>
+      listed().find((entry) => entry.item.uid === item.uid)?.own
+    return serveLocalBotItems(HOME_TASKS_BOT_ID, { call, openChat, statuses, statusOf })
   }, [t])
   useEffect(() => {
-    const before = JSON.stringify(entries.map((entry) => [entry.item, entry.events.length]))
+    const before = JSON.stringify(
+      entries.map((entry) => [entry.item, entry.events.length, entry.own])
+    )
     entries = built
-    if (JSON.stringify(built.map((entry) => [entry.item, entry.events.length])) !== before) {
+    if (
+      JSON.stringify(built.map((entry) => [entry.item, entry.events.length, entry.own])) !== before
+    ) {
       changed()
     }
   }, [built])

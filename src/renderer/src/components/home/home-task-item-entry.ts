@@ -150,6 +150,7 @@ export function makeHomeItemEntry(
     events,
     ask: askEvent && shape && open ? { eventId: askEvent.id, shape, answer: open.answer } : null,
     taskId: rest.taskId,
+    ...(rest.taskId ? { own: task.done ? 'done' : BOT_STATUS[task.status ?? 'todo'] } : {}),
     chat: rest.chat
   }
 }
