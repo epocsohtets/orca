@@ -31475,7 +31475,6 @@
       "titleTooLong": "Use {{max}} characters or fewer.",
       "attendeesRequired": "Add at least one person besides the host.",
       "fromChat": "From the chat “{{name}}”. The meeting links back to it; it stays its own item.",
-      "intro": "Attendees get it on their own schedule and can read the outline first.",
       "title": "Title",
       "when": "When",
       "now": "Start now and record",
@@ -31609,7 +31608,9 @@
       "assignWho": "The meeting agent tells the {{people}} owners. The agent drafted these: change an owner or untick a line that is wrong.",
       "colTask": "Task",
       "colOwner": "Owner",
-      "colActions": "Actions"
+      "colActions": "Actions",
+      "stateUnasked": "Waiting for the host to assign",
+      "suggestedOutside": "{{name}} was not in the meeting; not asked yet"
     },
     "openTask": "Open task",
     "notMine": "Not mine",
@@ -32068,6 +32069,10 @@
       "done": "I finished this task.",
       "copyChosen": "The writing agent drafted two headlines and I chose one. It is matching the body text and the button to it.",
       "mine": "I worked on this task today."
+    },
+    "offer": {
+      "declined": "The host now sees these as not mine.",
+      "undo": "Undo"
     }
   },
   "taskLoop": {

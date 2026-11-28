@@ -62,12 +62,15 @@ export function MeetingCreateForm({
     draft?.materials ?? preset?.materials ?? []
   )
   const [errors, setErrors] = useState<Record<string, string | undefined>>({})
+  // The schedule is checked from the first time the keyboard leaves its row, on every change after that.
+  const [whenTouched, setWhenTouched] = useState(false)
   const [saving, setSaving] = useState(false)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
   useEffect(() => () => clearTimeout(timer.current ?? undefined), [])
 
+  // Starting now keeps the length that was set and moves it to this moment.
   const shownRange: MeetingRange = startNow
-    ? { startsAt: openedAt, endsAt: Math.max(range.endsAt, openedAt + MINUTE) }
+    ? { startsAt: openedAt, endsAt: openedAt + Math.max(MINUTE, range.endsAt - range.startsAt) }
     : range
   const recentPlaces = [...new Set(meetings.map((meeting) => meeting.place).filter(Boolean))]
     .filter((entry) => entry !== place)
@@ -106,6 +109,7 @@ export function MeetingCreateForm({
         ? t('meetings.form.attendeesRequired', 'Add at least one person besides the host.')
         : undefined
   }
+  const whenError = whenTouched || typedTime !== null ? check.when() : undefined
   const blur = (field: keyof typeof check) => () =>
     setErrors((current) => ({ ...current, [field]: check[field]() }))
   const clear = (field: keyof typeof check): void => {
@@ -118,6 +122,7 @@ export function MeetingCreateForm({
     event.preventDefault()
     const next = { title: check.title(), when: check.when(), attendees: check.attendees() }
     setErrors(next)
+    setWhenTouched(true)
     const firstInvalid = (['title', 'when', 'attendees'] as const).find((field) => next[field])
     if (firstInvalid) {
       document.getElementById(ID(firstInvalid))?.focus()
@@ -156,24 +161,21 @@ export function MeetingCreateForm({
       data-meeting-create-form=""
       onSubmit={submit}
     >
-      <p className="text-xs text-muted-foreground">
-        {draft
-          ? t(
-              'meetings.form.fromWhisper',
-              'The meeting agent filled this in from the chat “{{name}}”. Change what is wrong.',
-              { name: origin?.name ?? '' }
-            )
-          : origin
+      {draft || origin ? (
+        <p className="text-xs text-muted-foreground">
+          {draft
             ? t(
-                'meetings.form.fromChat',
-                'From the chat “{{name}}”. The meeting links back to it; it stays its own item.',
-                { name: origin.name }
+                'meetings.form.fromWhisper',
+                'The meeting agent filled this in from the chat “{{name}}”. Change what is wrong.',
+                { name: origin?.name ?? '' }
               )
             : t(
-                'meetings.form.intro',
-                'Attendees get it on their own schedule and can read the outline first.'
+                'meetings.form.fromChat',
+                'From the chat “{{name}}”. The meeting links back to it; it stays its own item.',
+                { name: origin?.name ?? '' }
               )}
-      </p>
+        </p>
+      ) : null}
 
       <MeetingFormField
         id={ID('title')}
@@ -217,35 +219,14 @@ export function MeetingCreateForm({
           today={today}
           startDisabled={startNow}
           disabled={saving}
-          invalid={Boolean(errors.when)}
-          onChange={(next) => {
-            setRange(next)
-            if (errors.when && !checkRange(next) && typedTime === null) {
-              setErrors((current) => ({ ...current, when: undefined }))
-            }
-          }}
-          onTimeTyped={(typed) => {
-            setTypedTime(typed)
-            setErrors((current) => ({
-              ...current,
-              when: typed
-                ? t(
-                    'meetings.form.timeInvalid',
-                    '“{{typed}}” is not a time. Write it like 15:30, or pick one from the list.',
-                    { typed }
-                  )
-                : undefined
-            }))
-          }}
-          onBlur={() => {
-            if (typedTime === null) {
-              blur('when')()
-            }
-          }}
+          invalid={Boolean(whenError)}
+          onChange={setRange}
+          onTimeTyped={setTypedTime}
+          onBlur={() => setWhenTouched(true)}
         />
-        {errors.when ? (
+        {whenError ? (
           <p id={`${ID('when')}-error`} role="alert" className="text-xs text-destructive">
-            {errors.when}
+            {whenError}
           </p>
         ) : (
           <p id={`${ID('when')}-description`} className="text-xs text-muted-foreground">
@@ -373,7 +354,15 @@ export function MeetingCreateForm({
               ? t('meetings.form.submitNow', 'Create and record')
               : t('meetings.form.submit', 'Create')}
         </Button>
-        <Button type="button" size="sm" variant="ghost" disabled={saving} onClick={onCancel}>
+        <Button
+          type="button"
+          size="sm"
+          variant="ghost"
+          disabled={saving}
+          // Leaving must not first check the field the keyboard was in: the message would move this button.
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={onCancel}
+        >
           {t('meetings.cancel', 'Cancel')}
         </Button>
       </div>

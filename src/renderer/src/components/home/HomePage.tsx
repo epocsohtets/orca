@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { toast } from 'sonner'
 import { useAppStore } from '@/store'
 import { useIntlLocale, useTranslate } from '@/i18n/use-translate'
 import { uiDateTimeFormat } from '@/i18n/ui-intl-formatters'
@@ -129,15 +130,28 @@ export default function HomePage(): React.JSX.Element {
   /** My answer to what the meeting agent offered me: each item becomes my task, or goes back to the host. */
   const answerOffer = (meetingId: string, choiceId: string): void => {
     const meeting = useMeetings.getState().meetings.find((entry) => entry.id === meetingId)
-    for (const followUp of meeting?.followUps ?? []) {
-      if (followUp.suggestedOwnerId !== viewerId || followUp.taskId || followUp.declined) {
-        continue
-      }
+    const offered = (meeting?.followUps ?? []).filter(
+      (followUp) => followUp.suggestedOwnerId === viewerId && !followUp.taskId && !followUp.declined
+    )
+    for (const followUp of offered) {
       if (choiceId === HOME_ACCEPT_FOLLOW_UPS) {
         acceptFollowUp(meetingId, followUp.id)
       } else {
         setFollowUpDeclined(meetingId, followUp.id, true)
       }
+    }
+    if (choiceId !== HOME_ACCEPT_FOLLOW_UPS && offered.length > 0) {
+      // The row leaves the board with the answer, so the way back comes with the message.
+      toast(t('home.offer.declined', 'The host now sees these as not mine.'), {
+        action: {
+          label: t('home.offer.undo', 'Undo'),
+          onClick: () => {
+            for (const followUp of offered) {
+              setFollowUpDeclined(meetingId, followUp.id, false)
+            }
+          }
+        }
+      })
     }
   }
   /** An agent's row goes to its conversation; a bot without one opens in place. */

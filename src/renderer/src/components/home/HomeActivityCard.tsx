@@ -9,7 +9,7 @@ const SHORT = 5
 
 export type HomeActivityFilter = 'all' | 'finished'
 
-/** This week's log, newest first. A line jumps to the task or agent it is about. */
+/** This week's log, newest first. A line jumps to the task, agent or meeting it is about. */
 export function HomeActivityCard({
   entries,
   filter,
@@ -96,7 +96,7 @@ export function HomeActivityCard({
             )
             return (
               <li key={entry.id}>
-                {entry.taskId || entry.agentId ? (
+                {entry.taskId || entry.agentId || entry.meetingId ? (
                   <button
                     type="button"
                     className={`${HOME_ROW_BUTTON_CLASS} flex items-start gap-2`}

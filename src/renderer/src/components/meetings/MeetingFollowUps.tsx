@@ -15,7 +15,7 @@ import { HOME_META_CLASS, HomeAvatar, HomeCard, HomeWhoMarker } from '@/componen
 import { InaxStatusBadge } from '@/components/task-page/inax/inax-status-badge'
 import { openMeeting, openMeetingTask } from './meeting-navigation'
 import { MEETING_PEOPLE, personName } from './meeting-people'
-import { followUpCounts, followUpState, type FollowUpState } from './meeting-rules'
+import { followUpCounts, followUpState, isParticipant, type FollowUpState } from './meeting-rules'
 import { useMeetingText } from './MeetingParts'
 import type { Meeting, MeetingFollowUp } from './meeting-types'
 import { acceptFollowUp, assignFollowUps, setFollowUpDeclined, useMeetings } from './meetings-store'
@@ -26,8 +26,23 @@ const HEAD_CLASS =
 const CELL_CLASS = 'px-4 py-2 align-middle'
 
 /** The one state of a follow-up: its task's status, or where the offer stands. */
-function FollowUpStateCell({ state }: { state: FollowUpState }): React.JSX.Element {
+function FollowUpStateCell({
+  state,
+  asked = true
+}: {
+  state: FollowUpState
+  /** False when the suggested owner was not in the meeting: the agent offers only to people who were. */
+  asked?: boolean
+}): React.JSX.Element {
   const t = useTranslate()
+  if (state.kind === 'proposed' && !asked) {
+    return (
+      <HomeWhoMarker
+        who="waiting"
+        label={t('meetings.followUps.stateUnasked', 'Waiting for the host to assign')}
+      />
+    )
+  }
   return state.kind === 'task' ? (
     <InaxStatusBadge status={state.task.status} />
   ) : state.kind === 'declined' ? (
@@ -258,9 +273,15 @@ export function MeetingFollowUps({ meeting }: { meeting: Meeting }): React.JSX.E
                             ? state.task.route === 'accepted'
                               ? t('meetings.followUps.accepted', 'Taken by the owner')
                               : t('meetings.followUps.assigned', 'Assigned by the host')
-                            : t('meetings.followUps.proposedTo', 'Proposed to {{name}}', {
-                                name: personName(followUp.suggestedOwnerId)
-                              })}
+                            : isParticipant(meeting, followUp.suggestedOwnerId)
+                              ? t('meetings.followUps.proposedTo', 'Proposed to {{name}}', {
+                                  name: personName(followUp.suggestedOwnerId)
+                                })
+                              : t(
+                                  'meetings.followUps.suggestedOutside',
+                                  '{{name}} was not in the meeting; not asked yet',
+                                  { name: personName(followUp.suggestedOwnerId) }
+                                )}
                         </span>
                       </span>
                     </span>
@@ -298,7 +319,10 @@ export function MeetingFollowUps({ meeting }: { meeting: Meeting }): React.JSX.E
                     )}
                   </td>
                   <td className={`${CELL_CLASS} whitespace-nowrap`} data-meeting-follow-up-state="">
-                    <FollowUpStateCell state={state} />
+                    <FollowUpStateCell
+                      state={state}
+                      asked={isParticipant(meeting, followUp.suggestedOwnerId)}
+                    />
                   </td>
                   <td className={`${CELL_CLASS} whitespace-nowrap ${HOME_META_CLASS}`}>
                     {text.dueDate(followUp.due)}

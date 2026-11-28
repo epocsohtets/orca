@@ -250,7 +250,11 @@ export function buildHomeMeetings(
     activity.push({
       id: `minutes:${meeting.id}`,
       day,
-      at: minuteOfDay(meeting.minutesSentAt),
+      // What followed a meeting is stamped a little after it; it is never shown as still to come.
+      at:
+        day === 0
+          ? Math.min(minuteOfDay(meeting.minutesSentAt), args.minutes)
+          : minuteOfDay(meeting.minutesSentAt),
       who: agentName,
       text: t('home.activity.minutesSent', 'sent the minutes of “{{title}}” to {{count}} people', {
         title: meeting.title,
@@ -272,7 +276,10 @@ export function buildHomeMeetings(
     activity.push({
       id: `task:${task.id}`,
       day,
-      at: minuteOfDay(task.createdAt),
+      at:
+        day === 0
+          ? Math.min(minuteOfDay(task.createdAt), args.minutes)
+          : minuteOfDay(task.createdAt),
       who: task.route === 'accepted' ? t('home.activity.me', 'I') : args.personName(meeting.hostId),
       text:
         task.route === 'accepted'

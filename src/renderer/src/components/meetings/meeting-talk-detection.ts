@@ -23,6 +23,7 @@ const SETTING_UP =
 const ASKING_A_TIME = /(어때|어떠|어떨|괜찮|가능|될까|되나요|되세요)/
 const DAY_WORD = /(오늘|내일|모레|(다음\s*주\s*)?([일월화수목금토])요일)/
 const VAGUE_TIME = /(오전|오후)에/
+const POINTING_WORD = /^(그|이|저|그거|이거|저거|그것|이것|저것)$/
 const TOPIC = /([가-힣A-Za-z0-9][가-힣A-Za-z0-9 ]{1,18}?)\s*(건|관련)(은|는|으로|해서|도)?[\s,]/
 
 function dayFromWord(text: string, now: number): number | null {
@@ -84,6 +85,8 @@ export function detectMeetingTalk(text: string, now: number): MeetingTalk | null
       startsAt = atMinutes(addWorkingDays(now, 1), minutes)
     }
   }
-  const topic = TOPIC.exec(cleaned)?.[1].trim() ?? null
+  const named = TOPIC.exec(cleaned)?.[1].trim() ?? null
+  // "그 건은" points at something said earlier; it names nothing.
+  const topic = named && !POINTING_WORD.test(named) ? named : null
   return { startsAt, endsAt: startsAt + length * MINUTE, topic, timeGuessed: minutes === null }
 }

@@ -29101,7 +29101,6 @@
       "titleTooLong": "{{max}}자 이하로 입력하세요.",
       "attendeesRequired": "주최자 말고 한 명 이상을 넣으세요.",
       "fromChat": "채팅 「{{name}}」에서 생성하는 회의입니다. 회의는 이 채팅과 연결되지만, 따로 관리됩니다.",
-      "intro": "참석자의 일정에 들어가고, 참석자는 개요를 미리 읽습니다.",
       "title": "제목",
       "when": "언제",
       "now": "지금 시작 · 녹음",
@@ -29235,7 +29234,9 @@
       "assignWho": "담당자 {{people}}명에게 회의 에이전트가 알립니다. 에이전트가 뽑은 초안이니, 틀린 줄만 담당자를 바꾸거나 체크를 푸세요.",
       "colTask": "업무",
       "colOwner": "담당자",
-      "colActions": "동작"
+      "colActions": "동작",
+      "stateUnasked": "주최자의 할당을 기다림",
+      "suggestedOutside": "{{name}} 님은 회의에 없었습니다. 아직 묻지 않았습니다"
     },
     "openTask": "업무 열기",
     "notMine": "아님",
@@ -29311,7 +29312,7 @@
       "dismiss": "닫기"
     },
     "task": {
-      "from": "회의 “{{title}}”에서 나온 일 · {{day}}",
+      "from": "회의 「{{title}}」에서 나온 일 · {{day}}",
       "source": "근거 문장 보기"
     },
     "whisper": {
@@ -29464,8 +29465,8 @@
       "meetingStarted": "· 회의를 시작했습니다. 회의 에이전트가 기록하고 있습니다",
       "wrappedUp": "· 오늘 정리에서 업데이트 {{count}}건을 확인했습니다",
       "minutesSent": "· 「{{title}}」의 회의록을 {{count}}명에게 보냈습니다",
-      "tookFollowUp": "· 회의 「{{title}}」의 「{{task}}」를 내 업무로 받았습니다",
-      "assignedFollowUp": "· 회의 「{{title}}」의 「{{task}}」를 나에게 할당했습니다"
+      "tookFollowUp": "· 회의 「{{title}}」에서 「{{task}}」 업무를 내 업무로 받았습니다",
+      "assignedFollowUp": "· 회의 「{{title}}」에서 「{{task}}」 업무를 나에게 할당했습니다"
     },
     "agents": {
       "waiting": "내 답을 기다림",
@@ -29694,6 +29695,10 @@
     },
     "person": {
       "hyunwoo": "최현우"
+    },
+    "offer": {
+      "declined": "주최자에게 내 몫이 아니라고 알렸습니다.",
+      "undo": "실행 취소"
     }
   },
   "taskLoop": {

@@ -53,15 +53,17 @@ function DateButton({
         </Button>
       </PopoverTrigger>
       <PopoverContent align="start" className="w-auto">
-        <MonthCalendar
-          autoFocus
-          selected={new Date(value)}
-          today={new Date(today)}
-          onSelect={(day) => {
-            onChange(day.getTime())
-            setOpen(false)
-          }}
-        />
+        <div className="p-3">
+          <MonthCalendar
+            autoFocus
+            selected={new Date(value)}
+            today={new Date(today)}
+            onSelect={(day) => {
+              onChange(day.getTime())
+              setOpen(false)
+            }}
+          />
+        </div>
       </PopoverContent>
     </Popover>
   )

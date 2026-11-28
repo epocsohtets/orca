@@ -202,7 +202,8 @@ export function startRecording(id: string): void {
 export function stopRecording(id: string): void {
   patchMeeting(id, (m) => ({
     recordingStartedAt: null,
-    minutesSentAt: m.endsAt + 2 * MINUTE,
+    // Two minutes after the scheduled end, or now when the recording ended before that.
+    minutesSentAt: Math.min(m.endsAt + 2 * MINUTE, scenarioNow()),
     ...sampleResult(m)
   }))
   set({ depth: 'brief' })

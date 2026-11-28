@@ -56,6 +56,9 @@ describe('meeting talk pattern rules', () => {
       '뉴스레터 주제'
     )
     expect(detectMeetingTalk('금요일 2시 어때요?', NOW)?.topic).toBeNull()
+    expect(
+      detectMeetingTalk('그 건은 다음 주 목요일 오전 10시에 회의 합시다', NOW)?.topic
+    ).toBeNull()
   })
 
   it('stays quiet for lines that are not about setting up a meeting', () => {
