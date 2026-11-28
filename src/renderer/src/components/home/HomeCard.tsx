@@ -38,10 +38,13 @@ export const HOME_GROUP_RULED_CLASS = `mx-4 flex h-7 items-center gap-1.5 border
 export const HOME_BOARD_SCOPE_CLASS =
   '[&_button]:font-normal [&_[data-slot=badge]]:font-normal [&_button[data-variant=outline]]:shadow-none [&_button[data-size=sm]]:h-7 [&_button[data-size=sm]]:px-2.5 [&_button[data-size=sm]]:text-[13px] [&_button[data-size=sm]]:leading-5'
 /** The board pages' width and the gap between their cards. */
-export const HOME_BOARD_PAGE_CLASS = `rail-page-row-gutter mx-auto flex max-w-[calc(1200px+2*var(--rail-page-gutter))] flex-col gap-4 pt-6 pb-24 ${HOME_BOARD_SCOPE_CLASS}`
-/** Main and side columns, 2 to 1. */
+export const HOME_BOARD_PAGE_CLASS = `@container/board-page rail-page-row-gutter mx-auto flex max-w-[calc(1200px+2*var(--rail-page-gutter))] flex-col gap-4 pt-6 pb-24 ${HOME_BOARD_SCOPE_CLASS}`
+/**
+ * Main and side columns, 2 to 1, by the page's own width (a side panel beside it takes its share): one column
+ * below 72rem, where the side column would cut its rows' text.
+ */
 export const HOME_BOARD_COLUMNS_CLASS =
-  'grid items-start gap-4 @min-[60rem]/rail-page:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]'
+  'grid items-start gap-4 @min-[72rem]/board-page:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]'
 
 export type HomeCardTabs = {
   label: string

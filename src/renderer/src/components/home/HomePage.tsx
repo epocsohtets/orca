@@ -224,7 +224,7 @@ export default function HomePage(): React.JSX.Element {
                   <HomeTiles
                     counts={view.counts}
                     agentFinished={view.agentFinished}
-                    lateFirst={lateFirst ? `${lateFirst.dueLabel} · ${lateFirst.title}` : ''}
+                    lateFirst={lateFirst?.title ?? ''}
                     onSelect={selectTile}
                   />
                 ) : null}
@@ -265,6 +265,23 @@ export default function HomePage(): React.JSX.Element {
                           onOpen={openAgent}
                           onRevealTask={revealTask}
                         />
+                        <HomeActivityCard
+                          entries={view.activity}
+                          filter={activityFilter}
+                          onFilterChange={setActivityFilter}
+                          showAll={activityAll}
+                          onShowAllChange={setActivityAll}
+                          onReveal={(entry) => {
+                            if (entry.meetingId) {
+                              openMeeting(entry.meetingId)
+                            } else if (entry.taskId) {
+                              openInaxTask(entry.taskId)
+                            } else if (entry.agentId) {
+                              setOpenAgentId(entry.agentId)
+                              focusRow(`[data-home-agent="${entry.agentId}"]`)
+                            }
+                          }}
+                        />
                       </>
                     ) : (
                       <HomeCard
@@ -298,25 +315,6 @@ export default function HomePage(): React.JSX.Element {
                       onOpenMeeting={(meetingId) => openMeeting(meetingId)}
                       onOpenCalendar={openMeetingSchedule}
                     />
-                    {signedIn ? (
-                      <HomeActivityCard
-                        entries={view.activity}
-                        filter={activityFilter}
-                        onFilterChange={setActivityFilter}
-                        showAll={activityAll}
-                        onShowAllChange={setActivityAll}
-                        onReveal={(entry) => {
-                          if (entry.meetingId) {
-                            openMeeting(entry.meetingId)
-                          } else if (entry.taskId) {
-                            openInaxTask(entry.taskId)
-                          } else if (entry.agentId) {
-                            setOpenAgentId(entry.agentId)
-                            focusRow(`[data-home-agent="${entry.agentId}"]`)
-                          }
-                        }}
-                      />
-                    ) : null}
                     {phase === 'evening' ? null : myDay}
                   </div>
                 </div>

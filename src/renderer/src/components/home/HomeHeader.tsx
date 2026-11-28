@@ -74,7 +74,7 @@ export function HomeTiles({
 }: {
   counts: HomeBoardCounts
   agentFinished: number
-  /** The first late row, in the row's own words. */
+  /** The first late row's title; the late date is on the row itself. */
   lateFirst: string
   onSelect: (tile: HomeTileId) => void
 }): React.JSX.Element {
