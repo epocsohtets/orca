@@ -3,7 +3,7 @@
 // are items of their own. The item panel's own components read these; nothing here draws.
 import type { BotItemAsk } from '../../../../shared/bots/bot-item-ask'
 import type { BotItemActor } from '../../../../shared/bots/bot-items'
-import type { HomeDayEndCard } from './home-day-end'
+import { homeDayEndMove, type HomeDayEndCard } from './home-day-end'
 import { homeLoopDraftAt, homeLoopQuestionAt, type InaxStatus } from './home-task-loop'
 import {
   buildHomeLoopScript,
@@ -92,7 +92,7 @@ export function buildHomeTaskItems(input: HomeItemsInput): HomeItemEntry[] {
           'dayend',
           entry.answer ?? (note?.by === 'me' ? note.text : labels[status]),
           savedAt + 1,
-          entry.status ?? undefined
+          homeDayEndMove(entry)
         )
       )
     }

@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import { EMPTY_HOME_BOARD_STATE, type HomeTask } from './home-board'
 import {
+  homeDayEndMove,
   planHomeDayEnd,
   saveHomeDayEndTask,
   undoHomeDayEnd,
   type HomeDayEndLine
 } from './home-day-end'
+import { homeAnsweredLine } from './home-task-item-entry'
 
 const task = (id: string, patch: Partial<HomeTask> = {}): HomeTask => ({
   id,
@@ -164,5 +166,29 @@ describe('day-end cards', () => {
     const undone = undoHomeDayEnd(withoutRecords, 0).state
     expect(undone.inax).toEqual(before.inax)
     expect(undone.dayEnd).toEqual([])
+  })
+
+  it('keeps a picked status the task already had as my answer, not a move', () => {
+    const answer = (status: 'inProgress' | 'review') => {
+      const saved = saveHomeDayEndTask(EMPTY_HOME_BOARD_STATE, {
+        taskId: 'waiting',
+        text: '',
+        byAgent: false,
+        status,
+        current: 'inProgress',
+        answersProposal: false,
+        answer: status,
+        at: 1
+      })
+      const entry = saved.dayEnd[0]
+      if (entry?.kind !== 'task') {
+        throw new Error('no task entry')
+      }
+      // The status is still written, so a wait on someone's reply clears.
+      expect(saved.inax.waiting?.status).toBe(status)
+      return homeAnsweredLine(undefined, status, 2, homeDayEndMove(entry)).data
+    }
+    expect(answer('inProgress')).toEqual({ answer: 'inProgress' })
+    expect(answer('review')).toEqual({ from: null, to: 'waiting' })
   })
 })

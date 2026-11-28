@@ -61,6 +61,8 @@ export type HomeDayEndSaved = (
       closedLoop: boolean
       /** My answer to the day-end question as I gave it; absent for a task the pass settled another way. */
       answer?: string
+      /** The status picked was the one the task had (set only to clear a wait): an answer, not a change. */
+      kept?: true
     }
   | { kind: 'meeting'; id: string; taskIds: string[] }
   | { kind: 'records'; id: 'records'; recordIds: string[] }
@@ -231,12 +233,20 @@ export function saveHomeDayEndTask(
         noteId,
         status: args.status,
         prevStatus: record?.status ?? null,
+        ...(args.status !== null && args.status === args.current ? { kept: true as const } : {}),
         closedLoop,
         ...(args.answer ? { answer: args.answer } : {}),
         at: args.at
       }
     ]
   }
+}
+
+/** The status a saved task card moved the task to; none when it kept the one it had (that is my answer). */
+export function homeDayEndMove(
+  entry: Extract<HomeDayEndSaved, { kind: 'task' }>
+): InaxStatus | undefined {
+  return entry.kept ? undefined : (entry.status ?? undefined)
 }
 
 /** Takes back what one saved card sent. `meetingTaskIds` are the follow-up tasks to remove. */
