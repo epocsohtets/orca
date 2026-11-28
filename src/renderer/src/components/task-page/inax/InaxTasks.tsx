@@ -12,7 +12,7 @@ import {
   startHomeLoop
 } from '@/components/home/home-board-actions'
 import type { HomeAgent, HomeTask } from '@/components/home/home-board'
-import { homeLoopOpenProposal, type HomeTaskLoop } from '@/components/home/home-task-loop'
+import type { HomeTaskLoop } from '@/components/home/home-task-loop'
 import {
   buildHomeLoopScript,
   buildHomeLoopTranscript
@@ -52,23 +52,18 @@ function sampleTranscript(
     : rows
 }
 
-function loopCard(
-  t: Translate,
-  task: HomeTask,
-  loop: HomeTaskLoop,
-  now: number
-): InaxConversationCard | null {
-  const script = buildHomeLoopScript(t, task, loop)
-  const proposal = homeLoopOpenProposal(loop, now, script.note)
+function loopCard(t: Translate, task: HomeTask, loop: HomeTaskLoop): InaxConversationCard | null {
   if (task.loop === 'question') {
+    const script = buildHomeLoopScript(t, task, loop)
     return { kind: 'question', question: script.question, choices: script.choices }
   }
-  return proposal
+  // The board already decided whether a proposal waits: a task with nothing prepared has none at the end.
+  return task.proposal && task.proposalStep
     ? {
         kind: 'proposal',
-        step: proposal.step,
-        proposal: { status: proposal.status, note: proposal.note },
-        basis: script.basis
+        step: task.proposalStep,
+        proposal: task.proposal,
+        basis: task.proposalBasis ?? []
       }
     : null
 }
@@ -155,7 +150,7 @@ export function TaskPageInax(): React.JSX.Element {
         working={task.loop === 'working'}
         card={
           loop
-            ? loopCard(t, task, loop, now)
+            ? loopCard(t, task, loop)
             : task.question && task.choices
               ? { kind: 'question', question: task.question, choices: task.choices }
               : null
