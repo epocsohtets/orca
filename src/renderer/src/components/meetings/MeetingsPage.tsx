@@ -29,7 +29,8 @@ import { MeetingList } from './MeetingList'
 import { MeetingAgentCard, MeetingWaitingCard } from './MeetingsSideCards'
 import { useMeetingText } from './MeetingParts'
 import { MeetingViewerMenu } from './MeetingViewerMenu'
-import { resetMeetingsSample, scenarioNow, useMeetings, type MeetingsPane } from './meetings-store'
+import { resetSample } from '@/components/home/home-sample-reset'
+import { scenarioNow, useMeetings, type MeetingsPane } from './meetings-store'
 
 const DATE_OPTIONS: Intl.DateTimeFormatOptions = { weekday: 'long', month: 'long', day: 'numeric' }
 const PANES: MeetingsPane[] = ['upcoming', 'past', 'agenda']
@@ -192,7 +193,7 @@ export default function MeetingsPage(): React.JSX.Element {
                 title={t('meetings.title', 'Meetings')}
                 line={uiDateTimeFormat(DATE_OPTIONS, intlLocale).format(day)}
               >
-                <MeetingViewerMenu onReset={resetMeetingsSample} />
+                <MeetingViewerMenu onReset={resetSample} />
                 <Button
                   type="button"
                   size="sm"

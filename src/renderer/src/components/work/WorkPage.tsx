@@ -13,7 +13,8 @@ import { MeetingViewerRadioGroup } from '@/components/meetings/MeetingViewerMenu
 import { MAKO } from '@/components/meetings/meeting-people'
 import { signInInaxMock } from '@/lib/inax-mock-account'
 import { useHomeBoard } from '@/components/home/use-home-board'
-import { resetHomeBoard, useHomeBoardStore } from '@/components/home/home-board-store'
+import { useHomeBoardStore } from '@/components/home/home-board-store'
+import { resetSample } from '@/components/home/home-sample-reset'
 import {
   answerHomeLoop,
   setHomeTaskStatus,
@@ -44,7 +45,7 @@ export function WorkSurface(): React.JSX.Element {
     <DemoMenu>
       <MeetingViewerRadioGroup />
       <DropdownMenuSeparator />
-      <DropdownMenuItem onSelect={resetHomeBoard}>
+      <DropdownMenuItem onSelect={resetSample}>
         {t('home.preview.reset', 'Start over')}
       </DropdownMenuItem>
     </DemoMenu>

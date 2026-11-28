@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { DemoMenu } from '@/components/task-page/inax/InaxDemoNote'
 import { MeetingViewerRadioGroup } from '@/components/meetings/MeetingViewerMenu'
-import { resetHomeBoard } from './home-board-store'
+import { resetSample } from './home-sample-reset'
 import type { HomePhase } from './home-day'
 
 /** Review tools for the sample: pretend a time of day, show the first-run page, start the sample over. */
@@ -52,7 +52,7 @@ export function HomePreviewMenu({
       <DropdownMenuCheckboxItem checked={firstRun} onCheckedChange={onFirstRunChange}>
         {t('home.preview.firstRun', 'Before sign-in')}
       </DropdownMenuCheckboxItem>
-      <DropdownMenuItem onSelect={resetHomeBoard}>
+      <DropdownMenuItem onSelect={resetSample}>
         {t('home.preview.reset', 'Start over')}
       </DropdownMenuItem>
     </DemoMenu>

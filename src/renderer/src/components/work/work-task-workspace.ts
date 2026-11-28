@@ -42,13 +42,46 @@ export function taskIdOfWorkspace(
 
 const creating = new Map<string, Promise<string | null>>()
 
+// The sample's tasks keep their folders in one folder of their own, so starting over can remove them and
+// never touches another folder of the work folder location.
+const SAMPLE_TASK_FOLDER = 'orca-sample-tasks'
+
+function pathSeparator(root: string): string {
+  return root.includes('\\') ? '\\' : '/'
+}
+
+function sampleTaskRoot(root: string): string {
+  return `${root}${pathSeparator(root)}${SAMPLE_TASK_FOLDER}`
+}
+
+/** Starting the sample over: the workspaces the sample's tasks made, and their folders, go to the trash. */
+export async function removeSampleTaskWorkspaces(): Promise<void> {
+  const root = useAppStore.getState().settings?.workspaceDir
+  if (!root) {
+    return
+  }
+  const sample = sampleTaskRoot(root)
+  const inside = `${sample}${pathSeparator(root)}`
+  const store = useAppStore.getState()
+  await store.fetchFolderWorkspaces({ runtimeEnvironmentId: null })
+  for (const workspace of selectFolderWorkspaces(useAppStore.getState())) {
+    if (!workspace.connectionId && workspace.folderPath.startsWith(inside)) {
+      await store.deleteFolderWorkspace(workspace.id)
+    }
+  }
+  // Not permanent: the folder goes to the trash, where a file someone put there by hand can be found.
+  await window.api.fs.deletePath({ targetPath: sample, recursive: true }).catch(() => undefined)
+}
+
 async function createTaskWorkspace(taskId: string, title: string): Promise<string | null> {
   const root = useAppStore.getState().settings?.workspaceDir
   if (!root) {
     return null
   }
   const name = title.replace(/[\\/:*?"<>|]/g, ' ').trim()
-  const folder = `${root}${root.includes('\\') ? '\\' : '/'}${name}`
+  const sample = sampleTaskRoot(root)
+  const folder = `${sample}${pathSeparator(root)}${name}`
+  await window.api.fs.createDir({ dirPath: sample }).catch(() => undefined)
   // An existing folder of that name is the task's folder from an earlier start.
   await window.api.fs.createDir({ dirPath: folder }).catch(() => undefined)
   const store = useAppStore.getState()
