@@ -5,7 +5,6 @@ import {
   countHomeBoard,
   homeTaskTab,
   orderHomeAgents,
-  planHomeWrapUp,
   sortHomeTasks,
   type HomeAgent,
   type HomeTask
@@ -90,27 +89,5 @@ describe('home board', () => {
       labels
     )
     expect(orderHomeAgents(agents, answered, false, agentLabels)[0].state).toBe('working')
-  })
-
-  it('reports a day record only under the task I linked it to, and never an unanswered one', () => {
-    const board = [task('research', { report: 'two of three done' }), task('review'), task('other')]
-    const records = [{ id: 'pages' }, { id: 'app' }, { id: 'chat' }]
-    const plan = planHomeWrapUp(board, records, { pages: { taskId: 'review' }, chat: 'notWork' })
-    expect(plan.items.map((item) => [item.task.id, item.linkedRecords])).toEqual([
-      ['research', 0],
-      ['review', 1]
-    ])
-    expect(plan.unanswered).toEqual([{ id: 'app' }])
-    // Linking the unanswered record moves it under its task and empties the list.
-    const linked = planHomeWrapUp(board, records, {
-      pages: { taskId: 'review' },
-      chat: 'notWork',
-      app: { taskId: 'research' }
-    })
-    expect(linked.items.map((item) => [item.task.id, item.linkedRecords])).toEqual([
-      ['research', 1],
-      ['review', 1]
-    ])
-    expect(linked.unanswered).toEqual([])
   })
 })

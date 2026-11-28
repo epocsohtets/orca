@@ -27,7 +27,8 @@ export function HomeMyDayCard({
   answers,
   tasks,
   onAnswer,
-  wrappedUp,
+  cardsLeft,
+  result,
   prominent,
   hasApp,
   onManageApps,
@@ -40,7 +41,10 @@ export function HomeMyDayCard({
   answers: Readonly<Record<string, HomeRecordAnswer>>
   tasks: readonly HomeTask[]
   onAnswer: (recordId: string, answer: HomeRecordAnswer | null) => void
-  wrappedUp: number | null
+  /** Day-end cards still to go through. */
+  cardsLeft: number
+  /** What the cards I saved sent to colleagues. */
+  result: React.ReactNode
   /** Evening: wrapping up is the point of the visit. */
   prominent: boolean
   hasApp: boolean
@@ -55,10 +59,7 @@ export function HomeMyDayCard({
   return (
     <HomeCard
       title={t('home.day.title', 'My day')}
-      aside={t(
-        'home.day.privacy',
-        'Only I see this. Only what I confirm in Wrap up today is reported to the team.'
-      )}
+      aside={t('home.day.privacy', 'Only I see this. The team sees only what I save in Wrap up.')}
       data-home-card="day"
       action={
         <DropdownMenu>
@@ -148,24 +149,19 @@ export function HomeMyDayCard({
           </ul>
         </section>
       ) : null}
-      <div className="flex flex-wrap items-center gap-2 border-t border-border px-4 pt-2">
+      <div className="flex flex-wrap items-center gap-2 border-t border-border px-4 py-2">
         <Button
           type="button"
-          variant={prominent && wrappedUp === null ? 'default' : 'outline'}
+          variant={prominent && cardsLeft > 0 ? 'default' : 'outline'}
           size="sm"
+          disabled={cardsLeft === 0}
           data-home-wrap-up-open=""
           onClick={onWrapUp}
         >
-          {t('home.wrapUp.title', 'Wrap up today')}
+          {t('home.wrapUp.title', 'Wrap up')}
         </Button>
-        <span className={HOME_META_CLASS}>
-          {wrappedUp === null
-            ? t('home.day.wrapUpHint', 'I choose what is reported.')
-            : t('home.day.wrappedUp', 'Wrapped up: {{count}} updates confirmed.', {
-                count: wrappedUp
-              })}
-        </span>
       </div>
+      {result}
     </HomeCard>
   )
 }

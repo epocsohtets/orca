@@ -9,6 +9,34 @@ const SHORT = 5
 
 export type HomeActivityFilter = 'all' | 'finished'
 
+/** One line of a log: who, what they did, when. Recent activity and a day-end card draw the same line. */
+export function HomeActivityLine({
+  entry
+}: {
+  entry: Pick<HomeActivityRow, 'who' | 'text' | 'when'> &
+    Partial<Pick<HomeActivityRow, 'finished' | 'confirmed'>>
+}): React.JSX.Element {
+  const t = useTranslate()
+  return (
+    <>
+      <HomeAvatar name={entry.who} />
+      <span className="flex min-w-0 flex-1 flex-col gap-1 text-xs text-foreground">
+        <span>
+          <span className="font-medium">{entry.who}</span> {entry.text}
+        </span>
+        {entry.finished ? (
+          <span className={HOME_META_CLASS}>
+            {entry.confirmed
+              ? t('home.activity.confirmed', 'Confirmed by me')
+              : t('home.activity.unconfirmed', 'Not confirmed by me yet')}
+          </span>
+        ) : null}
+      </span>
+      <span className={`shrink-0 tabular-nums ${HOME_META_CLASS}`}>{entry.when}</span>
+    </>
+  )
+}
+
 /** This week's log, newest first. A line jumps to the task, agent or meeting it is about. */
 export function HomeActivityCard({
   entries,
@@ -79,24 +107,7 @@ export function HomeActivityCard({
       ) : (
         <ol className="border-t border-border" data-home-activity-list="">
           {shown.map((entry) => {
-            const body = (
-              <>
-                <HomeAvatar name={entry.who} />
-                <span className="flex min-w-0 flex-1 flex-col gap-1 text-xs text-foreground">
-                  <span>
-                    <span className="font-medium">{entry.who}</span> {entry.text}
-                  </span>
-                  {entry.finished ? (
-                    <span className={HOME_META_CLASS}>
-                      {entry.confirmed
-                        ? t('home.activity.confirmed', 'Confirmed by me')
-                        : t('home.activity.unconfirmed', 'Not confirmed by me yet')}
-                    </span>
-                  ) : null}
-                </span>
-                <span className={`shrink-0 tabular-nums ${HOME_META_CLASS}`}>{entry.when}</span>
-              </>
-            )
+            const body = <HomeActivityLine entry={entry} />
             return (
               <li key={entry.id}>
                 {entry.taskId || entry.agentId || entry.meetingId ? (

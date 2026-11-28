@@ -1,3 +1,4 @@
+import type { HomeDayEndSaved } from './home-day-end'
 import type {
   HomeLoopPhase,
   HomeProposal,
@@ -78,7 +79,8 @@ export type HomeBoardState = {
   records: Record<string, HomeRecordAnswer>
   addedTasks: { id: string; title: string; agent?: boolean }[]
   doneTaskIds: string[]
-  wrapUp: { count: number } | null
+  /** What I saved from the day-end cards, newest last; each entry holds what Undo takes back. */
+  dayEnd: HomeDayEndSaved[]
   /** Task id to my conversation with its agent. */
   loops: Record<string, HomeTaskLoop>
   /** Task id to what I confirmed onto inAX. */
@@ -90,7 +92,7 @@ export const EMPTY_HOME_BOARD_STATE: HomeBoardState = {
   records: {},
   addedTasks: [],
   doneTaskIds: [],
-  wrapUp: null,
+  dayEnd: [],
   loops: {},
   inax: {}
 }
@@ -216,38 +218,4 @@ export function orderHomeAgents(
         : agent
     })
     .sort((a, b) => AGENT_ORDER[a.state] - AGENT_ORDER[b.state])
-}
-
-export type HomeWrapUpPlan<DayRecord> = {
-  /** One update per task: tasks with a written update, and tasks I linked a day record to. */
-  items: { task: HomeTask; linkedRecords: number }[]
-  /** Records I have not answered. They are never part of the report. */
-  unanswered: DayRecord[]
-}
-
-/**
- * What Wrap up today may report. A day record reaches the report only through the task I linked it to, and only
- * as a count beside that task's update; a record I ruled out or never answered is not in it.
- */
-export function planHomeWrapUp<DayRecord extends { id: string }>(
-  tasks: readonly HomeTask[],
-  records: readonly DayRecord[],
-  answers: Readonly<Record<string, HomeRecordAnswer | undefined>>
-): HomeWrapUpPlan<DayRecord> {
-  const linked = new Map<string, number>()
-  const unanswered: DayRecord[] = []
-  for (const record of records) {
-    const answer = answers[record.id]
-    if (answer === undefined) {
-      unanswered.push(record)
-    } else if (answer !== 'notWork') {
-      linked.set(answer.taskId, (linked.get(answer.taskId) ?? 0) + 1)
-    }
-  }
-  return {
-    items: tasks
-      .filter((task) => !task.meetingId && (task.report !== undefined || linked.has(task.id)))
-      .map((task) => ({ task, linkedRecords: linked.get(task.id) ?? 0 })),
-    unanswered
-  }
 }

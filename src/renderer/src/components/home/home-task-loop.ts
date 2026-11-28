@@ -10,8 +10,10 @@ export type HomeTaskNote = {
   at: number
   text: string
   status: InaxStatus
-  /** Who wrote it and who let it through. */
-  by: 'agentConfirmed'
+  /** Who wrote it and who let it through: the agent's words as I confirmed them, or my own. */
+  by: 'agentConfirmed' | 'me'
+  /** False for a note saved without a status change; absent on notes from a proposal, which always change it. */
+  statusChanged?: boolean
 }
 
 /** What inAX holds for a task beyond the sample: only confirmed changes get here. */

@@ -120,6 +120,15 @@ export function buildHomeActivity(t: Translate): HomeActivity[] {
       taskId: 'research'
     },
     {
+      id: 'copy-comment',
+      day: 0,
+      at: at(14, 20),
+      who: t('home.person.jiwoo', 'Kim Jiwoo'),
+      text: t('home.activity.copyComment', 'commented: “The second one reads better”'),
+      byAgent: false,
+      taskId: 'copy'
+    },
+    {
       id: 'research-done',
       day: 0,
       at: at(17, 10),

@@ -152,16 +152,22 @@ export function TaskPageInaxTaskDetail({
                       {note.text}
                     </p>
                     <p className={HOME_META_CLASS}>
-                      {t(
-                        'taskLoop.detail.noteBy',
-                        'Written by the agent, confirmed by me · {{when}} · status changed {{to}}',
-                        {
-                          when: uiDateTimeFormat(NOTE_TIME, intlLocale).format(
-                            homeSampleMoment(note.at)
-                          ),
-                          to: statusTo[note.status]
-                        }
-                      )}
+                      {[
+                        note.by === 'me'
+                          ? t('taskLoop.detail.noteByMe', 'Written by me')
+                          : t(
+                              'taskLoop.detail.noteByAgent',
+                              'Written by the agent, confirmed by me'
+                            ),
+                        uiDateTimeFormat(NOTE_TIME, intlLocale).format(homeSampleMoment(note.at)),
+                        note.statusChanged === false
+                          ? null
+                          : t('taskLoop.detail.noteStatus', 'status changed {{to}}', {
+                              to: statusTo[note.status]
+                            })
+                      ]
+                        .filter(Boolean)
+                        .join(' · ')}
                     </p>
                   </li>
                 ))}

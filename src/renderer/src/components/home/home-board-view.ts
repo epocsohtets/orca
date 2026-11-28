@@ -5,12 +5,12 @@ import {
   applyHomeBoardState,
   countHomeBoard,
   orderHomeAgents,
-  planHomeWrapUp,
   type HomeAgent,
   type HomeBoardCounts,
   type HomeBoardState,
   type HomeTask
 } from './home-board'
+import { planHomeDayEnd, type HomeDayEndCard } from './home-day-end'
 import { HOME_LOOP_AGENT_ID, applyHomeTaskLoops } from './home-board-loops'
 import { buildHomeLoopScript, inaxStatusLabels } from './home-task-loop-script'
 import { buildHomeAgents } from './home-board-agents-mock'
@@ -38,7 +38,6 @@ const WEEKDAY_LONG: Intl.DateTimeFormatOptions = { weekday: 'long' }
 const WEEKDAY_SHORT: Intl.DateTimeFormatOptions = { weekday: 'short' }
 
 export type HomeActivityRow = HomeActivity & { when: string }
-export type HomeWrapUpUpdate = { id: string; title: string; text: string; linkedRecords: number }
 
 export type HomeBoardView = {
   tasks: HomeTask[]
@@ -57,7 +56,8 @@ export type HomeBoardView = {
   upcoming: HomeUpcoming[]
   segments: HomeDaySegment[]
   records: HomeDayRecord[]
-  wrapUp: { updates: HomeWrapUpUpdate[]; unanswered: HomeDayRecord[] }
+  /** The day-end cards still to go through. */
+  dayEnd: HomeDayEndCard[]
 }
 
 /** The whole sample board for one moment: the sample day, the pretend time, and what I have done so far. */
@@ -233,15 +233,15 @@ export function buildHomeBoardView(
           }
         ]
       : []),
-    ...(board.wrapUp
+    ...(board.dayEnd.length > 0
       ? [
           {
-            id: 'wrapped-up',
+            id: 'day-end',
             day: 0,
             at: minutes,
             who: me,
-            text: t('home.activity.wrappedUp', 'confirmed {{count}} updates in Wrap up today', {
-              count: board.wrapUp.count
+            text: t('home.activity.dayEnd', 'saved {{count}} cards in Wrap up', {
+              count: board.dayEnd.length
             }),
             byAgent: false
           }
@@ -271,7 +271,26 @@ export function buildHomeBoardView(
   const finished = activity.filter((entry) => entry.finished)
 
   const day = own ? buildHomeDay(t, phase, args.app) : { segments: [], records: [] }
-  const plan = planHomeWrapUp(tasks, day.records, board.records)
+  const dayEnd = own
+    ? planHomeDayEnd({
+        tasks,
+        activity,
+        records: day.records,
+        recordAnswers: board.records,
+        viewerId: args.meetings.viewerId,
+        meetings: args.meetings.meetings,
+        meetingTasks: args.meetings.tasks,
+        saved: board.dayEnd,
+        // Only what the agent knows: a task nobody reported on gets no line written for it.
+        suggestion: (task) =>
+          task.id === 'copy' && board.answers.copy !== undefined
+            ? t(
+                'home.report.copyChosen',
+                'The writing agent drafted two headlines and I chose one. It is matching the body text and the button to it.'
+              )
+            : (task.report ?? null)
+      })
+    : []
   return {
     tasks,
     otherTasks: withLoops(fromMeetings.otherTasks),
@@ -290,20 +309,6 @@ export function buildHomeBoardView(
       .sort((a, b) => a.at - b.at),
     segments: day.segments,
     records: day.records,
-    wrapUp: {
-      updates: plan.items.map(({ task, linkedRecords }) => ({
-        id: task.id,
-        title: task.title,
-        text:
-          task.id === 'copy' && board.answers.copy !== undefined
-            ? t(
-                'home.report.copyChosen',
-                'The writing agent drafted two headlines and I chose one. It is matching the body text and the button to it.'
-              )
-            : (task.report ?? t('home.report.mine', 'I worked on this task today.')),
-        linkedRecords
-      })),
-      unanswered: plan.unanswered
-    }
+    dayEnd
   }
 }

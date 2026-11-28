@@ -28,7 +28,7 @@ import type { BotItemQuestionSteps, BotItemQuickReplyActions } from './use-bot-i
 export const BOT_ITEM_CHIP =
   'min-h-8 w-fit max-w-full rounded-[16px] border border-question-option-border px-3.5 py-1.5 text-left text-[13px] leading-[18px] [overflow-wrap:anywhere]'
 
-const CHIP_ACTION =
+export const BOT_ITEM_CHIP_ACTION =
   'outline-none hover:bg-foreground/5 focus-visible:ring-2 focus-visible:ring-ring/50'
 
 /** The recommended reply of an open line: the same pill as its siblings, filled; the one the owner
@@ -41,7 +41,7 @@ export const BOT_ITEM_OPEN_QUESTION =
   'font-semibold [&_p]:font-semibold [&>*]:text-sm [&>*]:leading-5'
 
 /** A line's pick: solid, with a check. */
-const CHIP_PICKED =
+export const BOT_ITEM_CHIP_PICKED =
   'flex items-center gap-1.5 border-foreground bg-foreground text-background hover:bg-foreground/90'
 
 /** Your own words, muted, with a pencil: Type your answer on an open line. */
@@ -267,7 +267,7 @@ export function BotItemQuestionStep({
               aria-label={iconOnly ? typeAnswer : undefined}
               className={cn(
                 BOT_ITEM_CHIP,
-                CHIP_ACTION,
+                BOT_ITEM_CHIP_ACTION,
                 CHIP_OWN_WORDS,
                 iconOnly && 'size-8 shrink-0 justify-center self-start rounded-full p-0'
               )}
@@ -299,9 +299,9 @@ export function BotItemQuestionStep({
                     aria-pressed={picked}
                     className={cn(
                       BOT_ITEM_CHIP,
-                      CHIP_ACTION,
+                      BOT_ITEM_CHIP_ACTION,
                       // Recommended reads by its star alone: only a pick is filled.
-                      picked ? CHIP_PICKED : 'text-foreground'
+                      picked ? BOT_ITEM_CHIP_PICKED : 'text-foreground'
                     )}
                     onClick={(event) => {
                       if (event.altKey || event.shiftKey) {
@@ -325,7 +325,7 @@ export function BotItemQuestionStep({
                   // Reopening a typed pick focuses it, as a picked reply would be.
                   ref={target(`${index}:reply:${pick.words}`)}
                   type="button"
-                  className={cn(BOT_ITEM_CHIP, CHIP_ACTION, CHIP_PICKED)}
+                  className={cn(BOT_ITEM_CHIP, BOT_ITEM_CHIP_ACTION, BOT_ITEM_CHIP_PICKED)}
                   onClick={() => ownWords(index, pick)}
                 >
                   <Pencil className="size-3 shrink-0" />

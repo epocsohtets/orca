@@ -31815,10 +31815,11 @@
       "me": "I",
       "answered": "answered: {{choice}}",
       "meetingStarted": "started a meeting; the meeting agent is recording",
-      "wrappedUp": "confirmed {{count}} updates in Wrap up today",
       "minutesSent": "sent the minutes of “{{title}}” to {{count}} people",
       "tookFollowUp": "took “{{task}}” from the meeting “{{title}}”",
-      "assignedFollowUp": "assigned me “{{task}}” from the meeting “{{title}}”"
+      "assignedFollowUp": "assigned me “{{task}}” from the meeting “{{title}}”",
+      "dayEnd": "saved {{count}} cards in Wrap up",
+      "copyComment": "commented: “The second one reads better”"
     },
     "agents": {
       "waiting": "Waiting for my answer",
@@ -31869,7 +31870,7 @@
     },
     "day": {
       "title": "My day",
-      "privacy": "Only I see this. Only what I confirm in Wrap up today is reported to the team.",
+      "privacy": "Only I see this. The team sees only what I save in Wrap up.",
       "manage": "Manage records",
       "manageApps": "Apps that are recorded",
       "manageBrowser": "Browser activity record",
@@ -31878,8 +31879,6 @@
       "noApp": "Register an app you work in and its time collects here.",
       "unconfirmed": "Records to check",
       "unconfirmedHint": "Choose whether these were work.",
-      "wrapUpHint": "I choose what is reported.",
-      "wrappedUp": "Wrapped up: {{count}} updates confirmed.",
       "hours": "{{count}} hr",
       "minutes": "{{count}} min",
       "excluded": "Not work · only I see it",
@@ -31896,18 +31895,8 @@
       "yesterday": "yesterday"
     },
     "wrapUp": {
-      "title": "Wrap up today",
-      "errorEmpty": "Write the update, or clear “Report this” to leave it out.",
-      "linkedRecords": "Records linked from My day: {{count}} · only I see the records",
-      "include": "Report this",
-      "destination": "Only the updates you check become comments on their tasks in inAX. The project’s members and the team lead see them.",
-      "done": "{{count}} updates reported.",
-      "unanswered": "Records not checked yet",
-      "unansweredTitle": "Records not checked yet: {{count}} · only I see them",
-      "cancel": "Cancel",
-      "confirm": "Report {{count}} updates",
-      "close": "Close",
-      "selectAll": "Select all {{count}}"
+      "title": "Wrap up",
+      "close": "Close"
     },
     "newTask": {
       "label": "Task title",
@@ -31975,7 +31964,8 @@
       "recording": "Recording “{{title}}”"
     },
     "person": {
-      "hyunwoo": "Choi Hyunwoo"
+      "hyunwoo": "Choi Hyunwoo",
+      "jiwoo": "Kim Jiwoo"
     },
     "task": {
       "copy": "Settle the launch page headline",
@@ -32037,12 +32027,32 @@
       "inquiries": "The inquiry agent drafted 214 inquiries sorted into 6 types. My review is left.",
       "notice": "The inquiry agent cannot continue until the logistics team sends the new delivery dates. The deadline has passed.",
       "done": "I finished this task.",
-      "copyChosen": "The writing agent drafted two headlines and I chose one. It is matching the body text and the button to it.",
-      "mine": "I worked on this task today."
+      "copyChosen": "The writing agent drafted two headlines and I chose one. It is matching the body text and the button to it."
     },
     "offer": {
       "declined": "The host was told these are not mine.",
       "undo": "Undo"
+    },
+    "dayEnd": {
+      "recent": "Recent",
+      "progress": "Today’s progress",
+      "status": "Status",
+      "skip": "Skip",
+      "save": "Save",
+      "shared": "Shared",
+      "viewers": "Seen by",
+      "sharedNote": "Progress note",
+      "sharedStatus": "Status “{{status}}”",
+      "sharedNothing": "Nothing",
+      "sharedOwners": "Who has {{count}} follow-ups",
+      "audienceTask": "The PM and the team of “{{project}}”",
+      "followUpCount": "{{count}} follow-ups without an owner",
+      "recordsTitle": "Records without a task",
+      "task": "Task",
+      "recordYes": "Correct",
+      "recordOther": "Another task",
+      "resultTitle": "Shared today · {{count}}",
+      "resultAssigned": "{{count}} follow-ups assigned"
     }
   },
   "taskLoop": {
@@ -32087,7 +32097,6 @@
       "description": "Description",
       "due": "Due",
       "finish": "Mark as done",
-      "noteBy": "Written by the agent, confirmed by me · {{when}} · status changed {{to}}",
       "notes": "Progress notes",
       "notesEmpty": "Progress notes I confirm are kept here.",
       "openChat": "Open the conversation",
@@ -32096,7 +32105,10 @@
       "status": "Status",
       "who": "Who has it",
       "assignee": "Owner",
-      "origin": "Where it came from"
+      "origin": "Where it came from",
+      "noteByAgent": "Written by the agent, confirmed by me",
+      "noteByMe": "Written by me",
+      "noteStatus": "status changed {{to}}"
     },
     "gate": {
       "line": "Sign in to inAX and your tasks appear here."
