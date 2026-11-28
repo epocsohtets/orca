@@ -8,6 +8,7 @@ import { SidebarSettingsHelpMenu } from './SidebarSettingsHelpMenu'
 import { selectAppRailVisible } from '@/components/app-rail/app-rail-layout'
 import { useTranslate } from '@/i18n/use-translate'
 import { useAppStore } from '@/store'
+import { hidesDeveloperChrome } from '../../../../../shared/settings/work-styles'
 import { WorkspaceBoardMovedHint } from './WorkspaceBoardMovedHint'
 import { useWorkspaceBoardMovedHint } from './use-workspace-board-moved-hint'
 
@@ -27,6 +28,7 @@ const SidebarToolbar = React.memo(function SidebarToolbar({
   useTranslation()
   // The rail owns Settings and Help when it is on.
   const appRailVisible = useAppStore(selectAppRailVisible)
+  const hideDeveloper = useAppStore((state) => hidesDeveloperChrome(state.settings))
   const movedHint = useWorkspaceBoardMovedHint()
   const movedHintId = React.useId()
   const boardButtonRef = React.useRef<HTMLButtonElement>(null)
@@ -60,6 +62,10 @@ const SidebarToolbar = React.memo(function SidebarToolbar({
     onWorkspaceBoardToggle()
   }
 
+  // The board and the reveal button are about terminal workspaces, which are not shown to someone who left Code out.
+  if (hideDeveloper) {
+    return null
+  }
   return (
     <div className="mt-auto shrink-0">
       <div className="flex items-center justify-between border-t border-worktree-sidebar-border px-2 py-1.5">
