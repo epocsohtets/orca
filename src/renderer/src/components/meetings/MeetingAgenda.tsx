@@ -2,27 +2,28 @@ import React, { useState } from 'react'
 import { Check, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useTranslate } from '@/i18n/use-translate'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/class-names'
+import { HOME_META_CLASS, HOME_ROW_BUTTON_CLASS, HomeProjectDot } from '@/components/home/HomeCard'
+import type { HomeProjectId } from '@/components/home/home-board'
+import type { HomeProject } from '@/components/home/home-board-mock'
 import { personName } from './meeting-people'
 import { isParticipant } from './meeting-rules'
 import { sameDay, workWeek } from './meeting-schedule'
-import { moveRowFocus, useMeetingStateLine } from './MeetingList'
-import { MEETING_FOCUS_RING, useMeetingText } from './MeetingParts'
+import { moveRowFocus } from './MeetingList'
+import { MeetingStateMarker, useMeetingState, useMeetingText } from './MeetingParts'
 import { respondToInvitation, useMeetings } from './meetings-store'
 
-/** The viewer's own schedule: one working week, a day at a time. */
+/** The viewer's own schedule: one working week, a day at a time, as Home groups what is coming up. */
 export function MeetingAgenda({
-  selectedId,
+  projects,
   onSelect
 }: {
-  selectedId: string | null
+  projects: Record<HomeProjectId, HomeProject>
   onSelect: (id: string) => void
 }): React.JSX.Element {
   const t = useTranslate()
   const text = useMeetingText()
-  const stateLine = useMeetingStateLine()
+  const stateOf = useMeetingState()
   const meetings = useMeetings((state) => state.meetings)
-  const tasks = useMeetings((state) => state.tasks)
   const viewerId = useMeetings((state) => state.viewerId)
   const today = useMeetings((state) => state.day)
   const [weekOffset, setWeekOffset] = useState(0)
@@ -30,17 +31,11 @@ export function MeetingAgenda({
   const mine = meetings
     .filter((meeting) => isParticipant(meeting, viewerId))
     .sort((a, b) => a.startsAt - b.startsAt)
-  const firstId = mine.find((meeting) => days.some((day) => sameDay(day, meeting.startsAt)))?.id
-  const tabStopId = mine.some(
-    (m) => m.id === selectedId && days.some((d) => sameDay(d, m.startsAt))
-  )
-    ? selectedId
-    : firstId
 
   return (
-    <div className="flex flex-col gap-2 px-2 py-3">
-      <div className="flex items-center gap-1 px-2">
-        <span className="min-w-0 flex-1 truncate text-xs font-medium text-foreground">
+    <div className="flex flex-col gap-2 border-t border-border pt-2" data-meeting-agenda="">
+      <div className="flex items-center gap-1 px-4">
+        <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-foreground tabular-nums">
           {text.date(days[0])} – {text.date(days[4])}
         </span>
         <Button
@@ -80,18 +75,13 @@ export function MeetingAgenda({
           const isToday = sameDay(day, today)
           return (
             <li key={day}>
-              <h2 className="flex items-baseline gap-1.5 px-2 pb-0.5 text-xs">
-                <span
-                  className={isToday ? 'font-semibold text-foreground' : 'text-muted-foreground'}
-                >
-                  {text.date(day)}
-                </span>
-                {isToday ? (
-                  <span className="text-muted-foreground">{t('meetings.day.today', 'Today')}</span>
-                ) : null}
-              </h2>
+              <h3 className="flex items-baseline gap-2 px-4 py-1 text-xs font-medium text-muted-foreground">
+                <span className={isToday ? 'text-foreground' : undefined}>{text.date(day)}</span>
+                {isToday ? <span>{t('meetings.day.today', 'Today')}</span> : null}
+                <span className="tabular-nums">{entries.length}</span>
+              </h3>
               {entries.length === 0 ? (
-                <p className="px-2 py-1 text-xs text-muted-foreground">
+                <p className={`px-4 py-1 ${HOME_META_CLASS}`}>
                   {t('meetings.agenda.noMeetings', 'No meetings')}
                 </p>
               ) : (
@@ -102,47 +92,42 @@ export function MeetingAgenda({
                       meeting.hostId !== viewerId &&
                       !meeting.minutes &&
                       meeting.recordingStartedAt === null
-                    const current = meeting.id === selectedId
                     return (
-                      <li key={meeting.id}>
+                      <li key={meeting.id} className="flex items-stretch">
                         <button
                           type="button"
                           data-meeting-agenda-entry={meeting.id}
-                          data-current={current || undefined}
-                          aria-current={current ? 'true' : undefined}
-                          tabIndex={meeting.id === tabStopId ? 0 : -1}
                           onClick={() => onSelect(meeting.id)}
-                          className={cn(
-                            'grid w-full cursor-pointer grid-cols-[2.75rem_minmax(0,1fr)] gap-x-2 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-accent data-current:bg-accent',
-                            MEETING_FOCUS_RING
-                          )}
+                          className={`${HOME_ROW_BUTTON_CLASS} grid grid-cols-[6.5rem_minmax(0,1fr)] items-start gap-x-3 @min-[38rem]/home-card:grid-cols-[6.5rem_minmax(0,1fr)_9rem]`}
                         >
-                          <span className="text-xs leading-5 text-muted-foreground tabular-nums">
-                            {text.time(meeting.startsAt)}
+                          <span className={`pt-px tabular-nums ${HOME_META_CLASS}`}>
+                            {text.time(meeting.startsAt)}–{text.time(meeting.endsAt)}
                           </span>
-                          <span className="min-w-0">
-                            <span className="block truncate text-[13px] font-medium text-foreground">
+                          <span className="flex min-w-0 flex-col gap-1">
+                            <span className="line-clamp-2 text-[13px] font-medium text-foreground">
                               {meeting.title}
                             </span>
-                            <span className="block truncate text-xs text-muted-foreground">
-                              {t('meetings.agenda.host', 'Host {{name}}', {
-                                name: personName(meeting.hostId)
-                              })}
-                              {' · '}
-                              {stateLine(meeting, tasks)}
+                            <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                              <span className={HOME_META_CLASS}>
+                                {t('meetings.agenda.host', 'Host {{name}}', {
+                                  name: personName(meeting.hostId)
+                                })}
+                              </span>
+                              <MeetingStateMarker state={stateOf(meeting)} />
                             </span>
+                          </span>
+                          <span className="min-w-0 pt-px @max-[38rem]/home-card:hidden">
+                            <HomeProjectDot project={projects[meeting.project]} />
                           </span>
                         </button>
                         {answerable ? (
                           <div
-                            className="flex items-center gap-1.5 pb-1 pl-[3.75rem]"
+                            className="flex shrink-0 items-center gap-1.5 pr-4"
                             role="group"
                             aria-label={t(
                               'meetings.response.label',
                               'Will you come to “{{title}}”?',
-                              {
-                                title: meeting.title
-                              }
+                              { title: meeting.title }
                             )}
                             data-meeting-response={meeting.responses[viewerId] ?? 'none'}
                           >

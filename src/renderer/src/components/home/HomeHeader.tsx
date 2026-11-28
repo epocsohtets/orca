@@ -28,12 +28,37 @@ export function HomeGreeting({
     evening: t('home.header.evening', 'Good work today, {{name}}', { name })
   }[phase]
   return (
+    <HomePageHeading title={greeting} line={`${date} · ${line}`}>
+      {children}
+    </HomePageHeading>
+  )
+}
+
+/** The top of a board page: its name, one line that says what it holds, the demo note, actions at the right. */
+export function HomePageHeading({
+  title,
+  line,
+  before,
+  children
+}: {
+  title: string
+  line: string
+  /** A way back, above the title. */
+  before?: React.ReactNode
+  children?: React.ReactNode
+}): React.JSX.Element {
+  return (
     <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
-      <div className="flex min-w-0 flex-col gap-1">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">{greeting}</h1>
-        <p className="text-[13px] text-muted-foreground">
-          {date} · {line}
-        </p>
+      <div className="flex min-w-0 flex-col items-start gap-1">
+        {before}
+        <h1
+          tabIndex={-1}
+          data-page-heading=""
+          className="text-xl font-semibold tracking-tight text-foreground outline-none"
+        >
+          {title}
+        </h1>
+        <p className="text-[13px] text-muted-foreground">{line}</p>
         <InaxDemoNote />
       </div>
       <div className="flex flex-wrap items-center gap-2">{children}</div>
@@ -56,7 +81,7 @@ export function HomeTiles({
   onSelect: (tile: HomeTileId) => void
 }): React.JSX.Element {
   const t = useTranslate()
-  const tiles: { id: HomeTileId; label: string; value: number; sub: string; alert?: boolean }[] = [
+  const tiles: HomeTile<HomeTileId>[] = [
     {
       id: 'tasks',
       label: t('home.tiles.tasks', 'My work'),
@@ -92,6 +117,25 @@ export function HomeTiles({
       alert: counts.late > 0
     }
   ]
+  return <HomeTileRow tiles={tiles} onSelect={onSelect} />
+}
+
+export type HomeTile<Id extends string> = {
+  id: Id
+  label: string
+  value: number | string
+  sub: string
+  alert?: boolean
+}
+
+/** A row of big numbers; each is a button that shows the rows behind it. Size, not colour, carries the weight. */
+export function HomeTileRow<Id extends string>({
+  tiles,
+  onSelect
+}: {
+  tiles: readonly HomeTile<Id>[]
+  onSelect: (id: Id) => void
+}): React.JSX.Element {
   return (
     <Card size="sm" data-home-tiles="">
       <ul className="grid grid-cols-2 gap-y-2 @min-[44rem]/rail-page:grid-cols-4">

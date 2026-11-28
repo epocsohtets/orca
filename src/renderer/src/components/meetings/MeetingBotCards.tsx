@@ -10,6 +10,9 @@ import { openMeeting, openMeetingTask } from './meeting-navigation'
 import { personName } from './meeting-people'
 import { followUpState, meetingAccess } from './meeting-rules'
 import { MinutesRequestControl } from './MeetingSharing'
+import { InaxStatusBadge } from '@/components/task-page/inax/inax-status-badge'
+import { HOME_META_CLASS, HomeProjectDot } from '@/components/home/HomeCard'
+import { buildHomeProjects } from '@/components/home/home-board-mock'
 import { useMeetingText } from './MeetingParts'
 import type { Meeting, MeetingFollowUp, MeetingTask } from './meeting-types'
 import { acceptFollowUp, setFollowUpDeclined, useMeetings } from './meetings-store'
@@ -58,8 +61,11 @@ export function MinutesLinkCard({
         </NativeChatCardActions>
       }
     >
-      <p className="text-xs text-muted-foreground">
-        {text.when(meeting)} ·{' '}
+      <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <HomeProjectDot project={buildHomeProjects(t)[meeting.project]} />
+        <span className={`tabular-nums ${HOME_META_CLASS}`}>{text.when(meeting)}</span>
+      </p>
+      <p className={`mt-1 ${HOME_META_CLASS}`}>
         {sharedBy
           ? t('meetings.bot.sharedBy', 'Shared with you by {{name}}', {
               name: personName(sharedBy)
@@ -217,9 +223,7 @@ export function AssignedTaskCard({
         heading={t('meetings.bot.assignedCard', 'A task for you from “{{title}}”', {
           title: meeting.title
         })}
-        status={
-          <NativeChatCardStatus tone="success">{text.status[task.status]}</NativeChatCardStatus>
-        }
+        status={<InaxStatusBadge status={task.status} />}
         title={task.title}
         footer={
           <NativeChatCardActions

@@ -9,6 +9,7 @@ import {
   DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu'
 import { RailPageMoreMenu } from '@/components/rail-page/RailPageHeader'
+import { MeetingViewerRadioGroup } from '@/components/meetings/MeetingViewerMenu'
 import { resetHomeBoard } from './home-board-store'
 import type { HomePhase } from './home-day'
 
@@ -48,6 +49,8 @@ export function HomePreviewMenu({
           {t('home.preview.evening', 'Evening')}
         </DropdownMenuRadioItem>
       </DropdownMenuRadioGroup>
+      <DropdownMenuSeparator />
+      <MeetingViewerRadioGroup />
       <DropdownMenuSeparator />
       <DropdownMenuCheckboxItem checked={firstRun} onCheckedChange={onFirstRunChange}>
         {t('home.preview.firstRun', 'First run')}

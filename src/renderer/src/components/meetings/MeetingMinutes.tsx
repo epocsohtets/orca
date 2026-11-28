@@ -3,26 +3,18 @@ import { useTranslate } from '@/i18n/use-translate'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { RAIL_PAGE_GUTTER_X } from '@/components/rail-page/RailPage'
-import { cn } from '@/lib/class-names'
+import { HOME_META_CLASS, HOME_ROW_BUTTON_CLASS, HomeCard } from '@/components/home/HomeCard'
 import { openMeeting } from './meeting-navigation'
 import { MeetingAsk } from './MeetingAsk'
-import { MeetingFollowUps } from './MeetingFollowUps'
-import { MEETING_FOCUS_RING, MeetingSection } from './MeetingParts'
-import { MeetingPrep } from './MeetingPrep'
+import { MeetingMyPart } from './MeetingFollowUps'
 import { MeetingTranscript } from './MeetingTranscript'
 import type { Meeting, MeetingMinutes as Minutes } from './meeting-types'
 import { useMeetings, type MinutesDepth } from './meetings-store'
 
-const DEPTHS = ['brief', 'summary', 'full', 'ask'] as const
+const DEPTHS: MinutesDepth[] = ['brief', 'summary', 'full', 'ask']
+const GROUP_HEADING = 'px-4 py-1 text-xs font-medium text-muted-foreground'
 
-// The panel scrolls in a plain wrapper: TabsContent owns its own spacing and focus style.
-const PANEL = cn(
-  'h-full overflow-y-auto pt-2 pb-6 scrollbar-sleek in-focus-visible:ring-2 in-focus-visible:ring-ring in-focus-visible:ring-inset',
-  RAIL_PAGE_GUTTER_X
-)
-
-/** The minutes at the depth the reader picks: key points, summary, transcript, or a question. */
+/** The minutes by what each view holds: key points, summary by topic, the transcript, or a question. */
 export function MeetingMinutes({
   meeting,
   minutes
@@ -33,7 +25,6 @@ export function MeetingMinutes({
   const t = useTranslate()
   const depth = useMeetings((state) => state.depth)
   const focus = useMeetings((state) => state.focus)
-  const isHost = useMeetings((state) => state.viewerId === meeting.hostId)
   const [query, setQuery] = useState('')
   const found = query.trim()
     ? minutes.transcript.filter((turn) => turn.text.includes(query.trim()))
@@ -43,127 +34,148 @@ export function MeetingMinutes({
     openMeeting(meeting.id, { turnId })
   }
   const markedTurnId = focus?.meetingId === meeting.id ? focus.turnId : null
+  const labels: Record<MinutesDepth, string> = {
+    brief: t('meetings.minutes.brief', 'Key points'),
+    summary: t('meetings.minutes.summary', 'Summary'),
+    full: t('meetings.minutes.full', 'Transcript'),
+    ask: t('meetings.minutes.ask', 'Ask')
+  }
+  const counts: Partial<Record<MinutesDepth, number>> = {
+    brief: minutes.decisions.length,
+    summary: minutes.topics.length,
+    full: minutes.transcript.length
+  }
+  const sourceLabel = t('meetings.source', 'Where it was said')
 
   return (
-    <Tabs
-      value={depth}
-      onValueChange={(value) => {
-        const next = DEPTHS.find((id) => id === value)
-        if (next) {
-          useMeetings.setState({ depth: next satisfies MinutesDepth })
-        }
-      }}
-      className="min-h-0 flex-1"
-    >
-      <div className={cn('shrink-0 overflow-x-auto border-b border-border', RAIL_PAGE_GUTTER_X)}>
-        <TabsList
-          variant="line"
-          className="-mx-2"
-          aria-label={t('meetings.minutes.depth', 'How much to read')}
-        >
-          <TabsTrigger value="brief">{t('meetings.minutes.brief', 'Key points')}</TabsTrigger>
-          <TabsTrigger value="summary">{t('meetings.minutes.summary', 'Summary')}</TabsTrigger>
-          <TabsTrigger value="full">{t('meetings.minutes.full', 'Transcript')}</TabsTrigger>
-          <TabsTrigger value="ask">{t('meetings.minutes.ask', 'Ask')}</TabsTrigger>
-        </TabsList>
-      </div>
-      <TabsContent value="brief" className="min-h-0">
-        <div className={cn(PANEL, 'flex flex-col gap-6')}>
-          <MeetingSection title={t('meetings.minutes.decisions', 'Decisions')}>
-            <ul className="flex max-w-prose flex-col">
-              {minutes.decisions.map((decision) => (
-                <li key={decision.turnId} className="flex items-baseline gap-2 py-1">
-                  <span className="min-w-0 flex-1 text-sm leading-relaxed text-foreground">
-                    {decision.text}
-                  </span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="xs"
-                    onClick={() => source(decision.turnId)}
-                  >
-                    {t('meetings.source', 'Where it was said')}
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          </MeetingSection>
-          <MeetingFollowUps meeting={meeting} />
-          <MeetingPrep meeting={meeting} isHost={isHost} />
+    <HomeCard title={t('meetings.minutes.card', 'Minutes')} data-meeting-card="minutes">
+      <Tabs
+        value={depth}
+        onValueChange={(value) => {
+          const next = DEPTHS.find((id) => id === value)
+          if (next) {
+            useMeetings.setState({ depth: next })
+          }
+        }}
+      >
+        <div className="overflow-x-auto px-4 pb-2">
+          <TabsList aria-label={t('meetings.minutes.depth', 'What to read')}>
+            {DEPTHS.map((id) => (
+              <TabsTrigger key={id} value={id} data-meeting-depth={id}>
+                {labels[id]}
+                {counts[id] === undefined ? null : (
+                  <span className="tabular-nums">{counts[id]}</span>
+                )}
+              </TabsTrigger>
+            ))}
+          </TabsList>
         </div>
-      </TabsContent>
-      <TabsContent value="summary" className="min-h-0">
-        <div className={cn(PANEL, 'flex flex-col gap-5')}>
-          <p className="text-xs text-muted-foreground">
-            {t(
-              'meetings.minutes.summaryHelp',
-              'Select a sentence to go to the moment it was said.'
-            )}
-          </p>
-          {minutes.topics.map((topic) => (
-            <MeetingSection key={topic.title} title={topic.title}>
-              <ul className="-mx-2 flex max-w-prose flex-col">
-                {topic.points.map((point) => (
-                  <li key={point.turnId}>
-                    <button
+        <TabsContent value="brief">
+          <div className="flex flex-col gap-2">
+            <p className="max-w-prose px-4 text-[13px] leading-relaxed text-foreground">
+              {minutes.summary.join(' ')}
+            </p>
+            <section aria-label={t('meetings.minutes.decisions', 'Decisions')}>
+              <h3 className={`flex items-baseline gap-2 ${GROUP_HEADING}`}>
+                {t('meetings.minutes.decisions', 'Decisions')}
+                <span className="tabular-nums">{minutes.decisions.length}</span>
+              </h3>
+              <ul className="divide-y divide-border border-t border-border">
+                {minutes.decisions.map((decision) => (
+                  <li key={decision.turnId} className="flex items-center gap-3 px-4 py-2">
+                    <span className="min-w-0 flex-1 text-[13px] text-foreground">
+                      {decision.text}
+                    </span>
+                    <Button
                       type="button"
-                      data-meeting-summary-point={point.turnId}
-                      className={cn(
-                        'w-full cursor-pointer rounded-md px-2 py-1.5 text-left text-sm leading-relaxed text-foreground transition-colors hover:bg-accent',
-                        MEETING_FOCUS_RING
-                      )}
-                      onClick={() => source(point.turnId)}
+                      variant="link"
+                      size="inlineText"
+                      className="shrink-0"
+                      onClick={() => source(decision.turnId)}
                     >
-                      {point.text}
-                    </button>
+                      {sourceLabel}
+                    </Button>
                   </li>
                 ))}
               </ul>
-            </MeetingSection>
-          ))}
-        </div>
-      </TabsContent>
-      <TabsContent value="full" className="min-h-0">
-        <div className={cn(PANEL, 'flex flex-col gap-4')}>
-          <div className="flex max-w-prose items-center gap-3">
-            <Input
-              type="search"
-              className="max-w-64"
-              value={query}
-              aria-label={t('meetings.minutes.find', 'Find in the transcript')}
-              placeholder={t('meetings.minutes.find', 'Find in the transcript')}
-              onChange={(event) => setQuery(event.target.value)}
-            />
-            <p className="text-xs text-muted-foreground" role="status">
-              {query.trim()
-                ? t('meetings.minutes.found', '{{count}} of {{total}} turns', {
-                    count: found.length,
-                    total: minutes.transcript.length
-                  })
-                : t('meetings.minutes.turns', '{{total}} turns', {
-                    total: minutes.transcript.length
-                  })}
-            </p>
+            </section>
+            <MeetingMyPart meeting={meeting} />
           </div>
-          {found.length > 0 ? (
-            <MeetingTranscript
-              turns={found}
-              startsAt={meeting.startsAt}
-              markedTurnId={markedTurnId}
-              markNonce={focus?.nonce}
-            />
-          ) : (
-            <p className="text-xs text-muted-foreground">
-              {t('meetings.minutes.notFound', 'Nothing said matches. Try a shorter word.')}
+        </TabsContent>
+        <TabsContent value="summary">
+          <div className="flex flex-col gap-2">
+            <p className={`px-4 ${HOME_META_CLASS}`}>
+              {t(
+                'meetings.minutes.summaryHelp',
+                'Select a sentence to go to the moment it was said.'
+              )}
             </p>
-          )}
-        </div>
-      </TabsContent>
-      <TabsContent value="ask" className="min-h-0">
-        <div className={PANEL}>
-          <MeetingAsk meeting={meeting} />
-        </div>
-      </TabsContent>
-    </Tabs>
+            {minutes.topics.map((topic) => (
+              <section key={topic.title} aria-label={topic.title}>
+                <h3 className={`flex items-baseline gap-2 ${GROUP_HEADING}`}>
+                  {topic.title}
+                  <span className="tabular-nums">{topic.points.length}</span>
+                </h3>
+                <ul>
+                  {topic.points.map((point) => (
+                    <li key={point.turnId}>
+                      <button
+                        type="button"
+                        data-meeting-summary-point={point.turnId}
+                        className={`${HOME_ROW_BUTTON_CLASS} text-[13px] text-foreground`}
+                        onClick={() => source(point.turnId)}
+                      >
+                        {point.text}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))}
+          </div>
+        </TabsContent>
+        <TabsContent value="full">
+          <div className="flex flex-col gap-3 px-4 pb-2">
+            <div className="flex flex-wrap items-center gap-3">
+              <Input
+                type="search"
+                className="h-8 max-w-64"
+                value={query}
+                aria-label={t('meetings.minutes.find', 'Find in the transcript')}
+                placeholder={t('meetings.minutes.find', 'Find in the transcript')}
+                onChange={(event) => setQuery(event.target.value)}
+              />
+              <p className={`tabular-nums ${HOME_META_CLASS}`} role="status">
+                {query.trim()
+                  ? t('meetings.minutes.found', '{{count}} of {{total}} turns', {
+                      count: found.length,
+                      total: minutes.transcript.length
+                    })
+                  : t('meetings.minutes.turns', '{{total}} turns', {
+                      total: minutes.transcript.length
+                    })}
+              </p>
+            </div>
+            {found.length > 0 ? (
+              <MeetingTranscript
+                turns={found}
+                startsAt={meeting.startsAt}
+                markedTurnId={markedTurnId}
+                markNonce={focus?.nonce}
+              />
+            ) : (
+              <p className={HOME_META_CLASS}>
+                {t('meetings.minutes.notFound', 'Nothing said matches. Try a shorter word.')}
+              </p>
+            )}
+          </div>
+        </TabsContent>
+        <TabsContent value="ask">
+          <div className="px-4 pb-2">
+            <MeetingAsk meeting={meeting} />
+          </div>
+        </TabsContent>
+      </Tabs>
+    </HomeCard>
   )
 }

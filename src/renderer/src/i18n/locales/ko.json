@@ -29083,23 +29083,18 @@
       "start": "녹음 시작",
       "sent": "회의 에이전트가 회의에 있던 {{count}}명 모두에게 회의록을 보냈습니다.",
       "stop": "녹음 종료",
-      "simulated": "이 빌드는 소리를 녹음하지 않습니다. 녹음을 종료하면 준비된 예시 회의록이 만들어져 참석자에게 갑니다."
+      "simulated": "이 빌드는 소리를 녹음하지 않습니다. 녹음을 종료하면 준비된 예시 회의록이 만들어져 참석자에게 갑니다.",
+      "card": "녹음"
     },
     "title": "회의",
     "schedule": "회의 생성",
-    "close": "회의 닫기",
     "demo": "데모",
     "viewer": "보는 사람: {{name}}",
     "reset": "예시 데이터 초기화",
     "pane": {
-      "label": "내 회의를 보는 방법",
-      "list": "목록",
-      "agenda": "일정"
-    },
-    "detailRegion": "회의",
-    "none": {
-      "title": "{{name}} 님의 회의가 없습니다",
-      "detail": "초대받은 회의는 내 일정에 들어옵니다. 지금 회의를 생성할 수도 있습니다."
+      "agenda": "일정",
+      "upcoming": "다가오는 회의",
+      "past": "지난 회의"
     },
     "form": {
       "titleRequired": "참석자가 무슨 회의인지 알 수 있게 제목을 입력하세요.",
@@ -29149,7 +29144,9 @@
       "people": "사람",
       "noPerson": "“{{query}}”라는 이름이 없습니다. 이름을 확인하세요.",
       "everyoneIn": "모두 들어 있습니다.",
-      "inChat": "이 채팅"
+      "inChat": "이 채팅",
+      "line": "참석자의 일정에 개요와 자료와 함께 들어갑니다.",
+      "card": "새 회의"
     },
     "cancel": "취소",
     "day": {
@@ -29177,9 +29174,10 @@
       "outline": "사전 개요",
       "edit": "개요와 자료 수정",
       "noOutlineHost": "개요가 아직 없습니다. 참석자가 미리 읽을 수 있게 이 회의에서 정할 것을 적어 두세요.",
-      "write": "개요 작성",
       "noOutline": "주최자가 아직 개요를 넣지 않았습니다.",
-      "materials": "회의 자료"
+      "materials": "회의 자료",
+      "editShort": "수정",
+      "noMaterials": "붙인 자료가 없습니다."
     },
     "bot": {
       "minutesReady": "**{{title}}** 회의록이 준비됐습니다.",
@@ -29234,7 +29232,10 @@
       "chooseOwner": "담당자 선택",
       "assignedToast": "업무 {{count}}개를 “할 일” 상태로 생성했습니다. 회의 에이전트가 담당자 {{people}}명에게 알렸습니다.",
       "assignAll": "업무 {{count}}개 생성 · 할당",
-      "assignWho": "담당자 {{people}}명에게 회의 에이전트가 알립니다. 에이전트가 뽑은 초안이니, 틀린 줄만 담당자를 바꾸거나 체크를 푸세요."
+      "assignWho": "담당자 {{people}}명에게 회의 에이전트가 알립니다. 에이전트가 뽑은 초안이니, 틀린 줄만 담당자를 바꾸거나 체크를 푸세요.",
+      "colTask": "업무",
+      "colOwner": "담당자",
+      "colActions": "동작"
     },
     "openTask": "업무 열기",
     "notMine": "아님",
@@ -29243,12 +29244,8 @@
     "excerpt": {
       "scope": "이 회의에 참석하지 않아서, 내 업무와 그 업무가 나온 부분만 보입니다. 회의록 전체는 주최자나 참석자가 공유하면 볼 수 있습니다.",
       "task": "내 업무",
-      "assignedBy": "{{name}} 님이 할당함"
-    },
-    "backToList": "목록으로",
-    "detail": {
-      "people": "주최 {{host}} · 참석 {{attendees}}",
-      "origin": "채팅 「{{name}}」에서 생성한 회의"
+      "assignedBy": "{{name}} 님이 할당함",
+      "where": "이 일이 나온 부분"
     },
     "response": {
       "yes": "참석",
@@ -29267,7 +29264,8 @@
       "find": "대화록에서 검색",
       "found": "발언 {{total}}개 중 {{count}}개",
       "turns": "발언 {{total}}개",
-      "notFound": "맞는 발언이 없습니다. 더 짧은 낱말로 찾아보세요."
+      "notFound": "맞는 발언이 없습니다. 더 짧은 낱말로 찾아보세요.",
+      "card": "회의록"
     },
     "share": {
       "done": "회의 에이전트가 {{name}} 님에게 회의록 전체의 링크를 보냈습니다.",
@@ -29279,7 +29277,8 @@
       "approve": "승인",
       "requestDeclined": "{{name}} 님이 회의록 전체를 공유하지 않았습니다.",
       "requested": "요청했습니다. {{name}} 님의 회의록 화면에 요청이 보입니다.",
-      "requestButton": "회의록 보기 요청"
+      "requestButton": "회의록 보기 요청",
+      "card": "보는 범위"
     },
     "agenda": {
       "previousWeek": "이전 주",
@@ -29289,18 +29288,14 @@
       "host": "주최 {{name}}"
     },
     "state": {
-      "recording": "지금 녹음 중",
-      "scheduled": "예정",
-      "minutes": "회의록 있음",
-      "minutesFollowUps": "회의록 있음 · 후속 업무 {{total}}개 중 {{done}}개 완료",
-      "myTasks": "여기서 나온 내 업무 {{count}}개"
-    },
-    "list": {
-      "shared": "공유받은 회의록",
-      "hosting": "내가 주최한 회의",
-      "attending": "내가 참석하는 회의",
-      "assigned": "내 업무가 나온 회의",
-      "empty": "아직 회의가 없습니다. 주최하거나 초대받은 회의가 여기와 내 일정에 나타납니다."
+      "recording": "녹음 중",
+      "minutes": "회의록 도착",
+      "minutesFollowUps": "회의록 도착 · 후속 업무 {{total}}개 중 {{done}}개 완료",
+      "myTasks": "여기서 나온 내 업무 {{count}}개",
+      "scheduledPrep": "예정 · 준비 자료 있음",
+      "scheduledNoPrep": "예정 · 준비 자료 없음",
+      "waitingMine": "내 확인 필요 · 내 몫 {{count}}건",
+      "waitingSort": "내 확인 필요 · 정리할 후속 업무 {{count}}건"
     },
     "notice": {
       "recordingTitle": "녹음이 시작됐습니다",
@@ -29331,6 +29326,48 @@
       "create": "생성",
       "edit": "고쳐서 생성",
       "dismiss": "괜찮습니다"
+    },
+    "detail": {
+      "attendees": "사람",
+      "originLabel": "시작된 곳",
+      "originChat": "채팅 「{{name}}」"
+    },
+    "list": {
+      "emptyUpcoming": "예정된 회의가 없습니다. 초대받은 회의가 여기에 나타납니다.",
+      "emptyPast": "회의록이 아직 없습니다. 녹음이 끝나면 도착합니다."
+    },
+    "tiles": {
+      "today": "오늘 회의",
+      "next": "다음 {{time}} · {{title}}",
+      "noNext": "오늘 남은 회의 없음",
+      "waitingSub": "회의 에이전트가 기다립니다",
+      "week": "이번 주",
+      "weekSub": "주최 {{host}} · 참석 {{attend}}",
+      "followUpsSub": "완료 {{done}} · 진행 중 {{inProgress}} · 할 일 {{todo}}",
+      "decisionsSub": "각 결정은 근거 문장과 이어집니다",
+      "notTasksYet": "아직 업무가 아닌 것 {{count}}건",
+      "allTasks": "모두 업무가 됐습니다",
+      "doneSub": "진행 중 {{inProgress}} · 할 일 {{todo}}",
+      "mineOpen": "내 답을 기다리는 것 {{count}}건",
+      "mineNone": "내 답을 기다리는 것 없음"
+    },
+    "line": "내 회의와, 회의 에이전트가 정리한 것입니다.",
+    "mine": "내 회의",
+    "viewerLabel": "보는 사람",
+    "agent": {
+      "aside": "나에게 보낸 것",
+      "open": "대화 열기",
+      "proposals": "내 몫으로 본 일 {{count}}건",
+      "willDo": "회의 에이전트가 하는 일",
+      "plan1": "주최자가 녹음을 켠 동안 기록합니다.",
+      "plan2": "회의록을 쓰고, 회의에 있던 모두에게 링크를 보냅니다.",
+      "plan3": "각자의 몫으로 보이는 후속 업무를 그 사람에게 제안합니다. 누가 받거나 할당하기 전에는 업무가 되지 않습니다."
+    },
+    "role": {
+      "host": "주최",
+      "attendee": "참석",
+      "shared": "공유받음",
+      "assignee": "내 업무"
     }
   },
   "chats": {

@@ -15,7 +15,7 @@ import type {
 
 const MINUTE = 60_000
 
-export type MeetingsPane = 'list' | 'agenda'
+export type MeetingsPane = 'upcoming' | 'past' | 'agenda'
 export type MinutesDepth = 'brief' | 'summary' | 'full' | 'ask'
 
 export type MeetingDraft = Pick<
@@ -78,7 +78,7 @@ function initialState(): MeetingsState {
       `${id}:assigned:INAX-130`
     ]),
     selectedId: null,
-    pane: 'list',
+    pane: 'upcoming',
     composing: null,
     whisperDismissed: [],
     whisperHandled: [],
@@ -92,7 +92,7 @@ function initialState(): MeetingsState {
 export const useMeetings = create<MeetingsState>()(
   persist(initialState, {
     name: 'orca.poc.meetings.v2',
-    version: 4,
+    version: 5,
     // The sample's shape changed; an older saved sample starts over.
     migrate: () => initialState(),
     partialize: ({ focus: _focus, composing: _composing, ...kept }) => kept
@@ -122,7 +122,14 @@ export function resetMeetingsSample(): void {
 
 export function setViewer(viewerId: string): void {
   // Another person starts from their own first view, not from where the last one was reading.
-  set({ viewerId, selectedId: null, composing: null, focus: null, depth: 'brief', pane: 'list' })
+  set({
+    viewerId,
+    selectedId: null,
+    composing: null,
+    focus: null,
+    depth: 'brief',
+    pane: 'upcoming'
+  })
 }
 
 export function markSeen(keys: string[]): void {

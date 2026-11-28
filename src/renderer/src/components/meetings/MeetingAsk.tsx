@@ -38,14 +38,14 @@ export function MeetingAsk({ meeting }: { meeting: Meeting }): React.JSX.Element
         <ol className="flex flex-col gap-4">
           {asks.map((entry) => (
             <li key={entry.id} data-meeting-ask="">
-              <p className="text-[13px] font-semibold text-foreground">{entry.question}</p>
-              <p className="mt-1 text-sm leading-relaxed text-foreground">{entry.answer}</p>
+              <p className="text-[13px] font-medium text-foreground">{entry.question}</p>
+              <p className="mt-1 text-[13px] leading-relaxed text-foreground">{entry.answer}</p>
               {entry.turnId ? (
                 <Button
                   type="button"
-                  variant="ghost"
-                  size="xs"
-                  className="mt-1 -ml-2"
+                  variant="link"
+                  size="inlineText"
+                  className="mt-1"
                   onClick={() => openMeeting(meeting.id, { turnId: entry.turnId ?? undefined })}
                 >
                   {t('meetings.source', 'Where it was said')}
@@ -64,7 +64,7 @@ export function MeetingAsk({ meeting }: { meeting: Meeting }): React.JSX.Element
               key={suggestion}
               type="button"
               variant="outline"
-              size="sm"
+              size="xs"
               onClick={() => ask(suggestion)}
             >
               {suggestion}

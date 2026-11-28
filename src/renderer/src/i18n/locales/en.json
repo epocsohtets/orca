@@ -31457,23 +31457,18 @@
       "start": "Start recording",
       "sent": "The meeting agent sent the minutes to all {{count}} people in the meeting.",
       "stop": "End recording",
-      "simulated": "This build does not capture sound. When you end the recording, prepared sample minutes are made and sent to the attendees."
+      "simulated": "This build does not capture sound. When you end the recording, prepared sample minutes are made and sent to the attendees.",
+      "card": "Recording"
     },
     "title": "Meetings",
     "schedule": "Create meeting",
-    "close": "Close Meetings",
     "demo": "Demo",
     "viewer": "Seen as {{name}}",
     "reset": "Start the sample data over",
     "pane": {
-      "label": "How to see my meetings",
-      "list": "List",
-      "agenda": "Schedule"
-    },
-    "detailRegion": "Meeting",
-    "none": {
-      "title": "No meetings for {{name}}",
-      "detail": "A meeting you are invited to appears on your schedule. You can also set one up now."
+      "agenda": "Schedule",
+      "upcoming": "Coming up",
+      "past": "Past"
     },
     "form": {
       "titleRequired": "Enter a title so attendees know what the meeting is for.",
@@ -31523,7 +31518,9 @@
       "people": "People",
       "noPerson": "Nobody is called “{{query}}”. Check the name.",
       "everyoneIn": "Everyone is already in.",
-      "inChat": "In this chat"
+      "inChat": "In this chat",
+      "line": "Attendees get it on their own schedule, with the outline and the materials.",
+      "card": "New meeting"
     },
     "cancel": "Cancel",
     "day": {
@@ -31543,7 +31540,7 @@
       "done": "Done"
     },
     "chat": {
-      "setUp": "{{name}} set up a meeting: {{title}}",
+      "setUp": "{{name}} created a meeting: {{title}}",
       "open": "Open the meeting"
     },
     "save": "Save",
@@ -31551,9 +31548,10 @@
       "outline": "Outline",
       "edit": "Edit outline and materials",
       "noOutlineHost": "No outline yet. Write what the meeting must settle so attendees can read it first.",
-      "write": "Write the outline",
       "noOutline": "The host has not added an outline yet.",
-      "materials": "Materials"
+      "materials": "Materials",
+      "editShort": "Edit",
+      "noMaterials": "Nothing is attached."
     },
     "bot": {
       "minutesReady": "The minutes of **{{title}}** are ready.",
@@ -31608,7 +31606,10 @@
       "chooseOwner": "Choose owner",
       "assignedToast": "{{count}} tasks created in To do. The meeting agent told {{people}} owners.",
       "assignAll": "Create {{count}} tasks and assign",
-      "assignWho": "The meeting agent tells the {{people}} owners. The agent drafted these: change an owner or untick a line that is wrong."
+      "assignWho": "The meeting agent tells the {{people}} owners. The agent drafted these: change an owner or untick a line that is wrong.",
+      "colTask": "Task",
+      "colOwner": "Owner",
+      "colActions": "Actions"
     },
     "openTask": "Open task",
     "notMine": "Not mine",
@@ -31617,12 +31618,13 @@
     "excerpt": {
       "scope": "You were not in this meeting, so you see your task and the part of the meeting it came from. The host or an attendee can share the full minutes with you.",
       "task": "My task",
-      "assignedBy": "Assigned by {{name}}"
+      "assignedBy": "Assigned by {{name}}",
+      "where": "The part of the meeting it came from"
     },
-    "backToList": "Back to the list",
     "detail": {
-      "people": "Host {{host}} · Attendees {{attendees}}",
-      "origin": "Set up from the chat “{{name}}”"
+      "attendees": "People",
+      "originLabel": "Set up in",
+      "originChat": "Chat “{{name}}”"
     },
     "response": {
       "yes": "Coming",
@@ -31631,7 +31633,7 @@
       "label": "Will you come to “{{title}}”?"
     },
     "minutes": {
-      "depth": "How much to read",
+      "depth": "What to read",
       "brief": "Key points",
       "summary": "Summary",
       "full": "Transcript",
@@ -31641,7 +31643,8 @@
       "find": "Find in the transcript",
       "found": "{{count}} of {{total}} turns",
       "turns": "{{total}} turns",
-      "notFound": "Nothing said matches. Try a shorter word."
+      "notFound": "Nothing said matches. Try a shorter word.",
+      "card": "Minutes"
     },
     "share": {
       "done": "The meeting agent sent {{name}} the link to the full minutes.",
@@ -31653,7 +31656,8 @@
       "approve": "Approve",
       "requestDeclined": "{{name}} did not share the full minutes.",
       "requested": "Asked. {{name}} sees your request on the minutes.",
-      "requestButton": "Ask to see the full minutes"
+      "requestButton": "Ask to see the full minutes",
+      "card": "Who sees what"
     },
     "agenda": {
       "previousWeek": "Previous week",
@@ -31664,17 +31668,17 @@
     },
     "state": {
       "recording": "Recording now",
-      "scheduled": "Scheduled",
       "minutes": "Minutes ready",
       "minutesFollowUps": "Minutes ready · {{done}} of {{total}} follow-ups done",
-      "myTasks": "My tasks from it: {{count}}"
+      "myTasks": "My tasks from it: {{count}}",
+      "scheduledPrep": "Scheduled · prep ready",
+      "scheduledNoPrep": "Scheduled · no prep yet",
+      "waitingMine": "Needs me · {{count}} items for me",
+      "waitingSort": "Needs me · {{count}} follow-ups to sort"
     },
     "list": {
-      "shared": "Minutes shared with me",
-      "hosting": "Meetings I host",
-      "attending": "Meetings I attend",
-      "assigned": "Meetings my tasks came from",
-      "empty": "No meetings yet. A meeting you host or are invited to appears here and on your schedule."
+      "emptyUpcoming": "Nothing is scheduled. A meeting you are invited to appears here.",
+      "emptyPast": "No minutes yet. They arrive when a recording ends."
     },
     "notice": {
       "recordingTitle": "Recording has started",
@@ -31705,6 +31709,39 @@
       "create": "Create",
       "edit": "Edit, then create",
       "dismiss": "No thanks"
+    },
+    "tiles": {
+      "today": "Today’s meetings",
+      "next": "Next {{time}} · {{title}}",
+      "noNext": "None left today",
+      "waitingSub": "The meeting agent is waiting",
+      "week": "This week",
+      "weekSub": "I host {{host}} · I attend {{attend}}",
+      "followUpsSub": "Done {{done}} · in progress {{inProgress}} · to do {{todo}}",
+      "decisionsSub": "Each one opens where it was said",
+      "notTasksYet": "{{count}} not a task yet",
+      "allTasks": "All are tasks",
+      "doneSub": "In progress {{inProgress}} · to do {{todo}}",
+      "mineOpen": "{{count}} waiting for my answer",
+      "mineNone": "Nothing waiting for my answer"
+    },
+    "line": "My meetings, and what the meeting agent made of them.",
+    "mine": "My meetings",
+    "viewerLabel": "Seen as",
+    "agent": {
+      "aside": "What it sent me",
+      "open": "Open the conversation",
+      "proposals": "{{count}} items looked like mine",
+      "willDo": "What the meeting agent does",
+      "plan1": "Records while the host has recording on.",
+      "plan2": "Writes the minutes and sends the link to everyone in the meeting.",
+      "plan3": "Offers each person the follow-ups that look like theirs. Nothing becomes a task until someone takes or assigns it."
+    },
+    "role": {
+      "host": "I host",
+      "attendee": "I attend",
+      "shared": "Shared with me",
+      "assignee": "My task"
     }
   },
   "chats": {

@@ -2,7 +2,7 @@ import React from 'react'
 import { useTranslate } from '@/i18n/use-translate'
 import { openMeeting } from './meeting-navigation'
 import { isParticipant } from './meeting-rules'
-import { useElapsedSeconds } from './MeetingDetail'
+import { useElapsedSeconds } from './MeetingRecordingCard'
 import { useMeetingText } from './MeetingParts'
 import { useMeetings } from './meetings-store'
 

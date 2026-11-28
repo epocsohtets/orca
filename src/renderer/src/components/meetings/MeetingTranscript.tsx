@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+import { HomeAvatar } from '@/components/home/HomeCard'
 import { cn } from '@/lib/class-names'
 import { motionSafeScrollBehavior } from '@/hooks/theme/usePrefersReducedMotion'
 import { personName } from './meeting-people'
@@ -47,7 +48,8 @@ export function MeetingTranscript({
           ref={run.turns.some((turn) => turn.id === markedTurnId) ? marked : undefined}
           className="scroll-mt-4"
         >
-          <p className="pl-12 text-[13px] font-semibold text-foreground">
+          <p className="flex items-center gap-2 text-[13px] font-medium text-foreground">
+            <HomeAvatar name={personName(run.speakerId)} />
             {personName(run.speakerId)}
           </p>
           {run.turns.map((turn) => {
@@ -58,14 +60,16 @@ export function MeetingTranscript({
                 data-meeting-turn={turn.id}
                 data-marked={isMarked || undefined}
                 className={cn(
-                  'mt-1 grid grid-cols-[3rem_minmax(0,1fr)] rounded-md',
+                  'mt-1 grid grid-cols-[3rem_minmax(0,1fr)] rounded-md pl-7',
                   isMarked && 'bg-accent ring-1 ring-ring'
                 )}
               >
-                <span className="pt-0.5 pl-1 font-mono text-2xs leading-5 text-muted-foreground tabular-nums">
+                <span className="pt-0.5 text-xs leading-5 text-muted-foreground tabular-nums">
                   {text.time(startsAt + turn.at * 1000)}
                 </span>
-                <p className="py-0.5 pr-2 text-sm leading-relaxed text-foreground">{turn.text}</p>
+                <p className="py-0.5 pr-2 text-[13px] leading-relaxed text-foreground">
+                  {turn.text}
+                </p>
               </div>
             )
           })}

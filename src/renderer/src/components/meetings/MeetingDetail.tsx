@@ -1,129 +1,34 @@
-import React, { useEffect, useState } from 'react'
-import { ArrowLeft, Circle, Square } from 'lucide-react'
-import { toast } from 'sonner'
+import React from 'react'
 import { useTranslate } from '@/i18n/use-translate'
 import { Button } from '@/components/ui/button'
-import { RAIL_PAGE_GUTTER_X } from '@/components/rail-page/RailPage'
+import { Card } from '@/components/ui/card'
+import {
+  HOME_META_CLASS,
+  HomeCard,
+  HomeProjectDot,
+  HomeWhoMarker
+} from '@/components/home/HomeCard'
+import { HomePageHeading, HomeTileRow, type HomeTile } from '@/components/home/HomeHeader'
+import type { HomeProjectId } from '@/components/home/home-board'
+import type { HomeProject } from '@/components/home/home-board-mock'
+import { InaxStatusBadge } from '@/components/task-page/inax/inax-status-badge'
 import {
   SIDEBAR_CHAT_CONVERSATIONS,
   useSidebarChatOpenConversation
 } from '@/components/sidebar-chat/sidebar-chat-mock-data'
-import { installWindowVisibilityInterval } from '@/lib/window-activity/window-visibility-interval'
-import { cn } from '@/lib/class-names'
-import { openMeetingTask } from './meeting-navigation'
+import { openMeeting, openMeetingTask } from './meeting-navigation'
 import { personName } from './meeting-people'
-import { excerptAround, meetingAccess } from './meeting-rules'
+import { excerptAround, followUpCounts, followUpState, meetingAccess } from './meeting-rules'
+import { MeetingFollowUps } from './MeetingFollowUps'
 import { MeetingMinutes } from './MeetingMinutes'
-import { MeetingSection, useMeetingText } from './MeetingParts'
-import { MinutesRequestControl, MinutesSharing } from './MeetingSharing'
+import { useMeetingText } from './MeetingParts'
+import { MeetingPersonChip } from './MeetingPeoplePicker'
 import { MeetingPrep } from './MeetingPrep'
+import { MeetingRecordingCard } from './MeetingRecordingCard'
+import { MinutesRequestControl, MinutesScopeCard, MinutesShareButton } from './MeetingSharing'
 import { MeetingTranscript } from './MeetingTranscript'
 import type { Meeting } from './meeting-types'
-import { startRecording, stopRecording, useMeetings } from './meetings-store'
-
-/** Seconds since `startedAt`, ticking while the window can be seen. */
-export function useElapsedSeconds(startedAt: number | null): number {
-  const [now, setNow] = useState(() => Date.now())
-  useEffect(() => {
-    if (startedAt === null) {
-      return
-    }
-    setNow(Date.now())
-    // The timer is the feature, but it has nothing to draw while the window is hidden.
-    return installWindowVisibilityInterval({ run: () => setNow(Date.now()), intervalMs: 1000 })
-  }, [startedAt])
-  return startedAt === null ? 0 : (now - startedAt) / 1000
-}
-
-function RecordingStrip({
-  meeting,
-  isHost
-}: {
-  meeting: Meeting
-  isHost: boolean
-}): React.JSX.Element {
-  const t = useTranslate()
-  const text = useMeetingText()
-  const elapsed = useElapsedSeconds(meeting.recordingStartedAt)
-  const recording = meeting.recordingStartedAt !== null
-  const people = meeting.attendeeIds.length + 1
-  return (
-    <div className="flex flex-col gap-1.5">
-      <div
-        className="flex min-h-11 flex-wrap items-center gap-x-3 gap-y-1.5 rounded-md border border-border px-3 py-1.5"
-        data-meeting-recorder={recording ? 'recording' : 'idle'}
-      >
-        <div className="flex min-w-0 flex-1 items-center gap-2 text-sm">
-          {recording ? (
-            <>
-              <span
-                aria-hidden
-                className="size-2 shrink-0 rounded-full bg-destructive motion-safe:animate-pulse"
-              />
-              <span role="status" className="font-medium text-foreground">
-                {t('meetings.recording.on', 'Recording')}
-              </span>
-              <span role="timer" className="font-mono text-xs text-muted-foreground tabular-nums">
-                {text.elapsed(elapsed)}
-              </span>
-              <span className="text-xs text-muted-foreground">
-                {t(
-                  'meetings.recording.everyoneSees',
-                  'All {{count}} people in the meeting see this.',
-                  {
-                    count: people
-                  }
-                )}
-              </span>
-            </>
-          ) : (
-            <span className="text-muted-foreground">
-              {isHost
-                ? t('meetings.recording.hostIdle', 'Start recording when the meeting begins.')
-                : t(
-                    'meetings.recording.attendeeIdle',
-                    'When the host starts recording, it shows here and in the status bar.'
-                  )}
-            </span>
-          )}
-        </div>
-        {isHost && !recording ? (
-          <Button type="button" size="sm" onClick={() => startRecording(meeting.id)}>
-            <Circle className="size-3 fill-current" aria-hidden />
-            {t('meetings.recording.start', 'Start recording')}
-          </Button>
-        ) : null}
-        {isHost && recording ? (
-          <Button
-            type="button"
-            size="sm"
-            onClick={() => {
-              stopRecording(meeting.id)
-              toast.success(
-                t(
-                  'meetings.recording.sent',
-                  'The meeting agent sent the minutes to all {{count}} people in the meeting.',
-                  { count: people }
-                )
-              )
-            }}
-          >
-            <Square className="size-3 fill-current" aria-hidden />
-            {t('meetings.recording.stop', 'End recording')}
-          </Button>
-        ) : null}
-      </div>
-      {isHost && !recording ? (
-        <p className="text-xs text-muted-foreground">
-          {t(
-            'meetings.recording.simulated',
-            'This build does not capture sound. When you end the recording, prepared sample minutes are made and sent to the attendees.'
-          )}
-        </p>
-      ) : null}
-    </div>
-  )
-}
+import { useMeetings } from './meetings-store'
 
 /** What an assignee who was not in the meeting may see: their task and the part it rests on. */
 function MeetingExcerpt({ meeting }: { meeting: Meeting }): React.JSX.Element {
@@ -135,66 +40,142 @@ function MeetingExcerpt({ meeting }: { meeting: Meeting }): React.JSX.Element {
     (task) => task.meetingId === meeting.id && task.assigneeId === viewerId
   )
   return (
-    <div
-      className={cn(
-        'flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto pb-6 scrollbar-sleek',
-        RAIL_PAGE_GUTTER_X
-      )}
-    >
-      <div className="flex max-w-prose flex-col items-start gap-2">
-        <p className="text-xs text-muted-foreground">
-          {t(
-            'meetings.excerpt.scope',
-            'You were not in this meeting, so you see your task and the part of the meeting it came from. The host or an attendee can share the full minutes with you.'
-          )}
-        </p>
-        <MinutesRequestControl meeting={meeting} />
+    <div className="grid items-start gap-4 @min-[60rem]/rail-page:grid-cols-[minmax(0,5fr)_minmax(0,3fr)]">
+      <div className="flex min-w-0 flex-col gap-4">
+        {mine.map((task) => {
+          const turnId = meeting.followUps.find((f) => f.id === task.followUpId)?.turnId ?? ''
+          return (
+            <HomeCard
+              key={task.id}
+              title={t('meetings.excerpt.task', 'My task')}
+              data-meeting-card="excerpt"
+              action={
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="xs"
+                  onClick={() => openMeetingTask(task.id)}
+                >
+                  {t('meetings.openTask', 'Open task')}
+                </Button>
+              }
+            >
+              <div className="flex flex-col gap-3 px-4 pb-2">
+                <div className="flex flex-col gap-1">
+                  <p className="text-[13px] font-medium text-foreground">{task.title}</p>
+                  <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <InaxStatusBadge status={task.status} />
+                    <span className={HOME_META_CLASS}>
+                      {text.due(task.due)} ·{' '}
+                      {t('meetings.excerpt.assignedBy', 'Assigned by {{name}}', {
+                        name: personName(meeting.hostId)
+                      })}
+                    </span>
+                  </p>
+                </div>
+                <div className="border-t border-border pt-3">
+                  <h3 className="pb-2 text-xs font-medium text-muted-foreground">
+                    {t('meetings.excerpt.where', 'The part of the meeting it came from')}
+                  </h3>
+                  <MeetingTranscript
+                    turns={excerptAround(meeting.minutes?.transcript ?? [], [turnId])}
+                    startsAt={meeting.startsAt}
+                    markedTurnId={turnId}
+                    markNonce={focus?.nonce}
+                  />
+                </div>
+              </div>
+            </HomeCard>
+          )
+        })}
       </div>
-      {mine.map((task) => {
-        const followUp = meeting.followUps.find((f) => f.id === task.followUpId)
-        const turnId = followUp?.turnId ?? ''
-        return (
-          <MeetingSection
-            key={task.id}
-            title={t('meetings.excerpt.task', 'My task')}
-            action={
-              <Button
-                type="button"
-                variant="ghost"
-                size="xs"
-                onClick={() => openMeetingTask(task.id)}
-              >
-                {t('meetings.openTask', 'Open task')}
-              </Button>
-            }
-          >
-            <p className="text-sm font-medium text-foreground">{task.title}</p>
-            <p className="mb-3 text-xs text-muted-foreground">
-              {text.status[task.status]} · {text.due(task.due)} ·{' '}
-              {t('meetings.excerpt.assignedBy', 'Assigned by {{name}}', {
-                name: personName(meeting.hostId)
-              })}
-            </p>
-            <MeetingTranscript
-              turns={excerptAround(meeting.minutes?.transcript ?? [], [turnId])}
-              startsAt={meeting.startsAt}
-              markedTurnId={turnId}
-              markNonce={focus?.nonce}
-            />
-          </MeetingSection>
-        )
-      })}
+      <HomeCard title={t('meetings.share.card', 'Who sees what')} data-meeting-card="scope">
+        <div className="flex flex-col items-start gap-2 px-4 pb-2">
+          <p className="text-xs text-foreground">
+            {t(
+              'meetings.excerpt.scope',
+              'You were not in this meeting, so you see your task and the part of the meeting it came from. The host or an attendee can share the full minutes with you.'
+            )}
+          </p>
+          <MinutesRequestControl meeting={meeting} />
+        </div>
+      </HomeCard>
     </div>
   )
 }
 
-/** One meeting: before (outline), during (recording), after (minutes and follow-up tasks). */
-export function MeetingDetail({
+/** The facts of a meeting on one quiet row: project, host, who comes, where it was set up. */
+function MeetingFacts({
   meeting,
-  onBack
+  project,
+  showOrigin
 }: {
   meeting: Meeting
-  onBack: () => void
+  project: HomeProject
+  showOrigin: boolean
+}): React.JSX.Element {
+  const t = useTranslate()
+  const origin = SIDEBAR_CHAT_CONVERSATIONS.find(({ id }) => id === meeting.originConversationId)
+  const before = !meeting.minutes && meeting.recordingStartedAt === null
+  const answer = (id: string): string =>
+    meeting.responses[id] === 'yes'
+      ? t('meetings.response.yes', 'Coming')
+      : meeting.responses[id] === 'no'
+        ? t('meetings.response.no', 'Not coming')
+        : t('meetings.response.none', 'No answer')
+  return (
+    <Card size="sm" data-meeting-facts="">
+      <dl className="flex flex-wrap items-center gap-x-6 gap-y-2 px-4 text-xs">
+        <div className="flex min-w-0 items-center gap-2">
+          <dt className="text-muted-foreground">{t('taskLoop.detail.project', 'Project')}</dt>
+          <dd className="min-w-0">
+            <HomeProjectDot project={project} />
+          </dd>
+        </div>
+        <div className="flex min-w-0 flex-wrap items-center gap-2" data-meeting-people="">
+          <dt className="text-muted-foreground">{t('meetings.detail.attendees', 'People')}</dt>
+          <dd className="flex min-w-0 flex-wrap items-center gap-1.5">
+            <MeetingPersonChip personId={meeting.hostId} tag={t('meetings.form.host', 'Host')} />
+            {meeting.attendeeIds.map((id) => (
+              // Before the meeting each person carries the answer to the invitation.
+              <MeetingPersonChip key={id} personId={id} tag={before ? answer(id) : undefined} />
+            ))}
+          </dd>
+        </div>
+        {origin && showOrigin ? (
+          <div className="flex min-w-0 items-center gap-2">
+            <dt className="text-muted-foreground">
+              {t('meetings.detail.originLabel', 'Set up in')}
+            </dt>
+            <dd>
+              <Button
+                type="button"
+                variant="link"
+                size="inlineText"
+                data-meeting-origin=""
+                onClick={() => useSidebarChatOpenConversation.getState().setOpenId(origin.id)}
+              >
+                {t('meetings.detail.originChat', 'Chat “{{name}}”', { name: origin.name })}
+              </Button>
+            </dd>
+          </div>
+        ) : null}
+      </dl>
+    </Card>
+  )
+}
+
+type TileId = 'decisions' | 'followUps' | 'done' | 'mine'
+
+/** One meeting: before (outline and materials), during (recording), after (minutes and follow-up tasks). */
+export function MeetingDetail({
+  meeting,
+  projects,
+  before
+}: {
+  meeting: Meeting
+  projects: Record<HomeProjectId, HomeProject>
+  before: React.ReactNode
 }): React.JSX.Element {
   const t = useTranslate()
   const text = useMeetingText()
@@ -202,88 +183,131 @@ export function MeetingDetail({
   const tasks = useMeetings((state) => state.tasks)
   const access = meetingAccess(meeting, viewerId, tasks)
   const isHost = meeting.hostId === viewerId
-  const origin = SIDEBAR_CHAT_CONVERSATIONS.find(({ id }) => id === meeting.originConversationId)
+  const counts = followUpCounts(meeting.followUps, tasks)
+  const mine = meeting.followUps.filter((followUp) => {
+    const state = followUpState(followUp, tasks)
+    return state.kind === 'task'
+      ? state.task.assigneeId === viewerId
+      : followUp.suggestedOwnerId === viewerId
+  })
+  const mineOpen = mine.filter((followUp) => followUpState(followUp, tasks).kind === 'proposed')
+  const tiles: HomeTile<TileId>[] = [
+    {
+      id: 'decisions',
+      label: t('meetings.minutes.decisions', 'Decisions'),
+      value: meeting.minutes?.decisions.length ?? 0,
+      sub: t('meetings.tiles.decisionsSub', 'Each one opens where it was said')
+    },
+    {
+      id: 'followUps',
+      label: t('meetings.followUps.title', 'Follow-up tasks'),
+      value: counts.total,
+      sub:
+        counts.open > 0
+          ? t('meetings.tiles.notTasksYet', '{{count}} not a task yet', { count: counts.open })
+          : t('meetings.tiles.allTasks', 'All are tasks')
+    },
+    {
+      id: 'done',
+      label: t('meetings.status.done', 'Done'),
+      value: counts.done,
+      sub: t('meetings.tiles.doneSub', 'In progress {{inProgress}} · to do {{todo}}', counts)
+    },
+    {
+      id: 'mine',
+      label: t('meetings.followUps.mine', 'Mine'),
+      value: mine.length,
+      sub:
+        mineOpen.length > 0
+          ? t('meetings.tiles.mineOpen', '{{count}} waiting for my answer', {
+              count: mineOpen.length
+            })
+          : t('meetings.tiles.mineNone', 'Nothing waiting for my answer')
+    }
+  ]
+  const state =
+    meeting.recordingStartedAt !== null ? 'recording' : meeting.minutes ? 'after' : 'before'
 
   return (
-    <div className="flex h-full min-h-0 min-w-0 flex-col">
-      <div className={cn('flex shrink-0 flex-col gap-3 pt-4 pb-3', RAIL_PAGE_GUTTER_X)}>
-        <div className="flex items-start gap-2">
-          {/* The span carries the rule: Button's own display would beat it. */}
-          <span className="-ml-1.5 @min-[40rem]/rail-page:hidden">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-toolbar"
-              aria-label={t('meetings.backToList', 'Back to the list')}
-              onClick={onBack}
-            >
-              <ArrowLeft aria-hidden />
-            </Button>
-          </span>
-          <div className="min-w-0 flex-1">
-            <h2
-              tabIndex={-1}
-              data-meeting-detail-title=""
-              className="text-base font-semibold tracking-tight text-foreground outline-none"
-            >
-              {meeting.title}
-            </h2>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              {text.when(meeting)}
-              {meeting.place ? ` · ${meeting.place}` : ''}
-            </p>
-            <p className="text-xs text-muted-foreground" data-meeting-people="">
-              {t('meetings.detail.people', 'Host {{host}} · Attendees {{attendees}}', {
-                host: personName(meeting.hostId),
-                // Before the meeting each name carries the answer to the invitation.
-                attendees: meeting.attendeeIds
-                  .map((id) =>
-                    meeting.minutes || meeting.recordingStartedAt !== null
-                      ? personName(id)
-                      : `${personName(id)} (${
-                          meeting.responses[id] === 'yes'
-                            ? t('meetings.response.yes', 'Coming')
-                            : meeting.responses[id] === 'no'
-                              ? t('meetings.response.no', 'Not coming')
-                              : t('meetings.response.none', 'No answer')
-                        })`
-                  )
-                  .join(', ')
-              })}
-            </p>
-            {origin && access === 'full' ? (
-              <span className="mt-0.5 -ml-2 block">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="xs"
-                  data-meeting-origin=""
-                  onClick={() => useSidebarChatOpenConversation.getState().setOpenId(origin.id)}
-                >
-                  {t('meetings.detail.origin', 'Set up from the chat “{{name}}”', {
-                    name: origin.name
-                  })}
-                </Button>
-              </span>
-            ) : null}
-          </div>
-        </div>
-        {access === 'full' && !meeting.minutes ? (
-          <RecordingStrip meeting={meeting} isHost={isHost} />
-        ) : null}
-        {access === 'full' && meeting.minutes ? <MinutesSharing meeting={meeting} /> : null}
-      </div>
+    <>
+      <HomePageHeading
+        title={meeting.title}
+        line={`${text.when(meeting)}${meeting.place ? ` · ${meeting.place}` : ''}`}
+        before={before}
+      >
+        {access === 'full' && meeting.minutes ? <MinutesShareButton meeting={meeting} /> : null}
+      </HomePageHeading>
+      <MeetingFacts
+        meeting={meeting}
+        project={projects[meeting.project]}
+        showOrigin={access === 'full'}
+      />
       {access !== 'full' ? (
         <MeetingExcerpt meeting={meeting} />
       ) : meeting.minutes ? (
-        <MeetingMinutes meeting={meeting} minutes={meeting.minutes} />
+        <>
+          <HomeTileRow
+            tiles={tiles}
+            onSelect={(tile) => {
+              if (tile === 'decisions' || tile === 'mine') {
+                openMeeting(meeting.id, { depth: 'brief' })
+              }
+              document
+                .querySelector<HTMLElement>(
+                  tile === 'decisions' || tile === 'mine'
+                    ? '[data-meeting-card="minutes"]'
+                    : '[data-meeting-card="follow-ups"]'
+                )
+                ?.scrollIntoView({ block: 'nearest' })
+            }}
+          />
+          <div className="grid items-start gap-4 @min-[60rem]/rail-page:grid-cols-[minmax(0,5fr)_minmax(0,3fr)]">
+            <div className="flex min-w-0 flex-col gap-4">
+              <MeetingMinutes meeting={meeting} minutes={meeting.minutes} />
+              <MeetingFollowUps meeting={meeting} />
+            </div>
+            <div className="flex min-w-0 flex-col gap-4">
+              <MinutesScopeCard meeting={meeting} />
+              <MeetingPrep meeting={meeting} isHost={isHost} />
+            </div>
+          </div>
+        </>
       ) : (
         <div
-          className={cn('min-h-0 flex-1 overflow-y-auto pb-6 scrollbar-sleek', RAIL_PAGE_GUTTER_X)}
+          className="grid items-start gap-4 @min-[60rem]/rail-page:grid-cols-[minmax(0,5fr)_minmax(0,3fr)]"
+          data-meeting-state={state}
         >
-          <MeetingPrep meeting={meeting} isHost={isHost} />
+          <div className="flex min-w-0 flex-col gap-4">
+            <MeetingRecordingCard meeting={meeting} isHost={isHost} />
+            <MeetingPrep meeting={meeting} isHost={isHost} />
+          </div>
+          <HomeCard
+            title={t('meetings.agent.willDo', 'What the meeting agent does')}
+            data-meeting-card="agent-plan"
+          >
+            <ul className="flex flex-col gap-2 px-4 pb-2">
+              {[
+                t('meetings.agent.plan1', 'Records while the host has recording on.'),
+                t(
+                  'meetings.agent.plan2',
+                  'Writes the minutes and sends the link to everyone in the meeting.'
+                ),
+                t(
+                  'meetings.agent.plan3',
+                  'Offers each person the follow-ups that look like theirs. Nothing becomes a task until someone takes or assigns it.'
+                )
+              ].map((line) => (
+                <li key={line} className="flex items-start gap-2">
+                  <span className="pt-0.5">
+                    <HomeWhoMarker who="idle" label="" />
+                  </span>
+                  <span className="text-xs text-foreground">{line}</span>
+                </li>
+              ))}
+            </ul>
+          </HomeCard>
         </div>
       )}
-    </div>
+    </>
   )
 }
