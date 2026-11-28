@@ -14,20 +14,23 @@ import {
 /** Brings an agent's question to me when I am somewhere else: the one notice a task sends during the day. */
 export function WorkAskNoticeCard(): React.JSX.Element | null {
   const t = useTranslate()
-  const { view } = useHomeBoard()
+  const { view, board } = useHomeBoard()
   const seen = useMeetings()
   const openTaskId = useInaxSourceSelection((state) => state.taskId)
   const onWork = useAppStore((state) => state.activeView === 'tasks')
+  // Keyed by the conversation, so a task started again asks again.
+  const keyOf = (taskId: string): string =>
+    `notice:ask:${taskId}:${board.loops[taskId]?.startedAt ?? 0}`
   const task = view.tasks.find(
     (entry) =>
       entry.loop === 'question' &&
       !(onWork && openTaskId === entry.id) &&
-      !isSeen(seen, `notice:ask:${entry.id}`)
+      !isSeen(seen, keyOf(entry.id))
   )
   if (!task) {
     return null
   }
-  const key = `notice:ask:${task.id}`
+  const key = keyOf(task.id)
   return (
     <div data-work-ask-notice={task.id}>
       <Card size="notice" role="complementary" aria-labelledby="work-ask-notice-heading">

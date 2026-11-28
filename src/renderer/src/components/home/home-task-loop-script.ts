@@ -194,8 +194,7 @@ export function buildHomeLoopTranscript(
 export function homeLoopEventTimes(loop: HomeTaskLoop, now: number): Record<string, number> {
   const asked = homeLoopQuestionAt(loop)
   return {
-    // With my own message, before the agent's turn: the move was my press, not the agent's act.
-    [HOME_LOOP_MOVED_ROW]: loop.startedAt - 1,
+    [HOME_LOOP_MOVED_ROW]: loop.startedAt + 1,
     ...(now >= asked ? { [HOME_LOOP_ASKED_ROW]: asked } : {}),
     ...(loop.answer ? { [HOME_LOOP_ANSWER_ROW]: loop.answer.at } : {})
   }

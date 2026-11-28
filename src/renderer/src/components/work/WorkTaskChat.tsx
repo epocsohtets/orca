@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { ArrowRightLeft, ListTodo } from 'lucide-react'
+import { ListTodo } from 'lucide-react'
 import { useTranslate } from '@/i18n/use-translate'
 import { NativeChatMessageList } from '@/components/native-chat/NativeChatMessageList'
 import { NativeChatScriptedSurface } from '@/components/native-chat/scripted/NativeChatScriptedSurface'
@@ -77,7 +77,12 @@ export function WorkTaskChat({
         node: (
           <div data-work-chat-moved="">
             <NativeChatEventRow
-              icon={<ArrowRightLeft className="size-3.5" aria-hidden />}
+              // Whose act the line is: a line with no subject under the agent's turn read as the agent's.
+              icon={
+                <span className="flex size-4 items-center justify-center rounded-full bg-chat-foreground/[0.12] text-[10px] leading-none font-medium text-chat-foreground">
+                  {t('home.activity.me', 'I')}
+                </span>
+              }
               timestamp={times[HOME_LOOP_MOVED_ROW]}
             >
               {homeStatusMovedLine(t, task.title, 'inProgress')}
