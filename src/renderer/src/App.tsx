@@ -14,6 +14,7 @@ import RunningTerminalCloseDialog from './components/terminal-pane/layout/close/
 import WorktreeBaseFallbackDialog from './components/sidebar/workspace-creation/base-ref-update/WorktreeBaseFallbackDialog'
 import ClaudeAccountSwitchDialog from './components/provider-accounts/claude/ClaudeAccountSwitchDialog'
 import { AppBackgroundServices } from './app-shell/AppBackgroundServices'
+import { HomeTaskItemsHost } from './components/home/home-task-items-host'
 import { AppRootSurfaces } from './app-shell/AppRootSurfaces'
 import { AppWorkspaceShell } from './app-shell/AppWorkspaceShell'
 import { WindowControls } from './app-shell/chrome/WindowControls'
@@ -113,6 +114,7 @@ function App(): React.JSX.Element {
           <AddToChatPointMenuHost />
           <LinkRoutingPreferenceDialogProvider>
             <AppBackgroundServices />
+            <HomeTaskItemsHost />
             <SpaceWindowStatePublisher />
             <AppWorkspaceShell layout={layout} floatingWorkspace={floatingWorkspace} />
             <AppRootSurfaces

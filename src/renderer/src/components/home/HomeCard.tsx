@@ -358,7 +358,7 @@ export function HomeRowMenu({
 const WHO_STATE = {
   agentWorking: 'working',
   waiting: 'waiting',
-  blocked: 'blocked',
+  blocked: 'idle',
   draft: 'done',
   working: 'working',
   idle: 'idle'
@@ -375,11 +375,8 @@ export function HomeWhoMarker({
   return (
     <span
       className={`inline-flex min-w-0 items-center gap-1.5 text-xs leading-4 ${
-        who === 'blocked'
-          ? 'text-destructive'
-          : who === 'waiting'
-            ? 'text-foreground'
-            : 'text-muted-foreground'
+        // Red is for what is late; waiting on someone else's reply is grey (R6).
+        who === 'waiting' ? 'text-foreground' : 'text-muted-foreground'
       }`}
     >
       <AgentStateDot state={WHO_STATE[who]} title={null} />

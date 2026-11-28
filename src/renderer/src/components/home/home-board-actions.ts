@@ -71,18 +71,32 @@ export function answerHomeLoop(taskId: string, choiceId: string | null, text?: s
   })
 }
 
-export function sayHomeLoop(taskId: string, text: string): void {
+/**
+ * What I write on a task, from its item's comment box or its chat: one progress note on inAX, and my line in
+ * the conversation when the task has one. Returns the note's id.
+ */
+export function commentHomeTask(taskId: string, text: string, at = Date.now()): string {
+  const id = `note-${at}`
   useHomeBoardStore.setState((state) => {
+    const record = state.inax[taskId]
     const loop = state.loops[taskId]
-    return loop
-      ? {
-          loops: {
-            ...state.loops,
-            [taskId]: { ...loop, said: [...loop.said, { at: Date.now(), text }] }
-          }
+    return {
+      inax: {
+        ...state.inax,
+        [taskId]: {
+          ...record,
+          notes: [
+            ...(record?.notes ?? []),
+            { id, at, text, status: record?.status ?? 'inProgress', by: 'me', statusChanged: false }
+          ]
         }
-      : state
+      },
+      ...(loop
+        ? { loops: { ...state.loops, [taskId]: { ...loop, said: [...loop.said, { at, text }] } } }
+        : {})
+    }
   })
+  return id
 }
 
 /** Saves one day-end card: from here colleagues see it. */

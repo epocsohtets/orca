@@ -11,6 +11,7 @@ import {
   type HomeTask
 } from './home-board'
 import { planHomeDayEnd, type HomeDayEndCard } from './home-day-end'
+import { homeSampleAsks, withDayEndAsks, type HomeSampleAsk } from './home-board-asks'
 import { HOME_LOOP_AGENT_ID, applyHomeTaskLoops } from './home-board-loops'
 import { buildHomeLoopScript, inaxStatusLabels } from './home-task-loop-script'
 import { buildHomeLoopActivity } from './home-board-loop-activity'
@@ -65,6 +66,8 @@ export type HomeBoardView = {
   records: HomeDayRecord[]
   /** The day-end cards still to go through. */
   dayEnd: HomeDayEndCard[]
+  /** What the sample's agents asked of me, kept after I answer: the history of each task's item. */
+  sampleAsks: Record<string, HomeSampleAsk>
 }
 
 /** The whole sample board for one moment: the sample day, the pretend time, and what I have done so far. */
@@ -264,8 +267,12 @@ export function buildHomeBoardView(
             : (task.report ?? null)
       })
     : []
+  const shownTasks = phase === 'evening' ? withDayEndAsks(t, tasks, dayEnd) : tasks
   return {
-    tasks,
+    tasks: shownTasks,
+    sampleAsks: own
+      ? homeSampleAsks(sampleTasks, sample.at(0, Math.min(minutes - 30, 10 * 60 + 40)))
+      : {},
     // Someone else looking sees 마코's tasks as inAX shows them: status, saved notes, and that an agent is on it.
     boardTasks: own
       ? tasks.filter((task) => !task.meetingId)
@@ -280,7 +287,7 @@ export function buildHomeBoardView(
     otherTasks: withLoops(fromMeetings.otherTasks),
     recordingMeetingId: fromMeetings.recording?.id ?? null,
     openTasks: tasks.filter((task) => !task.done && !task.meetingId),
-    counts: countHomeBoard(tasks),
+    counts: countHomeBoard(shownTasks),
     agents,
     activity,
     agentFinished: finished.length,

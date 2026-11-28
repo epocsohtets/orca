@@ -1,4 +1,5 @@
 import { useEffect, useState, useSyncExternalStore } from 'react'
+import { create } from 'zustand'
 import { useAppStore } from '@/store'
 import { useIntlLocale, useTranslate } from '@/i18n/use-translate'
 import { useInaxMockAccount } from '@/lib/inax-mock-account'
@@ -18,8 +19,12 @@ import {
   type HomePhase
 } from './home-day'
 
+/** The demo menu's pretend time of day, for every screen of the sample at once. */
+export const useHomePreview = create<{ preview: 'auto' | HomePhase }>(() => ({ preview: 'auto' }))
+
 /** The sample board as it stands now, for Home and for the inAX task screens: one world, one store. */
-export function useHomeBoard(preview: 'auto' | HomePhase = 'auto') {
+export function useHomeBoard() {
+  const preview = useHomePreview((state) => state.preview)
   const t = useTranslate()
   const intlLocale = useIntlLocale()
   const signedIn = useInaxMockAccount((state) => state.signedIn)

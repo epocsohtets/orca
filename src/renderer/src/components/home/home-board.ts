@@ -35,6 +35,12 @@ export type HomeTask = {
   meetingId?: string
   /** An invitation to `meetingId` I have not answered: its row answers it with 참석 / 불참. */
   invitation?: boolean
+  /** The title of `meetingId`, for its item's chat row. */
+  meetingTitle?: string
+  /** Who asks what the row waits on, when it is a person or the meeting agent rather than a task agent. */
+  askedBy?: string
+  /** The day's records with no task, as one row of 내 확인 필요 at day end: not a task of inAX. */
+  dayEndRecords?: true
   /** A follow-up task: the meeting it came from and the sentence it rests on. */
   origin?: { meetingId: string; turnId: string | null }
   /** Set when the task belongs to someone else: it opens, but I cannot start or finish it. */

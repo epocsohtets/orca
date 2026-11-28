@@ -131,6 +131,7 @@ export function buildHomeMeetings(
     who: 'waiting',
     agentId: 'meeting',
     meetingId: meeting.id,
+    meetingTitle: meeting.title,
     ...patch
   })
   const waiting: HomeTask[] = []
@@ -151,7 +152,8 @@ export function buildHomeMeetings(
             title: meeting.title
           }),
           whoLabel: t('home.task.requestWho', 'Needs me'),
-          detail: ''
+          detail: '',
+          askedBy: args.personName(request.personId)
         })
       )
     }
@@ -170,6 +172,7 @@ export function buildHomeMeetings(
         whoLabel: t('home.task.requestWho', 'Needs me'),
         detail: '',
         invitation: true,
+        askedBy: args.personName(meeting.hostId),
         // Nobody's agent asks this: the host does.
         agentId: undefined,
         due: away <= 0 ? 'today' : away === 1 ? 'tomorrow' : 'week',
@@ -185,8 +188,8 @@ export function buildHomeMeetings(
     const away = calendarDaysBetween(args.sampleDay, day)
     const waitsOnMe = waiting.some((row) => row.meetingId === meeting.id)
     const over = meeting.minutes !== null
-    // Past days are history; a meeting that ended today stays while something of it waits on me.
-    if (away < 0 || away > 9 || (over && !waitsOnMe)) {
+    // Past days are history; a meeting that ended today stays, marked 끝남 unless something of it waits on me.
+    if (away < 0 || away > 9) {
       continue
     }
     const group: HomeUpcomingGroup =
@@ -211,11 +214,13 @@ export function buildHomeMeetings(
         note:
           meeting.recordingStartedAt !== null
             ? ''
-            : over || awaitsAnswer(meeting, viewerId)
+            : waitsOnMe || awaitsAnswer(meeting, viewerId)
               ? t('home.chip.waiting', 'Needs me')
-              : meeting.outline || meeting.materials.length > 0
-                ? t('home.chip.prep', 'Prep')
-                : ''
+              : over
+                ? t('meetings.status.done', 'Done')
+                : meeting.outline || meeting.materials.length > 0
+                  ? t('home.chip.prep', 'Prep')
+                  : ''
       }
     })
   }

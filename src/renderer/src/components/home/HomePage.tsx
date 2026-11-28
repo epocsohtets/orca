@@ -18,9 +18,8 @@ import {
   openScheduleForm
 } from '@/components/meetings/meeting-navigation'
 import { MAKO, personName } from '@/components/meetings/meeting-people'
-import { answerHomeRecord, saveHomeDayEnd, startHomeLoop } from './home-board-actions'
-import { useHomeBoard } from './use-home-board'
-import type { HomePhase } from './home-day'
+import { answerHomeRecord, startHomeLoop } from './home-board-actions'
+import { useHomeBoard, useHomePreview } from './use-home-board'
 import { HOME_BOARD_COLUMNS_CLASS, HOME_BOARD_PAGE_CLASS, HomeCard } from './HomeCard'
 import { HomeFirstSteps, HomeGreeting, HomeTiles, type HomeTileId } from './HomeHeader'
 import { HomeTasksCard } from './HomeTasksCard'
@@ -30,7 +29,9 @@ import { HomeActivityCard, type HomeActivityFilter } from './HomeActivityCard'
 import { HomeMyDayCard } from './HomeMyDayCard'
 import { HomeNewTaskButton } from './HomeNewTaskButton'
 import { HomePreviewMenu } from './HomePreviewMenu'
-import { HomeDayEndPanel } from './HomeDayEndPanel'
+import { FIRST_NEEDS_YOU, HomeItemsPanel } from './HomeItemsPanel'
+import { openHomeItem } from './home-task-items-host'
+import { homeRowItemUid, taskItemUid } from './home-task-item-model'
 import { HomeDayEndResult, useHomeDayEndRows } from './HomeDayEndResult'
 
 const DATE_OPTIONS: Intl.DateTimeFormatOptions = { weekday: 'long', month: 'long', day: 'numeric' }
@@ -57,16 +58,14 @@ export default function HomePage(): React.JSX.Element {
   const intlLocale = useIntlLocale()
   const bots = useBots()
   const hasAgentThread = useAllAgentPaneThreads().allThreads.length > 0
-  const [preview, setPreview] = useState<'auto' | HomePhase>('auto')
+  const preview = useHomePreview((state) => state.preview)
   const { board, view, viewerId, projects, signedIn, myApps, phase, sampleDay, minutes } =
-    useHomeBoard(preview)
+    useHomeBoard()
   const [previewFirstRun, setPreviewFirstRun] = useState(false)
   const [tab, setTab] = useState<HomeTaskTab>('today')
-  const [openTaskId, setOpenTaskId] = useState<string | null>(null)
   const [openAgentId, setOpenAgentId] = useState<string | null>(null)
   const [activityFilter, setActivityFilter] = useState<HomeActivityFilter>('all')
   const [activityAll, setActivityAll] = useState(false)
-  const [wrapUpOpen, setWrapUpOpen] = useState(false)
 
   const openSettings = (pane: 'my-apps' | 'browser', sectionId?: string): void => {
     useAppStore.getState().openSettingsTarget({ pane, repoId: null, sectionId })
@@ -82,14 +81,13 @@ export default function HomePage(): React.JSX.Element {
       return
     }
     setTab(homeTaskTab(task)[0] ?? 'today')
-    setOpenTaskId(taskId)
+    openHomeItem(taskItemUid(taskId))
     focusRow(`[data-home-task="${taskId}"]`)
   }
   const selectTile = (tile: HomeTileId): void => {
     const target = TILE_TAB[tile]
     if (target) {
       setTab(target)
-      setOpenTaskId(null)
       focusRow(`[data-home-tab="${target}"]`)
     } else {
       // The tile's number is the length of this list, so the jump shows all of it.
@@ -140,7 +138,7 @@ export default function HomePage(): React.JSX.Element {
       result={dayEndRows.length > 0 ? <HomeDayEndResult rows={dayEndRows} /> : null}
       onManageApps={() => openSettings('my-apps')}
       onManageBrowser={() => openSettings('browser', 'browser-activity-suggestions')}
-      onWrapUp={() => setWrapUpOpen(true)}
+      onWrapUp={() => openHomeItem(FIRST_NEEDS_YOU)}
     />
   )
 
@@ -187,7 +185,7 @@ export default function HomePage(): React.JSX.Element {
               />
               <HomePreviewMenu
                 preview={preview}
-                onPreviewChange={setPreview}
+                onPreviewChange={(next) => useHomePreview.setState({ preview: next })}
                 firstRun={previewFirstRun}
                 onFirstRunChange={setPreviewFirstRun}
               />
@@ -235,25 +233,17 @@ export default function HomePage(): React.JSX.Element {
                           tasks={tasks}
                           projects={projects}
                           tab={tab}
-                          onTabChange={(next) => {
-                            setTab(next)
-                            setOpenTaskId(null)
-                          }}
-                          openId={openTaskId}
-                          onOpenChange={setOpenTaskId}
-                          onOpenTask={(taskId) => openInaxTask(taskId)}
-                          onOpenMeeting={(meetingId) => openMeeting(meetingId)}
+                          onTabChange={setTab}
+                          onOpenTask={(taskId) =>
+                            openHomeItem(
+                              homeRowItemUid(
+                                tasks.find((task) => task.id === taskId) ?? { id: taskId }
+                              )
+                            )
+                          }
                           onStart={(task) => {
                             startHomeLoop(task.id, task.title, task.status)
                             openInaxTask(task.id)
-                          }}
-                          onAnswer={(taskId, choiceId) => {
-                            // Only a meeting's offer is answered in place.
-                            useHomeBoardStore.setState((state) => ({
-                              answers: { ...state.answers, [taskId]: choiceId }
-                            }))
-                            setOpenTaskId(null)
-                            focusRow(`[data-home-tab="${tab}"]`)
                           }}
                           onOpenTaskList={() => openInaxTask(null)}
                         />
@@ -320,21 +310,7 @@ export default function HomePage(): React.JSX.Element {
             )}
           </div>
         </RailPageScroll>
-        {/* Mounted per open: the walk is over the cards as they stand now. */}
-        {wrapUpOpen && view.dayEnd.length > 0 ? (
-          <HomeDayEndPanel
-            cards={view.dayEnd}
-            projects={projects}
-            openTasks={view.openTasks}
-            onSave={saveHomeDayEnd}
-            onClose={() => {
-              setWrapUpOpen(false)
-              focusRow('[data-home-wrap-up-open]:not(:disabled), [data-home-day-end-undo]')
-            }}
-            onOpenTask={(taskId) => openInaxTask(taskId)}
-            onOpenMeeting={(meetingId) => openMeeting(meetingId)}
-          />
-        ) : null}
+        {signedIn && !firstRun ? <HomeItemsPanel /> : null}
       </div>
     </RailPage>
   )

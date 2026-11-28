@@ -45,7 +45,8 @@ export function HomeMyDayCard({
   const t = useTranslate()
   // A block and its record row light up together.
   const [hovered, setHovered] = useState<string | null>(null)
-  const open = records.filter((record) => !answers[record.id]).length
+  // A record given a task is no longer one without a task: the heading counts the rows it shows.
+  const open = records.filter((record) => !answers[record.id])
 
   return (
     <HomeCard
@@ -76,11 +77,11 @@ export function HomeMyDayCard({
             {t('home.day.unconfirmed', 'Records without a task')}
             <span aria-hidden>·</span>
             <span className="tabular-nums" data-home-records-open="">
-              {open}
+              {open.length}
             </span>
           </h3>
           <ul className="mx-4" onMouseLeave={() => setHovered(null)}>
-            {records.map((record) => (
+            {open.map((record) => (
               <HomeRecordRow
                 key={record.id}
                 record={record}
