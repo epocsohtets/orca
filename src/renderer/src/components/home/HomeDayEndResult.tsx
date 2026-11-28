@@ -1,7 +1,7 @@
 import React from 'react'
 import { useTranslate } from '@/i18n/use-translate'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
-import { HOME_GROUP_CLASS, HomeRow, HomeRowMenu, HomeStateIcon } from './HomeCard'
+import { HOME_GROUP_RULED_CLASS, HomeRow, HomeRowMenu, HomeStateIcon } from './HomeCard'
 import { inaxStatusLabels } from './home-task-loop-script'
 import type { InaxStatus } from './home-task-loop'
 import type { HomeProjectId, HomeTask } from './home-board'
@@ -87,7 +87,7 @@ export function HomeDayEndResult({
   const statusLabels = inaxStatusLabels(t)
   return (
     <section data-home-day-end-result="" className="mt-3">
-      <h3 className={`mx-4 border-t border-border px-0 ${HOME_GROUP_CLASS}`}>
+      <h3 className={HOME_GROUP_RULED_CLASS}>
         {t('home.dayEnd.resultTitle', 'What the team sees today')}
       </h3>
       <ul className="mx-4">

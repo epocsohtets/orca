@@ -32,6 +32,8 @@ export const HOME_ROW_BUTTON_CLASS = `${HOME_FOCUS_RING_CLASS} w-full min-w-0 px
 export const HOME_ROW_DETAIL_CLASS = 'flex flex-col gap-2 bg-accent/50 px-4 py-3'
 /** A group's name above its rows: 28px. */
 export const HOME_GROUP_CLASS = `flex h-7 items-center gap-1.5 px-4 ${HOME_META_CLASS}`
+/** The same name with a rule above it, on the rows' own left edge. */
+export const HOME_GROUP_RULED_CLASS = `mx-4 flex h-7 items-center gap-1.5 border-t border-border ${HOME_META_CLASS}`
 /** The board pages' own button rules: two weights only, no shadow on an outline button, 28px page buttons. */
 export const HOME_BOARD_SCOPE_CLASS =
   '[&_button]:font-normal [&_[data-slot=badge]]:font-normal [&_button[data-variant=outline]]:shadow-none [&_button[data-size=sm]]:h-7 [&_button[data-size=sm]]:px-2.5 [&_button[data-size=sm]]:text-[13px] [&_button[data-size=sm]]:leading-5'

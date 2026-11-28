@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { HOME_GROUP_CLASS, HomeCard } from './HomeCard'
+import { HOME_GROUP_RULED_CLASS, HomeCard } from './HomeCard'
 import { HomeRecordRow } from './HomeRecordRow'
 import type { HomeRecordAnswer, HomeTask } from './home-board'
 import type { HomeDayRecord, HomeDaySegment } from './home-board-day-mock'
@@ -102,7 +102,7 @@ export function HomeMyDayCard({
       </div>
       {records.length > 0 ? (
         <section aria-label={t('home.day.unconfirmed', 'Records without a task')}>
-          <h3 className={`mx-4 border-t border-border px-0 ${HOME_GROUP_CLASS}`}>
+          <h3 className={HOME_GROUP_RULED_CLASS}>
             {t('home.day.unconfirmed', 'Records without a task')}
           </h3>
           <ul className="mx-4">
