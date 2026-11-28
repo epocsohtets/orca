@@ -11,10 +11,23 @@ import { signInInaxMock } from '@/lib/inax-mock-account'
 import { useBots } from '@/lib/bot-catalog'
 import { homeTaskTab, type HomeRecordAnswer, type HomeTaskTab } from './home-board'
 import { useHomeBoardStore } from './home-board-store'
+import { HOME_ACCEPT_FOLLOW_UPS } from './home-board-meetings'
+import {
+  openMeeting,
+  openMeetingBot,
+  openMeetingSchedule,
+  openScheduleForm
+} from '@/components/meetings/meeting-navigation'
+import { MAKO, personName } from '@/components/meetings/meeting-people'
+import {
+  acceptFollowUp,
+  setFollowUpDeclined,
+  useMeetings
+} from '@/components/meetings/meetings-store'
 import { answerHomeLoop, decideHomeLoop, startHomeLoop } from './home-board-actions'
 import { useHomeBoard } from './use-home-board'
 import type { HomePhase } from './home-day'
-import { HomeCard, HOME_META_CLASS } from './HomeCard'
+import { HomeCard } from './HomeCard'
 import { HomeFirstSteps, HomeGreeting, HomeTiles, type HomeTileId } from './HomeHeader'
 import { HomeTasksCard } from './HomeTasksCard'
 import { HomeUpcomingCard } from './HomeUpcomingCard'
@@ -61,7 +74,7 @@ export default function HomePage(): React.JSX.Element {
   const bots = useBots()
   const hasAgentThread = useAllAgentPaneThreads().allThreads.length > 0
   const [preview, setPreview] = useState<'auto' | HomePhase>('auto')
-  const { board, view, projects, signedIn, myApps, app, phase, sampleDay, duration } =
+  const { board, view, viewerId, projects, signedIn, myApps, app, phase, sampleDay, duration } =
     useHomeBoard(preview)
   const [previewFirstRun, setPreviewFirstRun] = useState(false)
   const [tab, setTab] = useState<HomeTaskTab>('today')
@@ -77,7 +90,7 @@ export default function HomePage(): React.JSX.Element {
   }
 
   const { tasks } = view
-  const recording = board.meetingStartedAt !== null
+  const recordingMeetingId = view.recordingMeetingId
 
   const revealTask = (taskId: string): void => {
     const task = tasks.find((entry) => entry.id === taskId)
@@ -113,8 +126,26 @@ export default function HomePage(): React.JSX.Element {
     setTab('today')
     focusRow(`[data-home-task="${id}"]`)
   }
-  /** An agent's row goes to its task's conversation; a bot without a task opens in place. */
+  /** My answer to what the meeting agent offered me: each item becomes my task, or goes back to the host. */
+  const answerOffer = (meetingId: string, choiceId: string): void => {
+    const meeting = useMeetings.getState().meetings.find((entry) => entry.id === meetingId)
+    for (const followUp of meeting?.followUps ?? []) {
+      if (followUp.suggestedOwnerId !== viewerId || followUp.taskId || followUp.declined) {
+        continue
+      }
+      if (choiceId === HOME_ACCEPT_FOLLOW_UPS) {
+        acceptFollowUp(meetingId, followUp.id)
+      } else {
+        setFollowUpDeclined(meetingId, followUp.id, true)
+      }
+    }
+  }
+  /** An agent's row goes to its conversation; a bot without one opens in place. */
   const openAgent = (agentId: string): void => {
+    if (agentId === 'meeting') {
+      openMeetingBot()
+      return
+    }
     const agent = view.agents.find((entry) => entry.id === agentId)
     const task = tasks.find((entry) => entry.id === agent?.taskId)
     if (task && !task.meetingId) {
@@ -150,6 +181,7 @@ export default function HomePage(): React.JSX.Element {
         <div className="rail-page-row-gutter mx-auto flex max-w-6xl flex-col gap-4 pt-6 pb-24">
           <HomeGreeting
             phase={phase}
+            name={viewerId === MAKO ? t('home.header.me', 'Mako') : personName(viewerId)}
             date={uiDateTimeFormat(DATE_OPTIONS, intlLocale).format(sampleDay)}
             line={t('home.header.line', 'My work today, and what my agents did.')}
           >
@@ -157,14 +189,13 @@ export default function HomePage(): React.JSX.Element {
               type="button"
               variant="outline"
               size="sm"
-              aria-pressed={recording}
               data-home-meeting=""
               onClick={() =>
-                useHomeBoardStore.setState({ meetingStartedAt: recording ? null : Date.now() })
+                recordingMeetingId ? openMeeting(recordingMeetingId) : openScheduleForm(null, true)
               }
             >
-              {recording
-                ? t('home.header.endMeeting', 'End meeting')
+              {recordingMeetingId
+                ? t('home.header.openMeeting', 'Meeting in progress')
                 : t('home.header.startMeeting', 'Start meeting')}
             </Button>
             <HomeNewTaskButton
@@ -188,14 +219,6 @@ export default function HomePage(): React.JSX.Element {
               onFirstRunChange={setPreviewFirstRun}
             />
           </HomeGreeting>
-          {recording ? (
-            <p role="status" className={HOME_META_CLASS}>
-              {t(
-                'home.header.meetingNote',
-                'The meeting bot is recording. There is no meeting page yet, so minutes do not arrive in this sample.'
-              )}
-            </p>
-          ) : null}
           {firstRun ? (
             <HomeFirstSteps
               steps={[
@@ -250,6 +273,7 @@ export default function HomePage(): React.JSX.Element {
                         openId={openTaskId}
                         onOpenChange={setOpenTaskId}
                         onOpenTask={(taskId) => openInaxTask(taskId)}
+                        onOpenMeeting={(meetingId) => openMeeting(meetingId)}
                         onOpenOutput={(taskId) => openInaxTask(taskId, 'chat')}
                         onDecide={(taskId, proposal) => {
                           const task = tasks.find((entry) => entry.id === taskId)
@@ -263,7 +287,10 @@ export default function HomePage(): React.JSX.Element {
                           focusRow(`[data-home-tab="${tab}"]`)
                         }}
                         onAnswer={(taskId, choiceId) => {
-                          if (board.loops[taskId]) {
+                          const meetingId = tasks.find((entry) => entry.id === taskId)?.meetingId
+                          if (meetingId) {
+                            answerOffer(meetingId, choiceId)
+                          } else if (board.loops[taskId]) {
                             answerHomeLoop(taskId, choiceId)
                           } else {
                             useHomeBoardStore.setState((state) => ({
@@ -308,11 +335,9 @@ export default function HomePage(): React.JSX.Element {
                   <HomeUpcomingCard
                     items={view.upcoming}
                     projects={projects}
-                    onRevealTask={(taskId) =>
-                      tasks.find((entry) => entry.id === taskId)?.meetingId
-                        ? revealTask(taskId)
-                        : openInaxTask(taskId)
-                    }
+                    onRevealTask={(taskId) => openInaxTask(taskId)}
+                    onOpenMeeting={(meetingId) => openMeeting(meetingId)}
+                    onOpenCalendar={openMeetingSchedule}
                   />
                   {signedIn ? (
                     <HomeActivityCard
@@ -322,7 +347,9 @@ export default function HomePage(): React.JSX.Element {
                       showAll={activityAll}
                       onShowAllChange={setActivityAll}
                       onReveal={(entry) => {
-                        if (entry.taskId) {
+                        if (entry.meetingId) {
+                          openMeeting(entry.meetingId)
+                        } else if (entry.taskId) {
                           openInaxTask(entry.taskId)
                         } else if (entry.agentId) {
                           setOpenAgentId(entry.agentId)

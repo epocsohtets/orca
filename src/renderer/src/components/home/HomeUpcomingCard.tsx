@@ -1,33 +1,30 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { CalendarDays } from 'lucide-react'
 import { useTranslate } from '@/i18n/use-translate'
 import { Button } from '@/components/ui/button'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import {
-  HOME_META_CLASS,
-  HOME_ROW_BUTTON_CLASS,
-  HOME_ROW_DETAIL_CLASS,
-  HomeCard,
-  HomeProjectDot
-} from './HomeCard'
+import { HOME_META_CLASS, HOME_ROW_BUTTON_CLASS, HomeCard, HomeProjectDot } from './HomeCard'
 import type { HomeProjectId } from './home-board'
 import type { HomeProject } from './home-board-mock'
 import type { HomeUpcoming, HomeUpcomingGroup } from './home-board-day-mock'
 
 const GROUPS: HomeUpcomingGroup[] = ['today', 'tomorrow', 'week', 'nextWeek']
 
-/** Deadlines and meetings together. A deadline jumps to its task; a meeting opens what is ready for it. */
+/** Deadlines and meetings together. A deadline jumps to its task; a meeting opens that meeting. */
 export function HomeUpcomingCard({
   items,
   projects,
-  onRevealTask
+  onRevealTask,
+  onOpenMeeting,
+  onOpenCalendar
 }: {
   items: readonly HomeUpcoming[]
   projects: Record<HomeProjectId, HomeProject>
   onRevealTask: (taskId: string) => void
+  /** Prep before the meeting, minutes after it. */
+  onOpenMeeting: (meetingId: string) => void
+  onOpenCalendar: () => void
 }): React.JSX.Element {
   const t = useTranslate()
-  const [openId, setOpenId] = useState<string | null>(null)
   const groupLabels: Record<HomeUpcomingGroup, string> = {
     today: t('home.upcoming.today', 'Today'),
     tomorrow: t('home.upcoming.tomorrow', 'Tomorrow'),
@@ -40,22 +37,16 @@ export function HomeUpcomingCard({
       title={t('home.upcoming.title', 'Coming up')}
       data-home-card="upcoming"
       action={
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button type="button" variant="ghost-muted" size="xs">
-              <CalendarDays aria-hidden />
-              {t('home.upcoming.calendar', 'Calendar')}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent align="end" className="w-64">
-            <p className="text-xs text-foreground">
-              {t(
-                'home.upcoming.noCalendar',
-                'There is no calendar page yet. Everything scheduled this week is in this card.'
-              )}
-            </p>
-          </PopoverContent>
-        </Popover>
+        <Button
+          type="button"
+          variant="ghost-muted"
+          size="xs"
+          data-home-calendar=""
+          onClick={onOpenCalendar}
+        >
+          <CalendarDays aria-hidden />
+          {t('home.upcoming.calendar', 'Calendar')}
+        </Button>
       }
     >
       <div className="flex flex-col gap-2">
@@ -72,18 +63,16 @@ export function HomeUpcomingCard({
               </h3>
               <ul>
                 {rows.map((item) => {
-                  const open = openId === item.id
                   return (
                     <li key={item.id} data-home-upcoming={item.id}>
                       <button
                         type="button"
-                        aria-expanded={item.meeting ? open : undefined}
                         className={`${HOME_ROW_BUTTON_CLASS} flex items-start gap-3`}
                         onClick={() => {
                           if (item.taskId) {
                             onRevealTask(item.taskId)
-                          } else {
-                            setOpenId(open ? null : item.id)
+                          } else if (item.meetingId) {
+                            onOpenMeeting(item.meetingId)
                           }
                         }}
                       >
@@ -108,17 +97,6 @@ export function HomeUpcomingCard({
                           {item.when}
                         </span>
                       </button>
-                      {item.meeting && open ? (
-                        <div className={HOME_ROW_DETAIL_CLASS}>
-                          <p className="text-xs text-foreground">{item.meeting.detail}</p>
-                          <p className={HOME_META_CLASS}>
-                            {t(
-                              'home.upcoming.noMeetingScreen',
-                              'A meeting has no page of its own yet; this is what is ready.'
-                            )}
-                          </p>
-                        </div>
-                      ) : null}
                     </li>
                   )
                 })}

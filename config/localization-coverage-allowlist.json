@@ -452,5 +452,25 @@
   {
     "filePath": "src/shared/bots/bot-item-ask-advice.ts",
     "reason": "Agent mail for item asks."
+  },
+  {
+    "filePath": "src/renderer/src/components/meetings/meeting-people.ts",
+    "reason": "PoC sample meeting content (Korean), shown as data."
+  },
+  {
+    "filePath": "src/renderer/src/components/meetings/meeting-sample-newsletter.ts",
+    "reason": "PoC sample meeting content (Korean), shown as data."
+  },
+  {
+    "filePath": "src/renderer/src/components/meetings/meeting-sample-promo.ts",
+    "reason": "PoC sample meeting content (Korean), shown as data."
+  },
+  {
+    "filePath": "src/renderer/src/components/meetings/meeting-sample-seed.ts",
+    "reason": "PoC sample meeting content (Korean), shown as data."
+  },
+  {
+    "filePath": "src/renderer/src/components/meetings/meeting-sample-weekly.ts",
+    "reason": "PoC sample meeting content (Korean), shown as data."
   }
 ]

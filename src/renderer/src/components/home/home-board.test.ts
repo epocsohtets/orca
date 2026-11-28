@@ -34,7 +34,6 @@ const tasks = [
   task('offer', { who: 'waiting', agentId: 'meeting', meetingId: 'weekly' }),
   task('notice', { due: 'overdue', who: 'blocked' })
 ]
-const followUps = [task('follow-1', { due: 'tomorrow' }), task('follow-2', { due: 'week' })]
 
 describe('home board', () => {
   it('counts what waits on me and what is late', () => {
@@ -51,24 +50,22 @@ describe('home board', () => {
     expect(sortHomeTasks(tasks).map((entry) => entry.id)).toEqual(['copy', 'offer', 'notice'])
   })
 
-  it('hands an answered task back to its agent and turns accepted follow-ups into tasks', () => {
+  it('hands an answered task back to its agent and finishes what I finished', () => {
     const next = applyHomeBoardState(
       tasks,
-      followUps,
       {
         ...EMPTY_HOME_BOARD_STATE,
-        answers: { copy: 'a', offer: 'accept' },
+        answers: { copy: 'a' },
         doneTaskIds: ['notice']
       },
       labels
     )
     expect(next.map((entry) => [entry.id, entry.who, entry.done])).toEqual([
       ['copy', 'agentWorking', false],
-      ['follow-1', null, false],
-      ['follow-2', null, false],
+      ['offer', 'waiting', false],
       ['notice', 'blocked', true]
     ])
-    expect(countHomeBoard(next).waiting).toBe(0)
+    expect(countHomeBoard(next).waiting).toBe(1)
   })
 
   it('lists agents that wait on me first and clears the wait once I answered', () => {
@@ -90,7 +87,6 @@ describe('home board', () => {
     ])
     const answered = applyHomeBoardState(
       tasks,
-      followUps,
       { ...EMPTY_HOME_BOARD_STATE, answers: { copy: 'a' } },
       labels
     )

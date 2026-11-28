@@ -10,20 +10,22 @@ import type { HomePhase } from './home-day'
 /** Greeting, date and the one line that says what this page is; the actions sit at the right. */
 export function HomeGreeting({
   phase,
+  name,
   date,
   line,
   children
 }: {
   phase: HomePhase
+  name: string
   date: string
   line: string
   children: React.ReactNode
 }): React.JSX.Element {
   const t = useTranslate()
   const greeting = {
-    morning: t('home.header.morning', 'Good morning, Mako'),
-    day: t('home.header.day', 'Hello, Mako'),
-    evening: t('home.header.evening', 'Good work today, Mako')
+    morning: t('home.header.morning', 'Good morning, {{name}}', { name }),
+    day: t('home.header.day', 'Hello, {{name}}', { name }),
+    evening: t('home.header.evening', 'Good work today, {{name}}', { name })
   }[phase]
   return (
     <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">

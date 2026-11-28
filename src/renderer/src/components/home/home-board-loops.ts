@@ -34,6 +34,7 @@ export function applyHomeTaskLoops(
     const record = state.inax[task.id]
     const status: InaxStatus =
       record?.status ??
+      task.status ??
       (task.done ? 'done' : task.who === null || task.meetingId ? 'todo' : 'inProgress')
     const loop = state.loops[task.id]
     const base = { ...task, status, done: status === 'done', notes: record?.notes ?? [] }

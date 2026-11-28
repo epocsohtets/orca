@@ -5,6 +5,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useTranslate } from '@/i18n/use-translate'
 import { useAppStore } from '@/store'
+import { ChatMeetingLinks } from '@/components/meetings/ChatMeetingLinks'
+import { ScheduleMeetingFromChatButton } from '@/components/meetings/ScheduleMeetingFromChatButton'
 import { SidebarChatAvatar } from './SidebarChatAvatar'
 import {
   SIDEBAR_CHAT_CONVERSATIONS,
@@ -101,6 +103,7 @@ function SidebarChatConversationView({
                 : null}
           </span>
         </div>
+        <ScheduleMeetingFromChatButton conversationId={conversation.id} />
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -131,6 +134,7 @@ function SidebarChatConversationView({
             </div>
           </div>
         ))}
+        <ChatMeetingLinks conversationId={conversation.id} />
       </div>
       <form
         className="flex shrink-0 items-end gap-2 border-t border-border px-4 py-3"

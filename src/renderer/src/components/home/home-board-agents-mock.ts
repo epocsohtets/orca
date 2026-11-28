@@ -6,7 +6,9 @@ import type { HomeSampleContext } from './home-board-mock'
 export function buildHomeAgents(
   t: Translate,
   tasks: readonly HomeTask[],
-  sample: HomeSampleContext
+  sample: HomeSampleContext,
+  /** The meeting agent's row is read from the meetings, not written here. */
+  meeting: Pick<HomeAgent, 'doing' | 'state' | 'stage' | 'taskId'>
 ): HomeAgent[] {
   const title = (id: string): string => tasks.find((task) => task.id === id)?.title ?? ''
   const researchDone = sample.phase === 'evening'
@@ -52,13 +54,10 @@ export function buildHomeAgents(
     },
     {
       id: 'meeting',
-      name: t('home.agent.meeting', 'Meeting bot'),
-      taskId: 'offer',
-      doing: t('home.agent.meetingDoing', 'Minutes of the campaign weekly meeting'),
-      state: 'waiting',
-      stage: 3,
-      last: sample.ago(9 * 60 + 35),
-      lines: [t('home.agent.meetingLine', 'The minutes are ready. Two items are yours.')]
+      name: t('home.agent.meeting', 'Meeting agent'),
+      ...meeting,
+      last: t('home.agent.justNow', 'Just now'),
+      lines: []
     },
     {
       id: 'triage',
@@ -72,7 +71,7 @@ export function buildHomeAgents(
         t('home.agent.triageLine1', 'I need the new delivery dates to revise the notice.'),
         t(
           'home.agent.triageLine2',
-          'Lee Doyun asked the logistics team again. I continue when they reply.'
+          'Lee Mina asked the logistics team again. I continue when they reply.'
         )
       ]
     },

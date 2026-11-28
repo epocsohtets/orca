@@ -29073,6 +29073,231 @@
     "signIn": "로그인",
     "home": "홈"
   },
+  "meetings": {
+    "recording": {
+      "statusAria": "{{title}}을(를) 녹음하고 있습니다. 회의를 엽니다.",
+      "on": "녹음 중",
+      "everyoneSees": "회의에 있는 {{count}}명 모두에게 이 표시가 보입니다.",
+      "hostIdle": "회의가 시작되면 녹음을 시작하세요.",
+      "attendeeIdle": "주최자가 녹음을 시작하면 여기와 아래 상태 줄에 표시됩니다.",
+      "start": "녹음 시작",
+      "sent": "회의 bot이 회의에 있던 {{count}}명 모두에게 회의록을 보냈습니다.",
+      "stop": "녹음 끝내기",
+      "simulated": "이 빌드는 소리를 녹음하지 않습니다. 녹음을 끝내면 준비된 예시 회의록이 만들어져 참석자에게 갑니다."
+    },
+    "title": "회의",
+    "schedule": "회의 잡기",
+    "close": "회의 닫기",
+    "demo": "데모",
+    "viewer": "보는 사람: {{name}}",
+    "reset": "예시 데이터를 처음으로 되돌리기",
+    "pane": {
+      "label": "내 회의를 보는 방법",
+      "list": "목록",
+      "agenda": "일정"
+    },
+    "detailRegion": "회의",
+    "none": {
+      "title": "{{name}} 님의 회의가 없습니다",
+      "detail": "초대받은 회의는 내 일정에 들어옵니다. 지금 회의를 잡을 수도 있습니다."
+    },
+    "form": {
+      "titleRequired": "참석자가 무슨 회의인지 알 수 있게 제목을 입력하세요.",
+      "titleTooLong": "{{max}}자 이하로 입력하세요.",
+      "datePast": "오늘이나 그 뒤의 날짜를 고르세요.",
+      "timeRequired": "시작 시각을 입력하세요.",
+      "attendeesRequired": "참석자를 한 명 이상 고르세요.",
+      "chatMembers": "“{{name}}”의 멤버",
+      "otherPeople": "다른 사람 추가",
+      "heading": "회의 잡기",
+      "fromChat": "채팅 “{{name}}”에서 잡는 회의입니다. 회의는 이 채팅과 연결되지만, 따로 관리됩니다.",
+      "intro": "참석자의 일정에 들어가고, 참석자는 개요를 미리 읽습니다.",
+      "title": "제목",
+      "when": "언제",
+      "later": "날짜와 시각을 정해서",
+      "now": "지금 바로",
+      "date": "날짜",
+      "time": "시작 시각",
+      "length": "길이",
+      "minutes": "{{count}}분",
+      "attendees": "참석자",
+      "place": "장소",
+      "optional": "선택 사항입니다.",
+      "outline": "사전 개요",
+      "outlineHelp": "이 회의에서 정해야 할 것을 적습니다. 참석자가 오기 전에 읽습니다.",
+      "materials": "회의 자료",
+      "materialsHelp": "한 줄에 파일이나 링크의 이름을 하나씩 적습니다.",
+      "submit": "회의 잡기"
+    },
+    "cancel": "취소",
+    "day": {
+      "today": "오늘",
+      "tomorrow": "내일",
+      "yesterday": "어제"
+    },
+    "due": "기한 {{date}}",
+    "elapsed": {
+      "hours": "{{h}}시간 {{m}}분",
+      "minutes": "{{m}}분 {{s}}초",
+      "seconds": "{{s}}초"
+    },
+    "status": {
+      "todo": "할 일",
+      "inProgress": "진행 중",
+      "done": "완료"
+    },
+    "chat": {
+      "setUp": "{{name}} 님이 회의를 잡았습니다: {{title}}",
+      "open": "회의 열기"
+    },
+    "save": "저장",
+    "prep": {
+      "outline": "사전 개요",
+      "edit": "개요와 자료 고치기",
+      "noOutlineHost": "개요가 아직 없습니다. 참석자가 미리 읽을 수 있게 이 회의에서 정할 것을 적어 두세요.",
+      "write": "개요 적기",
+      "noOutline": "주최자가 아직 개요를 넣지 않았습니다.",
+      "materials": "회의 자료"
+    },
+    "bot": {
+      "minutesReady": "**{{title}}** 회의록이 준비됐습니다.",
+      "proposalsFollow": "아래는 내 몫으로 보이는 일입니다. 받으면 “할 일” 상태의 내 업무가 됩니다.",
+      "noProposals": "이 회의에서 내 몫으로 보이는 일은 없습니다.",
+      "sharedMessage": "{{name}} 님이 **{{title}}** 회의록 전체를 공유했습니다. 이 회의에는 참석하지 않으셨습니다.",
+      "assignedMessage": "{{name}} 님이 **{{title}}**에서 나온 업무를 할당했습니다. 회의에 참석하지 않으셔서, 이 일이 나온 부분을 함께 보냅니다.",
+      "name": "회의 bot",
+      "askAbout": "“{{title}}”에 대해 묻기",
+      "askNone": "회의록을 받은 뒤에 물을 수 있습니다",
+      "about": "{{name}} 님에게 회의록과 내 몫으로 보이는 업무를 보냅니다",
+      "aboutOutside": "{{name}} 님에게 할당된 업무와 그 일이 나온 부분을 보냅니다. 회의록 전체는 카드에서 요청하면 볼 수 있습니다.",
+      "sample": "예시 대화",
+      "emptyTitle": "아직 받은 메시지가 없습니다",
+      "emptyDetail": "참석한 회의의 녹음이 끝나면 회의록이 여기로 옵니다. 회의에서 나에게 할당된 업무도 여기로 옵니다.",
+      "minutesCard": "회의록",
+      "openMinutes": "회의록 열기",
+      "sharedBy": "{{name}} 님이 공유함",
+      "sentTo": "회의에 있던 {{count}}명 모두에게 보냄",
+      "givenToOther": "{{name}} 님에게 할당됨",
+      "taken": "내 업무 · {{status}}",
+      "assignedByHost": "{{name}} 님이 할당함 · {{status}}",
+      "declined": "내 몫이 아니라고 답함",
+      "proposalCard": "내 몫으로 보이는 일",
+      "choiceHelp": "“받기”를 누르면 “할 일” 상태의 내 업무가 됩니다. “아님”을 누르면 {{name}} 님에게 “내 몫이 아님”으로 보이고, 주최자가 다른 사람에게 줄 수 있습니다.",
+      "declinedHelp": "{{name}} 님의 회의록 화면에 “내 몫 아님”으로 보입니다.",
+      "assignedHelp": "주최자인 {{name}} 님이 할당했습니다. 받기 단계는 없습니다.",
+      "assignedCard": "“{{title}}”에서 나온 내 업무",
+      "rowMinutes": "회의록: {{title}}",
+      "rowShared": "공유받은 회의록: {{title}}",
+      "rowTask": "새 업무: {{title}}",
+      "rowEmpty": "회의록과 내 업무가 여기로 옵니다"
+    },
+    "source": "근거 문장 보기",
+    "ask": {
+      "send": "묻기",
+      "noAnswer": "이 회의에서 그 내용은 찾지 못했습니다. 회의에서 나온 낱말로 다시 묻거나, 전체 전사문에서 찾아보세요.",
+      "label": "이 회의에 대해 회의 bot에게 묻기",
+      "suggestions": "예를 들면:"
+    },
+    "followUps": {
+      "title": "후속 업무",
+      "counts": "모두 {{total}}개 · 할 일 {{todo}} · 진행 중 {{inProgress}} · 완료 {{done}} · 아직 업무가 아님 {{open}}",
+      "include": "“{{text}}”을(를) 업무로 만들기",
+      "mine": "내 몫",
+      "accepted": "본인이 받음",
+      "assigned": "주최자가 할당함",
+      "proposedTo": "{{name}} 님에게 제안함",
+      "stateDeclined": "내 몫 아님",
+      "stateWaiting": "답 기다리는 중",
+      "owner": "“{{text}}”의 담당자",
+      "chooseOwner": "담당자 고르기",
+      "assignedToast": "업무 {{count}}개를 “할 일” 상태로 만들었습니다. 회의 bot이 담당자 {{people}}명에게 알렸습니다.",
+      "assignAll": "업무 {{count}}개 만들고 할당하기",
+      "assignWho": "담당자 {{people}}명에게 회의 bot이 알립니다. 에이전트가 뽑은 초안이니, 틀린 줄만 담당자를 바꾸거나 체크를 푸세요."
+    },
+    "openTask": "업무 열기",
+    "notMine": "아님",
+    "accept": "받기",
+    "acceptAfterAll": "다시 받기",
+    "excerpt": {
+      "scope": "이 회의에 참석하지 않아서, 내 업무와 그 업무가 나온 부분만 보입니다. 회의록 전체는 주최자나 참석자가 공유하면 볼 수 있습니다.",
+      "task": "내 업무",
+      "assignedBy": "{{name}} 님이 할당함"
+    },
+    "backToList": "목록으로 돌아가기",
+    "detail": {
+      "people": "주최 {{host}} · 참석 {{attendees}}",
+      "origin": "채팅 “{{name}}”에서 잡은 회의"
+    },
+    "response": {
+      "yes": "참석",
+      "no": "불참",
+      "none": "답 없음",
+      "label": "“{{title}}”에 참석하나요?"
+    },
+    "minutes": {
+      "depth": "얼마나 읽을지",
+      "brief": "30초",
+      "summary": "2분",
+      "full": "전체",
+      "ask": "묻기",
+      "decisions": "결정 사항",
+      "summaryHelp": "문장을 누르면 그 말이 나온 순간으로 갑니다.",
+      "find": "전사문에서 찾기",
+      "found": "발언 {{total}}개 중 {{count}}개",
+      "turns": "발언 {{total}}개",
+      "notFound": "맞는 발언이 없습니다. 더 짧은 낱말로 찾아보세요."
+    },
+    "share": {
+      "done": "회의 bot이 {{name}} 님에게 회의록 전체의 링크를 보냈습니다.",
+      "scope": "회의에 있던 {{count}}명이 회의록 전체를 봅니다. 참석하지 않은 담당자는 자기 업무와 그 근거 문장만 봅니다.",
+      "sharedWith": "링크로 공유한 사람: {{names}}.",
+      "button": "링크 공유",
+      "request": "{{name}} 님이 회의록 전체를 보고 싶어 합니다.",
+      "decline": "나중에",
+      "approve": "승인",
+      "requestDeclined": "{{name}} 님이 회의록 전체를 공유하지 않았습니다.",
+      "requested": "요청했습니다. {{name}} 님의 회의록 화면에 요청이 보입니다.",
+      "requestButton": "회의록 보기 요청"
+    },
+    "agenda": {
+      "previousWeek": "이전 주",
+      "thisWeek": "이번 주",
+      "nextWeek": "다음 주",
+      "noMeetings": "일정 없음",
+      "host": "주최 {{name}}"
+    },
+    "state": {
+      "recording": "지금 녹음 중",
+      "scheduled": "예정",
+      "minutes": "회의록 있음",
+      "minutesFollowUps": "회의록 있음 · 후속 업무 {{total}}개 중 {{done}}개 완료",
+      "myTasks": "여기서 나온 내 업무 {{count}}개"
+    },
+    "list": {
+      "shared": "공유받은 회의록",
+      "hosting": "내가 주최한 회의",
+      "attending": "내가 참석하는 회의",
+      "assigned": "내 업무가 나온 회의",
+      "empty": "아직 회의가 없습니다. 주최하거나 초대받은 회의가 여기와 내 일정에 나타납니다."
+    },
+    "notice": {
+      "recordingTitle": "녹음이 시작됐습니다",
+      "recordingBody": "{{name}} 님이 “{{title}}”을(를) 녹음하고 있습니다. 끝날 때까지 아래 상태 줄에 표시됩니다.",
+      "minutesTitle": "회의 bot: 회의록이 도착했습니다",
+      "sharedTitle": "회의 bot: 회의록을 공유받았습니다",
+      "taskTitle": "회의 bot: 새 업무가 할당됐습니다",
+      "openMessage": "메시지 열기",
+      "requestTitle": "{{name}} 님의 회의록 보기 요청",
+      "openRequest": "요청 보기",
+      "soonTitle": "{{count}}분 뒤에 시작합니다",
+      "openOutline": "개요 읽기",
+      "dismiss": "닫기"
+    },
+    "task": {
+      "from": "회의 “{{title}}”에서 나온 일 · {{day}}",
+      "source": "근거 문장 보기"
+    }
+  },
   "chats": {
     "delete": {
       "updateHost": "채팅을 삭제하려면 {{host}}을(를) 업데이트하세요",
@@ -29155,20 +29380,20 @@
       "budgetDone": "· 캠페인 예산표를 고쳤습니다",
       "quarterSummary": "· 지난 분기 캠페인 성과를 요약했습니다",
       "inquiryCounts": "· 지난주 문의 건수를 표로 정리했습니다",
-      "opsMinutes": "· 운영 점검의 회의록을 정리했습니다",
       "inquiriesDraft": "· “이번 달 고객 문의 유형 정리”의 초안을 올렸습니다",
       "noticeStop": "· 물류팀의 회신이 없어 “배송 지연 안내문 고치기”를 멈췄습니다",
       "researchStart": "· “경쟁사 프로모션 조사”를 시작했습니다",
-      "minutes": "· 주간 회의의 회의록을 정리했습니다 · 내 몫 2건",
       "copyDraft": "· 출시 페이지 머리 문구 두 안을 올리고 내 선택을 기다립니다",
       "draftsUp": "· 브랜드 가이드 시안 2안을 올렸습니다",
       "researchTable": "· 경쟁사 두 곳의 프로모션을 표로 정리했습니다",
-      "reviewMinutes": "· 시안 리뷰의 회의록을 정리했습니다",
       "researchDone": "· “경쟁사 프로모션 조사”를 끝냈습니다",
       "me": "나",
       "answered": "· 답을 골랐습니다: {{choice}}",
-      "meetingStarted": "· 회의를 시작했습니다. 회의 봇이 기록하고 있습니다",
-      "wrappedUp": "· 오늘 정리에서 업데이트 {{count}}건을 확인했습니다"
+      "meetingStarted": "· 회의를 시작했습니다. 회의 에이전트가 기록하고 있습니다",
+      "wrappedUp": "· 오늘 정리에서 업데이트 {{count}}건을 확인했습니다",
+      "minutesSent": "· 「{{title}}」의 회의록을 {{count}}명에게 보냈습니다",
+      "tookFollowUp": "· 회의 「{{title}}」의 「{{task}}」를 내 업무로 받았습니다",
+      "assignedFollowUp": "· 회의 「{{title}}」의 「{{task}}」를 나에게 할당했습니다"
     },
     "agents": {
       "waiting": "내 답을 기다림",
@@ -29192,15 +29417,15 @@
       "sampleChat": "예시 에이전트입니다. 대화의 마지막 줄을 보여 줍니다."
     },
     "header": {
-      "morning": "좋은 아침입니다, 마코 님",
-      "day": "안녕하세요, 마코 님",
-      "evening": "오늘도 수고하셨습니다, 마코 님",
+      "morning": "좋은 아침입니다, {{name}} 님",
+      "day": "안녕하세요, {{name}} 님",
+      "evening": "오늘도 수고하셨습니다, {{name}} 님",
       "handOff": "에이전트에게 맡기기",
       "line": "오늘 내 업무와, 에이전트가 한 일입니다.",
-      "endMeeting": "회의 끝내기",
       "startMeeting": "회의 시작",
       "newTask": "새 업무",
-      "meetingNote": "회의 봇이 기록하고 있습니다. 회의 화면이 아직 없어서 이 예시에서는 회의록이 도착하지 않습니다."
+      "me": "마코",
+      "openMeeting": "진행 중인 회의"
     },
     "tiles": {
       "tasks": "내 업무",
@@ -29283,7 +29508,9 @@
       "emptyLate": "늦거나 멈춘 업무가 없습니다.",
       "emptyDone": "아직 끝낸 업무가 없습니다.",
       "answer": "답하기",
-      "openList": "업무 목록 열기"
+      "openList": "업무 목록 열기",
+      "open": "열기",
+      "openMinutes": "회의록 열기"
     },
     "signedOut": {
       "line": "inAX(팀의 업무 관리)에 로그인하면 내 업무, 나를 기다리는 것, 에이전트가 하는 일이 여기에 보입니다."
@@ -29304,45 +29531,30 @@
       "nextWeek": "다음 주",
       "title": "다가오는 일",
       "calendar": "캘린더",
-      "noCalendar": "일정 화면은 아직 없습니다. 이번 주 일정은 이 카드에 모두 있습니다.",
       "deadline": "마감",
-      "noMeetingScreen": "회의의 화면은 아직 없습니다. 준비된 내용은 여기까지입니다.",
-      "weekly": "캠페인 주간 회의",
-      "weeklyMinutes": "회의록 도착 · 내 몫 2건",
-      "weeklyMinutesDetail": "결정: 다음 달 5일에 시작합니다. 머리 문구는 내가 먼저 고르고 김지우 님이 승인합니다.",
-      "weeklyPrep": "안건 준비됨",
-      "weeklyPrepDetail": "안건: 시작 날짜, 머리 문구, 협력사 견적. 회의록은 회의 봇이 정리합니다.",
-      "draftReview": "브랜드 리뉴얼 시안 리뷰",
       "prepReady": "준비 자료 있음",
-      "draftReviewDetail": "준비 자료: 박서연 님의 시안 2안, 지난 리뷰의 결정 3건.",
-      "opsWeekly": "운영 주간 점검",
-      "opsWeeklyDetail": "준비 자료: 지난주 문의 건수, 아직 고치지 못한 배송 지연 안내문.",
       "endOfDay": "퇴근 전",
-      "midCheck": "캠페인 중간 점검",
       "noPrep": "준비 자료 아직 없음",
-      "midCheckDetail": "회의 봇이 하루 전에 안건을 준비합니다."
+      "recording": "녹음 중",
+      "minutesMine": "회의록 도착 · 내 몫 {{count}}건",
+      "minutesWaiting": "회의록 도착 · 내 확인 필요"
     },
     "agent": {
       "research": "자료 조사 에이전트",
       "writer": "문서 작성 에이전트",
       "triage": "문의 분류 에이전트",
-      "meeting": "회의 봇",
+      "meeting": "회의 에이전트",
       "justNow": "방금",
       "researchDoneLine": "경쟁사 세 곳을 모두 표에 넣었습니다. 읽어 보실 수 있습니다.",
       "researchLine": "두 곳은 정리를 끝냈습니다. 마지막 한 곳의 할인 조건을 확인하고 있습니다.",
       "writerLine1": "머리 문구 두 안을 올렸습니다. A안은 만남을, B안은 빠름을 앞에 둡니다.",
       "writerLine2": "고르시면 본문과 버튼의 문구를 그 안에 맞추겠습니다.",
-      "meetingDoing": "캠페인 주간 회의의 회의록",
-      "meetingLine": "회의록을 정리했습니다. 마코 님의 몫은 2건입니다.",
       "triageLine1": "안내문을 고치려면 새 배송 일정이 필요합니다.",
-      "triageLine2": "이도윤 님이 물류팀에 다시 물었습니다. 회신이 오면 이어서 하겠습니다.",
+      "triageLine2": "이민아 님이 물류팀에 다시 물었습니다. 회신이 오면 이어서 하겠습니다.",
       "calendar": "일정 정리 봇",
       "calendarDoing": "맡은 일 없음",
       "calendarLine": "다음 주 일정이 바뀌면 알려 드리겠습니다.",
-      "recording": "내가 시작한 회의를 기록하는 중"
-    },
-    "person": {
-      "seoyeon": "박서연"
+      "recording": "「{{title}}」 녹음 중"
     },
     "task": {
       "copy": "출시 페이지 머리 문구 확정",
@@ -29362,19 +29574,18 @@
       "researchDetail": "자료 조사 에이전트가 경쟁사 3곳의 프로모션을 표 하나로 정리하고 있습니다.",
       "review": "브랜드 가이드 시안에 의견 남기기",
       "reviewDue": "오늘 15:00 전",
-      "reviewDetail": "박서연 님이 시안 2안을 올렸습니다. 15:00 시안 리뷰 전에 의견을 남깁니다.",
-      "offer": "주간 회의의 내 몫 2건 받기",
-      "offerWho": "내 답을 기다림 · 회의 봇",
-      "offerQuestion": "회의록에서 내 몫으로 정리된 2건을 내 업무에 넣을까요?",
+      "reviewDetail": "최현우 님이 시안 2안을 올렸습니다. 15:00 시안 리뷰 전에 의견을 남깁니다.",
+      "offer": "「{{title}}」의 내 몫 {{count}}건",
+      "offerWho": "내 답을 기다림 · 회의 에이전트",
+      "offerQuestion": "회의록에서 내 몫으로 정리된 {{count}}건을 내 업무에 넣을까요?",
       "offerAccept": "내 업무에 넣기",
       "offerDecline": "내 일이 아님",
-      "offerDetail": "캠페인 주간 회의에서: 협력사 견적 두 곳 비교, 다음 주 일정을 캠페인 일정표에 반영.",
       "inquiriesWho": "초안이 올라옴 · 문의 분류 에이전트",
       "inquiriesDetail": "문의 분류 에이전트가 문의 214건을 6개 유형으로 나눴습니다. 초안을 읽고 틀린 곳만 고칩니다.",
       "notice": "배송 지연 안내문 고치기",
       "dueWas": "{{day}} 마감",
       "noticeWho": "회신 대기 · 물류팀",
-      "noticeDetail": "안내문에는 새 배송 일정이 필요합니다. 이도윤 님이 오늘 아침에 물류팀에 다시 물었습니다.",
+      "noticeDetail": "안내문에는 새 배송 일정이 필요합니다. 이민아 님이 오늘 아침에 물류팀에 다시 물었습니다.",
       "report": "지난달 캠페인 결과 보고서 공유",
       "reportDetail": "보고서는 다 썼습니다. 김지우 님이 이번 주 안에 달라고 했습니다.",
       "newsletter": "이번 달 뉴스레터 발송 목록 확인",
@@ -29383,17 +29594,21 @@
       "budget": "캠페인 예산표 고치기",
       "finishedConfirmed": "{{day}} 끝냄 · 내가 확인함",
       "budgetDetail": "문서 작성 에이전트가 고쳤고, 숫자는 내가 확인했습니다.",
-      "followDetail": "캠페인 주간 회의에서 나온 업무입니다.",
-      "quotes": "협력사 견적 두 곳 비교",
-      "schedule": "다음 주 일정을 캠페인 일정표에 반영",
       "resumed": "에이전트 작업 중 · 내 답을 받아 이어감",
       "addedDetail": "여기에서 내가 추가한 업무입니다.",
-      "addedAgent": "에이전트 작업 중 · 방금 맡김"
+      "addedAgent": "에이전트 작업 중 · 방금 맡김",
+      "fromMeetingAccepted": "회의 「{{title}}」에서 나온 후속 업무입니다. 회의 에이전트가 제안했고 {{name}} 님이 받았습니다.",
+      "fromMeetingAssigned": "회의 「{{title}}」에서 나온 후속 업무입니다. {{host}} 님이 {{name}} 님에게 할당했습니다.",
+      "organise": "「{{title}}」의 후속 업무 {{count}}건 정리",
+      "organiseWho": "내 정리를 기다림 · 회의 에이전트",
+      "request": "{{name}} 님의 「{{title}}」 회의록 보기 요청",
+      "requestWho": "내 승인을 기다림"
     },
     "project": {
       "campaign": "신제품 출시 캠페인",
       "support": "고객 지원 운영",
-      "brand": "브랜드 리뉴얼"
+      "brand": "브랜드 리뉴얼",
+      "promo": "연말 프로모션"
     },
     "report": {
       "copy": "문서 작성 에이전트가 머리 문구 두 안을 썼습니다. 나는 아직 고르지 않았습니다.",
@@ -29404,6 +29619,9 @@
       "done": "내가 이 업무를 끝냈습니다.",
       "copyChosen": "문서 작성 에이전트가 머리 문구 두 안을 썼고, 내가 그중 하나를 골랐습니다. 에이전트가 본문과 버튼의 문구를 그 안에 맞추고 있습니다.",
       "mine": "내가 오늘 이 업무를 진행했습니다."
+    },
+    "person": {
+      "hyunwoo": "최현우"
     }
   },
   "taskLoop": {
@@ -29457,7 +29675,9 @@
       "project": "프로젝트",
       "start": "에이전트와 시작",
       "status": "상태",
-      "who": "지금 맡은 쪽"
+      "who": "지금 맡은 쪽",
+      "assignee": "담당자",
+      "origin": "나온 곳"
     },
     "gate": {
       "line": "inAX(팀의 업무 관리)에 로그인하면 내 업무가 여기에 보입니다."

@@ -31447,6 +31447,231 @@
     "signIn": "Sign in",
     "home": "Home"
   },
+  "meetings": {
+    "recording": {
+      "statusAria": "{{title}} is being recorded. Open the meeting.",
+      "on": "Recording",
+      "everyoneSees": "All {{count}} people in the meeting see this.",
+      "hostIdle": "Start recording when the meeting begins.",
+      "attendeeIdle": "When the host starts recording, it shows here and in the status bar.",
+      "start": "Start recording",
+      "sent": "The meeting bot sent the minutes to all {{count}} people in the meeting.",
+      "stop": "End recording",
+      "simulated": "This build does not capture sound. When you end the recording, prepared sample minutes are made and sent to the attendees."
+    },
+    "title": "Meetings",
+    "schedule": "Set up a meeting",
+    "close": "Close Meetings",
+    "demo": "Demo",
+    "viewer": "Seen as {{name}}",
+    "reset": "Start the sample data over",
+    "pane": {
+      "label": "How to see my meetings",
+      "list": "List",
+      "agenda": "Schedule"
+    },
+    "detailRegion": "Meeting",
+    "none": {
+      "title": "No meetings for {{name}}",
+      "detail": "A meeting you are invited to appears on your schedule. You can also set one up now."
+    },
+    "form": {
+      "titleRequired": "Enter a title so attendees know what the meeting is for.",
+      "titleTooLong": "Use {{max}} characters or fewer.",
+      "datePast": "Choose today or a later date.",
+      "timeRequired": "Enter a start time.",
+      "attendeesRequired": "Choose at least one attendee.",
+      "chatMembers": "Members of “{{name}}”",
+      "otherPeople": "Add someone else",
+      "heading": "Set up a meeting",
+      "fromChat": "From the chat “{{name}}”. The meeting links back to it; it stays its own item.",
+      "intro": "Attendees get it on their own schedule and can read the outline first.",
+      "title": "Title",
+      "when": "When",
+      "later": "On a date and time",
+      "now": "Right now",
+      "date": "Date",
+      "time": "Start time",
+      "length": "Length",
+      "minutes": "{{count}} min",
+      "attendees": "Attendees",
+      "place": "Place",
+      "optional": "Optional.",
+      "outline": "Outline",
+      "outlineHelp": "What the meeting must settle. Attendees read this before they come.",
+      "materials": "Materials",
+      "materialsHelp": "One file or link name on each line.",
+      "submit": "Set up meeting"
+    },
+    "cancel": "Cancel",
+    "day": {
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "yesterday": "Yesterday"
+    },
+    "due": "Due {{date}}",
+    "elapsed": {
+      "hours": "{{h}} hr {{m}} min",
+      "minutes": "{{m}} min {{s}} sec",
+      "seconds": "{{s}} sec"
+    },
+    "status": {
+      "todo": "To do",
+      "inProgress": "In progress",
+      "done": "Done"
+    },
+    "chat": {
+      "setUp": "{{name}} set up a meeting: {{title}}",
+      "open": "Open the meeting"
+    },
+    "save": "Save",
+    "prep": {
+      "outline": "Outline",
+      "edit": "Edit outline and materials",
+      "noOutlineHost": "No outline yet. Write what the meeting must settle so attendees can read it first.",
+      "write": "Write the outline",
+      "noOutline": "The host has not added an outline yet.",
+      "materials": "Materials"
+    },
+    "bot": {
+      "minutesReady": "The minutes of **{{title}}** are ready.",
+      "proposalsFollow": "Below is what looks like yours. Take it and it becomes your task in To do.",
+      "noProposals": "Nothing in this meeting looks like yours.",
+      "sharedMessage": "{{name}} shared the full minutes of **{{title}}** with you. You were not in the meeting.",
+      "assignedMessage": "{{name}} assigned you a task from **{{title}}**. You were not in the meeting, so I am sending the part it came from.",
+      "name": "Meeting bot",
+      "askAbout": "Ask about “{{title}}”",
+      "askNone": "You can ask once you have minutes",
+      "about": "Sends {{name}} the minutes and the tasks that look like theirs",
+      "aboutOutside": "Sends {{name}} assigned tasks and the part they came from. Ask on a card to see the full minutes.",
+      "sample": "Sample conversation",
+      "emptyTitle": "No messages yet",
+      "emptyDetail": "When a meeting you are in ends its recording, the minutes come here. So do tasks assigned to you from a meeting.",
+      "minutesCard": "Minutes",
+      "openMinutes": "Open the minutes",
+      "sharedBy": "Shared with you by {{name}}",
+      "sentTo": "Sent to all {{count}} people in the meeting",
+      "givenToOther": "Assigned to {{name}}",
+      "taken": "Yours · {{status}}",
+      "assignedByHost": "Assigned by {{name}} · {{status}}",
+      "declined": "You said this is not yours",
+      "proposalCard": "This looks like yours",
+      "choiceHelp": "“Take it” makes it your task in To do. “Not mine” shows {{name}} that it is not yours, so the host can give it to someone else.",
+      "declinedHelp": "{{name}} sees it as “not theirs” on the minutes.",
+      "assignedHelp": "{{name}} assigned this as the host, so there is nothing to accept.",
+      "assignedCard": "A task for you from “{{title}}”",
+      "rowMinutes": "Minutes: {{title}}",
+      "rowShared": "Shared minutes: {{title}}",
+      "rowTask": "New task: {{title}}",
+      "rowEmpty": "Minutes and your tasks arrive here"
+    },
+    "source": "Where it was said",
+    "ask": {
+      "send": "Ask",
+      "noAnswer": "I did not find that in this meeting. Try a word that was said, or search the full transcript.",
+      "label": "Ask the meeting bot about this meeting",
+      "suggestions": "For example:"
+    },
+    "followUps": {
+      "title": "Follow-up tasks",
+      "counts": "{{total}} in all · To do {{todo}} · In progress {{inProgress}} · Done {{done}} · Not a task yet {{open}}",
+      "include": "Make “{{text}}” a task",
+      "mine": "Mine",
+      "accepted": "Taken by the owner",
+      "assigned": "Assigned by the host",
+      "proposedTo": "Proposed to {{name}}",
+      "stateDeclined": "Says not theirs",
+      "stateWaiting": "No answer yet",
+      "owner": "Owner of “{{text}}”",
+      "chooseOwner": "Choose owner",
+      "assignedToast": "{{count}} tasks created in To do. The meeting bot told {{people}} owners.",
+      "assignAll": "Create {{count}} tasks and assign",
+      "assignWho": "The meeting bot tells the {{people}} owners. The agent drafted these: change an owner or untick a line that is wrong."
+    },
+    "openTask": "Open task",
+    "notMine": "Not mine",
+    "accept": "Take it",
+    "acceptAfterAll": "Take it after all",
+    "excerpt": {
+      "scope": "You were not in this meeting, so you see your task and the part of the meeting it came from. The host or an attendee can share the full minutes with you.",
+      "task": "My task",
+      "assignedBy": "Assigned by {{name}}"
+    },
+    "backToList": "Back to the list",
+    "detail": {
+      "people": "Host {{host}} · Attendees {{attendees}}",
+      "origin": "Set up from the chat “{{name}}”"
+    },
+    "response": {
+      "yes": "Coming",
+      "no": "Not coming",
+      "none": "No answer",
+      "label": "Will you come to “{{title}}”?"
+    },
+    "minutes": {
+      "depth": "How much to read",
+      "brief": "30 seconds",
+      "summary": "2 minutes",
+      "full": "Everything",
+      "ask": "Ask",
+      "decisions": "Decisions",
+      "summaryHelp": "Select a sentence to go to the moment it was said.",
+      "find": "Find in the transcript",
+      "found": "{{count}} of {{total}} turns",
+      "turns": "{{total}} turns",
+      "notFound": "Nothing said matches. Try a shorter word."
+    },
+    "share": {
+      "done": "The meeting bot sent {{name}} the link to the full minutes.",
+      "scope": "The {{count}} people who were in the meeting see the full minutes. An assignee who was not there sees only their task and the sentence it came from.",
+      "sharedWith": "Shared by link with {{names}}.",
+      "button": "Share link",
+      "request": "{{name}} asks to see the full minutes.",
+      "decline": "Not now",
+      "approve": "Approve",
+      "requestDeclined": "{{name}} did not share the full minutes.",
+      "requested": "Asked. {{name}} sees your request on the minutes.",
+      "requestButton": "Ask to see the full minutes"
+    },
+    "agenda": {
+      "previousWeek": "Previous week",
+      "thisWeek": "This week",
+      "nextWeek": "Next week",
+      "noMeetings": "No meetings",
+      "host": "Host {{name}}"
+    },
+    "state": {
+      "recording": "Recording now",
+      "scheduled": "Scheduled",
+      "minutes": "Minutes ready",
+      "minutesFollowUps": "Minutes ready · {{done}} of {{total}} follow-ups done",
+      "myTasks": "My tasks from it: {{count}}"
+    },
+    "list": {
+      "shared": "Minutes shared with me",
+      "hosting": "Meetings I host",
+      "attending": "Meetings I attend",
+      "assigned": "Meetings my tasks came from",
+      "empty": "No meetings yet. A meeting you host or are invited to appears here and on your schedule."
+    },
+    "notice": {
+      "recordingTitle": "Recording has started",
+      "recordingBody": "{{name}} is recording “{{title}}”. It stays in the status bar until it ends.",
+      "minutesTitle": "Meeting bot: the minutes are here",
+      "sharedTitle": "Meeting bot: minutes were shared with you",
+      "taskTitle": "Meeting bot: a task was assigned to you",
+      "openMessage": "Open the message",
+      "requestTitle": "{{name}} asks to see the minutes",
+      "openRequest": "See the request",
+      "soonTitle": "Starts in {{count}} minutes",
+      "openOutline": "Read the outline",
+      "dismiss": "Dismiss"
+    },
+    "task": {
+      "from": "From the meeting “{{title}}” · {{day}}",
+      "source": "See where it was said"
+    }
+  },
   "chats": {
     "delete": {
       "updateHost": "Update {{host}} to delete chats",
@@ -31529,20 +31754,20 @@
       "budgetDone": "updated the campaign budget sheet",
       "quarterSummary": "summarised last quarter’s campaign results",
       "inquiryCounts": "put last week’s inquiry counts into a table",
-      "opsMinutes": "wrote the operations check minutes",
       "inquiriesDraft": "drafted “Sort this month’s customer inquiries by type”",
       "noticeStop": "stopped “Revise the delivery delay notice”: no reply from logistics",
       "researchStart": "started “Survey competitors’ promotions”",
-      "minutes": "wrote the weekly meeting minutes · 2 items for me",
       "copyDraft": "drafted two launch page headlines and asked me to choose",
       "draftsUp": "uploaded two brand guide drafts",
       "researchTable": "put two competitors’ promotions into a table",
-      "reviewMinutes": "wrote the draft review minutes",
       "researchDone": "finished “Survey competitors’ promotions”",
       "me": "I",
       "answered": "answered: {{choice}}",
-      "meetingStarted": "started a meeting; the meeting bot is recording",
-      "wrappedUp": "confirmed {{count}} updates in Wrap up today"
+      "meetingStarted": "started a meeting; the meeting agent is recording",
+      "wrappedUp": "confirmed {{count}} updates in Wrap up today",
+      "minutesSent": "sent the minutes of “{{title}}” to {{count}} people",
+      "tookFollowUp": "took “{{task}}” from the meeting “{{title}}”",
+      "assignedFollowUp": "assigned me “{{task}}” from the meeting “{{title}}”"
     },
     "agents": {
       "waiting": "Waiting for my answer",
@@ -31566,15 +31791,15 @@
       "sampleChat": "Sample agent: these are the last lines of its conversation."
     },
     "header": {
-      "morning": "Good morning, Mako",
-      "day": "Hello, Mako",
-      "evening": "Good work today, Mako",
+      "morning": "Good morning, {{name}}",
+      "day": "Hello, {{name}}",
+      "evening": "Good work today, {{name}}",
       "handOff": "Hand to an agent",
       "line": "My work today, and what my agents did.",
-      "endMeeting": "End meeting",
       "startMeeting": "Start meeting",
       "newTask": "New task",
-      "meetingNote": "The meeting bot is recording. There is no meeting page yet, so minutes do not arrive in this sample."
+      "me": "Mako",
+      "openMeeting": "Meeting in progress"
     },
     "tiles": {
       "tasks": "My work",
@@ -31657,7 +31882,9 @@
       "emptyLate": "Nothing is late or blocked.",
       "emptyDone": "Nothing finished yet.",
       "answer": "Answer",
-      "openList": "Open the task list"
+      "openList": "Open the task list",
+      "open": "Open",
+      "openMinutes": "Open the minutes"
     },
     "signedOut": {
       "line": "Sign in with inAX (the team’s work tracker) to see your work, what waits on you, and what your agents are doing."
@@ -31678,45 +31905,33 @@
       "nextWeek": "Next week",
       "title": "Coming up",
       "calendar": "Calendar",
-      "noCalendar": "There is no calendar page yet. Everything scheduled this week is in this card.",
       "deadline": "Deadline",
-      "noMeetingScreen": "A meeting has no page of its own yet; this is what is ready.",
-      "weekly": "Campaign weekly meeting",
-      "weeklyMinutes": "Minutes arrived · 2 items for me",
-      "weeklyMinutesDetail": "Decided: launch on the 5th of next month. Kim Jiwoo approves the headline; you choose it first.",
-      "weeklyPrep": "Agenda ready",
-      "weeklyPrepDetail": "Agenda: launch date, headline, vendor quotes. The meeting bot will take the minutes.",
-      "draftReview": "Brand renewal draft review",
       "prepReady": "Prep ready",
-      "draftReviewDetail": "Prep: Park Seoyeon’s two drafts and the three decisions from the last review.",
-      "opsWeekly": "Operations weekly check",
-      "opsWeeklyDetail": "Prep: last week’s inquiry counts and the open delivery delay notice.",
       "endOfDay": "End of day",
-      "midCheck": "Campaign mid-point check",
       "noPrep": "No prep yet",
-      "midCheckDetail": "The meeting bot prepares the agenda the day before."
+      "recording": "Recording now",
+      "minutesMine": "Minutes arrived · {{count}} items for me",
+      "minutesWaiting": "Minutes arrived · waiting for me"
     },
     "agent": {
       "research": "Research agent",
       "writer": "Writing agent",
       "triage": "Inquiry agent",
-      "meeting": "Meeting bot",
+      "meeting": "Meeting agent",
       "justNow": "Just now",
       "researchDoneLine": "All three competitors are in the table. It is ready for you to read.",
       "researchLine": "Two competitors are done. I am checking the discount terms of the last one.",
       "writerLine1": "I uploaded two headlines. A leads with the meeting, B with speed.",
       "writerLine2": "When you choose, I will match the body text and the button to it.",
-      "meetingDoing": "Minutes of the campaign weekly meeting",
-      "meetingLine": "The minutes are ready. Two items are yours.",
       "triageLine1": "I need the new delivery dates to revise the notice.",
-      "triageLine2": "Lee Doyun asked the logistics team again. I continue when they reply.",
+      "triageLine2": "Lee Mina asked the logistics team again. I continue when they reply.",
       "calendar": "Schedule bot",
       "calendarDoing": "Nothing assigned",
       "calendarLine": "I will tell you when next week’s schedule changes.",
-      "recording": "Recording the meeting I started"
+      "recording": "Recording “{{title}}”"
     },
     "person": {
-      "seoyeon": "Park Seoyeon"
+      "hyunwoo": "Choi Hyunwoo"
     },
     "task": {
       "copy": "Settle the launch page headline",
@@ -31736,19 +31951,18 @@
       "researchDetail": "The research agent is putting three competitors’ promotions into one table.",
       "review": "Comment on the brand guide drafts",
       "reviewDue": "Today, before 15:00",
-      "reviewDetail": "Park Seoyeon uploaded two drafts. Leave your comments before the 15:00 draft review.",
-      "offer": "Take my 2 items from the weekly meeting",
-      "offerWho": "Waiting for my answer · Meeting bot",
-      "offerQuestion": "Add the 2 items the minutes give you to My work?",
+      "reviewDetail": "Choi Hyunwoo uploaded two drafts. Leave your comments before the 15:00 draft review.",
+      "offer": "My {{count}} items from “{{title}}”",
+      "offerWho": "Waiting for my answer · Meeting agent",
+      "offerQuestion": "Add the {{count}} items the minutes give you to My work?",
       "offerAccept": "Add to My work",
       "offerDecline": "Not mine",
-      "offerDetail": "From the campaign weekly meeting: compare two vendor quotes; move next week’s dates into the campaign schedule.",
       "inquiriesWho": "Draft ready · Inquiry agent",
       "inquiriesDetail": "The inquiry agent sorted 214 inquiries into 6 types. Read the draft and correct only what is wrong.",
       "notice": "Revise the delivery delay notice",
       "dueWas": "Due {{day}}",
       "noticeWho": "Awaiting a reply · logistics team",
-      "noticeDetail": "The notice needs the new delivery dates. Lee Doyun asked the logistics team again this morning.",
+      "noticeDetail": "The notice needs the new delivery dates. Lee Mina asked the logistics team again this morning.",
       "report": "Share last month’s campaign report",
       "reportDetail": "The report is written. Kim Jiwoo asked for it this week.",
       "newsletter": "Check this month’s newsletter mailing list",
@@ -31757,17 +31971,21 @@
       "budget": "Update the campaign budget sheet",
       "finishedConfirmed": "Finished {{day}} · confirmed by me",
       "budgetDetail": "The writing agent updated it; you confirmed the numbers.",
-      "followDetail": "From the campaign weekly meeting.",
-      "quotes": "Compare two vendor quotes",
-      "schedule": "Move next week’s dates into the campaign schedule",
       "resumed": "Agent working · picked up my answer",
       "addedDetail": "A task I added here.",
-      "addedAgent": "Agent working · just handed over"
+      "addedAgent": "Agent working · just handed over",
+      "fromMeetingAccepted": "A follow-up from the meeting “{{title}}”. The meeting agent offered it and {{name}} took it.",
+      "fromMeetingAssigned": "A follow-up from the meeting “{{title}}”. {{host}} assigned it to {{name}}.",
+      "organise": "Sort {{count}} follow-ups of “{{title}}”",
+      "organiseWho": "Waiting for me to sort them · Meeting agent",
+      "request": "{{name}} asks to see the minutes of “{{title}}”",
+      "requestWho": "Waiting for my approval"
     },
     "project": {
       "campaign": "Product launch campaign",
       "support": "Customer support",
-      "brand": "Brand renewal"
+      "brand": "Brand renewal",
+      "promo": "Year-end promotion"
     },
     "report": {
       "copy": "The writing agent drafted two headlines. I have not chosen one yet.",
@@ -31831,7 +32049,9 @@
       "project": "Project",
       "start": "Start with an agent",
       "status": "Status",
-      "who": "Who has it"
+      "who": "Who has it",
+      "assignee": "Owner",
+      "origin": "Where it came from"
     },
     "gate": {
       "line": "Sign in with inAX (the team’s work tracker) and your tasks appear here."

@@ -15,6 +15,7 @@ import {
   type HomeTaskTab
 } from '@/components/home/home-board'
 import type { HomeProject } from '@/components/home/home-board-mock'
+import { MeetingTaskOrigin } from '@/components/meetings/MeetingTaskCells'
 import { InaxStatusBadge } from './inax-status-badge'
 
 const TABS: HomeTaskTab[] = ['today', 'waiting', 'late', 'done']
@@ -92,6 +93,7 @@ export function TaskPageInaxList({
                         {task.who && task.whoLabel ? (
                           <HomeWhoMarker who={task.who} label={task.whoLabel} />
                         ) : null}
+                        {task.origin ? <MeetingTaskOrigin taskId={task.id} plain /> : null}
                       </span>
                       <span className="min-w-0 @max-[44rem]/home-card:hidden">
                         <HomeProjectDot project={projects[task.project]} />

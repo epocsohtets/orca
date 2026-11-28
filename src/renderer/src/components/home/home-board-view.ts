@@ -15,7 +15,9 @@ import { HOME_LOOP_AGENT_ID, applyHomeTaskLoops } from './home-board-loops'
 import { buildHomeLoopScript, inaxStatusLabels } from './home-task-loop-script'
 import { buildHomeAgents } from './home-board-agents-mock'
 import { buildHomeActivity, type HomeActivity } from './home-board-activity-mock'
-import { buildHomeFollowUps, buildHomeTasks, type HomeSampleContext } from './home-board-mock'
+import { buildHomeTasks, type HomeSampleContext } from './home-board-mock'
+import { buildHomeMeetings, type HomeMeetingsInput } from './home-board-meetings'
+import { MAKO, personName } from '@/components/meetings/meeting-people'
 import {
   buildHomeDay,
   buildHomeUpcoming,
@@ -40,6 +42,10 @@ export type HomeWrapUpUpdate = { id: string; title: string; text: string; linked
 
 export type HomeBoardView = {
   tasks: HomeTask[]
+  /** Follow-up tasks of meetings I can see that belong to someone else. */
+  otherTasks: HomeTask[]
+  /** The meeting of mine being recorded now, if any. */
+  recordingMeetingId: string | null
   /** Tasks a day record can be linked to. */
   openTasks: HomeTask[]
   counts: HomeBoardCounts
@@ -68,6 +74,7 @@ export function buildHomeBoardView(
     signedIn: boolean
     app: string | undefined
     duration: (minutes: number) => string
+    meetings: HomeMeetingsInput
   }
 ): HomeBoardView {
   const { board, minutes, phase, sampleDay, intlLocale } = args
@@ -86,20 +93,29 @@ export function buildHomeBoardView(
     },
     ago: (at) => formatUiRelativeTime(Math.min(-1, at - minutes) * 60_000, intlLocale)
   }
-  const baseTasks = buildHomeTasks(t, sample)
+  // The written sample is 마코's day. Seen as someone else, the board holds only what the meetings give them.
+  const own = args.meetings.viewerId === MAKO
+  const dayLabel = (dayStart: number): string => {
+    const away = calendarDaysBetween(sampleDay, dayStart)
+    return away === 0
+      ? t('home.task.today', 'Today')
+      : away === 1
+        ? t('home.day.tomorrow', 'tomorrow')
+        : away === -1
+          ? t('home.day.yesterday', 'yesterday')
+          : weekday(dayStart, WEEKDAY_LONG)
+  }
+  const fromMeetings = buildHomeMeetings(t, args.meetings, {
+    sampleDay,
+    minutes,
+    personName,
+    dayLabel,
+    weekday
+  })
+  const baseTasks = own ? buildHomeTasks(t, sample) : []
   const loopAgent = t('taskLoop.agent.name', 'Task agent')
-  const tasks = applyHomeTaskLoops(
-    applyHomeBoardState(baseTasks, buildHomeFollowUps(t, sample), board, {
-      resumed: t('home.task.resumed', 'Agent working · picked up my answer'),
-      addedDue: t('home.task.today', 'Today'),
-      addedDetail: t('home.task.addedDetail', 'A task I added here.'),
-      addedAgent: t('home.task.addedAgent', 'Agent working · just handed over'),
-      doneReport: t('home.report.done', 'I finished this task.')
-    }),
-    board,
-    args.now,
-    (task, loop) => buildHomeLoopScript(t, task, loop),
-    {
+  const withLoops = (list: readonly HomeTask[]): HomeTask[] =>
+    applyHomeTaskLoops(list, board, args.now, (task, loop) => buildHomeLoopScript(t, task, loop), {
       working: (count) =>
         count < 1
           ? t('taskLoop.who.justStarted', 'Agent working · just started')
@@ -115,9 +131,19 @@ export function buildHomeBoardView(
           status: inaxStatusLabels(t)[status]
         }),
       declined: t('taskLoop.who.declined', 'Draft ready · not on inAX yet')
-    }
-  )
-  const recording = board.meetingStartedAt !== null
+    })
+  const tasks = withLoops([
+    ...applyHomeBoardState(baseTasks, board, {
+      resumed: t('home.task.resumed', 'Agent working · picked up my answer'),
+      addedDue: t('home.task.today', 'Today'),
+      addedDetail: t('home.task.addedDetail', 'A task I added here.'),
+      addedAgent: t('home.task.addedAgent', 'Agent working · just handed over'),
+      doneReport: t('home.report.done', 'I finished this task.')
+    }),
+    ...fromMeetings.waiting,
+    ...fromMeetings.tasks
+  ])
+  const recording = fromMeetings.recording !== null
   const loopAgents: HomeAgent[] = tasks.flatMap((task) =>
     task.loop
       ? [
@@ -141,12 +167,17 @@ export function buildHomeBoardView(
       : []
   )
   const agents = orderHomeAgents(
-    [...loopAgents, ...buildHomeAgents(t, tasks, sample)],
+    [
+      ...loopAgents,
+      ...buildHomeAgents(t, tasks, sample, fromMeetings.agent).filter(
+        (agent) => own || agent.id === 'meeting'
+      )
+    ],
     tasks,
     recording,
     {
       resumedLast: t('home.agent.justNow', 'Just now'),
-      recording: t('home.agent.recording', 'Recording the meeting I started')
+      recording: fromMeetings.agent.doing
     }
   )
 
@@ -162,7 +193,7 @@ export function buildHomeBoardView(
         who: me,
         text: t('home.activity.answered', 'answered: {{choice}}', { choice: choice?.label ?? '' }),
         byAgent: false,
-        taskId: task?.meetingId ? undefined : taskId
+        taskId
       }
     }),
     ...Object.entries(board.loops).flatMap(([taskId, loop]) =>
@@ -187,7 +218,7 @@ export function buildHomeBoardView(
           ]
         : []
     ),
-    ...(recording
+    ...(fromMeetings.recording
       ? [
           {
             id: 'meeting-started',
@@ -196,10 +227,10 @@ export function buildHomeBoardView(
             who: me,
             text: t(
               'home.activity.meetingStarted',
-              'started a meeting; the meeting bot is recording'
+              'started a meeting; the meeting agent is recording'
             ),
             byAgent: false,
-            agentId: 'meeting'
+            meetingId: fromMeetings.recording.id
           }
         ]
       : []),
@@ -220,10 +251,13 @@ export function buildHomeBoardView(
   ]
   // My answer is the confirmation of the work that asked for it.
   const confirmedByAnswer: Record<string, boolean> = {
-    'copy-draft': board.answers.copy !== undefined,
-    minutes: board.answers.offer !== undefined
+    'copy-draft': board.answers.copy !== undefined
   }
-  const activity: HomeActivityRow[] = [...mine, ...buildHomeActivity(t)]
+  const activity: HomeActivityRow[] = [
+    ...(own ? mine : mine.filter((entry) => entry.id === 'meeting-started')),
+    ...(own ? buildHomeActivity(t) : []),
+    ...fromMeetings.activity
+  ]
     .filter((entry) =>
       entry.day === 0
         ? entry.at <= minutes
@@ -237,22 +271,24 @@ export function buildHomeBoardView(
     }))
   const finished = activity.filter((entry) => entry.finished)
 
-  const day = buildHomeDay(t, phase, args.app)
+  const day = own ? buildHomeDay(t, phase, args.app) : { segments: [], records: [] }
   const plan = planHomeWrapUp(tasks, day.records, board.records)
   return {
     tasks,
+    otherTasks: withLoops(fromMeetings.otherTasks),
+    recordingMeetingId: fromMeetings.recording?.id ?? null,
     openTasks: tasks.filter((task) => !task.done && !task.meetingId),
     counts: countHomeBoard(tasks),
     agents,
     activity,
     agentFinished: finished.length,
     agentConfirmed: finished.filter((entry) => entry.confirmed).length,
-    upcoming: buildHomeUpcoming(t, {
-      sampleDay,
-      minutes,
-      offerOpen: board.answers.offer === undefined,
-      weekday
-    }).filter((item) => args.signedIn || !item.taskId),
+    upcoming: [
+      ...(own ? buildHomeUpcoming(t, { sampleDay, minutes, weekday }) : []),
+      ...fromMeetings.upcoming
+    ]
+      .filter((item) => args.signedIn || !item.taskId)
+      .sort((a, b) => a.at - b.at),
     segments: day.segments,
     records: day.records,
     wrapUp: {

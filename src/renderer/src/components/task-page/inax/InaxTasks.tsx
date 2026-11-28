@@ -82,7 +82,9 @@ export function TaskPageInax(): React.JSX.Element {
   const show = (next: string | null, as: 'detail' | 'chat' = 'detail'): void =>
     useInaxSourceSelection.setState({ taskId: next, view: as })
   const openTaskGone =
-    signedIn && taskId !== null && !view.tasks.some((entry) => entry.id === taskId)
+    signedIn &&
+    taskId !== null &&
+    ![...view.tasks, ...view.otherTasks].some((entry) => entry.id === taskId)
   useEffect(() => {
     // An answered offer leaves the list; its page goes with it.
     if (openTaskGone) {
@@ -111,7 +113,10 @@ export function TaskPageInax(): React.JSX.Element {
 
   // The same rows as Home's My work, a meeting's offer included, so the two counts agree.
   const { tasks } = view
-  const task = tasks.find((entry) => entry.id === taskId)
+  // What a meeting waits on me for is answered on Home; it has no page of its own.
+  const task = [...tasks, ...view.otherTasks].find(
+    (entry) => entry.id === taskId && !entry.meetingId
+  )
   if (!task) {
     return (
       <TaskPageInaxList tasks={tasks} projects={projects} onOpen={(id) => show(id, 'detail')} />

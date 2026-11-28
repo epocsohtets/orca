@@ -10,7 +10,7 @@ import type {
 /** Who is on a task right now. Null is "mine to do". */
 export type HomeTaskWho = 'agentWorking' | 'waiting' | 'draft' | 'blocked' | null
 export type HomeDue = 'overdue' | 'today' | 'tomorrow' | 'week'
-export type HomeProjectId = 'campaign' | 'support' | 'brand'
+export type HomeProjectId = 'campaign' | 'promo' | 'support' | 'brand'
 export type HomeTaskTab = 'today' | 'waiting' | 'late' | 'done'
 export type HomeAgentState = 'waiting' | 'working' | 'blocked' | 'idle'
 
@@ -30,8 +30,12 @@ export type HomeTask = {
   /** A question waiting on me; the row answers it in place. */
   question?: string
   choices?: HomeChoice[]
-  /** A meeting's follow-ups offered to me: listed under Needs me, not counted as a task. */
+  /** Something a meeting waits on me for (an offer, follow-ups to sort): listed under Needs me, not a task. */
   meetingId?: string
+  /** A follow-up task: the meeting it came from and the sentence it rests on. */
+  origin?: { meetingId: string; turnId: string | null }
+  /** Set when the task belongs to someone else: it opens, but I cannot start or finish it. */
+  assignee?: string
   detail: string
   /** Today's one-line update for this task, as it would be reported. */
   report?: string
@@ -74,7 +78,6 @@ export type HomeBoardState = {
   records: Record<string, HomeRecordAnswer>
   addedTasks: { id: string; title: string; agent?: boolean }[]
   doneTaskIds: string[]
-  meetingStartedAt: number | null
   wrapUp: { count: number } | null
   /** Task id to my conversation with its agent. */
   loops: Record<string, HomeTaskLoop>
@@ -87,21 +90,17 @@ export const EMPTY_HOME_BOARD_STATE: HomeBoardState = {
   records: {},
   addedTasks: [],
   doneTaskIds: [],
-  meetingStartedAt: null,
   wrapUp: null,
   loops: {},
   inax: {}
 }
 
-export const HOME_ACCEPT_FOLLOW_UPS = 'accept'
-
 /**
- * The task list as it stands after what I did: an answered question hands the task back to its agent, accepted
- * follow-ups and tasks I added join the list, and tasks I finished are done.
+ * The task list as it stands after what I did: an answered question hands the task back to its agent, tasks I
+ * added join the list, and tasks I finished are done.
  */
 export function applyHomeBoardState(
   tasks: readonly HomeTask[],
-  followUps: readonly HomeTask[],
   state: HomeBoardState,
   labels: {
     resumed: string
@@ -114,15 +113,6 @@ export function applyHomeBoardState(
   const next: HomeTask[] = []
   for (const task of tasks) {
     const answered = state.answers[task.id] !== undefined
-    if (task.meetingId) {
-      // An answered offer leaves the list; accepting it adds the follow-ups as real tasks.
-      if (!answered) {
-        next.push(task)
-      } else if (state.answers[task.id] === HOME_ACCEPT_FOLLOW_UPS) {
-        next.push(...followUps)
-      }
-      continue
-    }
     next.push(
       answered && task.who === 'waiting'
         ? { ...task, who: 'agentWorking', whoLabel: labels.resumed, question: undefined }

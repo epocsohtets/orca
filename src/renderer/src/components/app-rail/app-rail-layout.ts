@@ -20,6 +20,7 @@ export function selectAppRailWidth(state: AppRailSettingsState): number {
 /** Pages that live on the rail below Workspaces, in this order. With the rail on, each fills the page and hides the list. */
 export const APP_RAIL_DESTINATION_IDS = [
   'tasks',
+  'meetings',
   'automations',
   'artifacts',
   'skills',

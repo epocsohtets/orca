@@ -8,6 +8,7 @@ import type { HomeTask } from '@/components/home/home-board'
 import type { HomeProject } from '@/components/home/home-board-mock'
 import { inaxStatusTo } from '@/components/home/home-task-loop-script'
 import { homeSampleMoment } from '@/components/home/home-day'
+import { MeetingTaskOrigin } from '@/components/meetings/MeetingTaskCells'
 import { InaxStatusBadge } from './inax-status-badge'
 import { InaxDemoNote } from './InaxDemoNote'
 
@@ -40,6 +41,7 @@ export function TaskPageInaxTaskDetail({
   const intlLocale = useIntlLocale()
   const statusTo = inaxStatusTo(t)
   const hasChat = task.loop !== undefined || task.who !== null
+  const mine = task.assignee === undefined
   const notes = task.notes ?? []
 
   return (
@@ -63,7 +65,7 @@ export function TaskPageInaxTaskDetail({
             <h2 className="min-w-0 flex-1 text-lg leading-snug font-semibold text-foreground">
               {task.title}
             </h2>
-            {task.done ? null : hasChat ? (
+            {task.done || !mine ? null : hasChat ? (
               <Button type="button" size="sm" data-inax-open-chat="" onClick={onOpenChat}>
                 {t('taskLoop.detail.openChat', 'Open the conversation')}
               </Button>
@@ -94,6 +96,12 @@ export function TaskPageInaxTaskDetail({
                 <HomeProjectDot project={project} />
               </dd>
             </div>
+            {task.assignee ? (
+              <div className="flex items-center gap-2">
+                <dt className="text-muted-foreground">{t('taskLoop.detail.assignee', 'Owner')}</dt>
+                <dd className="text-foreground">{task.assignee}</dd>
+              </div>
+            ) : null}
             {task.who && task.whoLabel ? (
               <div className="flex min-w-0 items-center gap-2">
                 <dt className="text-muted-foreground">{t('taskLoop.detail.who', 'Who has it')}</dt>
@@ -114,6 +122,14 @@ export function TaskPageInaxTaskDetail({
             </h3>
             <p className="text-[13px] leading-relaxed text-foreground">{task.detail}</p>
           </section>
+          {task.origin ? (
+            <section className="flex flex-col gap-2" data-inax-origin="">
+              <h3 className="text-sm font-semibold text-foreground">
+                {t('taskLoop.detail.origin', 'Where it came from')}
+              </h3>
+              <MeetingTaskOrigin taskId={task.id} />
+            </section>
+          ) : null}
           <section className="flex flex-col gap-2">
             <h3 className="text-sm font-semibold text-foreground">
               {t('taskLoop.detail.notes', 'Progress notes')}
@@ -169,7 +185,7 @@ export function TaskPageInaxTaskDetail({
               </p>
             </section>
           ) : null}
-          {!task.done && task.who === null && !task.loop ? (
+          {mine && !task.done && task.who === null && !task.loop ? (
             <Button
               type="button"
               variant="outline"

@@ -133,6 +133,8 @@ export type UiViewHistory =
   | 'terminal'
   | 'settings'
   | 'tasks'
+  | 'meetings'
+  | 'meetingBot'
   | 'activity'
   | 'automations'
   | 'space'
@@ -173,6 +175,8 @@ export type UISliceCore = {
   clearManuallyUnreadTurns: (paneKeys: string[]) => void
   activeView: TopLevelView
   previousViewBeforeTasks: Exclude<UiViewHistory, 'tasks'>
+  previousViewBeforeMeetings: Exclude<UiViewHistory, 'meetings'>
+  previousViewBeforeMeetingBot: Exclude<UiViewHistory, 'meetingBot'>
   previousViewBeforeSettings: Exclude<UiViewHistory, 'settings'>
   previousViewBeforeActivity: Exclude<UiViewHistory, 'activity'>
   previousViewBeforeAutomations: Exclude<UiViewHistory, 'automations'>
@@ -195,6 +199,10 @@ export type UISliceCore = {
     options?: { recordTasksInteraction?: boolean }
   ) => void
   closeTaskPage: () => void
+  openMeetingsPage: () => void
+  closeMeetingsPage: () => void
+  openMeetingBotPage: () => void
+  closeMeetingBotPage: () => void
   openActivityPage: () => void
   closeActivityPage: () => void
   selectedAutomationId: string | null

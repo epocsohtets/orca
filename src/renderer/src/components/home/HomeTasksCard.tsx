@@ -38,6 +38,7 @@ export function HomeTasksCard({
   onAnswer,
   onDecide,
   onOpenTask,
+  onOpenMeeting,
   onOpenOutput,
   onOpenTaskList
 }: {
@@ -52,6 +53,8 @@ export function HomeTasksCard({
   onDecide: (taskId: string, proposal: HomeProposal | null) => void
   /** Opens the task's own page. */
   onOpenTask: (taskId: string) => void
+  /** Opens the meeting a waiting row is about. */
+  onOpenMeeting: (meetingId: string) => void
   /** Opens the task's conversation, where the agent's draft is. */
   onOpenOutput: (taskId: string) => void
   onOpenTaskList: () => void
@@ -103,17 +106,23 @@ export function HomeTasksCard({
               {shown.map((task) => {
                 const waiting = task.who === 'waiting'
                 // Only what waits on me opens in place; every other row goes to the task's page.
-                const open = openId === task.id && waiting
                 const offer = task.meetingId !== undefined
+                // A meeting's row with nothing to answer here goes to the meeting.
+                const toMeeting = offer && !task.question ? task.meetingId : undefined
+                const open = openId === task.id && waiting && !toMeeting
                 return (
                   <li key={task.id} data-home-task={task.id}>
                     <div className="flex items-stretch">
                       <button
                         type="button"
-                        aria-expanded={offer ? open : undefined}
+                        aria-expanded={offer && !toMeeting ? open : undefined}
                         className={`${HOME_ROW_BUTTON_CLASS} grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 @min-[40rem]/home-card:grid-cols-[minmax(0,1fr)_9rem_8rem]`}
                         onClick={() =>
-                          offer ? onOpenChange(open ? null : task.id) : onOpenTask(task.id)
+                          toMeeting
+                            ? onOpenMeeting(toMeeting)
+                            : offer
+                              ? onOpenChange(open ? null : task.id)
+                              : onOpenTask(task.id)
                         }
                       >
                         <span className="flex min-w-0 flex-col gap-1">
@@ -140,11 +149,15 @@ export function HomeTasksCard({
                               type="button"
                               variant="outline"
                               size="xs"
-                              onClick={() => onOpenChange(task.id)}
+                              onClick={() =>
+                                toMeeting ? onOpenMeeting(toMeeting) : onOpenChange(task.id)
+                              }
                             >
-                              {task.proposal
-                                ? t('taskLoop.home.review', 'Review')
-                                : t('home.tasks.answer', 'Answer')}
+                              {toMeeting
+                                ? t('home.tasks.open', 'Open')
+                                : task.proposal
+                                  ? t('taskLoop.home.review', 'Review')
+                                  : t('home.tasks.answer', 'Answer')}
                             </Button>
                           ) : null}
                         </div>
@@ -185,6 +198,18 @@ export function HomeTasksCard({
                                       {choice.label}
                                     </Button>
                                   ))}
+                                  {task.meetingId ? (
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="xs"
+                                      onClick={() =>
+                                        task.meetingId && onOpenMeeting(task.meetingId)
+                                      }
+                                    >
+                                      {t('home.tasks.openMinutes', 'Open the minutes')}
+                                    </Button>
+                                  ) : null}
                                 </div>
                               </div>
                             ) : null}

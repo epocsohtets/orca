@@ -63,6 +63,20 @@ export function createUiViewActions(set: UISliceSet, get: UISliceGet): Partial<U
         worktreeNavHistoryIndex: rewindHistoryIndexPastView(state, 'automations'),
         automationsPageNextVisitMode: 'push'
       })),
+    openMeetingsPage: () =>
+      set((state) => ({
+        activeView: 'meetings',
+        previousViewBeforeMeetings:
+          state.activeView === 'meetings' ? state.previousViewBeforeMeetings : state.activeView
+      })),
+    closeMeetingsPage: () => set((state) => ({ activeView: state.previousViewBeforeMeetings })),
+    openMeetingBotPage: () =>
+      set((state) => ({
+        activeView: 'meetingBot',
+        previousViewBeforeMeetingBot:
+          state.activeView === 'meetingBot' ? state.previousViewBeforeMeetingBot : state.activeView
+      })),
+    closeMeetingBotPage: () => set((state) => ({ activeView: state.previousViewBeforeMeetingBot })),
     openSpacePage: () => {
       get().recordFeatureInteraction?.('workspace-cleanup')
       if (typeof window !== 'undefined' && window.api?.workspaceSpace?.openWindow) {

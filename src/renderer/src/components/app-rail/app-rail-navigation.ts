@@ -8,6 +8,8 @@ import { selectRailPageHidesWorkspaceList } from './app-rail-layout'
 type PageCloseActions = Pick<
   UISlice,
   | 'closeTaskPage'
+  | 'closeMeetingsPage'
+  | 'closeMeetingBotPage'
   | 'closeAutomationsPage'
   | 'closeArtifactsPage'
   | 'closeSkillsPage'
@@ -26,6 +28,8 @@ export type RailNavigationStore = {
 
 const CLOSE_PAGE: Record<Exclude<UISlice['activeView'], 'terminal'>, keyof PageCloseActions> = {
   tasks: 'closeTaskPage',
+  meetings: 'closeMeetingsPage',
+  meetingBot: 'closeMeetingBotPage',
   automations: 'closeAutomationsPage',
   artifacts: 'closeArtifactsPage',
   skills: 'closeSkillsPage',

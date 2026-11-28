@@ -17,6 +17,7 @@ const DESTINATION_VISIBLE: Record<
   (settings: AppState['settings']) => boolean
 > = {
   tasks: (settings) => settings?.showTasksButton !== false,
+  meetings: (settings) => settings?.showMeetingsButton !== false,
   automations: shouldShowAutomationsButton,
   artifacts: shouldShowArtifactsButton,
   skills: shouldShowSkillsButton,
@@ -27,12 +28,14 @@ const DESTINATION_VISIBLE: Record<
 const DESTINATION_SETTING: Record<
   AppRailDestinationId,
   | 'showTasksButton'
+  | 'showMeetingsButton'
   | 'showAutomationsButton'
   | 'showArtifactsButton'
   | 'showSkillsButton'
   | 'showMobileButton'
 > = {
   tasks: 'showTasksButton',
+  meetings: 'showMeetingsButton',
   automations: 'showAutomationsButton',
   artifacts: 'showArtifactsButton',
   skills: 'showSkillsButton',
@@ -46,6 +49,7 @@ export function setRailDestinationShown(id: AppRailDestinationId, shown: boolean
 
 const DESTINATION_OPEN: Record<AppRailDestinationId, (state: AppState) => void> = {
   tasks: (state) => state.openTaskPage(),
+  meetings: (state) => state.openMeetingsPage(),
   automations: (state) => state.openAutomationsPage(),
   artifacts: (state) => state.openArtifactsPage(),
   skills: (state) => state.openSkillsPage(),

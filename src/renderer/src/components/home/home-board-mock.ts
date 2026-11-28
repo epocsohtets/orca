@@ -1,11 +1,12 @@
 import type { Translate } from '@/i18n/use-translate'
 import { REPO_COLORS } from '../../../../shared/repository/appearance/repo-badge-color'
-import { HOME_ACCEPT_FOLLOW_UPS, type HomeProjectId, type HomeTask } from './home-board'
+import type { HomeProjectId, HomeTask } from './home-board'
 import type { HomePhase } from './home-day'
 
 // shortcut: one working day of a marketing and operations team, all sample; each part names its real source in
 // the PoC report. Names of tasks, projects, meetings and people must stay consistent across this file, and no name
-// may carry a season or a month: the page shows the real date.
+// may carry a season or a month: the page shows the real date. The one exception is the year-end promotion, which
+// the meeting sample is about.
 
 export type HomeProject = { name: string; color: string }
 
@@ -16,6 +17,7 @@ export function buildHomeProjects(t: Translate): Record<HomeProjectId, HomeProje
       name: t('home.project.campaign', 'Product launch campaign'),
       color: REPO_COLORS[2]
     },
+    promo: { name: t('home.project.promo', 'Year-end promotion'), color: REPO_COLORS[3] },
     support: { name: t('home.project.support', 'Customer support'), color: REPO_COLORS[5] },
     brand: { name: t('home.project.brand', 'Brand renewal'), color: REPO_COLORS[6] }
   }
@@ -62,7 +64,7 @@ export function buildHomeTasks(t: Translate, sample: HomeSampleContext): HomeTas
     {
       id: 'research',
       title: t('home.task.research', 'Survey competitors’ promotions'),
-      project: 'campaign',
+      project: 'promo',
       due: 'today',
       dueLabel: t('home.task.today', 'Today'),
       done: false,
@@ -100,28 +102,7 @@ export function buildHomeTasks(t: Translate, sample: HomeSampleContext): HomeTas
       who: null,
       detail: t(
         'home.task.reviewDetail',
-        'Park Seoyeon uploaded two drafts. Leave your comments before the 15:00 draft review.'
-      )
-    },
-    {
-      id: 'offer',
-      title: t('home.task.offer', 'Take my 2 items from the weekly meeting'),
-      project: 'campaign',
-      due: 'today',
-      dueLabel: t('home.task.today', 'Today'),
-      done: false,
-      who: 'waiting',
-      whoLabel: t('home.task.offerWho', 'Waiting for my answer · Meeting bot'),
-      agentId: 'meeting',
-      meetingId: 'weekly',
-      question: t('home.task.offerQuestion', 'Add the 2 items the minutes give you to My work?'),
-      choices: [
-        { id: HOME_ACCEPT_FOLLOW_UPS, label: t('home.task.offerAccept', 'Add to My work') },
-        { id: 'decline', label: t('home.task.offerDecline', 'Not mine') }
-      ],
-      detail: t(
-        'home.task.offerDetail',
-        'From the campaign weekly meeting: compare two vendor quotes; move next week’s dates into the campaign schedule.'
+        'Choi Hyunwoo uploaded two drafts. Leave your comments before the 15:00 draft review.'
       )
     },
     {
@@ -154,7 +135,7 @@ export function buildHomeTasks(t: Translate, sample: HomeSampleContext): HomeTas
       agentId: 'triage',
       detail: t(
         'home.task.noticeDetail',
-        'The notice needs the new delivery dates. Lee Doyun asked the logistics team again this morning.'
+        'The notice needs the new delivery dates. Lee Mina asked the logistics team again this morning.'
       ),
       report: t(
         'home.report.notice',
@@ -198,33 +179,6 @@ export function buildHomeTasks(t: Translate, sample: HomeSampleContext): HomeTas
         'home.task.budgetDetail',
         'The writing agent updated it; you confirmed the numbers.'
       )
-    }
-  ]
-}
-
-/** What the meeting bot offers; they become tasks only when I accept. */
-export function buildHomeFollowUps(t: Translate, sample: HomeSampleContext): HomeTask[] {
-  const detail = t('home.task.followDetail', 'From the campaign weekly meeting.')
-  return [
-    {
-      id: 'quotes',
-      title: t('home.task.quotes', 'Compare two vendor quotes'),
-      project: 'campaign',
-      due: 'tomorrow',
-      dueLabel: sample.dayName(1),
-      done: false,
-      who: null,
-      detail
-    },
-    {
-      id: 'schedule',
-      title: t('home.task.schedule', 'Move next week’s dates into the campaign schedule'),
-      project: 'campaign',
-      due: 'week',
-      dueLabel: sample.dayName(3),
-      done: false,
-      who: null,
-      detail
     }
   ]
 }

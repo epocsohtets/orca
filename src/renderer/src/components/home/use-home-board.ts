@@ -5,6 +5,8 @@ import { useInaxMockAccount } from '@/lib/inax-mock-account'
 import { installWindowVisibilityInterval } from '@/lib/window-activity/window-visibility-interval'
 import { homeLoopPhase } from './home-task-loop'
 import { useHomeBoardStore } from './home-board-store'
+import { useMeetings } from '@/components/meetings/meetings-store'
+import './home-meeting-task-sync'
 import { buildHomeProjects } from './home-board-mock'
 import { buildHomeBoardView } from './home-board-view'
 import {
@@ -24,6 +26,9 @@ export function useHomeBoard(preview: 'auto' | HomePhase = 'auto') {
   const myApps = useAppStore((s) => s.settings?.myApps)
   // The whole mock board is one small object, read as it is.
   const board = useSyncExternalStore(useHomeBoardStore.subscribe, useHomeBoardStore.getState)
+  const viewerId = useMeetings((state) => state.viewerId)
+  const meetings = useMeetings((state) => state.meetings)
+  const meetingTasks = useMeetings((state) => state.tasks)
   // Read once per mount: the page shows a snapshot of the day.
   const [mountedAt] = useState(() => Date.now())
   const [now, setNow] = useState(mountedAt)
@@ -58,11 +63,13 @@ export function useHomeBoard(preview: 'auto' | HomePhase = 'auto') {
     intlLocale,
     signedIn,
     app,
-    duration
+    duration,
+    meetings: { viewerId, meetings, tasks: meetingTasks }
   })
   return {
     board,
     view,
+    viewerId,
     projects: buildHomeProjects(t),
     signedIn,
     myApps,

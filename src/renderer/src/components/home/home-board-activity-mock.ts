@@ -15,13 +15,13 @@ export type HomeActivity = {
   confirmed?: boolean
   taskId?: string
   agentId?: string
+  meetingId?: string
 }
 
 export function buildHomeActivity(t: Translate): HomeActivity[] {
   const research = t('home.agent.research', 'Research agent')
   const writer = t('home.agent.writer', 'Writing agent')
   const triage = t('home.agent.triage', 'Inquiry agent')
-  const meeting = t('home.agent.meeting', 'Meeting bot')
   return [
     {
       id: 'budget-done',
@@ -50,16 +50,6 @@ export function buildHomeActivity(t: Translate): HomeActivity[] {
       at: at(16, 30),
       who: triage,
       text: t('home.activity.inquiryCounts', 'put last week’s inquiry counts into a table'),
-      byAgent: true,
-      finished: true,
-      confirmed: true
-    },
-    {
-      id: 'ops-minutes',
-      day: -1,
-      at: at(11, 50),
-      who: meeting,
-      text: t('home.activity.opsMinutes', 'wrote the operations check minutes'),
       byAgent: true,
       finished: true,
       confirmed: true
@@ -99,16 +89,6 @@ export function buildHomeActivity(t: Translate): HomeActivity[] {
       taskId: 'research'
     },
     {
-      id: 'minutes',
-      day: 0,
-      at: at(9, 35),
-      who: meeting,
-      text: t('home.activity.minutes', 'wrote the weekly meeting minutes · 2 items for me'),
-      byAgent: true,
-      finished: true,
-      agentId: 'meeting'
-    },
-    {
       id: 'copy-draft',
       day: 0,
       at: at(9, 40),
@@ -125,7 +105,7 @@ export function buildHomeActivity(t: Translate): HomeActivity[] {
       id: 'drafts-up',
       day: 0,
       at: at(11, 40),
-      who: t('home.person.seoyeon', 'Park Seoyeon'),
+      who: t('home.person.hyunwoo', 'Choi Hyunwoo'),
       text: t('home.activity.draftsUp', 'uploaded two brand guide drafts'),
       byAgent: false,
       taskId: 'review'
@@ -138,16 +118,6 @@ export function buildHomeActivity(t: Translate): HomeActivity[] {
       text: t('home.activity.researchTable', 'put two competitors’ promotions into a table'),
       byAgent: true,
       taskId: 'research'
-    },
-    {
-      id: 'review-minutes',
-      day: 0,
-      at: at(16, 10),
-      who: meeting,
-      text: t('home.activity.reviewMinutes', 'wrote the draft review minutes'),
-      byAgent: true,
-      finished: true,
-      agentId: 'meeting'
     },
     {
       id: 'research-done',
