@@ -1,4 +1,4 @@
-import { addWorkingDays } from './meeting-schedule'
+import { addDays, addWorkingDays, isWorkingDay } from './meeting-schedule'
 import { DEFAULT_MEETING_MINUTES, atMinutes, dayStartOf, findClock } from './meeting-time-range'
 
 // shortcut: fixed pattern rules stand in for the meeting agent's reading of a conversation; replace with the
@@ -34,7 +34,10 @@ function dayFromWord(text: string, now: number): number | null {
   const today = dayStartOf(now)
   const offset = { 오늘: 0, 내일: 1, 모레: 2 }[match[1]]
   if (offset !== undefined) {
-    return new Date(today).setDate(new Date(today).getDate() + offset)
+    const day = addDays(today, offset)
+    // The team's days are working days (the sample clock has no weekend): "내일" said on a Friday is Monday.
+    // A weekday the line names itself ("토요일") is kept below.
+    return isWorkingDay(day) ? day : addWorkingDays(day, 1)
   }
   const target = WEEKDAYS.indexOf(match[3])
   const from = new Date(today).getDay()

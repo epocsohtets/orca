@@ -7,15 +7,13 @@ export type ChatLine = {
   id: string
   authorId: string
   text: string
-  /** Sample lines name who the meeting agent asks; a typed line asks its writer. */
-  whisperFor?: string
 }
 
 export type MeetingWhisper = { messageId: string; talk: MeetingTalk }
 
 /**
- * The meeting agent's question to one person about one chat. It is asked of a single person (the writer of the
- * line, or the person a sample line names) and nobody else in the chat gets it. Once that person says "no
+ * The meeting agent's question to one person about one chat. It is asked of a single person, the writer of the
+ * line, and nobody else in the chat gets it. Once that person says "no
  * thanks", the chat is not asked about again; a line that already became a meeting is not asked about twice.
  */
 export function whisperFor(args: {
@@ -29,7 +27,7 @@ export function whisperFor(args: {
     return null
   }
   for (const line of args.lines.toReversed()) {
-    if ((line.whisperFor ?? line.authorId) !== args.viewerId) {
+    if (line.authorId !== args.viewerId) {
       continue
     }
     const talk = detectMeetingTalk(line.text, args.now)

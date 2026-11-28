@@ -1,5 +1,6 @@
 import type { AppState } from '@/store/types'
 import { useAppStore } from '@/store/index'
+import { useMeetings } from '@/components/meetings/meetings-store'
 import {
   shouldShowArtifactsButton,
   shouldShowAutomationsButton,
@@ -49,7 +50,11 @@ export function setRailDestinationShown(id: AppRailDestinationId, shown: boolean
 
 const DESTINATION_OPEN: Record<AppRailDestinationId, (state: AppState) => void> = {
   tasks: (state) => state.openTaskPage(),
-  meetings: (state) => state.openMeetingsPage(),
+  // The rail opens the list, as it does for Tasks; a meeting is reopened from the list or from Home.
+  meetings: (state) => {
+    useMeetings.setState({ selectedId: null, composing: null })
+    state.openMeetingsPage()
+  },
   automations: (state) => state.openAutomationsPage(),
   artifacts: (state) => state.openArtifactsPage(),
   skills: (state) => state.openSkillsPage(),

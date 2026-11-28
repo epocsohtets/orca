@@ -4,6 +4,8 @@ import { useTranslate } from '@/i18n/use-translate'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import { homeSampleMoment } from '@/components/home/home-day'
+import { NativeChatClockContext } from '@/components/native-chat/messages/rows/NativeChatMessageTimestamp'
 import { NativeChatMessageList } from '@/components/native-chat/NativeChatMessageList'
 import type { NativeChatTimedRow } from '@/components/native-chat/conversation/slots/native-chat-timed-rows'
 import type { NativeChatLiveSession } from '@/components/native-chat/session/terminal/read/native-chat-live-session-contract'
@@ -221,13 +223,15 @@ export default function MeetingBotChatPage(): React.JSX.Element {
           className="native-chat-appearance flex min-h-0 flex-1 flex-col bg-chat-pane"
           data-meeting-bot-chat=""
         >
-          <NativeChatMessageList
-            session={session}
-            isWorking={false}
-            expandSignal={false}
-            timedRows={timedRows}
-            turnBot={{ name, src: null, fallback: name.charAt(0) }}
-          />
+          <NativeChatClockContext.Provider value={homeSampleMoment}>
+            <NativeChatMessageList
+              session={session}
+              isWorking={false}
+              expandSignal={false}
+              timedRows={timedRows}
+              turnBot={{ name, src: null, fallback: name.charAt(0) }}
+            />
+          </NativeChatClockContext.Provider>
         </div>
       )}
       <form

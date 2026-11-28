@@ -1,3 +1,4 @@
+import { createContext, useContext } from 'react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useIntlLocale, useTranslate } from '@/i18n/use-translate'
 import { useNowSnapshot } from '@/lib/window-activity/use-now'
@@ -7,11 +8,23 @@ import {
   getNativeChatMessageTimeFormatter
 } from '../../../../../../shared/native-chat/transcript/messages/native-chat-message-time'
 
+/**
+ * Maps the real clock to the one a conversation is told on. Only a sample conversation sets it, so its
+ * "today" and "yesterday" follow the sample's day and not the real one.
+ */
+export const NativeChatClockContext = createContext<((real: number) => number) | null>(null)
+
+function useChatDay(enabled = true): ReturnType<typeof getNativeChatMessageDay> {
+  const clock = useContext(NativeChatClockContext)
+  const today = useNowSnapshot(30_000, getNativeChatMessageDay, enabled)
+  return clock ? { ...today, date: new Date(clock(today.date.getTime())) } : today
+}
+
 /** The full spoken time a timestamp shows, for a control that names its row by words and time. */
 export function useNativeChatMessageTimeLabel(timestamp: number | null | undefined): string | null {
   const intlLocale = useIntlLocale()
   // A row with no time, such as waiting agent mail, keeps no clock running.
-  const today = useNowSnapshot(30_000, getNativeChatMessageDay, timestamp != null)
+  const today = useChatDay(timestamp != null)
   if (timestamp === null || timestamp === undefined) {
     return null
   }
@@ -31,7 +44,7 @@ export function NativeChatMessageTimestamp({
   className?: string
 }): React.JSX.Element | null {
   const intlLocale = useIntlLocale()
-  const today = useNowSnapshot(30_000, getNativeChatMessageDay)
+  const today = useChatDay()
   const t = useTranslate()
   if (timestamp === null) {
     return null

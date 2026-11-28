@@ -19,6 +19,14 @@ const span = (text: string): [number, number] | null => {
 }
 
 describe('meeting talk pattern rules', () => {
+  it('offers a working day for "내일" and "모레", and keeps a weekend the line names', () => {
+    const friday = at(27, 10)
+    expect(detectMeetingTalk('내일 3시에 30분만 모일까요?', friday)?.startsAt).toBe(at(30, 15))
+    expect(detectMeetingTalk('모레 3시에 모일까요?', friday)?.startsAt).toBe(at(30, 15))
+    expect(detectMeetingTalk('모레 3시에 모일까요?', NOW)?.startsAt).toBe(at(30, 15))
+    expect(detectMeetingTalk('토요일 3시에 모일까요?', friday)?.startsAt).toBe(at(28, 15))
+  })
+
   it('reads the day, the time and the length from a line about meeting', () => {
     expect(span('내일 3시에 30분만 모일까요?')).toEqual([at(27, 15), at(27, 15, 30)])
     expect(span('내일 오후 2시에 30분만 모여서 정하면 어떨까요?')).toEqual([
@@ -77,7 +85,7 @@ describe('meeting talk pattern rules', () => {
 describe('meeting whisper', () => {
   const lines: ChatLine[] = [
     { id: '1', authorId: 'jiho', text: '결과를 공유 폴더에 올렸습니다.' },
-    { id: '2', authorId: 'jiho', text: '내일 2시에 30분만 모일까요?', whisperFor: 'mako' }
+    { id: '2', authorId: 'mako', text: '내일 2시에 30분만 모일까요?' }
   ]
   const ask = (viewerId: string, patch = {}): string | null =>
     whisperFor({ lines, viewerId, dismissed: false, handledMessageIds: [], now: NOW, ...patch })

@@ -27,5 +27,7 @@ export function saveWorkStyles(
   })
   if (leftCodeOut) {
     useAppStore.getState().setRightSidebarOpen(false)
+    // Home stays full width; the titlebar toggle brings the list (Chat) back beside it.
+    useAppStore.getState().setSidebarOpen(false)
   }
 }

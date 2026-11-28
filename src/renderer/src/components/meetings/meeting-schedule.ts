@@ -2,7 +2,7 @@ import { homeSampleDay } from '@/components/home/home-day'
 
 const DAY = 86_400_000
 
-const isWorkingDay = (timestamp: number): boolean => {
+export const isWorkingDay = (timestamp: number): boolean => {
   const day = new Date(timestamp).getDay()
   return day !== 0 && day !== 6
 }

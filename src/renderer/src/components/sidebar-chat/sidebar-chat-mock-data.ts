@@ -20,8 +20,6 @@ export type SidebarChatMessage = {
   text: string
   /** Set on messages typed here; sample messages name their author. */
   authorId?: string
-  /** Sample only: who the meeting agent asks when this line reads as setting up a meeting. */
-  whisperFor?: string
 }
 
 export type SidebarChatConversation = {
@@ -44,7 +42,7 @@ export const SIDEBAR_CHAT_CONVERSATIONS: SidebarChatConversation[] = [
     kind: 'dm',
     name: '박지호',
     presence: 'online',
-    unread: 2,
+    unread: 0,
     messages: [
       {
         id: '1',
@@ -67,10 +65,9 @@ export const SIDEBAR_CHAT_CONVERSATIONS: SidebarChatConversation[] = [
       { id: '4', author: '박지호', time: '10:15', text: '공유 폴더에 올렸습니다.' },
       {
         id: '5',
-        author: '박지호',
+        author: SIDEBAR_CHAT_SELF,
         time: '10:21',
-        text: '뉴스레터 주제 건은 금요일 2시에 회의로 잡읍시다.',
-        whisperFor: MAKO
+        text: '뉴스레터 주제 건은 금요일 2시에 회의로 잡읍시다.'
       }
     ]
   },
@@ -134,7 +131,7 @@ export const SIDEBAR_CHAT_CONVERSATIONS: SidebarChatConversation[] = [
     memberIds: [MAKO, JIHO, MINA, DAEUN],
     kind: 'group',
     name: '연말-프로모션',
-    unread: 3,
+    unread: 0,
     messages: [
       {
         id: '1',
@@ -156,10 +153,9 @@ export const SIDEBAR_CHAT_CONVERSATIONS: SidebarChatConversation[] = [
       },
       {
         id: '4',
-        author: '박지호',
+        author: SIDEBAR_CHAT_SELF,
         time: '09:38',
-        text: '글로는 길어지겠네요. 다음 주 화요일 오후 2시에 30분만 모여서 정하면 어떨까요?',
-        whisperFor: MAKO
+        text: '글로는 길어지겠네요. 다음 주 화요일 오후 2시에 30분만 모여서 정하면 어떨까요?'
       }
     ]
   },

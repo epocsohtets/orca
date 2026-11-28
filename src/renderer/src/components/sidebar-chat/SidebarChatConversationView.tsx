@@ -72,8 +72,7 @@ function SidebarChatConversationView({
     lines: messages.map((message) => ({
       id: message.id,
       authorId: chatAuthorId(message),
-      text: message.text,
-      whisperFor: message.whisperFor
+      text: message.text
     })),
     viewerId,
     dismissed,
