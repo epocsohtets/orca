@@ -31796,15 +31796,10 @@
       "working": "Working",
       "blocked": "Blocked",
       "idle": "Resting",
-      "stageNone": "Not started",
-      "stagePlan": "Plan",
-      "stageWork": "Work",
-      "stageReview": "Review",
       "title": "Agents",
       "colWho": "Name",
       "colDoing": "Doing now",
       "colState": "State",
-      "colProgress": "Progress",
       "colLast": "Last activity",
       "answerInTask": "Answer it",
       "showTask": "Show its task"
@@ -31823,7 +31818,7 @@
       "tasks": "My work",
       "waiting": "Needs me",
       "agentDone": "Finished by agents",
-      "late": "Late · awaiting others"
+      "late": "Late"
     },
     "firstRun": {
       "title": "Start here",
@@ -31845,7 +31840,6 @@
       "pickTask": "Task to link this record to",
       "notWork": "Not work",
       "browser": "Browser",
-      "meetings": "Meetings",
       "recordBrowser": "Browser · 3 competitor promotion pages · {{range}}",
       "recordApp": "{{app}} · {{range}}",
       "tomorrow": "tomorrow",
@@ -31957,7 +31951,8 @@
       "fromMeetingAssigned": "A follow-up from the meeting “{{title}}”. {{host}} assigned it to {{name}}.",
       "request": "{{name}} asks to see the minutes of “{{title}}”",
       "requestWho": "Needs me",
-      "fromMeetingHeard": "A follow-up task from the meeting “{{title}}”. {{name}} agreed to take it in the meeting."
+      "fromMeetingHeard": "A follow-up task from the meeting “{{title}}”. {{name}} agreed to take it in the meeting.",
+      "invitation": "{{name}} invites me to “{{title}}”"
     },
     "project": {
       "campaign": "Product launch campaign",
@@ -31983,7 +31978,9 @@
       "resultTitle": "Saved today",
       "ahead": "Agent’s suggestion",
       "take": "Use",
-      "skip": "Skip"
+      "skip": "Skip",
+      "guess": "Agent’s pick: {{status}}",
+      "guessDraft": "Agent’s pick: {{status}} · a draft is attached"
     },
     "chip": {
       "waiting": "Needs me",
@@ -31995,6 +31992,12 @@
     "chat": {
       "placeholder": "Message",
       "placeholderTo": "Message {{name}}"
+    },
+    "note": {
+      "copy1": "Narrowed the headline down to three directions.",
+      "copy2": "Started drafts for two of the three directions.",
+      "copy3": "Compared the drafts with competitors’ headlines.",
+      "copy4": "Took out a phrase that needs a legal review."
     }
   },
   "taskLoop": {
@@ -32026,8 +32029,6 @@
       "noteByMe": "Written by me",
       "noteStatus": "Changed status {{to}}",
       "activity": "Now",
-      "folder": "Folder",
-      "output": "Result",
       "noteByAgentOf": "Written by the agent, confirmed by {{name}}",
       "noteBy": "Written by {{name}}"
     },

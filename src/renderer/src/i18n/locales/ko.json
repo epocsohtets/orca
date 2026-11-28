@@ -29426,15 +29426,10 @@
       "working": "작업 중",
       "blocked": "막힘",
       "idle": "쉬는 중",
-      "stageNone": "시작 전",
-      "stagePlan": "계획",
-      "stageWork": "작업",
-      "stageReview": "검토",
       "title": "에이전트",
       "colWho": "이름",
       "colDoing": "지금 하는 작업",
       "colState": "상태",
-      "colProgress": "진행",
       "colLast": "마지막 활동",
       "answerInTask": "답변",
       "showTask": "맡은 업무 보기"
@@ -29453,7 +29448,7 @@
       "tasks": "내 업무",
       "waiting": "내 확인 필요",
       "agentDone": "에이전트가 끝낸 작업",
-      "late": "지연 · 회신 대기"
+      "late": "지연"
     },
     "firstRun": {
       "title": "여기에서 시작합니다",
@@ -29475,7 +29470,6 @@
       "pickTask": "이 기록을 연결할 업무",
       "notWork": "업무 아님",
       "browser": "브라우저",
-      "meetings": "회의",
       "recordBrowser": "브라우저 · 경쟁사 프로모션 페이지 3곳 · {{range}}",
       "recordApp": "{{app}} · {{range}}",
       "tomorrow": "내일",
@@ -29583,7 +29577,8 @@
       "fromMeetingAssigned": "회의 「{{title}}」에서 나온 후속 업무입니다. {{host}} 님이 {{name}} 님에게 할당했습니다.",
       "request": "{{name}} 님의 「{{title}}」 회의록 보기 요청",
       "requestWho": "내 확인 필요",
-      "fromMeetingHeard": "회의 「{{title}}」의 후속 업무입니다. 회의에서 {{name}} 님이 맡기로 했습니다."
+      "fromMeetingHeard": "회의 「{{title}}」의 후속 업무입니다. 회의에서 {{name}} 님이 맡기로 했습니다.",
+      "invitation": "{{name}} 님의 「{{title}}」 초대"
     },
     "project": {
       "campaign": "신제품 출시 캠페인",
@@ -29613,7 +29608,9 @@
       "resultTitle": "오늘 저장한 기록",
       "ahead": "에이전트 제안",
       "take": "사용",
-      "skip": "건너뛰기"
+      "skip": "건너뛰기",
+      "guess": "에이전트 추천: {{status}}",
+      "guessDraft": "에이전트 추천: {{status}} · 초안을 올렸습니다"
     },
     "chip": {
       "waiting": "내 확인 필요",
@@ -29625,6 +29622,12 @@
     "chat": {
       "placeholder": "메시지",
       "placeholderTo": "{{name}} 님에게 메시지"
+    },
+    "note": {
+      "copy1": "머리 문구 방향을 세 가지로 좁혔습니다.",
+      "copy2": "세 방향 중 두 방향으로 초안을 쓰기 시작했습니다.",
+      "copy3": "초안을 경쟁사 머리 문구와 비교했습니다.",
+      "copy4": "법무 검토가 필요한 표현을 뺐습니다."
     }
   },
   "taskLoop": {
@@ -29656,8 +29659,6 @@
       "noteByMe": "내가 씀",
       "noteStatus": "상태를 {{to}} 바꿈",
       "activity": "지금",
-      "folder": "폴더",
-      "output": "결과물",
       "noteByAgentOf": "에이전트가 쓰고 {{name}} 님이 확인함",
       "noteBy": "{{name}} 님이 씀"
     },
