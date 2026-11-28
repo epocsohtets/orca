@@ -6,19 +6,18 @@ import { HomeCard, HomeRow, HomeStateIcon } from '@/components/home/HomeCard'
 import type { HomeProjectId, HomeTask } from '@/components/home/home-board'
 import type { HomeProject } from '@/components/home/home-board-mock'
 import { botItemsFor } from './meeting-rules'
-import { MeetingAnswerMenu } from './MeetingAnswerMenu'
+import { openHomeNeedsYou } from '@/components/home/home-task-items-host'
+import { homeRowItemUid } from '@/components/home/home-task-item-model'
 import { useMeetingText } from './MeetingParts'
 import { useMeetings } from './meetings-store'
 
-/** What meetings wait on me for: the same rows Home lists under Needs me. Each opens its meeting. */
+/** What waits on me: the same rows as Home's 내 확인 필요. Each opens its item in Home's panel. */
 export function MeetingWaitingCard({
   rows,
-  projects,
-  onSelect
+  projects
 }: {
   rows: readonly HomeTask[]
   projects: Record<HomeProjectId, HomeProject>
-  onSelect: (meetingId: string) => void
 }): React.JSX.Element {
   const t = useTranslate()
   return (
@@ -30,30 +29,26 @@ export function MeetingWaitingCard({
       {rows.length === 0 ? null : (
         <ul className="mx-4">
           {rows.map((row) => {
-            const open = (): void => {
-              if (row.meetingId) {
-                onSelect(row.meetingId)
-              }
-            }
+            const open = (): void => openHomeNeedsYou(homeRowItemUid(row))
             return (
               <HomeRow
                 key={row.id}
                 button={{ 'data-meeting-waiting': row.id }}
                 icon={<HomeStateIcon state="waiting" />}
                 title={row.title}
-                tip={[row.title, row.whoLabel, projects[row.project].name]
+                tip={[
+                  row.title,
+                  row.whoLabel,
+                  row.dayEndRecords ? null : projects[row.project].name
+                ]
                   .filter(Boolean)
                   .join(' · ')}
                 chip={t('home.chip.waiting', 'Needs me')}
                 onClick={open}
                 action={
-                  row.invitation && row.meetingId ? (
-                    <MeetingAnswerMenu meetingId={row.meetingId} />
-                  ) : (
-                    <Button type="button" variant="outline" size="xs" onClick={open}>
-                      {t('home.tasks.answer', 'Answer')}
-                    </Button>
-                  )
+                  <Button type="button" variant="outline" size="xs" onClick={open}>
+                    {t('home.tasks.answer', 'Answer')}
+                  </Button>
                 }
               />
             )

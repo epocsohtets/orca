@@ -18,6 +18,8 @@ import {
   HomeCard
 } from '@/components/home/HomeCard'
 import { HomePageHeading, HomeTileRow, type HomeTile } from '@/components/home/HomeHeader'
+import { openHomeNeedsYou } from '@/components/home/home-task-items-host'
+import { FIRST_NEEDS_YOU } from '@/components/home/HomeItemsPanel'
 import { useHomeBoard } from '@/components/home/use-home-board'
 import { openMeetingBot, openScheduleForm } from './meeting-navigation'
 import { followUpCounts, isParticipant, meetingAccess } from './meeting-rules'
@@ -66,14 +68,18 @@ export default function MeetingsPage(): React.JSX.Element {
     useMeetings.setState({ selectedId: id, composing: null, focus: null, depth: 'brief' })
   }
   const mine = visible.filter((m) => isParticipant(m, viewerId))
-  const upcoming = mine.filter((m) => !m.minutes).sort((a, b) => a.startsAt - b.startsAt)
+  // Today's meetings that ended stay in the list, marked 끝남: the list holds what the 오늘 회의 tile counts.
+  const upcoming = mine
+    .filter((m) => !m.minutes || sameDay(m.startsAt, day))
+    .sort((a, b) => a.startsAt - b.startsAt)
   const past = visible.filter((m) => m.minutes).sort((a, b) => b.startsAt - a.startsAt)
   const today = mine.filter((m) => sameDay(m.startsAt, day))
   const week = workWeek(day, 0)
   const thisWeek = mine.filter((m) => week.some((entry) => sameDay(entry, m.startsAt)))
   const now = scenarioNow()
   const next = upcoming.find((m) => m.endsAt >= now && sameDay(m.startsAt, day))
-  const waiting = view.tasks.filter((task) => task.meetingId)
+  // The same 내 확인 필요 as Home's: one number, the same rows.
+  const waiting = view.tasks.filter((task) => task.who === 'waiting' && !task.done)
   const counts = followUpCounts(
     past.filter((m) => meetingAccess(m, viewerId, tasks) === 'full').flatMap((m) => m.followUps),
     tasks
@@ -180,9 +186,7 @@ export default function MeetingsPage(): React.JSX.Element {
                   } else if (tile === 'today') {
                     setPane('upcoming')
                   } else {
-                    document
-                      .querySelector<HTMLElement>('[data-meeting-card="waiting"] button')
-                      ?.focus()
+                    openHomeNeedsYou(FIRST_NEEDS_YOU)
                   }
                 }}
               />
@@ -214,6 +218,7 @@ export default function MeetingsPage(): React.JSX.Element {
                     ) : (
                       <MeetingList
                         meetings={pane === 'upcoming' ? upcoming : past}
+                        markEnded={pane === 'upcoming'}
                         projects={projects}
                         onSelect={select}
                       />
@@ -221,7 +226,7 @@ export default function MeetingsPage(): React.JSX.Element {
                   </TabsContent>
                 </HomeCard>
                 <div className="flex min-w-0 flex-col gap-4">
-                  <MeetingWaitingCard rows={waiting} projects={projects} onSelect={select} />
+                  <MeetingWaitingCard rows={waiting} projects={projects} />
                   <MeetingAgentCard onOpen={openMeetingBot} />
                 </div>
               </div>

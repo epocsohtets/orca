@@ -36,11 +36,14 @@ export function moveRowFocus(event: React.KeyboardEvent<HTMLElement>, selector: 
 export function MeetingList({
   meetings,
   projects,
-  onSelect
+  onSelect,
+  markEnded = false
 }: {
   meetings: readonly Meeting[]
   projects: Record<HomeProjectId, HomeProject>
   onSelect: (id: string) => void
+  /** A meeting that ended carries 끝남: the list is of meetings to come and today's. */
+  markEnded?: boolean
 }): React.JSX.Element | null {
   const t = useTranslate()
   const text = useMeetingText()
@@ -77,7 +80,7 @@ export function MeetingList({
             }
             title={meeting.title}
             tip={[state.label, roleOf(meeting), text.when(meeting)].join(' · ')}
-            chip={state.chip}
+            chip={markEnded && meeting.minutes ? t('meetings.status.done', 'Done') : state.chip}
             project={projects[meeting.project]}
             people={
               // Why two spans: a display class on one span would win over the container rule that hides it.

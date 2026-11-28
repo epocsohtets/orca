@@ -2,19 +2,13 @@ import React from 'react'
 import { Check } from 'lucide-react'
 import { useTranslate } from '@/i18n/use-translate'
 import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
+import { openHomeNeedsYou } from '@/components/home/home-task-items-host'
+import { taskItemUid } from '@/components/home/home-task-item-model'
 import { HomeRowMenu } from '@/components/home/HomeCard'
 import { respondToInvitation, useMeetings } from './meetings-store'
 
-/**
- * A row's answer to an invitation: the 답변 button while there is none, the row menu once there is one. Both
- * offer the same two answers.
- */
+/** A row's answer to an invitation: the 답변 button while there is none, the row menu to change it once there is. */
 export function MeetingAnswerMenu({ meetingId }: { meetingId: string }): React.JSX.Element | null {
   const t = useTranslate()
   const meeting = useMeetings((state) => state.meetings.find((entry) => entry.id === meetingId))
@@ -34,16 +28,21 @@ export function MeetingAnswerMenu({ meetingId }: { meetingId: string }): React.J
         : t('meetings.response.no', 'Not coming')}
     </DropdownMenuItem>
   ))
+  // Unanswered, it is a row of 내 확인 필요: answered where every decision is, in Home's panel.
   return response ? (
     <HomeRowMenu label={label}>{answers}</HomeRowMenu>
   ) : (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button type="button" variant="outline" size="xs" aria-label={label}>
-          {t('home.tasks.answer', 'Answer')}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">{answers}</DropdownMenuContent>
-    </DropdownMenu>
+    <Button
+      type="button"
+      variant="outline"
+      size="xs"
+      aria-label={label}
+      onClick={(event) => {
+        event.stopPropagation()
+        openHomeNeedsYou(taskItemUid(`invitation:${meeting.id}`))
+      }}
+    >
+      {t('home.tasks.answer', 'Answer')}
+    </Button>
   )
 }
