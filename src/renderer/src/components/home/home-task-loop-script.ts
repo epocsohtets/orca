@@ -104,28 +104,58 @@ export function buildHomeLoopScript(
           )
     }
   }
+  if (task.id === 'review') {
+    return {
+      plan: t(
+        'taskLoop.script.reviewPlan',
+        'This is how I will do it.\n\n1. Look at the two brand guide drafts.\n2. Write down, for each draft, what works and what gets in the way.\n3. Attach the draft of the comment to this conversation and to the task.'
+      ),
+      question: t('taskLoop.script.reviewQuestion', 'How should the comment be written?'),
+      choices: [
+        { id: 'a', label: t('taskLoop.script.reviewA', 'Compare both drafts'), recommended: true },
+        { id: 'b', label: t('taskLoop.script.reviewB', 'Recommend one draft') }
+      ],
+      next: '',
+      output: t('taskLoop.script.reviewOutput', 'Comment on the brand guide drafts (draft)'),
+      draft: second
+        ? t(
+            'taskLoop.script.reviewDraftOne',
+            '**Comment on the brand guide drafts (draft)**\n\nI recommend draft 2.\n\n- Its body text is easier to read in long passages.\n- Its accent colour is weak on buttons: raise the contrast one step.\n- Draft 1 has the stronger logo, but its margins are too tight for small sizes.'
+          )
+        : t(
+            'taskLoop.script.reviewDraftBoth',
+            '**Comment on the brand guide drafts (draft)**\n\n**Draft 1**\n- Works: the logo is strong and easy to recognise.\n- In the way: the margin around the logo is tight at small sizes.\n\n**Draft 2**\n- Works: the body text reads well in long passages.\n- In the way: the accent colour is weak on buttons.'
+          ),
+      note: t(
+        'taskLoop.script.reviewNote',
+        'Wrote the draft of the comment on the two brand guide drafts. Please review it.'
+      )
+    }
+  }
+  // Any other task: a draft named after the task, so every task an agent starts reaches a result.
+  const reader = second
+    ? t('taskLoop.script.readerTeam', 'Written for the project team to read.')
+    : t('taskLoop.script.readerMe', 'Written for me to read.')
   return {
     plan: t(
       'taskLoop.script.plan',
-      'This is how I will do it.\n\n1. Read the task description.\n2. Split the task into items and put the list in this conversation.'
+      'This is how I will do it.\n\n1. Read the task description and what is attached to it.\n2. Write the draft of “{{title}}”.\n3. Attach the draft to this conversation and to the task.',
+      { title: task.title }
     ),
-    question: t('taskLoop.script.question', 'Who should the list be written for?'),
+    question: t('taskLoop.script.question', 'Who should the draft be written for?'),
     choices: [
       { id: 'a', label: t('taskLoop.script.choiceA', 'For me'), recommended: true },
       { id: 'b', label: t('taskLoop.script.choiceB', 'For the project team') }
     ],
-    draft: null,
-    output: '',
-    next: second
-      ? t(
-          'taskLoop.script.nextTeam',
-          'I am splitting the task into items now. When the list is ready I will put it in this conversation, written for the project team to read.'
-        )
-      : t(
-          'taskLoop.script.next',
-          'I am splitting the task into items now. When the list is ready I will put it in this conversation.'
-        ),
-    note: ''
+    draft: `${t('taskLoop.script.draft', '**{{title}} (draft)**', { title: task.title })}\n\n${reader}\n\n${t(
+      'taskLoop.script.draftBody',
+      '1. What is settled\n2. What is left to do, in order\n3. What needs a check before it goes out'
+    )}`,
+    output: t('taskLoop.script.output', '{{title}} (draft)', { title: task.title }),
+    next: '',
+    note: t('taskLoop.script.note', 'Wrote the draft of “{{title}}”. Please review it.', {
+      title: task.title
+    })
   }
 }
 

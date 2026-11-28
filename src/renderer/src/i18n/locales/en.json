@@ -31575,10 +31575,8 @@
     },
     "source": "Where it was said",
     "ask": {
-      "send": "Ask",
       "noAnswer": "I did not find that in this meeting. Try a word that was said, or search the full transcript.",
-      "label": "Ask the meeting agent about this meeting",
-      "suggestions": "For example:"
+      "label": "Ask the meeting agent about this meeting"
     },
     "followUps": {
       "title": "Follow-up tasks",
@@ -31682,7 +31680,7 @@
       "created": "Meeting created. It is on {{count}} people’s schedule.",
       "create": "Create",
       "edit": "Edit, then create",
-      "dismiss": "No thanks"
+      "dismiss": "Don’t create"
     },
     "tiles": {
       "today": "Today’s meetings",
@@ -32018,8 +32016,8 @@
       "nowActivity": "Last activity {{when}}",
       "nowAgent": "Agent working",
       "nowMeeting": "Minutes · {{count}} follow-up tasks",
-      "ahead": "Written by the agent",
-      "take": "to use"
+      "ahead": "Agent’s suggestion",
+      "take": "Use"
     },
     "chip": {
       "waiting": "Needs my answer",
@@ -32027,6 +32025,10 @@
       "working": "Working",
       "draft": "Draft ready",
       "prep": "Prep"
+    },
+    "chat": {
+      "placeholder": "Message",
+      "placeholderTo": "Message {{name}}"
     }
   },
   "taskLoop": {
@@ -32080,20 +32082,32 @@
     "script": {
       "choiceA": "For me",
       "choiceB": "For the project team",
-      "plan": "This is how I will do it.\n\n1. Read the task description.\n2. Split the task into items and put the list in this conversation.",
-      "question": "Who should the list be written for?",
+      "plan": "This is how I will do it.\n\n1. Read the task description and what is attached to it.\n2. Write the draft of “{{title}}”.\n3. Attach the draft to this conversation and to the task.",
+      "question": "Who should the draft be written for?",
       "reportA": "Include it",
       "reportB": "Leave it out",
       "reportNumbers": "- Visitors: 112% of the target\n- Sign-up conversion: 3.4% (2.9% the month before)\n- Ad spend: 96% of the budget",
       "reportPlan": "This is how I will do it.\n\n1. Collect last month’s campaign numbers: visitors, sign-up conversion, ad spend.\n2. Write the draft of the results report.\n3. Attach the draft to this conversation and to the task.",
       "reportQuestion": "Should the report include the agency’s fee?",
-      "next": "I am splitting the task into items now. When the list is ready I will put it in this conversation.",
-      "nextTeam": "I am splitting the task into items now. When the list is ready I will put it in this conversation, written for the project team to read.",
       "reportDraft": "**Last month’s campaign results report (draft)**\n\n**Summary**\n\nMore people visited than we aimed for, and more of them signed up. Ad spend stayed inside the budget.",
       "reportAgency": "- Agency fee: 18% of ad spend",
       "reportNote": "Wrote the draft of last month’s campaign results report: visitors, sign-up conversion, ad spend and the agency’s fee. Please review it.",
       "reportNoteWithout": "Wrote the draft of last month’s campaign results report: visitors, sign-up conversion and ad spend. The agency’s fee is left out. Please review it.",
-      "reportOutput": "Last month’s campaign results report (draft)"
+      "reportOutput": "Last month’s campaign results report (draft)",
+      "reviewPlan": "This is how I will do it.\n\n1. Look at the two brand guide drafts.\n2. Write down, for each draft, what works and what gets in the way.\n3. Attach the draft of the comment to this conversation and to the task.",
+      "reviewQuestion": "How should the comment be written?",
+      "reviewA": "Compare both drafts",
+      "reviewB": "Recommend one draft",
+      "reviewOutput": "Comment on the brand guide drafts (draft)",
+      "reviewDraftOne": "**Comment on the brand guide drafts (draft)**\n\nI recommend draft 2.\n\n- Its body text is easier to read in long passages.\n- Its accent colour is weak on buttons: raise the contrast one step.\n- Draft 1 has the stronger logo, but its margins are too tight for small sizes.",
+      "reviewDraftBoth": "**Comment on the brand guide drafts (draft)**\n\n**Draft 1**\n- Works: the logo is strong and easy to recognise.\n- In the way: the margin around the logo is tight at small sizes.\n\n**Draft 2**\n- Works: the body text reads well in long passages.\n- In the way: the accent colour is weak on buttons.",
+      "reviewNote": "Wrote the draft of the comment on the two brand guide drafts. Please review it.",
+      "readerTeam": "Written for the project team to read.",
+      "readerMe": "Written for me to read.",
+      "draft": "**{{title}} (draft)**",
+      "draftBody": "1. What is settled\n2. What is left to do, in order\n3. What needs a check before it goes out",
+      "output": "{{title}} (draft)",
+      "note": "Wrote the draft of “{{title}}”. Please review it."
     },
     "settings": {
       "cardDescription": "Sign in and your tasks appear on Home and in Tasks.",

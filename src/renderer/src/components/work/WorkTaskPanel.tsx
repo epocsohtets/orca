@@ -222,33 +222,36 @@ export function WorkTaskPanel({
             </>
           ) : null}
         </dl>
-        <div className="px-3.5">
-          {readOnly ? (
-            <dl className="grid grid-cols-[72px_minmax(0,1fr)] gap-x-2 text-xs">
-              <dt className="text-muted-foreground">{t('taskLoop.detail.status', 'Status')}</dt>
-              <dd className="text-foreground" data-work-task-status={status}>
-                {statusLabels[status]}
-              </dd>
-            </dl>
-          ) : (
-            <HomeDayEndChipLine
-              question={t('taskLoop.detail.status', 'Status')}
-              quiet
-              chips={INAX_STATUSES.map((value) => ({
-                id: value,
-                label: statusLabels[value],
-                recommended: false
-              }))}
-              picked={status}
-              onPick={(value) => {
-                const next = INAX_STATUSES.find((entry) => entry === value)
-                if (next && next !== status) {
-                  onStatus(next)
-                }
-              }}
-            />
-          )}
-        </div>
+        {/* While the agent's question waits, that is the task's one state here: the status choice comes back after the answer. */}
+        {asks ? null : (
+          <div className="px-3.5">
+            {readOnly ? (
+              <dl className="grid grid-cols-[72px_minmax(0,1fr)] gap-x-2 text-xs">
+                <dt className="text-muted-foreground">{t('taskLoop.detail.status', 'Status')}</dt>
+                <dd className="text-foreground" data-work-task-status={status}>
+                  {statusLabels[status]}
+                </dd>
+              </dl>
+            ) : (
+              <HomeDayEndChipLine
+                question={t('taskLoop.detail.status', 'Status')}
+                quiet
+                chips={INAX_STATUSES.map((value) => ({
+                  id: value,
+                  label: statusLabels[value],
+                  recommended: false
+                }))}
+                picked={status}
+                onPick={(value) => {
+                  const next = INAX_STATUSES.find((entry) => entry === value)
+                  if (next && next !== status) {
+                    onStatus(next)
+                  }
+                }}
+              />
+            )}
+          </div>
+        )}
         {notes.length === 0 ? null : (
           <section className="px-3.5" data-work-task-notes="">
             <h3 className="mb-1 text-xs text-muted-foreground">
