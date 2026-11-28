@@ -28,6 +28,7 @@ import { InaxStep } from './InaxStep'
 import { normalizeWorkStyles } from '../../../../shared/settings/work-styles'
 import { useInaxMockAccount } from '@/lib/inax-mock-account'
 import { stepCopy, stepTooltipLabels } from './onboarding-step-copy'
+import { STEPS } from './use-onboarding-flow-types'
 
 type OnboardingFlowProps = {
   onboarding: OnboardingState
@@ -195,7 +196,13 @@ export default function OnboardingFlow({
                 'min-h-4'
               )}
             >
-              {flow.progressSteps.map(({ step, index: realStepIndex }, progressIdx) => {
+              {(pageCountUnknown
+                ? // Before the choice on page 1, the bar shows the shortest way: this page and the sign-in.
+                  STEPS.map((step, index) => ({ step, index })).filter(
+                    ({ step }) => step.id === 'work_style' || step.id === 'inax'
+                  )
+                : flow.progressSteps
+              ).map(({ step, index: realStepIndex }, progressIdx) => {
                 const isActive = realStepIndex === stepIndex
                 const isDone = realStepIndex < stepIndex
                 const stepTooltipLabel = stepTooltipLabels[step.id].value
@@ -207,8 +214,7 @@ export default function OnboardingFlow({
                         className={cn(
                           // Expand the invisible hit area while keeping the stepper bars 4px tall.
                           'relative h-1 rounded-full outline-none transition-all duration-300 before:absolute before:-inset-y-2 before:-inset-x-1 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card',
-                          // The number of pages follows the choice on page 1: before it, only this page's bar shows.
-                          pageCountUnknown && progressIdx > 0 && 'invisible',
+                          'disabled:pointer-events-none',
                           isActive
                             ? 'w-10 bg-foreground'
                             : isDone
@@ -221,6 +227,8 @@ export default function OnboardingFlow({
                           { value0: progressIdx + 1, value1: stepTooltipLabel }
                         )}
                         aria-current={isActive ? 'step' : undefined}
+                        // No way past the choice on page 1 before it is made.
+                        disabled={pageCountUnknown && progressIdx > 0}
                         onClick={() => flow.jumpToStep(realStepIndex)}
                       />
                     </TooltipTrigger>
@@ -230,18 +238,6 @@ export default function OnboardingFlow({
                   </Tooltip>
                 )
               })}
-              <span
-                className={cn(
-                  'ml-3 text-xs font-medium text-muted-foreground',
-                  pageCountUnknown && 'invisible'
-                )}
-              >
-                {t(
-                  'auto.components.onboarding.OnboardingFlow.stepOfTotal',
-                  '{{current}} of {{total}}',
-                  { current: flow.progressStepIndex + 1, total: flow.progressSteps.length }
-                )}
-              </span>
             </div>
 
             <div className="mt-8 shrink-0">
