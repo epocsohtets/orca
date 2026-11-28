@@ -1,5 +1,5 @@
 import type { Translate } from '@/i18n/use-translate'
-import { isParticipant, meetingAccess } from '@/components/meetings/meeting-rules'
+import { awaitsAnswer, isParticipant, meetingAccess } from '@/components/meetings/meeting-rules'
 import type { Meeting, MeetingTask } from '@/components/meetings/meeting-types'
 import type { HomeActivity } from './home-board-activity-mock'
 import type { HomeUpcoming, HomeUpcomingGroup } from './home-board-day-mock'
@@ -17,7 +17,7 @@ export type HomeMeetingsBoard = {
   tasks: HomeTask[]
   /** Follow-up tasks of meetings I can see that belong to someone else; they open, read only. */
   otherTasks: HomeTask[]
-  /** What a meeting waits on me for: requests to see its minutes. */
+  /** What a meeting waits on me for: invitations I have not answered, requests to see its minutes. */
   waiting: HomeTask[]
   upcoming: HomeUpcoming[]
   activity: HomeActivity[]
@@ -157,6 +157,27 @@ export function buildHomeMeetings(
     }
   }
 
+  for (const meeting of mine.filter((entry) => awaitsAnswer(entry, viewerId))) {
+    const day = startOfDay(meeting.startsAt)
+    const away = calendarDaysBetween(args.sampleDay, day)
+    const clock = formatHomeClock(minuteOfDay(meeting.startsAt))
+    waiting.push(
+      waitingRow(`invitation:${meeting.id}`, meeting, {
+        title: t('home.task.invitation', '{{name}} invites me to “{{title}}”', {
+          name: args.personName(meeting.hostId),
+          title: meeting.title
+        }),
+        whoLabel: t('home.task.requestWho', 'Needs me'),
+        detail: '',
+        invitation: true,
+        // Nobody's agent asks this: the host does.
+        agentId: undefined,
+        due: away <= 0 ? 'today' : away === 1 ? 'tomorrow' : 'week',
+        dueLabel: away === 0 ? clock : `${args.weekday(day)} ${clock}`
+      })
+    )
+  }
+
   const recording = mine.find((meeting) => meeting.recordingStartedAt !== null) ?? null
   const upcoming: HomeUpcoming[] = []
   for (const meeting of [...mine].sort((a, b) => a.startsAt - b.startsAt)) {
@@ -190,7 +211,7 @@ export function buildHomeMeetings(
         note:
           meeting.recordingStartedAt !== null
             ? ''
-            : over
+            : over || awaitsAnswer(meeting, viewerId)
               ? t('home.chip.waiting', 'Needs me')
               : meeting.outline || meeting.materials.length > 0
                 ? t('home.chip.prep', 'Prep')
@@ -270,6 +291,8 @@ export function buildHomeMeetings(
     })
   }
 
+  // The meeting agent waits only on what it asks; an invitation is the host's.
+  const asked = waiting.find((row) => !row.invitation)
   return {
     tasks: followUpTasks.filter((task) => task.assignee === undefined),
     otherTasks: followUpTasks.filter((task) => task.assignee !== undefined),
@@ -283,8 +306,8 @@ export function buildHomeMeetings(
           state: 'working',
           stage: 2
         }
-      : waiting[0]
-        ? { doing: waiting[0].title, state: 'waiting', stage: 3, taskId: waiting[0].id }
+      : asked
+        ? { doing: asked.title, state: 'waiting', stage: 3, taskId: asked.id }
         : { doing: t('home.agent.calendarDoing', 'Nothing assigned'), state: 'idle', stage: 0 }
   }
 }

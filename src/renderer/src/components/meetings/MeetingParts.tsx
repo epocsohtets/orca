@@ -4,7 +4,7 @@ import { uiDateTimeFormat } from '@/i18n/ui-intl-formatters'
 import { Label } from '@/components/ui/label'
 import { HOME_FOCUS_RING_CLASS, HOME_META_CLASS, HomeWhoMarker } from '@/components/home/HomeCard'
 import type { HomeTaskWho } from '@/components/home/home-board'
-import { followUpCounts, followUpState, meetingAccess } from './meeting-rules'
+import { awaitsAnswer, followUpCounts, followUpState, meetingAccess } from './meeting-rules'
 import { dayDistance } from './meeting-schedule'
 import type { Meeting, MeetingTaskStatus } from './meeting-types'
 import { useMeetings } from './meetings-store'
@@ -43,7 +43,12 @@ export function useMeetingState(): (meeting: Meeting) => MeetingState {
       return {
         who: null,
         kind: 'scheduled',
-        chip: prep ? t('home.chip.prep', 'Prep') : undefined,
+        // An invitation I have not answered waits on me: every list says so with the same chip.
+        chip: awaitsAnswer(meeting, viewerId)
+          ? t('home.chip.waiting', 'Needs me')
+          : prep
+            ? t('home.chip.prep', 'Prep')
+            : undefined,
         label: prep
           ? t('meetings.state.scheduledPrep', 'Scheduled · prep ready')
           : t('meetings.state.scheduledNoPrep', 'Scheduled')

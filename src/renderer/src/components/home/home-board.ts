@@ -33,6 +33,8 @@ export type HomeTask = {
   choices?: HomeChoice[]
   /** Something a meeting waits on me for (an offer, follow-ups to sort): listed under Needs me, not a task. */
   meetingId?: string
+  /** An invitation to `meetingId` I have not answered: its row answers it with 참석 / 불참. */
+  invitation?: boolean
   /** A follow-up task: the meeting it came from and the sentence it rests on. */
   origin?: { meetingId: string; turnId: string | null }
   /** Set when the task belongs to someone else: it opens, but I cannot start or finish it. */
@@ -161,7 +163,8 @@ export function homeTaskTab(task: HomeTask): HomeTaskTab[] {
   if (task.who === 'waiting') {
     tabs.push('waiting')
   }
-  if (task.due === 'overdue' || task.who === 'blocked') {
+  // One kind per count: late is past its date. Awaiting a reply is the row's chip, not a second kind here.
+  if (task.due === 'overdue') {
     tabs.push('late')
   }
   return tabs
@@ -185,7 +188,7 @@ export function countHomeBoard(tasks: readonly HomeTask[]): HomeBoardCounts {
     waiting: waiting.length,
     waitingAgents: waiting.filter((task) => !task.meetingId).length,
     waitingMeetings: waiting.filter((task) => task.meetingId).length,
-    late: open.filter((task) => task.due === 'overdue' || task.who === 'blocked').length
+    late: open.filter((task) => task.due === 'overdue').length
   }
 }
 

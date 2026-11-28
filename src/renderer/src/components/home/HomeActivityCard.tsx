@@ -64,7 +64,6 @@ export function HomeActivityCard({
     <HomeCard
       title={t('home.activity.title', 'Recent activity')}
       titleTip={t('home.activity.aside', 'This week')}
-      aside={t('home.activity.aside', 'This week')}
       data-home-card="activity"
       tabs={{
         label: t('home.activity.filter', 'Activity type'),

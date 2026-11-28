@@ -5,7 +5,8 @@ import { HomeAvatarStack, HomeRow } from '@/components/home/HomeCard'
 import type { HomeProjectId } from '@/components/home/home-board'
 import type { HomeProject } from '@/components/home/home-board-mock'
 import { personName } from './meeting-people'
-import { meetingAccess } from './meeting-rules'
+import { invitedToAnswer, meetingAccess } from './meeting-rules'
+import { MeetingAnswerMenu } from './MeetingAnswerMenu'
 import { useMeetingState, useMeetingText } from './MeetingParts'
 import type { Meeting } from './meeting-types'
 import { useMeetings } from './meetings-store'
@@ -90,6 +91,12 @@ export function MeetingList({
             }
             date={text.whenShort(meeting)}
             onClick={() => onSelect(meeting.id)}
+            // The one button a row may carry: an invitation waiting on my answer (R3).
+            action={
+              invitedToAnswer(meeting, viewerId) ? (
+                <MeetingAnswerMenu meetingId={meeting.id} />
+              ) : null
+            }
           />
         )
       })}

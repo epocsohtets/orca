@@ -70,13 +70,10 @@ export type HomeTileId = 'tasks' | 'waiting' | 'agentDone' | 'late'
 export function HomeTiles({
   counts,
   agentFinished,
-  lateFirst,
   onSelect
 }: {
   counts: HomeBoardCounts
   agentFinished: number
-  /** The first late row's title; the late date is on the row itself. */
-  lateFirst: string
   onSelect: (tile: HomeTileId) => void
 }): React.JSX.Element {
   const t = useTranslate()
@@ -102,10 +99,8 @@ export function HomeTiles({
     {
       id: 'late',
       icon: Clock,
-      label: t('home.tiles.late', 'Late · awaiting others'),
+      label: t('home.tiles.late', 'Late'),
       value: counts.late,
-      sub: lateFirst,
-      tone: 'alert',
       alert: counts.late > 0
     }
   ]

@@ -6,6 +6,7 @@ import { HomeCard, HomeRow, HomeStateIcon } from '@/components/home/HomeCard'
 import type { HomeProjectId, HomeTask } from '@/components/home/home-board'
 import type { HomeProject } from '@/components/home/home-board-mock'
 import { botItemsFor } from './meeting-rules'
+import { MeetingAnswerMenu } from './MeetingAnswerMenu'
 import { useMeetingText } from './MeetingParts'
 import { useMeetings } from './meetings-store'
 
@@ -46,9 +47,13 @@ export function MeetingWaitingCard({
                 chip={t('home.chip.waiting', 'Needs me')}
                 onClick={open}
                 action={
-                  <Button type="button" variant="outline" size="xs" onClick={open}>
-                    {t('home.tasks.answer', 'Answer')}
-                  </Button>
+                  row.invitation && row.meetingId ? (
+                    <MeetingAnswerMenu meetingId={row.meetingId} />
+                  ) : (
+                    <Button type="button" variant="outline" size="xs" onClick={open}>
+                      {t('home.tasks.answer', 'Answer')}
+                    </Button>
+                  )
                 }
               />
             )

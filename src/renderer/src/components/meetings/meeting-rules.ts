@@ -10,6 +10,17 @@ import type {
 export const isParticipant = (meeting: Meeting, personId: string): boolean =>
   meeting.hostId === personId || meeting.attendeeIds.includes(personId)
 
+/** An invited person (not the host) answers the invitation until the meeting starts. */
+export const invitedToAnswer = (meeting: Meeting, personId: string): boolean =>
+  meeting.hostId !== personId &&
+  meeting.attendeeIds.includes(personId) &&
+  !meeting.minutes &&
+  meeting.recordingStartedAt === null
+
+/** An invitation with no answer yet: it waits on that person, and is counted with what does. */
+export const awaitsAnswer = (meeting: Meeting, personId: string): boolean =>
+  invitedToAnswer(meeting, personId) && meeting.responses[personId] === undefined
+
 /** Attendees see everything; an assignee who did not attend sees only what their task rests on. */
 export function meetingAccess(
   meeting: Meeting,

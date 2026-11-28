@@ -11,6 +11,7 @@ import {
   type HomeTaskTab
 } from './home-board'
 import type { HomeProject } from './home-board-mock'
+import { MeetingAnswerMenu } from '@/components/meetings/MeetingAnswerMenu'
 
 const TABS: HomeTaskTab[] = ['today', 'waiting', 'late', 'done']
 
@@ -122,20 +123,25 @@ export function HomeTasksCard({
                   action={
                     // One width for every row's slot, so the date column stays on one line.
                     <span className="flex w-[104px] justify-end">
-                      {waiting ? (
+                      {waiting && task.invitation && task.meetingId ? (
+                        <MeetingAnswerMenu meetingId={task.meetingId} />
+                      ) : waiting ? (
                         <Button type="button" variant="outline" size="xs" onClick={go}>
                           {t('home.tasks.answer', 'Answer')}
                         </Button>
                       ) : startable(task) ? (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="xs"
-                          data-home-task-start=""
-                          onClick={() => onStart(task)}
-                        >
-                          {t('taskLoop.detail.start', 'Start with an agent')}
-                        </Button>
+                        // Shown on the row's hover or focus only (R3); its slot stays, so dates keep their column.
+                        <span className="flex opacity-0 group-focus-within/home-row:opacity-100 group-hover/home-row:opacity-100 pointer-coarse:opacity-100">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="xs"
+                            data-home-task-start=""
+                            onClick={() => onStart(task)}
+                          >
+                            {t('taskLoop.detail.start', 'Start with an agent')}
+                          </Button>
+                        </span>
                       ) : null}
                     </span>
                   }

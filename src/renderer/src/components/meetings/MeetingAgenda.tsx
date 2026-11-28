@@ -1,22 +1,17 @@
 import React, { useState } from 'react'
-import { Check, ChevronLeft, ChevronRight, FileText, Mic, Users } from 'lucide-react'
+import { ChevronLeft, ChevronRight, FileText, Mic, Users } from 'lucide-react'
 import { useTranslate } from '@/i18n/use-translate'
 import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
-import { HOME_GROUP_CLASS, HomeRow, HomeRowMenu } from '@/components/home/HomeCard'
+import { HOME_GROUP_CLASS, HomeRow } from '@/components/home/HomeCard'
 import type { HomeProjectId } from '@/components/home/home-board'
 import type { HomeProject } from '@/components/home/home-board-mock'
 import { personName } from './meeting-people'
-import { isParticipant } from './meeting-rules'
+import { invitedToAnswer, isParticipant } from './meeting-rules'
+import { MeetingAnswerMenu } from './MeetingAnswerMenu'
 import { sameDay, workWeek } from './meeting-schedule'
 import { moveRowFocus } from './MeetingList'
 import { useMeetingState, useMeetingText } from './MeetingParts'
-import { respondToInvitation, useMeetings } from './meetings-store'
+import { useMeetings } from './meetings-store'
 
 /** The viewer's own schedule: one working week, a day at a time, as Home groups what is coming up. */
 export function MeetingAgenda({
@@ -86,26 +81,8 @@ export function MeetingAgenda({
                 <ul className="mx-4">
                   {entries.map((meeting) => {
                     const state = stateOf(meeting)
-                    // An invited person answers until the meeting starts; the host sees it on the meeting.
-                    const answerable =
-                      meeting.hostId !== viewerId &&
-                      !meeting.minutes &&
-                      meeting.recordingStartedAt === null
+                    const answerable = invitedToAnswer(meeting, viewerId)
                     const response = meeting.responses[viewerId]
-                    const answers = (['yes', 'no'] as const).map((answer) => (
-                      <DropdownMenuItem
-                        key={answer}
-                        onSelect={() => respondToInvitation(meeting.id, answer)}
-                      >
-                        {response === answer ? <Check aria-hidden /> : null}
-                        {answer === 'yes'
-                          ? t('meetings.response.yes', 'Coming')
-                          : t('meetings.response.no', 'Not coming')}
-                      </DropdownMenuItem>
-                    ))
-                    const label = t('meetings.response.label', 'Will you come to “{{title}}”?', {
-                      title: meeting.title
-                    })
                     return (
                       <HomeRow
                         key={meeting.id}
@@ -137,30 +114,11 @@ export function MeetingAgenda({
                         ]
                           .filter(Boolean)
                           .join(' · ')}
-                        // 내 확인 필요 is what the page counts; an invitation is marked by its 답변 button.
                         chip={state.chip}
                         project={projects[meeting.project]}
                         date={text.time(meeting.startsAt)}
                         onClick={() => onSelect(meeting.id)}
-                        action={
-                          !answerable ? null : response ? (
-                            <HomeRowMenu label={label}>{answers}</HomeRowMenu>
-                          ) : (
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="xs"
-                                  aria-label={label}
-                                >
-                                  {t('home.tasks.answer', 'Answer')}
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">{answers}</DropdownMenuContent>
-                            </DropdownMenu>
-                          )
-                        }
+                        action={answerable ? <MeetingAnswerMenu meetingId={meeting.id} /> : null}
                       />
                     )
                   })}

@@ -16,7 +16,7 @@ const HEAD_CLASS = 'h-8 px-4 py-0 text-left text-xs leading-4 font-normal whites
 const FIT_CLASS = `${HEAD_CLASS} w-px`
 const CELL_CLASS = 'h-10 px-4 py-0 align-middle'
 
-/** One line per agent or bot: what it is doing, its state, its stage as a word. Waiting on me comes first. */
+/** One line per agent or bot: what it is doing and its one state. Waiting on me comes first. */
 export function HomeAgentsCard({
   agents,
   openId,
@@ -36,12 +36,6 @@ export function HomeAgentsCard({
     blocked: t('home.agents.blocked', 'Blocked'),
     idle: t('home.agents.idle', 'Resting')
   }
-  const stageLabels = [
-    t('home.agents.stageNone', 'Not started'),
-    t('home.agents.stagePlan', 'Plan'),
-    t('home.agents.stageWork', 'Work'),
-    t('home.agents.stageReview', 'Review')
-  ]
 
   return (
     <HomeCard title={t('home.agents.title', 'Agents')} data-home-card="agents">
@@ -57,9 +51,6 @@ export function HomeAgentsCard({
               </th>
               <th scope="col" className={FIT_CLASS}>
                 {t('home.agents.colState', 'State')}
-              </th>
-              <th scope="col" className={FIT_CLASS}>
-                {t('home.agents.colProgress', 'Progress')}
               </th>
               <th scope="col" className={`${FIT_CLASS} text-right`}>
                 {t('home.agents.colLast', 'Last activity')}
@@ -100,16 +91,13 @@ export function HomeAgentsCard({
                         label={agent.stateLabel ?? stateLabels[agent.state]}
                       />
                     </td>
-                    <td className={`${CELL_CLASS} whitespace-nowrap ${HOME_META_CLASS}`}>
-                      {stageLabels[agent.stage]}
-                    </td>
                     <td className={`${CELL_CLASS} text-right whitespace-nowrap ${HOME_META_CLASS}`}>
                       {agent.last}
                     </td>
                   </tr>
                   {open ? (
                     <tr>
-                      <td colSpan={5} className="p-0">
+                      <td colSpan={4} className="p-0">
                         <div className={HOME_ROW_DETAIL_CLASS}>
                           <ul className="flex flex-col gap-1">
                             {agent.lines.map((line) => (
