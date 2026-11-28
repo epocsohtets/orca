@@ -40,7 +40,8 @@ export function HomePageHeading({
   children
 }: {
   title: string
-  line: string
+  /** The line under the title (the date); none on a form. */
+  line?: string
   /** A way back, above the title. */
   before?: React.ReactNode
   children?: React.ReactNode
@@ -56,7 +57,7 @@ export function HomePageHeading({
         >
           {title}
         </h1>
-        <p className={HOME_META_CLASS}>{line}</p>
+        {line ? <p className={HOME_META_CLASS}>{line}</p> : null}
       </div>
       <div className="flex flex-wrap items-center gap-2">{children}</div>
     </header>

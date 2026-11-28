@@ -140,14 +140,7 @@ export default function MeetingsPage(): React.JSX.Element {
         <div className={HOME_BOARD_PAGE_CLASS}>
           {composing ? (
             <>
-              <HomePageHeading
-                title={createLabel}
-                line={t(
-                  'meetings.form.line',
-                  'The meeting goes on each attendee’s schedule, with the outline and the materials.'
-                )}
-                before={back}
-              />
+              <HomePageHeading title={createLabel} before={back} />
               <HomeCard title={t('meetings.form.card', 'New meeting')} data-meeting-card="create">
                 <div className="px-4">
                   <MeetingCreateForm
