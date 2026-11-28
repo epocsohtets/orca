@@ -1,18 +1,21 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useTranslate } from '@/i18n/use-translate'
-import { Button } from '@/components/ui/button'
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import {
   Select,
   SelectContent,
   SelectItem,
+  SelectSeparator,
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-import { HOME_META_CLASS } from './HomeCard'
+import { HomeRow, HomeRowMenu } from './HomeCard'
 import type { HomeRecordAnswer, HomeTask } from './home-board'
 import type { HomeDayRecord } from './home-board-day-mock'
 
-/** One day record the app is unsure about: link it to a task I pick, or say it was not work. Undoable. */
+const NOT_WORK = 'notWork'
+
+/** One day record the app is unsure about: I pick its task, or say it was not work. Picking applies at once. */
 export function HomeRecordRow({
   record,
   answer,
@@ -25,53 +28,49 @@ export function HomeRecordRow({
   onAnswer: (answer: HomeRecordAnswer | null) => void
 }): React.JSX.Element {
   const t = useTranslate()
-  const [taskId, setTaskId] = useState(record.suggestTaskId)
-  const linked =
-    answer && answer !== 'notWork' ? tasks.find((task) => task.id === answer.taskId) : null
   return (
-    <li className="flex flex-col gap-2 py-2" data-home-record={answer ? 'answered' : 'open'}>
-      <p
-        className={`text-[13px] leading-5 ${answer === 'notWork' ? 'text-muted-foreground' : 'text-foreground'}`}
-      >
-        {record.text}
-      </p>
-      {answer ? (
-        <div className="flex flex-wrap items-center gap-2" role="status">
-          <span className={HOME_META_CLASS}>
-            {answer === 'notWork'
-              ? t('home.day.excluded', 'Not work')
-              : t('home.day.linked', 'Linked to “{{task}}”', { task: linked?.title ?? '' })}
-          </span>
-          <Button type="button" variant="ghost-muted" size="xs" onClick={() => onAnswer(null)}>
-            {t('home.day.undo', 'Undo')}
-          </Button>
-        </div>
-      ) : (
-        <div className="flex flex-wrap items-center gap-2">
-          <Select value={taskId} onValueChange={setTaskId}>
+    <HomeRow
+      data-home-record={answer ? 'answered' : 'open'}
+      title={record.text}
+      tip={record.text}
+      action={
+        <span className="flex items-center gap-1">
+          <Select
+            // Why '': an empty value shows the placeholder again after an undo.
+            value={answer ? (answer === NOT_WORK ? NOT_WORK : answer.taskId) : ''}
+            onValueChange={(value) => onAnswer(value === NOT_WORK ? NOT_WORK : { taskId: value })}
+          >
             <SelectTrigger
               size="xs"
-              className="min-w-0 flex-1"
+              className="w-40"
               aria-label={t('home.day.pickTask', 'Task to link this record to')}
             >
-              <SelectValue />
+              <SelectValue placeholder={t('home.day.pick', 'Pick a task')} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent align="end">
               {tasks.map((task) => (
                 <SelectItem key={task.id} value={task.id}>
                   {task.title}
                 </SelectItem>
               ))}
+              <SelectSeparator />
+              <SelectItem value={NOT_WORK}>{t('home.day.notWork', 'Not work')}</SelectItem>
             </SelectContent>
           </Select>
-          <Button type="button" variant="outline" size="xs" onClick={() => onAnswer({ taskId })}>
-            {t('home.day.link', 'Link')}
-          </Button>
-          <Button type="button" variant="outline" size="xs" onClick={() => onAnswer('notWork')}>
-            {t('home.day.notWork', 'Not work')}
-          </Button>
-        </div>
-      )}
-    </li>
+          {/* The slot stays when the menu does not: the select keeps its place. */}
+          <span className="flex w-7 justify-end">
+            {answer ? (
+              <HomeRowMenu
+                label={t('meetings.followUps.more', 'Menu for “{{text}}”', { text: record.text })}
+              >
+                <DropdownMenuItem onSelect={() => onAnswer(null)}>
+                  {t('home.day.undo', 'Undo')}
+                </DropdownMenuItem>
+              </HomeRowMenu>
+            ) : null}
+          </span>
+        </span>
+      }
+    />
   )
 }

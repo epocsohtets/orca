@@ -69,14 +69,12 @@ export type HomeTileId = 'tasks' | 'waiting' | 'agentDone' | 'late'
 export function HomeTiles({
   counts,
   agentFinished,
-  agentConfirmed,
   lateFirst,
   onSelect
 }: {
   counts: HomeBoardCounts
   agentFinished: number
-  agentConfirmed: number
-  /** The first late row, in the row's own words: every tile has a line under its number. */
+  /** The first late row, in the row's own words. */
   lateFirst: string
   onSelect: (tile: HomeTileId) => void
 }): React.JSX.Element {
@@ -86,29 +84,19 @@ export function HomeTiles({
       id: 'tasks',
       icon: List,
       label: t('home.tiles.tasks', 'My work'),
-      value: counts.open,
-      sub: t('home.tiles.tasksSub', '{{count}} due today', { count: counts.dueToday })
+      value: counts.open
     },
     {
       id: 'waiting',
       icon: CircleAlert,
       label: t('home.tiles.waiting', 'Needs me'),
-      value: counts.waiting,
-      sub: t('home.tiles.waitingSub', 'Agents {{agents}}, meetings {{meetings}}', {
-        agents: counts.waitingAgents,
-        meetings: counts.waitingMeetings
-      })
+      value: counts.waiting
     },
     {
       id: 'agentDone',
       icon: CircleCheck,
-      tone: 'done',
       label: t('home.tiles.agentDone', 'Finished by agents'),
-      value: agentFinished,
-      sub: t('home.tiles.agentDoneSub', 'This week · {{confirmed}} of {{total}} confirmed by me', {
-        confirmed: agentConfirmed,
-        total: agentFinished
-      })
+      value: agentFinished
     },
     {
       id: 'late',
@@ -128,7 +116,8 @@ export type HomeTile<Id extends string> = {
   icon: LucideIcon
   label: string
   value: number | string
-  sub: string
+  /** Words under the number, never a second count: a tile shows one number. */
+  sub?: string
   /** What the helper line means: done is green, alert (late, or waits on me) is red. */
   tone?: 'done' | 'alert'
   /** The number counts late items and is above zero. */

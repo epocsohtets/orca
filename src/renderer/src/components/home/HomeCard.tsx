@@ -30,7 +30,7 @@ export const HOME_FOCUS_RING_CLASS =
 export const HOME_ROW_BUTTON_CLASS = `${HOME_FOCUS_RING_CLASS} w-full min-w-0 px-4 py-2 text-left transition-colors motion-reduce:transition-none hover:bg-accent`
 /** What a row shows when it is open. */
 export const HOME_ROW_DETAIL_CLASS = 'flex flex-col gap-2 bg-accent/50 px-4 py-3'
-/** A group's name above its rows: 28px, with its count. */
+/** A group's name above its rows: 28px. */
 export const HOME_GROUP_CLASS = `flex h-7 items-center gap-1.5 px-4 ${HOME_META_CLASS}`
 /** The board pages' own button rules: two weights only, no shadow on an outline button, 28px page buttons. */
 export const HOME_BOARD_SCOPE_CLASS =
@@ -263,14 +263,16 @@ export function HomeRow({
       <span className="min-w-0 flex-1" />
       <span className="flex shrink-0 items-center gap-6">
         {project ? (
-          <span className="flex w-[140px] items-center gap-1.5 @max-[30rem]/home-card:w-auto">
-            <span
-              aria-hidden
-              className="size-1.5 shrink-0 rounded-full"
-              style={{ backgroundColor: project.color }}
-            />
-            <span className={`truncate @max-[30rem]/home-card:hidden ${HOME_META_CLASS}`}>
-              {project.name}
+          // A narrow card leaves the project to the item's own page: a dot alone says nothing.
+          // Why two spans: `flex` on the same span would win over the container rule that hides it.
+          <span className="@max-[30rem]/home-card:hidden">
+            <span className="flex w-[140px] items-center gap-1.5">
+              <span
+                aria-hidden
+                className="size-1.5 shrink-0 rounded-full"
+                style={{ backgroundColor: project.color }}
+              />
+              <span className={`truncate ${HOME_META_CLASS}`}>{project.name}</span>
             </span>
           </span>
         ) : null}

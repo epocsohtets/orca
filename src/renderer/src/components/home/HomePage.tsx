@@ -224,7 +224,6 @@ export default function HomePage(): React.JSX.Element {
                   <HomeTiles
                     counts={view.counts}
                     agentFinished={view.agentFinished}
-                    agentConfirmed={view.agentConfirmed}
                     lateFirst={lateFirst ? `${lateFirst.dueLabel} · ${lateFirst.title}` : ''}
                     onSelect={selectTile}
                   />

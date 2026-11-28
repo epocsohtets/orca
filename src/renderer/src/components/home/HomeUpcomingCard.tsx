@@ -56,10 +56,7 @@ export function HomeUpcomingCard({
         }
         return (
           <section key={group} aria-label={groupLabels[group]}>
-            <h3 className={HOME_GROUP_CLASS}>
-              {groupLabels[group]}
-              <span className="tabular-nums">{rows.length}</span>
-            </h3>
+            <h3 className={HOME_GROUP_CLASS}>{groupLabels[group]}</h3>
             <ul className="mx-4">
               {rows.map((item) => (
                 <HomeRow
@@ -86,7 +83,11 @@ export function HomeUpcomingCard({
                   ]
                     .filter(Boolean)
                     .join(' · ')}
-                  chip={item.meeting?.note || undefined}
+                  chip={
+                    item.meeting?.recording
+                      ? t('meetings.chip.recording', 'Recording')
+                      : item.meeting?.note || undefined
+                  }
                   project={projects[item.project]}
                   date={item.when}
                   onClick={() => {

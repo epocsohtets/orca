@@ -88,9 +88,7 @@ export function HomeDayEndResult({
   return (
     <section data-home-day-end-result="" className="mt-3">
       <h3 className={`mx-4 border-t border-border px-0 ${HOME_GROUP_CLASS}`}>
-        {t('home.dayEnd.resultTitle', 'What the team sees today · {{count}}', {
-          count: rows.length
-        })}
+        {t('home.dayEnd.resultTitle', 'What the team sees today')}
       </h3>
       <ul className="mx-4">
         {rows.map((row) => (
