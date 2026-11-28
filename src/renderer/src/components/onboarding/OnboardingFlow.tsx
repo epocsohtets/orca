@@ -34,6 +34,28 @@ type OnboardingFlowProps = {
   onOnboardingChange: (state: OnboardingState) => void
 }
 
+/**
+ * The line above a page's title. Every page keeps its place, so the title does not jump between pages; only
+ * the first page shows it.
+ */
+function OnboardingEyebrow({ shown }: { shown: boolean }): React.JSX.Element {
+  const t = useTranslate()
+  const welcome = t('auto.components.onboarding.OnboardingFlow.1b5e182e9f', 'Welcome to Orca')
+  return (
+    <div
+      aria-hidden={!shown}
+      className={cn(
+        'mb-2 text-xs font-medium uppercase text-muted-foreground',
+        // Latin capitals only: the same tracking pulls Korean or Japanese syllables apart.
+        /^[\u0020-\u024f]*$/.test(welcome) && 'tracking-[0.18em]',
+        !shown && 'invisible'
+      )}
+    >
+      {welcome}
+    </div>
+  )
+}
+
 export default function OnboardingFlow({
   onboarding,
   onOnboardingChange
@@ -170,8 +192,7 @@ export default function OnboardingFlow({
             <div
               className={cn(
                 'mt-10 flex items-center gap-2 transition-[margin-top] duration-[760ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none',
-                // The number of pages follows the choice on page 1: no total is shown before it.
-                pageCountUnknown && 'invisible'
+                'min-h-4'
               )}
             >
               {flow.progressSteps.map(({ step, index: realStepIndex }, progressIdx) => {
@@ -186,6 +207,8 @@ export default function OnboardingFlow({
                         className={cn(
                           // Expand the invisible hit area while keeping the stepper bars 4px tall.
                           'relative h-1 rounded-full outline-none transition-all duration-300 before:absolute before:-inset-y-2 before:-inset-x-1 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card',
+                          // The number of pages follows the choice on page 1: before it, only this page's bar shows.
+                          pageCountUnknown && progressIdx > 0 && 'invisible',
                           isActive
                             ? 'w-10 bg-foreground'
                             : isDone
@@ -207,7 +230,12 @@ export default function OnboardingFlow({
                   </Tooltip>
                 )
               })}
-              <span className="ml-3 text-xs font-medium text-muted-foreground">
+              <span
+                className={cn(
+                  'ml-3 text-xs font-medium text-muted-foreground',
+                  pageCountUnknown && 'invisible'
+                )}
+              >
                 {t(
                   'auto.components.onboarding.OnboardingFlow.stepOfTotal',
                   '{{current}} of {{total}}',
@@ -217,11 +245,7 @@ export default function OnboardingFlow({
             </div>
 
             <div className="mt-8 shrink-0">
-              {stepIndex === 0 && (
-                <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                  {t('auto.components.onboarding.OnboardingFlow.1b5e182e9f', 'Welcome to Orca')}
-                </div>
-              )}
+              <OnboardingEyebrow shown={stepIndex === 0} />
               <h1 className="text-[34px] font-semibold leading-[1.15] tracking-tight text-foreground">
                 {copy.title}
               </h1>
@@ -304,8 +328,8 @@ export default function OnboardingFlow({
               onSetUpLater={() => void flow.setUpLater()}
               stepIndex={stepIndex}
               onBack={flow.back}
-              // Signed out, the page's own sign-in button is the one primary action.
-              showPrimary={!onInaxPage || inaxSignedIn}
+              // Signed out, the way on keeps its place and waits for the sign-in.
+              primaryDisabled={onInaxPage && !inaxSignedIn}
               primaryBusy={shouldShowFooterBusy}
               primaryLabel={footerPrimaryLabel}
               shortcutModifierLabel={worksWithCode ? continueShortcutModifierLabel : null}
