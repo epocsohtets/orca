@@ -149,7 +149,7 @@ export function buildHomeTasks(t: Translate, sample: HomeSampleContext): HomeTas
       who: null,
       detail: t(
         'home.task.reportDetail',
-        'The report is written. Kim Jiwoo asked for it this week.'
+        'Put last month’s campaign results into a report and share it. Kim Jiwoo asked for it this week.'
       )
     },
     {

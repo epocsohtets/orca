@@ -12,7 +12,6 @@ import {
   BOT_ITEM_CHIP,
   BOT_ITEM_CHIP_ACTION,
   BOT_ITEM_CHIP_PICKED,
-  BOT_ITEM_CHIP_RECOMMENDED,
   BOT_ITEM_OPEN_QUESTION,
   BotItemChipWords
 } from '@/components/bots/items/BotItemQuestionStep'
@@ -79,12 +78,7 @@ export function HomeDayEndChipLine({
               BOT_ITEM_CHIP,
               BOT_ITEM_CHIP_ACTION,
               'flex items-center gap-1.5',
-              picked === chip.id
-                ? BOT_ITEM_CHIP_PICKED
-                : // An open ask fills the agent's pick, as Orca's item ask does.
-                  chip.recommended && picked === undefined
-                  ? BOT_ITEM_CHIP_RECOMMENDED
-                  : 'text-foreground'
+              picked === chip.id ? BOT_ITEM_CHIP_PICKED : 'text-foreground'
             )}
             onClick={() => onPick(chip.id)}
           >

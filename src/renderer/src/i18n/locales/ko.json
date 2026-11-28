@@ -29183,7 +29183,6 @@
       "sharedMessage": "{{name}} 님이 **{{title}}** 회의록 전체를 공유했습니다.",
       "assignedMessage": "{{name}} 님이 **{{title}}**에서 나온 업무를 할당했습니다.",
       "name": "회의 에이전트",
-      "askAbout": "「{{title}}」에 대한 질문",
       "about": "회의록과 회의에서 나온 내 업무를 보냅니다",
       "aboutOutside": "할당된 업무와 그 업무가 나온 부분을 보냅니다",
       "emptyTitle": "아직 받은 메시지가 없습니다",
@@ -29214,7 +29213,6 @@
     },
     "followUps": {
       "title": "후속 업무",
-      "counts": "모두 {{total}}건 · 할 일 {{todo}} · 진행 중 {{inProgress}} · 끝남 {{done}} · 담당자 없음 {{open}}",
       "mine": "내 몫",
       "accepted": "본인이 받음",
       "stateDeclined": "본인 몫이 아니라고 답함",
@@ -29394,9 +29392,7 @@
     },
     "conversation": {
       "close": "대화 닫기",
-      "send": "전송",
-      "now": "방금",
-      "placeholder": "{{name}}에게 보낼 메시지"
+      "now": "방금"
     },
     "members": "멤버 {{count}}명",
     "section": {
@@ -29687,7 +29683,7 @@
     "chat": {
       "kickoff": "이 업무를 맡아 주세요: {{title}}",
       "noted": "알겠습니다. 지금 쓰는 내용에 반영하겠습니다.",
-      "moved": "{{title}}{{particle}} {{to}} 옮겼습니다",
+      "moved": "{{title}} {{to}} 옮겼습니다",
       "asked": "질문 {{items}}"
     },
     "demo": {

@@ -63,6 +63,7 @@ export function WorkTaskPanel({
   const intlLocale = useIntlLocale()
   const box = useRef<HTMLTextAreaElement | null>(null)
   const [own, setOwn] = useState('')
+  const [typing, setTyping] = useState(false)
   useSidePanelInset()
   const statusLabels = inaxStatusLabels(t)
   const statusTo = inaxStatusTo(t)
@@ -142,20 +143,54 @@ export function WorkTaskPanel({
               picked={undefined}
               onPick={(choiceId) => onAnswer(choiceId)}
             >
-              <button
-                type="button"
-                data-work-task-own-words=""
-                className={cn(
-                  BOT_ITEM_CHIP,
-                  BOT_ITEM_CHIP_ACTION,
-                  'flex items-center gap-1.5 text-muted-foreground'
-                )}
-                onClick={() => box.current?.focus()}
-              >
-                <Pencil aria-hidden className="size-3 shrink-0" />
-                {t('taskLoop.question.ownWords', 'My own answer')}
-              </button>
+              {typing ? null : (
+                <button
+                  type="button"
+                  data-work-task-own-words=""
+                  className={cn(
+                    BOT_ITEM_CHIP,
+                    BOT_ITEM_CHIP_ACTION,
+                    'flex items-center gap-1.5 text-muted-foreground'
+                  )}
+                  aria-expanded={typing}
+                  onClick={() => setTyping(true)}
+                >
+                  <Pencil aria-hidden className="size-3 shrink-0" />
+                  {t('taskLoop.question.ownWords', 'My own answer')}
+                </button>
+              )}
             </HomeDayEndChipLine>
+            {typing ? (
+              <div className="mt-2.5 flex flex-col gap-1 rounded-xl border border-border bg-background p-2 shadow-xs">
+                <ImeTextarea
+                  ref={box}
+                  autoFocus
+                  rows={1}
+                  value={own}
+                  aria-label={t('taskLoop.question.ownWords', 'My own answer')}
+                  data-work-task-box=""
+                  className="scrollbar-sleek block max-h-[6lh] min-h-[1lh] w-full resize-none border-0 bg-transparent px-2 py-1 text-sm leading-5 outline-none [field-sizing:content]"
+                  onChange={(event) => setOwn(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (
+                      event.key === 'Enter' &&
+                      !event.shiftKey &&
+                      !isImeOwnedKeyboardEvent(event)
+                    ) {
+                      event.preventDefault()
+                      sendOwn()
+                    } else if (event.key === 'Escape' && !isImeOwnedKeyboardEvent(event)) {
+                      setTyping(false)
+                    }
+                  }}
+                />
+                <div className="flex justify-end">
+                  <Button type="button" size="sm" disabled={!own.trim()} onClick={sendOwn}>
+                    {t('taskLoop.question.send', 'Send')}
+                  </Button>
+                </div>
+              </div>
+            ) : null}
           </div>
         ) : null}
         <dl className="grid grid-cols-[72px_minmax(0,1fr)] items-baseline gap-x-2 gap-y-2 px-3.5 text-xs">
@@ -233,7 +268,7 @@ export function WorkTaskPanel({
                       uiDateTimeFormat(NOTE_TIME, intlLocale).format(note.at),
                       note.statusChanged === false
                         ? null
-                        : t('taskLoop.detail.noteStatus', 'Status changed {{to}}', {
+                        : t('taskLoop.detail.noteStatus', 'Changed status {{to}}', {
                             to: statusTo[note.status]
                           })
                     ]
@@ -246,34 +281,7 @@ export function WorkTaskPanel({
           </section>
         )}
       </div>
-      {asks ? (
-        <div className="mx-3 mb-3 flex shrink-0 flex-col gap-1 rounded-xl border border-border bg-background p-2 shadow-xs">
-          <label className="flex flex-col gap-0.5">
-            <span className="px-2 pt-1 text-xs text-muted-foreground">
-              {t('taskLoop.question.ownWords', 'My own answer')}
-            </span>
-            <ImeTextarea
-              ref={box}
-              rows={1}
-              value={own}
-              data-work-task-box=""
-              className="scrollbar-sleek block max-h-[6lh] min-h-[1lh] w-full resize-none border-0 bg-transparent px-2 py-1 text-sm leading-5 outline-none [field-sizing:content]"
-              onChange={(event) => setOwn(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' && !event.shiftKey && !isImeOwnedKeyboardEvent(event)) {
-                  event.preventDefault()
-                  sendOwn()
-                }
-              }}
-            />
-          </label>
-          <div className="flex justify-end">
-            <Button type="button" size="sm" disabled={!own.trim()} onClick={sendOwn}>
-              {t('taskLoop.question.send', 'Send')}
-            </Button>
-          </div>
-        </div>
-      ) : onStart ? (
+      {asks ? null : onStart ? (
         <div className="mx-3 mb-3 flex shrink-0 justify-end">
           <Button type="button" size="sm" data-work-task-start="" onClick={onStart}>
             {t('taskLoop.detail.start', 'Start with an agent')}

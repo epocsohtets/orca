@@ -29,7 +29,7 @@ export function SidebarBotsEmptyState({ onNewBot }: { onNewBot: () => void }): J
           ))}
         </span>
         <div className="max-w-full grow basis-16 text-[13px] leading-tight font-semibold break-words text-foreground">
-          {t('bots.section.emptyCardTitle', 'Your AI teammate')}
+          {t('bots.section.emptyCardTitle', 'Make a bot to hand work to')}
         </div>
       </div>
       <div className="mt-2.5 flex flex-wrap gap-1.5">

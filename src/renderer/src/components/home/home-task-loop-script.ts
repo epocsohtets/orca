@@ -1,3 +1,4 @@
+import { getIntlLocaleForCopy } from '@/i18n/i18n'
 import type { Translate } from '@/i18n/use-translate'
 import type { NativeChatMessage } from '../../../../shared/native-chat/native-chat-types'
 import type { HomeChoice, HomeTask } from './home-board'
@@ -47,17 +48,19 @@ export function inaxStatusTo(t: Translate): Record<InaxStatus, string> {
   }
 }
 
-/** The Korean object particle for a title; empty for a title that does not end in Hangul. */
-function objectParticle(title: string): string {
+/** A title with its Korean object particle; unchanged in another language or when it does not end in Hangul. */
+function asObject(title: string): string {
   const code = title.trim().charCodeAt(title.trim().length - 1) - 0xac00
-  return code < 0 || code > 11171 ? '' : code % 28 === 0 ? '를' : '을'
+  if (!getIntlLocaleForCopy('taskLoop.chat.moved').startsWith('ko') || code < 0 || code > 11171) {
+    return title
+  }
+  return `${title.trim()}${code % 28 === 0 ? '를' : '을'}`
 }
 
 /** The line a status change by my own hand leaves: in the conversation, and nowhere else. */
 export function homeStatusMovedLine(t: Translate, title: string, status: InaxStatus): string {
   return t('taskLoop.chat.moved', 'Moved {{title}} {{to}}', {
-    title,
-    particle: objectParticle(title),
+    title: asObject(title),
     to: inaxStatusTo(t)[status]
   })
 }
@@ -191,7 +194,8 @@ export function buildHomeLoopTranscript(
 export function homeLoopEventTimes(loop: HomeTaskLoop, now: number): Record<string, number> {
   const asked = homeLoopQuestionAt(loop)
   return {
-    [HOME_LOOP_MOVED_ROW]: loop.startedAt + 1,
+    // With my own message, before the agent's turn: the move was my press, not the agent's act.
+    [HOME_LOOP_MOVED_ROW]: loop.startedAt - 1,
     ...(now >= asked ? { [HOME_LOOP_ASKED_ROW]: asked } : {}),
     ...(loop.answer ? { [HOME_LOOP_ANSWER_ROW]: loop.answer.at } : {})
   }

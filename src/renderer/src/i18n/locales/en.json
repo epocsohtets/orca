@@ -31553,7 +31553,6 @@
       "sharedMessage": "{{name}} shared the full minutes of **{{title}}** with you.",
       "assignedMessage": "{{name}} assigned you a task from **{{title}}**.",
       "name": "Meeting agent",
-      "askAbout": "Ask about “{{title}}”",
       "about": "Sends you the minutes and the items that look like yours",
       "aboutOutside": "Sends you assigned tasks and the part they came from",
       "emptyTitle": "No messages yet",
@@ -31584,7 +31583,6 @@
     },
     "followUps": {
       "title": "Follow-up tasks",
-      "counts": "{{total}} in all · To do {{todo}} · In progress {{inProgress}} · Done {{done}} · No owner {{open}}",
       "mine": "Mine",
       "accepted": "Taken by the owner",
       "stateDeclined": "Says not theirs",
@@ -31764,9 +31762,7 @@
     },
     "conversation": {
       "close": "Close conversation",
-      "send": "Send",
-      "now": "Now",
-      "placeholder": "Message {{name}}"
+      "now": "Now"
     },
     "members": "{{count}} members",
     "section": {
@@ -32042,8 +32038,8 @@
       "nowActivity": "Last activity {{when}}",
       "nowAgent": "Agent working",
       "nowMeeting": "Minutes · {{count}} follow-up tasks",
-      "ahead": "Written by the agent ·",
-      "take": "uses it"
+      "ahead": "Written by the agent",
+      "take": "to use"
     }
   },
   "taskLoop": {
@@ -32058,7 +32054,7 @@
       "kickoff": "Please take this task: {{title}}",
       "noted": "Noted. I will apply it to what I am writing now.",
       "moved": "Moved {{title}} {{to}}",
-      "asked": "Asked you {{items}}"
+      "asked": "Asked you about {{items}}"
     },
     "demo": {
       "chip": "Demo"

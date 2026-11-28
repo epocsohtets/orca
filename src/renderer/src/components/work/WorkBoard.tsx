@@ -138,9 +138,9 @@ export function WorkBoard({
                           <DropdownMenuTrigger asChild>
                             <Button
                               type="button"
-                              variant="ghost"
+                              variant="ghost-muted"
                               size="icon-xs"
-                              className="mt-2 mr-2 shrink-0 text-muted-foreground"
+                              className="mt-2 mr-2 shrink-0"
                               aria-label={`${task.title} · ${statusLabel}`}
                               data-work-card-menu=""
                             >

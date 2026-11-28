@@ -81,10 +81,9 @@ function RowMenu({
       <DropdownMenuTrigger asChild>
         <Button
           type="button"
-          variant="ghost"
+          variant="ghost-muted"
           size="icon-xs"
-          className="text-muted-foreground"
-          aria-label={t('meetings.followUps.more', 'More for “{{text}}”', { text: followUp.text })}
+          aria-label={t('meetings.followUps.more', 'Menu for “{{text}}”', { text: followUp.text })}
           data-meeting-follow-up-menu=""
         >
           <MoreHorizontal />
@@ -205,14 +204,11 @@ export function MeetingFollowUps({ meeting }: { meeting: Meeting }): React.JSX.E
     <HomeCard
       title={t('meetings.followUps.title', 'Follow-up tasks')}
       aside={
-        <span data-meeting-follow-up-counts="">
-          {t(
-            'meetings.followUps.counts',
-            '{{total}} in all · To do {{todo}} · In progress {{inProgress}} · Done {{done}} · No owner {{open}}',
-            counts
-          )}
-          {allHeard ? ` · ${t('meetings.followUps.heard', 'Made by the meeting agent')}` : ''}
-        </span>
+        allHeard ? (
+          <span data-meeting-follow-up-maker="">
+            {t('meetings.followUps.heard', 'Made by the meeting agent')}
+          </span>
+        ) : undefined
       }
       data-meeting-card="follow-ups"
     >

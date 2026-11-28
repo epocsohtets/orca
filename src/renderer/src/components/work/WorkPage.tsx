@@ -139,7 +139,7 @@ export function WorkSurface(): React.JSX.Element {
           {task && hasChat ? task.title : title}
         </h1>
         <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
-          {task && hasChat ? '' : 'inAX'}
+          {task && hasChat ? '' : t('auto.components.TaskPage.inaxSource', 'inAX')}
         </span>
         {demo}
       </RailPageBand>

@@ -60,7 +60,7 @@ export function WorkAskNoticeCard(): React.JSX.Element | null {
                 openInaxTask(task.id)
               }}
             >
-              {t('taskLoop.notice.open', 'Open the question')}
+              {t('taskLoop.notice.open', 'Answer')}
             </Button>
           </div>
         </div>

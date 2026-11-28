@@ -113,8 +113,8 @@ export function HomeDayEndPanel({
     const { task } = card
     const current = task.status ?? 'todo'
     const picked = draft.status ?? card.proposed ?? current
-    const typed = (draft.text ?? '').trim()
-    const text = typed || card.suggestion || ''
+    // The line written ahead is not mine until I take it: Save sends only what stands in the box.
+    const text = (draft.text ?? '').trim()
     const status = picked === current ? null : picked
     save = {
       kind: 'task',
@@ -349,7 +349,7 @@ export function HomeDayEndPanel({
               >
                 {t('home.dayEnd.ahead', 'Written by the agent')}
                 <ShortcutKeyCombo keys={['Tab']} size="compact" />
-                {t('home.dayEnd.take', 'to edit')}
+                {t('home.dayEnd.take', 'to use')}
               </span>
             ) : null}
             <ImeTextarea

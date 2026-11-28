@@ -62,7 +62,7 @@ export function buildHomeLoopActivity(
       line(
         'start',
         args.me,
-        t('taskLoop.activity.started', '· started with an agent: “{{title}}”', {
+        t('taskLoop.activity.started', '· started the task “{{title}}” with an agent', {
           title: task.title
         }),
         false

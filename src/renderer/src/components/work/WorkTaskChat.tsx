@@ -63,9 +63,7 @@ export function WorkTaskChat({
       olderHistoryGeneration: 0,
       loadEarlier: async () => 'exhausted'
     }),
-    // The script's rows change only when the task's phase does.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [loop, sample, task.id, task.title, task.loop, tabId, t]
+    [loop, sample, task, now, tabId, t]
   )
   const timedRows = useMemo<NativeChatTimedRow[]>(() => {
     if (!loop) {
@@ -139,8 +137,7 @@ export function WorkTaskChat({
       })
     }
     return rows
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loop, task.title, task.loop, t, onOpenQuestion])
+  }, [loop, task, now, t, onOpenQuestion])
   return (
     <NativeChatScriptedSurface
       id={tabId}
