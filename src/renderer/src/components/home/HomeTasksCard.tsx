@@ -1,9 +1,8 @@
 import React from 'react'
 import { useTranslate } from '@/i18n/use-translate'
 import { Button } from '@/components/ui/button'
-import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { TabsContent } from '@/components/ui/tabs'
-import { HOME_ROW_DETAIL_CLASS, HomeCard, HomeRow, HomeRowMenu, HomeStateIcon } from './HomeCard'
+import { HOME_ROW_DETAIL_CLASS, HomeCard, HomeRow, HomeStateIcon } from './HomeCard'
 import {
   homeTaskTab,
   sortHomeTasks,
@@ -121,21 +120,24 @@ export function HomeTasksCard({
                   expanded={offer && !toMeeting ? open : undefined}
                   onClick={go}
                   action={
-                    waiting ? (
-                      <Button type="button" variant="outline" size="xs" onClick={go}>
-                        {t('home.tasks.answer', 'Answer')}
-                      </Button>
-                    ) : startable(task) ? (
-                      <HomeRowMenu
-                        label={t('meetings.followUps.more', 'Menu for “{{text}}”', {
-                          text: task.title
-                        })}
-                      >
-                        <DropdownMenuItem data-home-task-start="" onSelect={() => onStart(task)}>
+                    // One width for every row's slot, so the date column stays on one line.
+                    <span className="flex w-[104px] justify-end">
+                      {waiting ? (
+                        <Button type="button" variant="outline" size="xs" onClick={go}>
+                          {t('home.tasks.answer', 'Answer')}
+                        </Button>
+                      ) : startable(task) ? (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="xs"
+                          data-home-task-start=""
+                          onClick={() => onStart(task)}
+                        >
                           {t('taskLoop.detail.start', 'Start with an agent')}
-                        </DropdownMenuItem>
-                      </HomeRowMenu>
-                    ) : null
+                        </Button>
+                      ) : null}
+                    </span>
                   }
                 />
                 {open ? (
