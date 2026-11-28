@@ -31,7 +31,7 @@ export function HomeAgentsCard({
 }): React.JSX.Element {
   const t = useTranslate()
   const stateLabels: Record<HomeAgentState, string> = {
-    waiting: t('home.agents.waiting', 'Waiting for my answer'),
+    waiting: t('home.agents.waiting', 'Needs me'),
     working: t('home.agents.working', 'Working'),
     blocked: t('home.agents.blocked', 'Blocked'),
     idle: t('home.agents.idle', 'Resting')

@@ -68,7 +68,7 @@ export function useMeetingState(): (meeting: Meeting) => MeetingState {
     return {
       who: 'draft',
       kind: 'minutes',
-      chip: offered ? t('home.chip.waiting', 'Needs my answer') : undefined,
+      chip: offered ? t('home.chip.waiting', 'Needs me') : undefined,
       label:
         counts.total === 0
           ? t('meetings.state.minutes', 'Minutes ready')

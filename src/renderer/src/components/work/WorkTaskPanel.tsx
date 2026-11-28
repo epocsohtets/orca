@@ -69,7 +69,7 @@ export function WorkTaskPanel({
   const statusTo = inaxStatusTo(t)
   const group = itemGroup(task)
   const groupLabels: Record<BotItemStatus, string> = {
-    needs_you: t('taskLoop.group.needsYou', 'Needs you'),
+    needs_you: t('taskLoop.group.needsYou', 'Needs me'),
     working: t('taskLoop.group.working', 'In progress'),
     waiting: t('taskLoop.group.waiting', 'Waiting'),
     planned: t('taskLoop.group.waiting', 'Waiting'),

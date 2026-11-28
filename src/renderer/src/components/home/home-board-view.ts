@@ -124,7 +124,7 @@ export function buildHomeBoardView(
         count < 1
           ? t('taskLoop.who.justStarted', 'Agent working · just started')
           : t('home.task.researchWho', 'Agent working · {{time}}', { time: args.duration(count) }),
-      question: t('taskLoop.who.question', 'Waiting for my answer · {{agent}}', {
+      question: t('taskLoop.who.question', 'Needs me · {{agent}}', {
         agent: loopAgent
       }),
       result: t('taskLoop.who.result', 'Result ready'),

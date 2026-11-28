@@ -162,7 +162,7 @@ export function MeetingMyPart({ meeting }: { meeting: Meeting }): React.JSX.Elem
             icon={<HomeStateIcon state="waiting" />}
             title={followUp.text}
             tip={followUp.text}
-            chip={t('home.chip.waiting', 'Needs my answer')}
+            chip={t('home.chip.waiting', 'Needs me')}
             date={text.dueDate(followUp.due)}
             action={
               <Button

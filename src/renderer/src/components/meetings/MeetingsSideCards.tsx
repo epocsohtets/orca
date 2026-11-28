@@ -39,7 +39,7 @@ export function MeetingWaitingCard({
                 tip={[row.title, row.whoLabel, projects[row.project].name]
                   .filter(Boolean)
                   .join(' · ')}
-                chip={t('home.chip.waiting', 'Needs my answer')}
+                chip={t('home.chip.waiting', 'Needs me')}
                 onClick={open}
                 action={
                   <Button type="button" variant="outline" size="xs" onClick={open}>

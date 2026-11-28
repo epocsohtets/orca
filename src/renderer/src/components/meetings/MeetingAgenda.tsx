@@ -138,9 +138,7 @@ export function MeetingAgenda({
                           .filter(Boolean)
                           .join(' · ')}
                         chip={
-                          answerable && !response
-                            ? t('home.chip.waiting', 'Needs my answer')
-                            : state.chip
+                          answerable && !response ? t('home.chip.waiting', 'Needs me') : state.chip
                         }
                         project={projects[meeting.project]}
                         date={text.time(meeting.startsAt)}

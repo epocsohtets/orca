@@ -44,7 +44,7 @@ export function buildHomeTasks(t: Translate, sample: HomeSampleContext): HomeTas
       dueLabel: t('home.task.copyDue', 'Today 17:00'),
       done: false,
       who: 'waiting',
-      whoLabel: t('home.task.copyWho', 'Waiting for my answer · Writing agent'),
+      whoLabel: t('home.task.copyWho', 'Needs me · Writing agent'),
       agentId: 'writer',
       question: t('home.task.copyQuestion', 'Which headline should the page use?'),
       choices: [

@@ -31797,7 +31797,7 @@
       "heardFollowUp": "put “{{task}}” from the meeting “{{title}}” into My work"
     },
     "agents": {
-      "waiting": "Waiting for my answer",
+      "waiting": "Needs me",
       "working": "Working",
       "blocked": "Blocked",
       "idle": "Resting",
@@ -31926,7 +31926,7 @@
       "copy": "Settle the launch page headline",
       "inquiries": "Sort this month’s customer inquiries by type",
       "copyDue": "Today 17:00",
-      "copyWho": "Waiting for my answer · Writing agent",
+      "copyWho": "Needs me · Writing agent",
       "copyQuestion": "Which headline should the page use?",
       "copyA": "A · The first way to meet it",
       "copyB": "B · Before anyone else, now",
@@ -31961,7 +31961,7 @@
       "fromMeetingAccepted": "A follow-up from the meeting “{{title}}”. The meeting agent offered it and {{name}} took it.",
       "fromMeetingAssigned": "A follow-up from the meeting “{{title}}”. {{host}} assigned it to {{name}}.",
       "request": "{{name}} asks to see the minutes of “{{title}}”",
-      "requestWho": "Waiting for my approval",
+      "requestWho": "Needs me",
       "fromMeetingHeard": "A follow-up task from the meeting “{{title}}”. {{name}} agreed to take it in the meeting."
     },
     "project": {
@@ -32004,7 +32004,7 @@
       "take": "Use"
     },
     "chip": {
-      "waiting": "Needs my answer",
+      "waiting": "Needs me",
       "blocked": "Awaiting reply",
       "working": "Working",
       "draft": "Draft ready",
@@ -32120,12 +32120,12 @@
     "who": {
       "confirmed": "{{status}} · written by the agent, confirmed by me",
       "justStarted": "Agent working · just started",
-      "question": "Waiting for my answer · {{agent}}",
+      "question": "Needs me · {{agent}}",
       "result": "Result ready",
       "confirmedBy": "{{status}} · written by the agent, confirmed by {{name}}"
     },
     "group": {
-      "needsYou": "Needs you",
+      "needsYou": "Needs me",
       "working": "In progress",
       "waiting": "Waiting",
       "closed": "Closed"

@@ -56,7 +56,7 @@ export function HomeTasksCard({
     done: t('home.tasks.done', 'Done')
   }
   const chips: Record<NonNullable<HomeTask['who']>, string> = {
-    waiting: t('home.chip.waiting', 'Needs my answer'),
+    waiting: t('home.chip.waiting', 'Needs me'),
     blocked: t('home.chip.blocked', 'Awaiting reply'),
     agentWorking: t('home.chip.working', 'Working'),
     draft: t('home.chip.draft', 'Draft ready')

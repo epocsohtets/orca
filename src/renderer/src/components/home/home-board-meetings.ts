@@ -150,7 +150,7 @@ export function buildHomeMeetings(
             name: args.personName(request.personId),
             title: meeting.title
           }),
-          whoLabel: t('home.task.requestWho', 'Waiting for my approval'),
+          whoLabel: t('home.task.requestWho', 'Needs me'),
           detail: ''
         })
       )
@@ -191,7 +191,7 @@ export function buildHomeMeetings(
           meeting.recordingStartedAt !== null
             ? ''
             : over
-              ? t('home.chip.waiting', 'Needs my answer')
+              ? t('home.chip.waiting', 'Needs me')
               : meeting.outline || meeting.materials.length > 0
                 ? t('home.chip.prep', 'Prep')
                 : ''
