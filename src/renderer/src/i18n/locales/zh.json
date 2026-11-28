@@ -28469,7 +28469,6 @@
         "links": "链接",
         "showLess": "收起",
         "showMore": "展开",
-        "subWhere": "事项 {{number}} · {{chat}}",
         "showEarlier": "显示更早的",
         "place": "{{index}} / {{total}}",
         "deleted": "此事项已被删除",

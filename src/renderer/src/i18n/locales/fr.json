@@ -28059,7 +28059,6 @@
         "lastItem": "Dernier élément",
         "previous": "Élément précédent",
         "next": "Élément suivant",
-        "subWhere": "Élément {{number}} · {{chat}}",
         "loading": "Chargement de l’élément…"
       },
       "activity": {

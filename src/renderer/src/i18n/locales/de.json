@@ -27514,8 +27514,7 @@
         "lastItem": "Letztes Element",
         "loading": "Element wird geladen…",
         "previous": "Vorheriges Element",
-        "next": "Nächstes Element",
-        "subWhere": "Element {{number}} · {{chat}}"
+        "next": "Nächstes Element"
       },
       "activity": {
         "linked": "hat {{links}} verknüpft",

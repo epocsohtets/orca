@@ -115,7 +115,11 @@ async function createTaskWorkspace(taskId: string, title: string): Promise<strin
   const workspaceId = workspace.id
   useHomeBoardStore.setState((state) => {
     const loop = state.loops[taskId]
-    return loop ? { loops: { ...state.loops, [taskId]: { ...loop, folder, workspaceId } } } : state
+    return loop
+      ? {
+          loops: { ...state.loops, [taskId]: { ...loop, folder, workspaceId } }
+        }
+      : state
   })
   return workspaceId
 }
@@ -172,7 +176,7 @@ export function useTaskIdOfWorkspace(workspaceKey: string | null): string | null
 /** Whether the task's agent waits on my answer now: the count on the sidebar's task tab. */
 export function useTaskAsksMe(taskId: string | null): boolean {
   const loop = useHomeBoardStore((state) => (taskId ? state.loops[taskId] : undefined))
-  const askAt = loop && !loop.answer ? homeLoopQuestionAt(loop) : null
+  const askAt = loop && !loop.answer && !loop.chatOnly ? homeLoopQuestionAt(loop) : null
   const [asked, setAsked] = useState(false)
   useEffect(() => {
     if (askAt === null) {

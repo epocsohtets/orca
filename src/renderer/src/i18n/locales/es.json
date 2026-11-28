@@ -28105,8 +28105,7 @@
         "lastItem": "Último elemento",
         "loading": "Cargando elemento…",
         "previous": "Elemento anterior",
-        "next": "Elemento siguiente",
-        "subWhere": "Elemento {{number}} · {{chat}}"
+        "next": "Elemento siguiente"
       },
       "activity": {
         "linked": "enlazó {{links}}",

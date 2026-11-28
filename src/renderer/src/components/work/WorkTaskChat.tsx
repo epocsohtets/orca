@@ -67,8 +67,10 @@ export function WorkTaskChat({
   )
   const timedRows = useMemo<NativeChatTimedRow[]>(() => {
     const times = homeLoopEventTimes(loop, now)
-    const rows: NativeChatTimedRow[] = [
-      {
+    const rows: NativeChatTimedRow[] = []
+    // A conversation I opened by writing a line moved no status.
+    if (times[HOME_LOOP_MOVED_ROW] !== undefined) {
+      rows.push({
         key: HOME_LOOP_MOVED_ROW,
         at: times[HOME_LOOP_MOVED_ROW],
         node: (
@@ -86,8 +88,8 @@ export function WorkTaskChat({
             </NativeChatEventRow>
           </div>
         )
-      }
-    ]
+      })
+    }
     const question = buildHomeLoopScript(t, task, loop).question
     const chip = (answered: boolean): React.JSX.Element => (
       <button
@@ -159,7 +161,11 @@ export function WorkTaskChat({
           workingStartedAt={loop.answer?.at ?? loop.startedAt}
           expandSignal={false}
           timedRows={timedRows}
-          turnBot={{ name: agentName, src: null, fallback: agentName.charAt(0) }}
+          turnBot={{
+            name: agentName,
+            src: null,
+            fallback: agentName.charAt(0)
+          }}
         />
       )}
     </NativeChatScriptedSurface>

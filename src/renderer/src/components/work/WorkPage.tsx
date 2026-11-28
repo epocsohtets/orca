@@ -68,8 +68,8 @@ export function WorkSurface(): React.JSX.Element {
     )
   }
 
-  // A colleague's view of the board opens no item: the item list is mine.
-  const panel = task && own ? <HomeTaskItem taskId={task.id} /> : null
+  // A colleague opens 마코's task to read it: the same panel, with nothing to answer or write.
+  const panel = task ? <HomeTaskItem taskId={task.id} readOnly={!own} /> : null
 
   return (
     <>

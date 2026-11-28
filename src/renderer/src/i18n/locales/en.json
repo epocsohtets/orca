@@ -30629,7 +30629,8 @@
         "snoozedBare": "snoozed this",
         "unsnoozed": "unsnoozed this",
         "snoozeEnded": "Back from snooze early",
-        "waitingOn": "Waiting on"
+        "waitingOn": "Waiting on",
+        "answered": "answered:"
       },
       "cancel": {
         "confirmMany": "Cancel {{count}}",
@@ -30771,7 +30772,6 @@
         "links": "Links",
         "showLess": "Show less",
         "showMore": "Show more",
-        "subWhere": "Item {{number}} · {{chat}}",
         "showEarlier": "Show earlier",
         "next": "Next item",
         "previous": "Previous item",
@@ -31804,9 +31804,7 @@
       "showTask": "Show its task"
     },
     "header": {
-      "morning": "Good morning, {{name}}",
       "day": "Hello, {{name}}",
-      "evening": "Good work today, {{name}}",
       "handOff": "Hand to an agent",
       "startMeeting": "Start meeting",
       "newTask": "New task",
@@ -31843,7 +31841,8 @@
       "recordApp": "{{app}} · {{range}}",
       "tomorrow": "tomorrow",
       "yesterday": "yesterday",
-      "pick": "Pick a task"
+      "pick": "Pick a task",
+      "recordQuestion": "Which task is this record?"
     },
     "wrapUp": {
       "title": "Wrap-up"
@@ -31969,7 +31968,8 @@
     "dayEnd": {
       "progress": "Progress note",
       "sharedOwners": "Owners of {{count}} follow-ups",
-      "resultTitle": "Saved today"
+      "resultTitle": "Saved today",
+      "question": "How far did this task get today?"
     },
     "chip": {
       "waiting": "Needs me",
@@ -32001,7 +32001,8 @@
       "kickoff": "Please take this task: {{title}}",
       "noted": "Noted. I will apply it to what I am writing now.",
       "moved": "Moved {{title}} {{to}}",
-      "asked": "Asked you about {{items}}"
+      "asked": "Asked you about {{items}}",
+      "notedOnTask": "I have added it to the activity."
     },
     "demo": {
       "chip": "Demo"
@@ -32049,7 +32050,12 @@
       "draft": "**{{title}} (draft)**",
       "draftBody": "1. Settled: the scope and the due date in the task description.\n2. Left to do: check the material, finish the draft, share it, in that order.\n3. To check before it goes out: who receives it, and the numbers.",
       "output": "{{title}} (draft)",
-      "note": "Wrote the draft of “{{title}}”. Please review it."
+      "note": "Wrote the draft of “{{title}}”. Please review it.",
+      "draftQuotes": "**Comparing the two vendor quotes (draft)**\n\n- Vendor A: 18.4 million won, delivery in 12 working days, 3 revisions\n- Vendor B: 15.9 million won, delivery in 20 working days, 2 revisions\n\nVendor B costs 2.5 million won less. But vendor B delivers after the campaign starts. I recommend vendor A.",
+      "draftSchedule": "**Next week’s schedule changes (draft)**\n\nThree changes to make in the campaign calendar.\n\n- Tuesday shoot: 10:00 → 14:00\n- Wednesday draft review: move to Thursday 11:00\n- Friday 15:00 launch check meeting: add",
+      "draftSurvey": "**Unsubscribe survey (draft)**\n\nPick why you are leaving.\n\n- The emails come too often\n- The content is not right for me\n- I get the same information somewhere else\n- Another reason (type it)",
+      "draftSendTime": "**Send time test (draft)**\n\n- Split the next issue in two groups: 620 people at 08:00, 620 at the usual send time.\n- After 3 days, compare the open rate of the two groups.\n- If the 08:00 group is 2 points higher or more, send at 08:00 from the issue after.",
+      "draftTopics": "**Topics for the next issue (draft)**\n\n1. A first look at the year-end promotion: promotion news got the most clicks in the last issue.\n2. The five questions customers asked most this month: the answers come from the inquiries themselves.\n3. Behind the brand renewal: shows the drafts before next month’s launch."
     },
     "settings": {
       "cardDescription": "Sign in and your tasks appear on Home and in Tasks.",
@@ -32086,6 +32092,14 @@
     "notice": {
       "title": "Needs your answer",
       "open": "Answer"
+    }
+  },
+  "time": {
+    "shortAgo": {
+      "now": "now",
+      "minutes": "{{count}}m",
+      "hours": "{{count}}h",
+      "days": "{{count}}d"
     }
   }
 }

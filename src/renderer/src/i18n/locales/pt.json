@@ -29277,7 +29277,6 @@
         "loading": "Carregando item…",
         "previous": "Item anterior",
         "next": "Próximo item",
-        "subWhere": "Item {{number}} · {{chat}}",
         "activity": "Atividade",
         "canceledNote": "Cancelado:",
         "doneNote": "Concluído:",

@@ -27349,8 +27349,7 @@
         "lastItem": "最後の項目",
         "loading": "項目を読み込み中…",
         "previous": "前の項目",
-        "next": "次の項目",
-        "subWhere": "項目 {{number}} · {{chat}}"
+        "next": "次の項目"
       },
       "activity": {
         "linked": "が {{links}} をリンクしました",
