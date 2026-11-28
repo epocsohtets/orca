@@ -133,9 +133,10 @@ export function buildHomeLoopScript(
     }
   }
   // Any other task: a draft named after the task, so every task an agent starts reaches a result.
+  // Written for me is the plain case and says nothing; written for the team says so.
   const reader = second
-    ? t('taskLoop.script.readerTeam', 'Written for the project team to read.')
-    : t('taskLoop.script.readerMe', 'Written for me to read.')
+    ? `${t('taskLoop.script.readerTeam', 'Written for the project team to read.')}\n\n`
+    : ''
   return {
     plan: t(
       'taskLoop.script.plan',
@@ -147,9 +148,9 @@ export function buildHomeLoopScript(
       { id: 'a', label: t('taskLoop.script.choiceA', 'For me'), recommended: true },
       { id: 'b', label: t('taskLoop.script.choiceB', 'For the project team') }
     ],
-    draft: `${t('taskLoop.script.draft', '**{{title}} (draft)**', { title: task.title })}\n\n${reader}\n\n${t(
+    draft: `${t('taskLoop.script.draft', '**{{title}} (draft)**', { title: task.title })}\n\n${reader}${t(
       'taskLoop.script.draftBody',
-      '1. What is settled\n2. What is left to do, in order\n3. What needs a check before it goes out'
+      '1. Settled: the scope and the due date in the task description.\n2. Left to do: check the material, finish the draft, share it, in that order.\n3. To check before it goes out: who receives it, and the numbers.'
     )}`,
     output: t('taskLoop.script.output', '{{title}} (draft)', { title: task.title }),
     next: '',

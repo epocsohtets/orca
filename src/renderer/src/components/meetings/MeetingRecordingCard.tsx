@@ -42,76 +42,72 @@ export function MeetingRecordingCard({
       data-meeting-card="recording"
       data-meeting-recorder={recording ? 'recording' : 'idle'}
     >
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 pb-2">
-        <div className="flex min-w-0 flex-1 basis-64 flex-col gap-1">
-          {recording ? (
-            <p className="flex flex-wrap items-center gap-x-2 gap-y-1" role="status">
-              <span
-                aria-hidden
-                className="size-2 shrink-0 rounded-full bg-destructive motion-safe:animate-pulse"
-              />
-              <span className="text-[13px] leading-5 text-foreground">
-                {t('meetings.recording.on', 'Recording')}
-              </span>
-              <span
-                role="timer"
-                className="text-2xl leading-8 font-semibold text-foreground tabular-nums"
-              >
-                {text.elapsed(elapsed)}
-              </span>
+      {/* An attendee before the recording has nothing to do here: the card keeps its place, empty. */}
+      {isHost || recording ? (
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4">
+          <div className="flex min-w-0 flex-1 basis-64 flex-col gap-1">
+            {recording ? (
+              <p className="flex flex-wrap items-center gap-x-2 gap-y-1" role="status">
+                <span
+                  aria-hidden
+                  className="size-2 shrink-0 rounded-full bg-destructive motion-safe:animate-pulse"
+                />
+                <span className="text-[13px] leading-5 text-foreground">
+                  {t('meetings.recording.on', 'Recording')}
+                </span>
+                <span
+                  role="timer"
+                  className="text-[22px] leading-[26px] font-semibold text-foreground tabular-nums"
+                >
+                  {text.elapsed(elapsed)}
+                </span>
+              </p>
+            ) : null}
+            <p className={HOME_META_CLASS}>
+              {recording
+                ? t(
+                    'meetings.recording.everyoneSees',
+                    'All {{count}} people in the meeting see this.',
+                    {
+                      count: people
+                    }
+                  )
+                : null}
             </p>
-          ) : isHost ? null : (
-            <p className="text-[13px] text-foreground">
-              {t(
-                'meetings.recording.attendeeIdle',
-                'When the host starts recording, everyone in the meeting sees the recording mark.'
-              )}
-            </p>
-          )}
-          <p className={HOME_META_CLASS}>
-            {recording
-              ? t(
-                  'meetings.recording.everyoneSees',
-                  'All {{count}} people in the meeting see this.',
-                  {
-                    count: people
-                  }
+          </div>
+          {isHost && !recording ? (
+            <Button
+              type="button"
+              size="sm"
+              data-meeting-record="start"
+              onClick={() => startRecording(meeting.id)}
+            >
+              <Circle className="size-3 fill-current" aria-hidden />
+              {t('meetings.recording.start', 'Start recording')}
+            </Button>
+          ) : null}
+          {isHost && recording ? (
+            <Button
+              type="button"
+              size="sm"
+              data-meeting-record="stop"
+              onClick={() => {
+                stopRecording(meeting.id)
+                toast.success(
+                  t(
+                    'meetings.recording.sent',
+                    'The meeting agent sent the minutes to all {{count}} people in the meeting.',
+                    { count: people }
+                  )
                 )
-              : null}
-          </p>
+              }}
+            >
+              <Square className="size-3 fill-current" aria-hidden />
+              {t('meetings.recording.stop', 'End recording')}
+            </Button>
+          ) : null}
         </div>
-        {isHost && !recording ? (
-          <Button
-            type="button"
-            size="sm"
-            data-meeting-record="start"
-            onClick={() => startRecording(meeting.id)}
-          >
-            <Circle className="size-3 fill-current" aria-hidden />
-            {t('meetings.recording.start', 'Start recording')}
-          </Button>
-        ) : null}
-        {isHost && recording ? (
-          <Button
-            type="button"
-            size="sm"
-            data-meeting-record="stop"
-            onClick={() => {
-              stopRecording(meeting.id)
-              toast.success(
-                t(
-                  'meetings.recording.sent',
-                  'The meeting agent sent the minutes to all {{count}} people in the meeting.',
-                  { count: people }
-                )
-              )
-            }}
-          >
-            <Square className="size-3 fill-current" aria-hidden />
-            {t('meetings.recording.stop', 'End recording')}
-          </Button>
-        ) : null}
-      </div>
+      ) : null}
     </HomeCard>
   )
 }

@@ -2,10 +2,10 @@ import React, { useId, useState } from 'react'
 import {
   Circle,
   CircleAlert,
-  CircleCheck,
   CircleCheckBig,
   CircleDashed,
   Clock,
+  FileText,
   MoreHorizontal
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -83,29 +83,32 @@ export function HomeCard({
           {title}
         </h2>
         <div
-          className={`min-w-0 flex-1 truncate ${HOME_META_CLASS} ${titleTip ? '@max-[30rem]/home-card:invisible' : ''}`}
+          className={`min-w-0 flex-1 truncate ${HOME_META_CLASS} ${titleTip ? '@max-[30rem]/home-card:hidden' : ''}`}
         >
           {aside}
         </div>
-        {tabs ? (
-          <TabsList size="sm" aria-label={tabs.label} className="min-w-0 shrink">
-            {tabs.items.map((item) => (
-              <TabsTrigger
-                key={item.value}
-                value={item.value}
-                className="min-w-0 flex-[0_1_auto]"
-                {...item.data}
-              >
-                {/* A narrow header cuts a long tab name before it pushes the link out of the card. */}
-                <span className="min-w-[2em] truncate">{item.label}</span>
-                {item.count === undefined ? null : (
-                  <span className="text-muted-foreground tabular-nums">{item.count}</span>
-                )}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        ) : null}
-        {action}
+        {/* Why a group pushed right: a narrow header drops the aside, and the tabs keep their place. */}
+        <div className="ml-auto flex min-w-0 items-center gap-3">
+          {tabs ? (
+            <TabsList size="sm" aria-label={tabs.label} className="min-w-0 shrink">
+              {tabs.items.map((item) => (
+                <TabsTrigger
+                  key={item.value}
+                  value={item.value}
+                  className="min-w-0 flex-[0_1_auto]"
+                  {...item.data}
+                >
+                  {/* A narrow header cuts a long tab name before it pushes the link out of the card. */}
+                  <span className="min-w-[2em] truncate">{item.label}</span>
+                  {item.count === undefined ? null : (
+                    <span className="text-muted-foreground tabular-nums">{item.count}</span>
+                  )}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          ) : null}
+          {action}
+        </div>
       </div>
       <div className="pb-4 empty:hidden">{children}</div>
     </section>
@@ -184,7 +187,8 @@ const STATE_ICON = {
   waiting: CircleAlert,
   blocked: Clock,
   agentWorking: CircleDashed,
-  draft: CircleCheck,
+  // A sheet, not a check: a check read as done.
+  draft: FileText,
   done: CircleCheckBig
 } as const
 

@@ -31455,7 +31455,6 @@
       "statusAria": "Open the meeting being recorded: {{title}}",
       "on": "Recording",
       "everyoneSees": "All {{count}} people in the meeting see this.",
-      "attendeeIdle": "When the host starts recording, everyone in the meeting sees the recording mark.",
       "start": "Start recording",
       "sent": "The meeting agent sent the minutes to all {{count}} people in the meeting.",
       "stop": "End recording",
@@ -32103,9 +32102,8 @@
       "reviewDraftBoth": "**Comment on the brand guide drafts (draft)**\n\n**Draft 1**\n- Works: the logo is strong and easy to recognise.\n- In the way: the margin around the logo is tight at small sizes.\n\n**Draft 2**\n- Works: the body text reads well in long passages.\n- In the way: the accent colour is weak on buttons.",
       "reviewNote": "Wrote the draft of the comment on the two brand guide drafts. Please review it.",
       "readerTeam": "Written for the project team to read.",
-      "readerMe": "Written for me to read.",
       "draft": "**{{title}} (draft)**",
-      "draftBody": "1. What is settled\n2. What is left to do, in order\n3. What needs a check before it goes out",
+      "draftBody": "1. Settled: the scope and the due date in the task description.\n2. Left to do: check the material, finish the draft, share it, in that order.\n3. To check before it goes out: who receives it, and the numbers.",
       "output": "{{title}} (draft)",
       "note": "Wrote the draft of “{{title}}”. Please review it."
     },

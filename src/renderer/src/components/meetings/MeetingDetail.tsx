@@ -192,7 +192,8 @@ export function MeetingDetail({
       ? state.task.assigneeId === viewerId
       : followUp.suggestedOwnerId === viewerId
   })
-  const mineOpen = mine.filter((followUp) => followUpState(followUp, tasks).kind === 'proposed')
+  // Not a task yet, whether never answered or handed back: it still waits for my answer.
+  const mineOpen = mine.filter((followUp) => followUpState(followUp, tasks).kind !== 'task')
   const tiles: HomeTile<TileId>[] = [
     {
       id: 'decisions',
