@@ -47,6 +47,69 @@ describe('day-end cards', () => {
     expect(cards[0]).toMatchObject({ suggestion: 'agent line', proposed: 'review' })
   })
 
+  it('asks the host only about follow-ups the meeting gave nobody, and skips a task that only arrived', () => {
+    const followUp = (id: string, taskId: string | null) => ({
+      id,
+      text: id,
+      turnId: 't1',
+      suggestedOwnerId: taskId ? 'ann' : null,
+      due: '2026-12-01',
+      taskId,
+      declined: false
+    })
+    const cards = planHomeDayEnd({
+      tasks: [task('INAX-1')],
+      activity: [line('task:INAX-1', 'INAX-1')],
+      records: [],
+      recordAnswers: {},
+      viewerId: 'me',
+      meetings: [
+        {
+          id: 'm',
+          title: 'm',
+          hostId: 'me',
+          attendeeIds: ['ann'],
+          startsAt: 0,
+          endsAt: 1,
+          place: '',
+          project: 'campaign',
+          originConversationId: null,
+          outline: '',
+          materials: [],
+          recordingStartedAt: null,
+          minutes: { summary: ['', ''], decisions: [], topics: [], transcript: [] },
+          minutesSentAt: 10,
+          followUps: [followUp('named', 'INAX-1'), followUp('open', null)],
+          responses: {},
+          shares: [],
+          requests: [],
+          sample: 'generic'
+        }
+      ],
+      meetingTasks: [
+        {
+          id: 'INAX-1',
+          title: 'named',
+          assigneeId: 'ann',
+          status: 'todo',
+          due: '2026-12-01',
+          meetingId: 'm',
+          followUpId: 'named',
+          route: 'heard',
+          createdAt: 11
+        }
+      ],
+      saved: [],
+      suggestion: () => null
+    })
+    expect(cards).toHaveLength(1)
+    expect(cards[0]).toMatchObject({
+      kind: 'meeting',
+      settled: 1,
+      followUps: [{ id: 'open', returnedBy: null }]
+    })
+  })
+
   it('drops a saved task card and the records card once every record is placed', () => {
     const saved = saveHomeDayEndTask(EMPTY_HOME_BOARD_STATE, {
       taskId: 'moved',
@@ -84,12 +147,19 @@ describe('day-end cards', () => {
       at: 2
     })
     expect(saved.inax.moved).toMatchObject({ status: 'review', notes: [{ by: 'me' }] })
-    const undone = undoHomeDayEnd({
+    const both = {
       ...saved,
-      dayEnd: [...saved.dayEnd, { kind: 'records', id: 'records', recordIds: ['pages'] }]
-    })
-    expect(undone.state.inax).toEqual(before.inax)
-    expect(undone.state.records).toEqual({})
-    expect(undone.state.dayEnd).toEqual([])
+      dayEnd: [
+        ...saved.dayEnd,
+        { kind: 'records' as const, id: 'records' as const, recordIds: ['pages'] }
+      ]
+    }
+    // One row's undo takes back that card only.
+    const withoutRecords = undoHomeDayEnd(both, 1).state
+    expect(withoutRecords.records).toEqual({})
+    expect(withoutRecords.inax).toEqual(saved.inax)
+    const undone = undoHomeDayEnd(withoutRecords, 0).state
+    expect(undone.inax).toEqual(before.inax)
+    expect(undone.dayEnd).toEqual([])
   })
 })

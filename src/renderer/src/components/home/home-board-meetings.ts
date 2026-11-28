@@ -1,13 +1,10 @@
 import type { Translate } from '@/i18n/use-translate'
-import { followUpState, isParticipant, meetingAccess } from '@/components/meetings/meeting-rules'
+import { isParticipant, meetingAccess } from '@/components/meetings/meeting-rules'
 import type { Meeting, MeetingTask } from '@/components/meetings/meeting-types'
 import type { HomeActivity } from './home-board-activity-mock'
 import type { HomeUpcoming, HomeUpcomingGroup } from './home-board-day-mock'
 import { addWorkdays, calendarDaysBetween, formatHomeClock, inSameWeek } from './home-day'
 import type { HomeAgent, HomeDue, HomeTask } from './home-board'
-
-export const HOME_ACCEPT_FOLLOW_UPS = 'accept'
-export const HOME_DECLINE_FOLLOW_UPS = 'decline'
 
 export type HomeMeetingsInput = {
   viewerId: string
@@ -20,7 +17,7 @@ export type HomeMeetingsBoard = {
   tasks: HomeTask[]
   /** Follow-up tasks of meetings I can see that belong to someone else; they open, read only. */
   otherTasks: HomeTask[]
-  /** What a meeting waits on me for: the agent's offers, and a host's follow-ups and requests. */
+  /** What a meeting waits on me for: requests to see its minutes. */
   waiting: HomeTask[]
   upcoming: HomeUpcoming[]
   activity: HomeActivity[]
@@ -96,21 +93,27 @@ export function buildHomeMeetings(
       },
       assignee: own ? undefined : args.personName(task.assigneeId),
       detail:
-        task.route === 'accepted'
+        task.route === 'heard'
           ? t(
-              'home.task.fromMeetingAccepted',
-              'A follow-up from the meeting “{{title}}”. The meeting agent offered it and {{name}} took it.',
+              'home.task.fromMeetingHeard',
+              'A follow-up from the meeting “{{title}}”. The meeting named {{name}} for it.',
               { title: meeting.title, name: args.personName(task.assigneeId) }
             )
-          : t(
-              'home.task.fromMeetingAssigned',
-              'A follow-up from the meeting “{{title}}”. {{host}} assigned it to {{name}}.',
-              {
-                title: meeting.title,
-                host: args.personName(meeting.hostId),
-                name: args.personName(task.assigneeId)
-              }
-            )
+          : task.route === 'accepted'
+            ? t(
+                'home.task.fromMeetingAccepted',
+                'A follow-up from the meeting “{{title}}”. The meeting agent offered it and {{name}} took it.',
+                { title: meeting.title, name: args.personName(task.assigneeId) }
+              )
+            : t(
+                'home.task.fromMeetingAssigned',
+                'A follow-up from the meeting “{{title}}”. {{host}} assigned it to {{name}}.',
+                {
+                  title: meeting.title,
+                  host: args.personName(meeting.hostId),
+                  name: args.personName(task.assigneeId)
+                }
+              )
     }
   }
   const followUpTasks = tasks.flatMap((task) => toHomeTask(task) ?? [])
@@ -135,48 +138,10 @@ export function buildHomeMeetings(
     if (!meeting.minutes) {
       continue
     }
-    const open = meeting.followUps.filter(
-      (followUp) => followUpState(followUp, tasks).kind !== 'task'
-    )
-    const offered = open.filter(
-      (followUp) => followUp.suggestedOwnerId === viewerId && !followUp.declined
-    )
-    if (offered.length > 0) {
-      waiting.push(
-        waitingRow(`offer:${meeting.id}`, meeting, {
-          title: t('home.task.offer', 'My {{count}} items from “{{title}}”', {
-            count: offered.length,
-            title: meeting.title
-          }),
-          whoLabel: t('home.task.offerWho', 'Waiting for my answer · Meeting agent'),
-          question: t(
-            'home.task.offerQuestion',
-            'Add the {{count}} items the minutes give you to My work?',
-            { count: offered.length }
-          ),
-          choices: [
-            { id: HOME_ACCEPT_FOLLOW_UPS, label: t('home.task.offerAccept', 'Add to My work') },
-            { id: HOME_DECLINE_FOLLOW_UPS, label: t('home.task.offerDecline', 'Not mine') }
-          ],
-          detail: offered.map((followUp) => followUp.text).join(' · ')
-        })
-      )
-    }
+    // Follow-ups never wait on anyone during the day: what the meeting settled is a task already, and what it
+    // left open waits in the host's day-end cards.
     if (meeting.hostId !== viewerId) {
       continue
-    }
-    const others = open.filter((followUp) => !offered.includes(followUp))
-    if (others.length > 0) {
-      waiting.push(
-        waitingRow(`organise:${meeting.id}`, meeting, {
-          title: t('home.task.organise', 'Sort {{count}} follow-ups of “{{title}}”', {
-            count: others.length,
-            title: meeting.title
-          }),
-          whoLabel: t('home.task.organiseWho', 'Waiting for me to sort them · Meeting agent'),
-          detail: others.map((followUp) => followUp.text).join(' · ')
-        })
-      )
     }
     for (const request of meeting.requests.filter((entry) => !entry.declined)) {
       waiting.push(
@@ -212,7 +177,6 @@ export function buildHomeMeetings(
             ? 'week'
             : 'nextWeek'
     const clock = formatHomeClock(minuteOfDay(meeting.startsAt))
-    const offer = waiting.find((row) => row.id === `offer:${meeting.id}`)
     upcoming.push({
       id: meeting.id,
       group,
@@ -226,11 +190,7 @@ export function buildHomeMeetings(
           meeting.recordingStartedAt !== null
             ? t('home.upcoming.recording', 'Recording now')
             : over
-              ? offer
-                ? t('home.upcoming.minutesMine', 'Minutes arrived · {{count}} items for me', {
-                    count: offer.detail.split(' · ').length
-                  })
-                : t('home.upcoming.minutesWaiting', 'Minutes arrived · waiting for me')
+              ? t('home.upcoming.minutesWaiting', 'Minutes arrived · waiting for me')
               : meeting.outline || meeting.materials.length > 0
                 ? t('home.upcoming.prepReady', 'Prep ready')
                 : ''
@@ -280,19 +240,31 @@ export function buildHomeMeetings(
         day === 0
           ? Math.min(minuteOfDay(task.createdAt), args.minutes)
           : minuteOfDay(task.createdAt),
-      who: task.route === 'accepted' ? t('home.activity.me', 'I') : args.personName(meeting.hostId),
+      // I am "I" in my own log, also when I assigned the task to myself as the host.
+      who:
+        task.route === 'heard'
+          ? agentName
+          : task.route === 'accepted' || meeting.hostId === viewerId
+            ? t('home.activity.me', 'I')
+            : args.personName(meeting.hostId),
       text:
-        task.route === 'accepted'
-          ? t('home.activity.tookFollowUp', 'took “{{task}}” from the meeting “{{title}}”', {
-              task: task.title,
-              title: meeting.title
-            })
-          : t(
-              'home.activity.assignedFollowUp',
-              'assigned me “{{task}}” from the meeting “{{title}}”',
+        task.route === 'heard'
+          ? t(
+              'home.activity.heardFollowUp',
+              'put “{{task}}” from the meeting “{{title}}” into My work',
               { task: task.title, title: meeting.title }
-            ),
-      byAgent: false,
+            )
+          : task.route === 'accepted'
+            ? t('home.activity.tookFollowUp', 'took “{{task}}” from the meeting “{{title}}”', {
+                task: task.title,
+                title: meeting.title
+              })
+            : t(
+                'home.activity.assignedFollowUp',
+                'assigned me “{{task}}” from the meeting “{{title}}”',
+                { task: task.title, title: meeting.title }
+              ),
+      byAgent: task.route === 'heard',
       taskId: task.id
     })
   }

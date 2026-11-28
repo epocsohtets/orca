@@ -12,7 +12,8 @@ import { HOME_META_CLASS, HomeAvatar, HomeCard } from '@/components/home/HomeCar
 import { MEETING_PEOPLE, personName } from './meeting-people'
 import { isParticipant, meetingAccess } from './meeting-rules'
 import type { Meeting } from './meeting-types'
-import { declineMinutesRequest, requestMinutes, shareMinutes, useMeetings } from './meetings-store'
+import { declineMinutesRequest, requestMinutes, shareMinutes } from './meeting-sharing-actions'
+import { useMeetings } from './meetings-store'
 
 function useShare(meeting: Meeting): (personId: string) => void {
   const t = useTranslate()

@@ -92,7 +92,7 @@ function initialState(): MeetingsState {
 export const useMeetings = create<MeetingsState>()(
   persist(initialState, {
     name: 'orca.poc.meetings.v2',
-    version: 5,
+    version: 6,
     // The sample's shape changed; an older saved sample starts over.
     migrate: () => initialState(),
     partialize: ({ focus: _focus, composing: _composing, ...kept }) => kept
@@ -210,6 +210,15 @@ export function stopRecording(id: string): void {
     return { recordingStartedAt: null, minutesSentAt, endsAt, ...result }
   })
   set({ depth: 'brief' })
+  // What the meeting settled is work from this moment: nobody is asked to confirm it.
+  const heard = get().meetings.find((m) => m.id === id)?.followUps ?? []
+  createTasks(
+    id,
+    heard.flatMap((f) =>
+      f.suggestedOwnerId ? [{ followUpId: f.id, assigneeId: f.suggestedOwnerId }] : []
+    ),
+    'heard'
+  )
 }
 
 function createTasks(
@@ -262,12 +271,12 @@ function createTasks(
   })
 }
 
-/** Route 1: the person takes the agent's proposal. */
+/** The person takes back what they had said was not theirs. */
 export function acceptFollowUp(meetingId: string, followUpId: string): void {
   createTasks(meetingId, [{ followUpId, assigneeId: get().viewerId }], 'accepted')
 }
 
-/** Route 2: the host creates and assigns the rest in one go. */
+/** The host gives owners to follow-ups nobody has. */
 export function assignFollowUps(
   meetingId: string,
   rows: { followUpId: string; assigneeId: string }[]
@@ -275,13 +284,26 @@ export function assignFollowUps(
   createTasks(meetingId, rows, 'assigned')
 }
 
-export function setFollowUpDeclined(
-  meetingId: string,
-  followUpId: string,
-  declined: boolean
-): void {
-  patchMeeting(meetingId, (m) => ({
-    followUps: m.followUps.map((f) => (f.id === followUpId && !f.taskId ? { ...f, declined } : f))
+/**
+ * Undo for a task the agent made: the follow-up is open again. `notMine` is the owner's own answer, kept so the
+ * host sees who gave it back; the host's undo leaves it without an owner.
+ */
+export function takeBackTask(taskId: string, notMine: boolean): void {
+  set((state) => ({
+    tasks: state.tasks.filter((task) => task.id !== taskId),
+    meetings: state.meetings.map((m) => ({
+      ...m,
+      followUps: m.followUps.map((f) =>
+        f.taskId === taskId
+          ? {
+              ...f,
+              taskId: null,
+              declined: notMine,
+              suggestedOwnerId: notMine ? f.suggestedOwnerId : null
+            }
+          : f
+      )
+    }))
   }))
 }
 
@@ -320,40 +342,4 @@ export function askMeetingBot(meetingId: string, question: string, fallback: str
 export function respondToInvitation(meetingId: string, answer: 'yes' | 'no'): void {
   const { viewerId } = get()
   patchMeeting(meetingId, (m) => ({ responses: { ...m.responses, [viewerId]: answer } }))
-}
-
-/** Gives someone who was not in the meeting the full minutes; the meeting agent sends them the link. */
-export function shareMinutes(meetingId: string, personId: string): void {
-  const { viewerId, tick } = get()
-  patchMeeting(meetingId, (m) =>
-    m.shares.some((entry) => entry.personId === personId)
-      ? {}
-      : {
-          shares: [
-            ...m.shares,
-            { personId, byId: viewerId, at: (m.minutesSentAt ?? m.endsAt) + (tick + 1) * MINUTE }
-          ],
-          requests: m.requests.filter((entry) => entry.personId !== personId)
-        }
-  )
-  set({ tick: tick + 1 })
-}
-
-/** An assignee who was not in the meeting asks its host for the full minutes. */
-export function requestMinutes(meetingId: string): void {
-  const { viewerId } = get()
-  patchMeeting(meetingId, (m) => ({
-    requests: [
-      ...m.requests.filter((entry) => entry.personId !== viewerId),
-      { personId: viewerId, declined: false }
-    ]
-  }))
-}
-
-export function declineMinutesRequest(meetingId: string, personId: string): void {
-  patchMeeting(meetingId, (m) => ({
-    requests: m.requests.map((entry) =>
-      entry.personId === personId ? { ...entry, declined: true } : entry
-    )
-  }))
 }

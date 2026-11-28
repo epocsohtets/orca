@@ -10,7 +10,7 @@ import {
 } from '@/components/home/HomeCard'
 import type { HomeTaskWho } from '@/components/home/home-board'
 import { personName } from './meeting-people'
-import { followUpCounts, followUpState, meetingAccess } from './meeting-rules'
+import { followUpCounts, meetingAccess } from './meeting-rules'
 import { dayDistance } from './meeting-schedule'
 import type { Meeting, MeetingTaskStatus } from './meeting-types'
 import { useMeetings } from './meetings-store'
@@ -48,23 +48,6 @@ export function useMeetingState(): (meeting: Meeting) => MeetingState {
           count: tasks.filter(
             (task) => task.meetingId === meeting.id && task.assigneeId === viewerId
           ).length
-        })
-      }
-    }
-    const open = meeting.followUps.filter((f) => followUpState(f, tasks).kind !== 'task')
-    const mine = open.filter((f) => f.suggestedOwnerId === viewerId && !f.declined).length
-    const toSort = meeting.hostId === viewerId ? open.length - mine : 0
-    if (mine > 0) {
-      return {
-        who: 'waiting',
-        label: t('meetings.state.waitingMine', 'Needs me · {{count}} items for me', { count: mine })
-      }
-    }
-    if (toSort > 0) {
-      return {
-        who: 'waiting',
-        label: t('meetings.state.waitingSort', 'Needs me · {{count}} follow-ups to sort', {
-          count: toSort
         })
       }
     }

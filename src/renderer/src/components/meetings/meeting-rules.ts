@@ -142,11 +142,11 @@ export function botItemsFor(
       const proposedToViewer =
         attended &&
         meeting.followUps.some((f) => f.id === task.followUpId && f.suggestedOwnerId === viewerId)
-      // A proposal the host assigned first turns into that task; it is not a second message.
+      // A task of someone who was named in the meeting rides with their minutes; it is not a second message.
       if (
         task.meetingId === meeting.id &&
         task.assigneeId === viewerId &&
-        task.route === 'assigned' &&
+        task.route !== 'accepted' &&
         !proposedToViewer
       ) {
         items.push({

@@ -102,7 +102,7 @@ export function sampleResult(
 ): { minutes: MeetingMinutes; followUps: MeetingFollowUp[] } {
   const followUp = (
     index: number,
-    [text, turnId, suggestedOwnerId, days]: [string, string, string, number]
+    [text, turnId, suggestedOwnerId, days]: [string, string, string | null, number]
   ): MeetingFollowUp => ({
     id: `${target.id}-f${index + 1}`,
     text,
@@ -116,9 +116,11 @@ export function sampleResult(
     return { minutes: PROMO_MINUTES, followUps: PROMO_FOLLOW_UPS.map((row, i) => followUp(i, row)) }
   }
   const otherId = target.attendeeIds[0] ?? target.hostId
-  const rows: [string, string, string, number][] = [
+  const rows: [string, string, string | null, number][] = [
     ['논의한 내용을 한 장으로 정리해 공유', 't3', target.hostId, 1],
-    ['필요한 자료를 모아서 전달', 't4', otherId, 1]
+    ['필요한 자료를 모아서 전달', 't4', otherId, 1],
+    // Said without a name or a date: the one the host settles at day end.
+    ['다음 일정 조율', 't5', null, 3]
   ]
   return {
     minutes: genericMinutes(target.hostId, otherId),
@@ -182,7 +184,7 @@ export function seedMeetings(day: number): { meetings: Meeting[]; tasks: Meeting
   const tasks: MeetingTask[] = followUps.map((followUp, index) => ({
     id: followUp.taskId ?? '',
     title: followUp.text,
-    assigneeId: followUp.suggestedOwnerId,
+    assigneeId: followUp.suggestedOwnerId ?? JIHO,
     status: statuses[index],
     due: followUp.due,
     meetingId: 'newsletter-review',
@@ -190,8 +192,31 @@ export function seedMeetings(day: number): { meetings: Meeting[]; tasks: Meeting
     route: index === 1 ? 'assigned' : 'accepted',
     createdAt: atTime(lastWeek, 11, 5 + index)
   }))
+  // This morning's meeting named an owner and a date for each, so its follow-ups are tasks already.
+  const weeklyFollowUps: MeetingFollowUp[] = WEEKLY_FOLLOW_UPS.map(
+    ([text, turnId, suggestedOwnerId, days], index) => ({
+      id: `weekly-f${index + 1}`,
+      text,
+      turnId,
+      suggestedOwnerId,
+      due: dateKey(addWorkingDays(day, days)),
+      taskId: `INAX-${132 + index}`,
+      declined: false
+    })
+  )
+  const weeklyTasks: MeetingTask[] = weeklyFollowUps.map((followUp, index) => ({
+    id: followUp.taskId ?? '',
+    title: followUp.text,
+    assigneeId: followUp.suggestedOwnerId ?? JIHO,
+    status: 'todo',
+    due: followUp.due,
+    meetingId: 'weekly',
+    followUpId: followUp.id,
+    route: 'heard',
+    createdAt: atTime(day, 9, 1 + index)
+  }))
   return {
-    tasks,
+    tasks: [...tasks, ...weeklyTasks],
     meetings: [
       meeting({
         id: 'newsletter-review',
@@ -219,15 +244,7 @@ export function seedMeetings(day: number): { meetings: Meeting[]; tasks: Meeting
         materials: [{ kind: 'file', name: '협력사 견적 비교.xlsx', size: 48_200 }],
         minutes: WEEKLY_MINUTES,
         minutesSentAt: atTime(day, 9),
-        followUps: WEEKLY_FOLLOW_UPS.map(([text, turnId, suggestedOwnerId, days], index) => ({
-          id: `weekly-f${index + 1}`,
-          text,
-          turnId,
-          suggestedOwnerId,
-          due: dateKey(addWorkingDays(day, days)),
-          taskId: null,
-          declined: false
-        }))
+        followUps: weeklyFollowUps
       }),
       meeting({
         id: 'draft-review',

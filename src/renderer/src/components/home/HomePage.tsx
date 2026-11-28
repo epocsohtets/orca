@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { toast } from 'sonner'
 import { useAppStore } from '@/store'
 import { useIntlLocale, useTranslate } from '@/i18n/use-translate'
 import { uiDateTimeFormat } from '@/i18n/ui-intl-formatters'
@@ -12,7 +11,6 @@ import { signInInaxMock } from '@/lib/inax-mock-account'
 import { useBots } from '@/lib/bot-catalog'
 import { homeTaskTab, type HomeTaskTab } from './home-board'
 import { useHomeBoardStore } from './home-board-store'
-import { HOME_ACCEPT_FOLLOW_UPS } from './home-board-meetings'
 import {
   openMeeting,
   openMeetingBot,
@@ -21,17 +19,11 @@ import {
 } from '@/components/meetings/meeting-navigation'
 import { MAKO, personName } from '@/components/meetings/meeting-people'
 import {
-  acceptFollowUp,
-  setFollowUpDeclined,
-  useMeetings
-} from '@/components/meetings/meetings-store'
-import {
   answerHomeLoop,
   answerHomeRecord,
   decideHomeLoop,
   saveHomeDayEnd,
-  startHomeLoop,
-  undoHomeDayEndAll
+  startHomeLoop
 } from './home-board-actions'
 import { useHomeBoard } from './use-home-board'
 import type { HomePhase } from './home-day'
@@ -124,33 +116,6 @@ export default function HomePage(): React.JSX.Element {
     setTab('today')
     focusRow(`[data-home-task="${id}"]`)
   }
-  /** My answer to what the meeting agent offered me: each item becomes my task, or goes back to the host. */
-  const answerOffer = (meetingId: string, choiceId: string): void => {
-    const meeting = useMeetings.getState().meetings.find((entry) => entry.id === meetingId)
-    const offered = (meeting?.followUps ?? []).filter(
-      (followUp) => followUp.suggestedOwnerId === viewerId && !followUp.taskId && !followUp.declined
-    )
-    for (const followUp of offered) {
-      if (choiceId === HOME_ACCEPT_FOLLOW_UPS) {
-        acceptFollowUp(meetingId, followUp.id)
-      } else {
-        setFollowUpDeclined(meetingId, followUp.id, true)
-      }
-    }
-    if (choiceId !== HOME_ACCEPT_FOLLOW_UPS && offered.length > 0) {
-      // The row leaves the board with the answer, so the way back comes with the message.
-      toast(t('home.offer.declined', 'The host was told these are not mine.'), {
-        action: {
-          label: t('home.offer.undo', 'Undo'),
-          onClick: () => {
-            for (const followUp of offered) {
-              setFollowUpDeclined(meetingId, followUp.id, false)
-            }
-          }
-        }
-      })
-    }
-  }
   /** An agent's row goes to its conversation; a bot without one opens in place. */
   const openAgent = (agentId: string): void => {
     if (agentId === 'meeting') {
@@ -178,11 +143,7 @@ export default function HomePage(): React.JSX.Element {
       tasks={view.openTasks}
       onAnswer={answerHomeRecord}
       cardsLeft={view.dayEnd.length}
-      result={
-        dayEndRows.length > 0 ? (
-          <HomeDayEndResult rows={dayEndRows} onUndo={undoHomeDayEndAll} />
-        ) : null
-      }
+      result={dayEndRows.length > 0 ? <HomeDayEndResult rows={dayEndRows} /> : null}
       prominent={phase === 'evening'}
       hasApp={app !== undefined}
       onManageApps={() => openSettings('my-apps')}
@@ -304,10 +265,7 @@ export default function HomePage(): React.JSX.Element {
                             focusRow(`[data-home-tab="${tab}"]`)
                           }}
                           onAnswer={(taskId, choiceId) => {
-                            const meetingId = tasks.find((entry) => entry.id === taskId)?.meetingId
-                            if (meetingId) {
-                              answerOffer(meetingId, choiceId)
-                            } else if (board.loops[taskId]) {
+                            if (board.loops[taskId]) {
                               answerHomeLoop(taskId, choiceId)
                             } else {
                               useHomeBoardStore.setState((state) => ({

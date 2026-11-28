@@ -85,7 +85,7 @@ export function HomeDayEndTimeline({
   return (
     <section>
       <h4 className="mb-1 px-3.5 text-xs text-muted-foreground">
-        {t('home.dayEnd.recent', 'Recent')}
+        {t('home.activity.title', 'Recent activity')}
       </h4>
       <ol>
         {lines.map((line) => (
@@ -140,7 +140,7 @@ export function HomeDayEndRecords({
             chips={[
               {
                 id: HOME_RECORD_YES,
-                label: t('home.dayEnd.recordYes', 'Correct'),
+                label: t('home.dayEnd.recordYes', 'This task'),
                 recommended: true
               }
             ]}

@@ -162,7 +162,7 @@ export function TaskPageInaxTaskDetail({
                         uiDateTimeFormat(NOTE_TIME, intlLocale).format(homeSampleMoment(note.at)),
                         note.statusChanged === false
                           ? null
-                          : t('taskLoop.detail.noteStatus', 'status changed {{to}}', {
+                          : t('taskLoop.detail.noteStatus', 'Changed status {{to}}', {
                               to: statusTo[note.status]
                             })
                       ]

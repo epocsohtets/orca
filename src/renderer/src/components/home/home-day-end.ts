@@ -32,7 +32,10 @@ export type HomeDayEndCard =
       title: string
       project: HomeProjectId
       timeline: HomeDayEndLine[]
-      followUps: { id: string; text: string; suggestedOwnerId: string }[]
+      /** `returnedBy`: the person the meeting named, who said it is not theirs. */
+      followUps: { id: string; text: string; returnedBy: string | null }[]
+      /** Follow-ups of this meeting that are tasks already: colleagues see those now. */
+      settled: number
       /** Who can take a follow-up: the host and the attendees. */
       peopleIds: string[]
     }
@@ -81,7 +84,7 @@ export type HomeDayEndSave =
 const SHOWN_LINES = 4
 
 /**
- * The day-end cards: one per task of mine that moved today, one per meeting I host with follow-ups nobody has,
+ * The day-end cards: one per task of mine that moved today, one per meeting I host with follow-ups the meeting gave nobody,
  * and one for day records the app could not place. A card I saved does not come back.
  */
 export function planHomeDayEnd(args: {
@@ -101,12 +104,13 @@ export function planHomeDayEnd(args: {
   const cards: HomeDayEndCard[] = []
   for (const task of args.tasks) {
     const lines = args.activity.filter((line) => line.taskId === task.id)
-    // "Moved today": someone (me, an agent, a colleague) did something on it today.
+    // "Moved today": someone (me, an agent, a colleague) did something on it today. A task that only arrived
+    // from a meeting today has nothing to report yet; its arrival line is `task:<id>`.
     if (
       task.meetingId ||
       task.assignee ||
       saved.has(task.id) ||
-      !lines.some((line) => line.day === 0)
+      !lines.some((line) => line.day === 0 && line.id !== `task:${task.id}`)
     ) {
       continue
     }
@@ -135,7 +139,12 @@ export function planHomeDayEnd(args: {
       title: meeting.title,
       project: meeting.project,
       timeline: args.activity.filter((line) => line.meetingId === meeting.id).slice(0, SHOWN_LINES),
-      followUps: open.map(({ id, text, suggestedOwnerId }) => ({ id, text, suggestedOwnerId })),
+      settled: meeting.followUps.length - open.length,
+      followUps: open.map(({ id, text, declined, suggestedOwnerId }) => ({
+        id,
+        text,
+        returnedBy: declined ? suggestedOwnerId : null
+      })),
       peopleIds: [meeting.hostId, ...meeting.attendeeIds]
     })
   }
@@ -214,37 +223,43 @@ export function saveHomeDayEndTask(
   }
 }
 
-/** Takes back everything the day-end cards saved. `meetingTaskIds` are the follow-up tasks to remove. */
-export function undoHomeDayEnd(state: DayEndState): {
-  state: DayEndState
-  meetingTaskIds: string[]
-} {
-  const inax = { ...state.inax }
-  const loops = { ...state.loops }
-  const records = { ...state.records }
-  const meetingTaskIds: string[] = []
-  // Newest first, so a task saved twice ends at its first "before".
-  for (const entry of state.dayEnd.toReversed()) {
-    if (entry.kind === 'meeting') {
-      meetingTaskIds.push(...entry.taskIds)
-    } else if (entry.kind === 'records') {
-      for (const id of entry.recordIds) {
-        delete records[id]
-      }
-    } else {
-      const record = inax[entry.id]
-      const notes = (record?.notes ?? []).filter((note) => note.id !== entry.noteId)
-      const status = entry.status === null ? record?.status : (entry.prevStatus ?? undefined)
-      if (notes.length === 0 && status === undefined) {
-        delete inax[entry.id]
-      } else {
-        inax[entry.id] = { status, notes }
-      }
-      const loop = loops[entry.id]
-      if (entry.closedLoop && loop) {
-        loops[entry.id] = { ...loop, final: undefined }
-      }
-    }
+/** Takes back what one saved card sent. `meetingTaskIds` are the follow-up tasks to remove. */
+export function undoHomeDayEnd(
+  state: DayEndState,
+  index: number
+): { state: DayEndState; meetingTaskIds: string[] } {
+  const entry = state.dayEnd[index]
+  const dayEnd = state.dayEnd.filter((_, at) => at !== index)
+  if (!entry || entry.kind === 'meeting') {
+    return { state: { ...state, dayEnd }, meetingTaskIds: entry ? entry.taskIds : [] }
   }
-  return { state: { inax, loops, records, dayEnd: [] }, meetingTaskIds }
+  if (entry.kind === 'records') {
+    const records = { ...state.records }
+    for (const id of entry.recordIds) {
+      delete records[id]
+    }
+    return { state: { ...state, records, dayEnd }, meetingTaskIds: [] }
+  }
+  const inax = { ...state.inax }
+  const record = inax[entry.id]
+  const notes = (record?.notes ?? []).filter((note) => note.id !== entry.noteId)
+  const status = entry.status === null ? record?.status : (entry.prevStatus ?? undefined)
+  if (notes.length === 0 && status === undefined) {
+    delete inax[entry.id]
+  } else {
+    inax[entry.id] = { status, notes }
+  }
+  const loop = state.loops[entry.id]
+  return {
+    state: {
+      ...state,
+      inax,
+      loops:
+        entry.closedLoop && loop
+          ? { ...state.loops, [entry.id]: { ...loop, final: undefined } }
+          : state.loops,
+      dayEnd
+    },
+    meetingTaskIds: []
+  }
 }

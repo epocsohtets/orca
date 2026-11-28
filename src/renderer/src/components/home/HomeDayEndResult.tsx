@@ -9,8 +9,9 @@ import type { HomeProject } from './home-board-mock'
 import type { HomeDayEndSaved } from './home-day-end'
 import { openInaxTask } from '@/components/task-page/inax/inax-source-selection'
 import { openMeeting } from '@/components/meetings/meeting-navigation'
-import { personName } from '@/components/meetings/meeting-people'
+import { MAKO, personName } from '@/components/meetings/meeting-people'
 import { useMeetings } from '@/components/meetings/meetings-store'
+import { undoHomeDayEndAt } from './home-board-actions'
 
 export type HomeDayEndResultRow = {
   id: string
@@ -21,6 +22,7 @@ export type HomeDayEndResultRow = {
   /** Who sees it now. */
   viewers: string
   open: () => void
+  undo: () => void
 }
 
 /** What I saved, as rows. Records stay with me, so they are not among what colleagues got. */
@@ -32,8 +34,8 @@ export function useHomeDayEndRows(
 ): HomeDayEndResultRow[] {
   const t = useTranslate()
   const meetings = useMeetings((state) => state.meetings)
-  const meetingTasks = useMeetings((state) => state.tasks)
-  return saved.flatMap((entry, index) => {
+  // The cards are 마코's: seen as someone else, the board holds none of them.
+  return (viewerId === MAKO ? saved : []).flatMap((entry, index) => {
     if (entry.kind === 'task') {
       const task = tasks.find((item) => item.id === entry.id)
       return task
@@ -41,30 +43,33 @@ export function useHomeDayEndRows(
             {
               id: `${index}`,
               title: task.title,
-              what: entry.noteId ? t('home.dayEnd.sharedNote', 'Progress note') : '',
+              what: entry.noteId ? t('home.dayEnd.progress', 'Today’s progress') : '',
               status: entry.status,
               viewers: t('home.dayEnd.audienceTask', 'The PM and the team of “{{project}}”', {
                 project: projects[task.project].name
               }),
-              open: () => openInaxTask(task.id)
+              open: () => openInaxTask(task.id),
+              undo: () => undoHomeDayEndAt(index)
             }
           ]
         : []
     }
     if (entry.kind === 'meeting') {
-      const assigned = meetingTasks.filter((task) => entry.taskIds.includes(task.id))
+      const meeting = meetings.find((item) => item.id === entry.id)
       return [
         {
           id: `${index}`,
-          title: meetings.find((meeting) => meeting.id === entry.id)?.title ?? '',
-          what: t('home.dayEnd.resultAssigned', '{{count}} follow-ups assigned', {
-            count: assigned.length
+          title: meeting?.title ?? '',
+          what: t('home.dayEnd.sharedOwners', 'Owners of {{count}} follow-ups', {
+            count: entry.taskIds.length
           }),
           status: null,
-          viewers: [...new Set(assigned.map((task) => task.assigneeId))]
+          // Everyone in the meeting sees who has its follow-ups.
+          viewers: (meeting ? [meeting.hostId, ...meeting.attendeeIds] : [])
             .map((id) => (id === viewerId ? t('home.activity.me', 'I') : personName(id)))
             .join(', '),
-          open: () => openMeeting(entry.id)
+          open: () => openMeeting(entry.id),
+          undo: () => undoHomeDayEndAt(index)
         }
       ]
     }
@@ -72,37 +77,27 @@ export function useHomeDayEndRows(
   })
 }
 
-/** What the day-end cards sent to colleagues: one row per card, what went and who sees it, and one Undo for all. */
+/** What the day-end cards sent to colleagues: one row per card, what went, who sees it, and its Undo. */
 export function HomeDayEndResult({
-  rows,
-  onUndo
+  rows
 }: {
   rows: readonly HomeDayEndResultRow[]
-  onUndo: () => void
 }): React.JSX.Element {
   const t = useTranslate()
   return (
     <section data-home-day-end-result="" className="border-t border-border pt-2">
-      <div className="flex items-center gap-2 px-4">
-        <h3 className="min-w-0 flex-1 text-xs font-medium text-foreground">
-          {t('home.dayEnd.resultTitle', 'Shared today · {{count}}', { count: rows.length })}
-        </h3>
-        <Button
-          type="button"
-          variant="ghost-muted"
-          size="xs"
-          data-home-day-end-undo=""
-          onClick={onUndo}
-        >
-          {t('home.day.undo', 'Undo')}
-        </Button>
-      </div>
+      <h3 className="px-4 text-xs font-medium text-foreground">
+        {t('home.dayEnd.resultTitle', 'What the team sees today · {{count}}', {
+          count: rows.length
+        })}
+      </h3>
       <ul>
         {rows.map((row) => (
-          <li key={row.id}>
+          <li key={row.id} className="flex items-center gap-2 pr-4">
             <button
               type="button"
-              className={`${HOME_ROW_BUTTON_CLASS} flex flex-col gap-1`}
+              data-home-day-end-row=""
+              className={`${HOME_ROW_BUTTON_CLASS} flex flex-1 flex-col gap-1`}
               onClick={row.open}
             >
               <span className="text-xs font-medium text-foreground">{row.title}</span>
@@ -112,6 +107,15 @@ export function HomeDayEndResult({
                 <span className={HOME_META_CLASS}>{row.viewers}</span>
               </span>
             </button>
+            <Button
+              type="button"
+              variant="ghost-muted"
+              size="xs"
+              data-home-day-end-undo=""
+              onClick={row.undo}
+            >
+              {t('home.day.undo', 'Undo')}
+            </Button>
           </li>
         ))}
       </ul>

@@ -232,20 +232,6 @@ export function buildHomeBoardView(
             meetingId: fromMeetings.recording.id
           }
         ]
-      : []),
-    ...(board.dayEnd.length > 0
-      ? [
-          {
-            id: 'day-end',
-            day: 0,
-            at: minutes,
-            who: me,
-            text: t('home.activity.dayEnd', 'saved {{count}} cards in Wrap up', {
-              count: board.dayEnd.length
-            }),
-            byAgent: false
-          }
-        ]
       : [])
   ]
   // My answer is the confirmation of the work that asked for it.

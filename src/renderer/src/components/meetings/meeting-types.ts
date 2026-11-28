@@ -12,13 +12,13 @@ export type MeetingFollowUp = {
   text: string
   /** The sentence in the transcript this follow-up came from. */
   turnId: string
-  /** Who the agent thinks owns it; the meeting agent proposes it to them. */
-  suggestedOwnerId: string
+  /** Who the meeting named for it. Null when nobody was named: the host gives it an owner at day end. */
+  suggestedOwnerId: string | null
   /** YYYY-MM-DD. */
   due: string
   /** One follow-up is one task: set once by whichever route creates it. */
   taskId: string | null
-  /** The suggested owner answered "not mine". */
+  /** The person the meeting named said "not mine" and gave it back. */
   declined: boolean
 }
 
@@ -76,8 +76,11 @@ export type MeetingTask = {
   due: string
   meetingId: string
   followUpId: string
-  /** 'accepted': the owner took the agent's proposal. 'assigned': the host created and assigned it. */
-  route: 'accepted' | 'assigned'
+  /**
+   * 'heard': the meeting named the owner and the date, so the agent made it when the minutes went out.
+   * 'assigned': the host gave it an owner. 'accepted': the owner took it back after saying "not mine".
+   */
+  route: 'accepted' | 'assigned' | 'heard'
   createdAt: number
 }
 

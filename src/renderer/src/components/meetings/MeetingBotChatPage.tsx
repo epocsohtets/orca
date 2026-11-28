@@ -91,11 +91,17 @@ export default function MeetingBotChatPage(): React.JSX.Element {
                 '{{name}} shared the full minutes of **{{title}}** with you.',
                 { name: personName(item.byId), title: item.meeting.title }
               )
-            : t(
-                'meetings.bot.assignedMessage',
-                '{{name}} assigned you a task from **{{title}}**. Here is the part it came from.',
-                { name: personName(item.meeting.hostId), title: item.meeting.title }
-              )
+            : item.task.route === 'heard'
+              ? t(
+                  'meetings.bot.heardMessage',
+                  'A task for you came out of **{{title}}**. Here is the part it came from.',
+                  { title: item.meeting.title }
+                )
+              : t(
+                  'meetings.bot.assignedMessage',
+                  '{{name}} assigned you a task from **{{title}}**. Here is the part it came from.',
+                  { name: personName(item.meeting.hostId), title: item.meeting.title }
+                )
       rows.push(message(item.key, 'assistant', item.at, `${heading}\n\n${body}`))
     }
     for (const ask of myAsks) {

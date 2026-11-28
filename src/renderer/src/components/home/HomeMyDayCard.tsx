@@ -59,7 +59,7 @@ export function HomeMyDayCard({
   return (
     <HomeCard
       title={t('home.day.title', 'My day')}
-      aside={t('home.day.privacy', 'Only I see this. The team sees only what I save in Wrap up.')}
+      aside={t('home.day.privacy', 'Only I see this. The team sees only what I save in Wrap-up.')}
       data-home-card="day"
       action={
         <DropdownMenu>
@@ -158,7 +158,7 @@ export function HomeMyDayCard({
           data-home-wrap-up-open=""
           onClick={onWrapUp}
         >
-          {t('home.wrapUp.title', 'Wrap up')}
+          {t('home.wrapUp.title', 'Wrap-up')}
         </Button>
       </div>
       {result}

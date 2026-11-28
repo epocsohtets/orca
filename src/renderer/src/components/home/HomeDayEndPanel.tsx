@@ -4,6 +4,7 @@ import { useTranslate } from '@/i18n/use-translate'
 import { cn } from '@/lib/class-names'
 import { isImeOwnedKeyboardEvent } from '@/lib/text-input/ime/ime-composition-keyboard-event'
 import { Button } from '@/components/ui/button'
+import { ShortcutKeyCombo } from '@/components/ui/ShortcutKeyCombo'
 import { ImeTextarea } from '@/lib/text-input/ime/ime-text-field'
 import { BotItemStepper } from '@/components/bots/items/BotItemStepper'
 import { useBotItemChords } from '@/components/bots/items/use-bot-item-chords'
@@ -97,11 +98,14 @@ export function HomeDayEndPanel({
   }
 
   const statusLabels = inaxStatusLabels(t)
+  const progress = t('home.dayEnd.progress', 'Today’s progress')
   const me = t('home.activity.me', 'I')
   let header: React.ReactNode
   let body: React.ReactNode
-  /** Null on a card that sends nothing to anyone. */
+  /** What Save sends. Null on a card that sends nothing to anyone. */
   let shared: string | null
+  /** What colleagues see of this already, without my confirmation. */
+  let visibleNow: string | null = null
   let viewers: string
   let save: HomeDayEndSave
   if (card.kind === 'task') {
@@ -121,13 +125,26 @@ export function HomeDayEndPanel({
     }
     shared =
       [
-        text ? t('home.dayEnd.sharedNote', 'Progress note') : null,
+        text ? progress : null,
         status
-          ? t('home.dayEnd.sharedStatus', 'Status “{{status}}”', { status: statusLabels[status] })
+          ? t('home.dayEnd.sharedStatus', 'Status {{from}} → {{to}}', {
+              from: statusLabels[current],
+              to: statusLabels[status]
+            })
           : null
       ]
         .filter(Boolean)
         .join(' · ') || t('home.dayEnd.sharedNothing', 'Nothing')
+    // Status and activity are shared as they happen; only the written line and a proposed status wait for Save.
+    visibleNow = [
+      t('home.dayEnd.nowStatus', 'Status {{status}}', { status: statusLabels[current] }),
+      card.timeline[0]
+        ? t('home.dayEnd.nowActivity', 'Last activity {{when}}', { when: card.timeline[0].when })
+        : null,
+      task.who === 'agentWorking' ? t('home.dayEnd.nowAgent', 'Agent working') : null
+    ]
+      .filter(Boolean)
+      .join(' · ')
     viewers = t('home.dayEnd.audienceTask', 'The PM and the team of “{{project}}”', {
       project: projects[task.project].name
     })
@@ -165,20 +182,22 @@ export function HomeDayEndPanel({
       </>
     )
   } else if (card.kind === 'meeting') {
-    const owner = (followUp: { id: string; suggestedOwnerId: string }): string =>
-      draft.picks?.[followUp.id] ?? followUp.suggestedOwnerId
-    const rows = card.followUps
-      .map((followUp) => ({ followUpId: followUp.id, assigneeId: owner(followUp) }))
-      .filter((row) => row.assigneeId !== '')
+    // Nobody was named for these, so no pick is made ahead: only the ones I give an owner are saved.
+    const rows = card.followUps.flatMap((followUp) =>
+      draft.picks?.[followUp.id]
+        ? [{ followUpId: followUp.id, assigneeId: draft.picks[followUp.id] }]
+        : []
+    )
     save = { kind: 'meeting', meetingId: card.id, rows }
     shared =
       rows.length > 0
-        ? t('home.dayEnd.sharedOwners', 'Who has {{count}} follow-ups', { count: rows.length })
+        ? t('home.dayEnd.sharedOwners', 'Owners of {{count}} follow-ups', { count: rows.length })
         : t('home.dayEnd.sharedNothing', 'Nothing')
-    viewers =
-      [...new Set(rows.map((row) => row.assigneeId))]
-        .map((id) => (id === card.peopleIds[0] ? me : personName(id)))
-        .join(', ') || me
+    visibleNow = t('home.dayEnd.nowMeeting', 'Minutes · {{count}} follow-up tasks', {
+      count: card.settled
+    })
+    // Everyone in the meeting sees who has its follow-ups.
+    viewers = card.peopleIds.map((id, index) => (index === 0 ? me : personName(id))).join(', ')
     header = (
       <>
         <h3 className="text-[15px] leading-5 font-semibold text-foreground">{card.title}</h3>
@@ -200,18 +219,21 @@ export function HomeDayEndPanel({
             <HomeDayEndChipLine
               key={followUp.id}
               question={followUp.text}
+              note={
+                followUp.returnedBy ? (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {personName(followUp.returnedBy)} ·{' '}
+                    {t('meetings.followUps.stateDeclined', 'Says not theirs')}
+                  </p>
+                ) : undefined
+              }
               chips={card.peopleIds.map((id, index) => ({
                 id,
                 label: index === 0 ? me : personName(id),
-                recommended: id === followUp.suggestedOwnerId
+                recommended: false
               }))}
-              picked={owner(followUp)}
-              // The pick again leaves this one without an owner: it stays open for another day.
-              onPick={(id) =>
-                patch({
-                  picks: { ...draft.picks, [followUp.id]: owner(followUp) === id ? '' : id }
-                })
-              }
+              picked={draft.picks?.[followUp.id]}
+              onPick={(id) => patch({ picks: { ...draft.picks, [followUp.id]: id } })}
             />
           ))}
         </div>
@@ -230,7 +252,7 @@ export function HomeDayEndPanel({
     viewers = me
     header = (
       <h3 className="text-[15px] leading-5 font-semibold text-foreground">
-        {t('home.dayEnd.recordsTitle', 'Records without a task')}
+        {t('home.day.unconfirmed', 'Records to check')}
       </h3>
     )
     body = (
@@ -247,14 +269,13 @@ export function HomeDayEndPanel({
     onSave(save)
     advance()
   }
-  const progress = t('home.dayEnd.progress', 'Today’s progress')
   const suggestion = card.kind === 'task' ? card.suggestion : null
 
   return (
     <aside
       ref={root}
       tabIndex={-1}
-      aria-label={t('home.wrapUp.title', 'Wrap up')}
+      aria-label={t('home.wrapUp.title', 'Wrap-up')}
       data-home-day-end={card.kind}
       className={cn(
         '@container/item-pane flex w-[400px] shrink-0 flex-col border-l border-border bg-sidebar outline-none',
@@ -269,7 +290,7 @@ export function HomeDayEndPanel({
     >
       <div className="flex shrink-0 items-center gap-2 py-2 pr-2 pl-3.5">
         <h2 className="min-w-0 flex-1 text-xs font-medium text-muted-foreground">
-          {t('home.wrapUp.title', 'Wrap up')}
+          {t('home.wrapUp.title', 'Wrap-up')}
         </h2>
         <Button
           type="button"
@@ -283,16 +304,26 @@ export function HomeDayEndPanel({
       </div>
       <div className="scrollbar-sleek flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pb-3">
         <div className="px-3.5">{header}</div>
-        <dl className="grid grid-cols-[72px_minmax(0,1fr)] gap-x-2 gap-y-1 px-3.5 text-xs">
+        <dl className="grid grid-cols-[104px_minmax(0,1fr)] gap-x-2 gap-y-1 px-3.5 text-xs">
+          {visibleNow === null ? null : (
+            <>
+              <dt className="text-muted-foreground">{t('home.dayEnd.visibleNow', 'Shown now')}</dt>
+              <dd className="text-foreground" data-home-day-end-now="">
+                {visibleNow}
+              </dd>
+            </>
+          )}
           {shared === null ? null : (
             <>
-              <dt className="text-muted-foreground">{t('home.dayEnd.shared', 'Shared')}</dt>
+              <dt className="text-muted-foreground">
+                {t('home.dayEnd.shared', 'Shown after Save')}
+              </dt>
               <dd className="text-foreground" data-home-day-end-shared="">
                 {shared}
               </dd>
             </>
           )}
-          <dt className="text-muted-foreground">{t('home.dayEnd.viewers', 'Seen by')}</dt>
+          <dt className="text-muted-foreground">{t('home.dayEnd.viewers', 'Who sees it')}</dt>
           <dd className="text-foreground" data-home-day-end-viewers="">
             {viewers}
           </dd>
@@ -302,7 +333,13 @@ export function HomeDayEndPanel({
       <div className="mx-3 mb-3 flex shrink-0 flex-col gap-2 rounded-xl border border-border bg-background p-2 shadow-xs">
         {card.kind === 'task' ? (
           <label className="flex flex-col gap-0.5">
-            <span className="px-2 pt-1 text-xs text-muted-foreground">{progress}</span>
+            <span className="flex items-center gap-2 px-2 pt-1 text-xs text-muted-foreground">
+              <span className="min-w-0 flex-1">{progress}</span>
+              {/* The key that takes the line written ahead, shown while that line is. */}
+              {suggestion && !draft.text ? (
+                <ShortcutKeyCombo keys={['Tab']} size="compact" />
+              ) : null}
+            </span>
             <ImeTextarea
               ref={box}
               // Remounted per card, so one card's line never shows in the next.
@@ -346,7 +383,7 @@ export function HomeDayEndPanel({
             data-home-day-end-skip=""
             onClick={advance}
           >
-            {t('home.dayEnd.skip', 'Skip')}
+            {t('home.dayEnd.next', 'Next')}
           </Button>
           <Button
             ref={saveButton}

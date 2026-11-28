@@ -31562,13 +31562,14 @@
       "taken": "Yours · {{status}}",
       "assignedByHost": "Assigned by {{name}} · {{status}}",
       "declined": "You said this is not yours",
-      "proposalCard": "This looks like yours",
+      "proposalCard": "My task from this meeting",
       "declinedHelp": "{{name}} sees your answer: “Not mine”.",
       "assignedCard": "A task for you from “{{title}}”",
       "rowMinutes": "Minutes: {{title}}",
       "rowShared": "Shared minutes: {{title}}",
       "rowTask": "New task: {{title}}",
-      "rowEmpty": "Minutes and your tasks arrive here"
+      "rowEmpty": "Minutes and your tasks arrive here",
+      "heardMessage": "A task for you came out of **{{title}}**. Here is the part it came from."
     },
     "source": "Where it was said",
     "ask": {
@@ -31580,23 +31581,17 @@
     "followUps": {
       "title": "Follow-up tasks",
       "counts": "{{total}} in all · To do {{todo}} · In progress {{inProgress}} · Done {{done}} · Not settled yet {{open}}",
-      "include": "Make “{{text}}” a task",
       "mine": "Mine",
       "accepted": "Taken by the owner",
-      "proposedTo": "Offered by the meeting agent",
       "stateDeclined": "Says not theirs",
-      "stateWaiting": "Waiting for {{name}}’s answer",
       "owner": "Owner of “{{text}}”",
       "chooseOwner": "Choose owner",
-      "assignedToast": "{{count}} tasks created. {{people}} owners were told.",
-      "assignAll": "Create {{count}} tasks and assign",
-      "assignWho": "The meeting agent tells the {{people}} owners. Change the owner of a wrong line, or untick it.",
       "colTask": "Task",
       "colOwner": "Owner",
       "colActions": "Actions",
       "stateUnasked": "Not assigned yet",
-      "suggestedOutside": "{{name}} was not in the meeting",
-      "assignedByMe": "Assigned by me"
+      "assignedByMe": "Assigned by me",
+      "heard": "Created by the meeting agent"
     },
     "openTask": "Open task",
     "excerpt": {
@@ -31655,9 +31650,7 @@
       "minutesFollowUps": "Minutes ready · {{done}} of {{total}} follow-ups done",
       "myTasks": "My tasks from it: {{count}}",
       "scheduledPrep": "Scheduled · prep ready",
-      "scheduledNoPrep": "Scheduled",
-      "waitingMine": "Needs me · {{count}} items for me",
-      "waitingSort": "Needs me · {{count}} follow-ups to sort"
+      "scheduledNoPrep": "Scheduled"
     },
     "list": {
       "emptyUpcoming": "Nothing is scheduled. A meeting you create or are invited to appears here.",
@@ -31704,7 +31697,6 @@
       "allTasks": "All are settled",
       "doneSub": "Of {{total}} follow-up tasks",
       "mineOpen": "{{count}} waiting for my answer",
-      "mineOpenOne": "Waiting for my answer",
       "done": "Tasks done",
       "mineTaken": "In My work",
       "ended": "Ended {{count}}"
@@ -31818,8 +31810,8 @@
       "minutesSent": "sent the minutes of “{{title}}” to {{count}} people",
       "tookFollowUp": "took “{{task}}” from the meeting “{{title}}”",
       "assignedFollowUp": "assigned me “{{task}}” from the meeting “{{title}}”",
-      "dayEnd": "saved {{count}} cards in Wrap up",
-      "copyComment": "commented: “The second one reads better”"
+      "copyComment": "commented: “The second one reads better”",
+      "heardFollowUp": "put “{{task}}” from the meeting “{{title}}” into My work"
     },
     "agents": {
       "waiting": "Waiting for my answer",
@@ -31870,7 +31862,7 @@
     },
     "day": {
       "title": "My day",
-      "privacy": "Only I see this. The team sees only what I save in Wrap up.",
+      "privacy": "Only I see this. The team sees only what I save in Wrap-up.",
       "manage": "Manage records",
       "manageApps": "Apps that are recorded",
       "manageBrowser": "Browser activity record",
@@ -31895,7 +31887,7 @@
       "yesterday": "yesterday"
     },
     "wrapUp": {
-      "title": "Wrap up",
+      "title": "Wrap-up",
       "close": "Close"
     },
     "newTask": {
@@ -31943,7 +31935,6 @@
       "prepReady": "Prep ready",
       "endOfDay": "End of day",
       "recording": "Recording now",
-      "minutesMine": "Minutes arrived · {{count}} items for me",
       "minutesWaiting": "Minutes arrived · waiting for me"
     },
     "agent": {
@@ -31986,9 +31977,6 @@
       "review": "Comment on the brand guide drafts",
       "reviewDue": "Today, before 15:00",
       "reviewDetail": "Choi Hyunwoo uploaded two drafts. Leave your comments before the 15:00 draft review.",
-      "offer": "My {{count}} items from “{{title}}”",
-      "offerWho": "Waiting for my answer · Meeting agent",
-      "offerQuestion": "Add the {{count}} items the minutes give you to My work?",
       "offerAccept": "Add to My work",
       "offerDecline": "Not mine",
       "inquiriesWho": "Draft ready · Inquiry agent",
@@ -32009,10 +31997,9 @@
       "addedAgent": "Agent working · just handed over",
       "fromMeetingAccepted": "A follow-up from the meeting “{{title}}”. The meeting agent offered it and {{name}} took it.",
       "fromMeetingAssigned": "A follow-up from the meeting “{{title}}”. {{host}} assigned it to {{name}}.",
-      "organise": "Sort {{count}} follow-ups of “{{title}}”",
-      "organiseWho": "Waiting for me to sort them · Meeting agent",
       "request": "{{name}} asks to see the minutes of “{{title}}”",
-      "requestWho": "Waiting for my approval"
+      "requestWho": "Waiting for my approval",
+      "fromMeetingHeard": "A follow-up from the meeting “{{title}}”. The meeting named {{name}} for it."
     },
     "project": {
       "campaign": "Product launch campaign",
@@ -32022,37 +32009,34 @@
     },
     "report": {
       "copy": "The writing agent drafted two headlines. It is my turn to choose.",
-      "researchDone": "The research agent put three competitors’ promotions into a table. My check is left.",
+      "researchDone": "I put three competitors’ promotions into one table. Please review it.",
       "research": "The research agent has two of three competitors’ promotions in a table. My check is left.",
-      "inquiries": "The inquiry agent drafted 214 inquiries sorted into 6 types. My review is left.",
+      "inquiries": "I sorted 214 inquiries into 6 types. Please review them.",
       "notice": "The inquiry agent cannot continue until the logistics team sends the new delivery dates. The deadline has passed.",
       "done": "I finished this task.",
       "copyChosen": "The writing agent drafted two headlines and I chose one. It is matching the body text and the button to it."
     },
-    "offer": {
-      "declined": "The host was told these are not mine.",
-      "undo": "Undo"
-    },
     "dayEnd": {
-      "recent": "Recent",
       "progress": "Today’s progress",
       "status": "Status",
-      "skip": "Skip",
       "save": "Save",
-      "shared": "Shared",
-      "viewers": "Seen by",
-      "sharedNote": "Progress note",
-      "sharedStatus": "Status “{{status}}”",
+      "shared": "Shown after Save",
+      "viewers": "Who sees it",
+      "sharedStatus": "Status {{from}} → {{to}}",
       "sharedNothing": "Nothing",
-      "sharedOwners": "Who has {{count}} follow-ups",
+      "sharedOwners": "Owners of {{count}} follow-ups",
       "audienceTask": "The PM and the team of “{{project}}”",
       "followUpCount": "{{count}} follow-ups without an owner",
-      "recordsTitle": "Records without a task",
       "task": "Task",
-      "recordYes": "Correct",
+      "recordYes": "This task",
       "recordOther": "Another task",
-      "resultTitle": "Shared today · {{count}}",
-      "resultAssigned": "{{count}} follow-ups assigned"
+      "resultTitle": "What the team sees today · {{count}}",
+      "next": "Next",
+      "visibleNow": "Shown now",
+      "nowStatus": "Status {{status}}",
+      "nowActivity": "Last activity {{when}}",
+      "nowAgent": "Agent working",
+      "nowMeeting": "Minutes · {{count}} follow-up tasks"
     }
   },
   "taskLoop": {
@@ -32108,7 +32092,7 @@
       "origin": "Where it came from",
       "noteByAgent": "Written by the agent, confirmed by me",
       "noteByMe": "Written by me",
-      "noteStatus": "status changed {{to}}"
+      "noteStatus": "Changed status {{to}}"
     },
     "gate": {
       "line": "Sign in to inAX and your tasks appear here."

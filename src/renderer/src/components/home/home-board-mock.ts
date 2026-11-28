@@ -85,7 +85,7 @@ export function buildHomeTasks(t: Translate, sample: HomeSampleContext): HomeTas
       report: researchDone
         ? t(
             'home.report.researchDone',
-            'The research agent put three competitors’ promotions into a table. My check is left.'
+            'I put three competitors’ promotions into one table. Please review it.'
           )
         : t(
             'home.report.research',
@@ -118,10 +118,7 @@ export function buildHomeTasks(t: Translate, sample: HomeSampleContext): HomeTas
         'home.task.inquiriesDetail',
         'The inquiry agent sorted 214 inquiries into 6 types. Read the draft and correct only what is wrong.'
       ),
-      report: t(
-        'home.report.inquiries',
-        'The inquiry agent drafted 214 inquiries sorted into 6 types. My review is left.'
-      )
+      report: t('home.report.inquiries', 'I sorted 214 inquiries into 6 types. Please review them.')
     },
     {
       id: 'notice',

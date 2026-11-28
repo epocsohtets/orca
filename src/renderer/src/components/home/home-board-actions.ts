@@ -119,9 +119,9 @@ export function saveHomeDayEnd(save: HomeDayEndSave): void {
   }
 }
 
-/** Takes back everything the day-end cards saved today. */
-export function undoHomeDayEndAll(): void {
-  const undone = undoHomeDayEnd(useHomeBoardStore.getState())
+/** Takes back what one saved day-end card sent. */
+export function undoHomeDayEndAt(index: number): void {
+  const undone = undoHomeDayEnd(useHomeBoardStore.getState(), index)
   const taken = undone.meetingTaskIds
   // The follow-up tasks go, and each follow-up is open again, as before it was assigned.
   useMeetings.setState((state) => ({
