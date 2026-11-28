@@ -25,7 +25,6 @@ const task = (id: string, patch: Partial<HomeTask> = {}): HomeTask => ({
 const labels = {
   resumed: 'resumed',
   addedDue: 'today',
-  addedDetail: 'mine',
   addedAgent: 'agent',
   doneReport: 'I finished it'
 }
@@ -39,7 +38,7 @@ describe('home board', () => {
   it('counts what waits on me and what is late', () => {
     expect(countHomeBoard(tasks)).toEqual({
       open: 3,
-      dueToday: 1,
+      dueToday: 2,
       waiting: 2,
       waitingAgents: 1,
       waitingMeetings: 1,

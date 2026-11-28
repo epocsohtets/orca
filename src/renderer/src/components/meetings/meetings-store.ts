@@ -200,12 +200,15 @@ export function startRecording(id: string): void {
 
 /** Simulated: stopping produces the prepared minutes and the bot sends them to every attendee. */
 export function stopRecording(id: string): void {
-  patchMeeting(id, (m) => ({
-    recordingStartedAt: null,
-    // Two minutes after the scheduled end, or now when the recording ended before that.
-    minutesSentAt: Math.min(m.endsAt + 2 * MINUTE, scenarioNow()),
-    ...sampleResult(m)
-  }))
+  patchMeeting(id, (m) => {
+    const result = sampleResult(m)
+    const lastSaid = Math.max(0, ...(result.minutes?.transcript ?? []).map((turn) => turn.at))
+    // A meeting that ran over ends when its last words were said (to the next 5 minutes), not when it was planned to.
+    const endsAt = Math.max(m.endsAt, m.startsAt + Math.ceil((lastSaid + 60) / 300) * 5 * MINUTE)
+    // Sent two minutes after the scheduled end, or now when the recording ended before that.
+    const minutesSentAt = Math.min(m.endsAt + 2 * MINUTE, scenarioNow())
+    return { recordingStartedAt: null, minutesSentAt, endsAt, ...result }
+  })
   set({ depth: 'brief' })
 }
 

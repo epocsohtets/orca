@@ -1,10 +1,10 @@
+import { Bot } from 'lucide-react'
 import React from 'react'
 import { useTranslate } from '@/i18n/use-translate'
 import { Button } from '@/components/ui/button'
 import {
   HOME_META_CLASS,
   HOME_ROW_BUTTON_CLASS,
-  HomeAvatar,
   HomeCard,
   HomeProjectDot,
   HomeWhoMarker
@@ -96,7 +96,9 @@ export function MeetingAgentCard({ onOpen }: { onOpen: () => void }): React.JSX.
                 className={`${HOME_ROW_BUTTON_CLASS} flex items-start gap-2`}
                 onClick={onOpen}
               >
-                <HomeAvatar name={name} />
+                <span className="flex size-5 shrink-0 items-center justify-center rounded-full border border-border bg-muted text-muted-foreground">
+                  <Bot aria-hidden className="size-3" />
+                </span>
                 <span className="flex min-w-0 flex-1 flex-col gap-1">
                   <span
                     className={`line-clamp-2 text-[13px] text-foreground ${isSeen(state, item.key) ? '' : 'font-medium'}`}
@@ -115,7 +117,7 @@ export function MeetingAgentCard({ onOpen }: { onOpen: () => void }): React.JSX.
                   </span>
                   {item.kind === 'minutes' && item.proposals.length > 0 ? (
                     <span className={HOME_META_CLASS}>
-                      {t('meetings.agent.proposals', '{{count}} items looked like mine', {
+                      {t('meetings.agent.proposals', '{{count}} items look like mine', {
                         count: item.proposals.length
                       })}
                     </span>

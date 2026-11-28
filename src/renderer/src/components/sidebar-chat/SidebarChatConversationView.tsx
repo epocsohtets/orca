@@ -40,6 +40,17 @@ export function SidebarChatConversationMount(): React.JSX.Element | null {
       }),
     [setOpenId]
   )
+  // The conversation can lie over the page a rail button stands for (Home, without Code): pressing that button
+  // changes no view, so the press itself closes the conversation.
+  useEffect(() => {
+    const onClick = (event: MouseEvent): void => {
+      if (event.target instanceof Element && event.target.closest('[data-app-rail-item]')) {
+        setOpenId(null)
+      }
+    }
+    document.addEventListener('click', onClick, true)
+    return () => document.removeEventListener('click', onClick, true)
+  }, [setOpenId])
   const conversation = SIDEBAR_CHAT_CONVERSATIONS.find(({ id }) => id === openId)
   return conversation ? (
     <SidebarChatConversationView

@@ -105,7 +105,6 @@ export function applyHomeBoardState(
   labels: {
     resumed: string
     addedDue: string
-    addedDetail: string
     addedAgent: string
     doneReport: string
   }
@@ -129,7 +128,7 @@ export function applyHomeBoardState(
       done: false,
       who: added.agent ? 'agentWorking' : null,
       whoLabel: added.agent ? labels.addedAgent : undefined,
-      detail: labels.addedDetail
+      detail: ''
     })
   }
   // A task I finished today reports that I did, in my own words.
@@ -177,7 +176,7 @@ export function countHomeBoard(tasks: readonly HomeTask[]): HomeBoardCounts {
   const waiting = open.filter((task) => task.who === 'waiting')
   return {
     open: open.length,
-    dueToday: open.filter((task) => task.due === 'today' && !task.meetingId).length,
+    dueToday: open.filter((task) => task.due === 'today').length,
     waiting: waiting.length,
     waitingAgents: waiting.filter((task) => !task.meetingId).length,
     waitingMeetings: waiting.filter((task) => task.meetingId).length,
