@@ -1290,7 +1290,7 @@
     "checkForUpdates": "업데이트 확인...",
     "settings": "설정",
     "exploreOrca": "Orca 둘러보기",
-    "gettingStarted": "Orca 시작하기",
+    "gettingStarted": "Orca 시작",
     "reportCrash": "크래시 신고...",
     "file": "파일",
     "exit": "종료",
@@ -2501,8 +2501,8 @@
         "2b043783ef": "연동",
         "2cd4ea75da": "워크스페이스 기본값, 앱 설정 및 유지 관리.",
         "13241992bd": "일반",
-        "724c440e72": "시작하기",
-        "0505d0df29": "Orca 시작하기",
+        "724c440e72": "시작",
+        "0505d0df29": "Orca 시작",
         "ea0b1bc7b8": "설정 가이드",
         "17005c73d4": "설정 및 마일스톤 단계에 대한 온보딩 체크리스트를 엽니다.",
         "ded9e9032f": "온보딩 체크리스트",
@@ -2686,7 +2686,7 @@
         "4d555d3796": "설명 수정",
         "9df4e74bdf": "저장",
         "a154ec5224": "GitHub에서 댓글 열기",
-        "bca8eb39ac": "댓글에 답장하기",
+        "bca8eb39ac": "답장",
         "68cb993d61": "해결됨",
         "10f4ff5be8": "답글이 게시되었습니다.",
         "745c9089ec": "저장소 경로가 없으면 답글을 달 수 없습니다.",
@@ -2740,7 +2740,7 @@
         "21860b58d0": "PR 닫기",
         "5932578f51": "병합하려면 등록된 로컬 저장소가 필요합니다.",
         "080d071d48": "@{{value0}}에 답장",
-        "86f809e2ce": "이 리뷰 스레드에 답변하기",
+        "86f809e2ce": "이 리뷰 스레드에 답변",
         "136542c9ba": ":L{{value0}}",
         "283699bc82": "답글을 게시하지 못했습니다.",
         "d1c0dad471": "-L{{value0}}",
@@ -3185,7 +3185,7 @@
         "da9aaa8bcf": "설명 수정",
         "4a337ac05f": "저장",
         "0ac19bb52e": "GitHub에서 댓글 열기",
-        "d6c6679de7": "댓글에 답장하기",
+        "d6c6679de7": "답장",
         "76b2a0ac5b": "해결됨",
         "11505c7a71": "답글이 게시되었습니다.",
         "6885c619e7": "저장소 경로가 없으면 답글을 달 수 없습니다.",
@@ -3229,7 +3229,7 @@
         "96d013ed28": "PR 닫기",
         "eca289e593": "병합하려면 등록된 로컬 저장소가 필요합니다.",
         "31a7b202f2": "@{{value0}}에 답장",
-        "408e634fbb": "이 리뷰 스레드에 답변하기",
+        "408e634fbb": "이 리뷰 스레드에 답변",
         "34b9f7c264": ":L{{value0}}",
         "5821aab360": "답글을 게시하지 못했습니다.",
         "1378d79e83": "나란히",
@@ -7971,7 +7971,7 @@
         "guide": {
           "SetupGuideModal": {
             "3598a3ca0c": "Orca를 병렬 에이전트 작업에 유용하게 만드는 핵심 워크플로를 완료합니다.",
-            "48a9e5ef2d": "시작하기",
+            "48a9e5ef2d": "시작",
             "f3b5ffb2a6": "체크리스트 숨기기"
           },
           "SetupGuideProgressRing": {
@@ -11833,7 +11833,7 @@
               "080202facb": "모델",
               "7640ed9848": "음성",
               "56defcd6c3": "받아쓰기에 사용할 로컬 또는 클라우드 음성-텍스트 모델을 선택하세요.",
-              "931b1a9e53": "누르고 말하기",
+              "931b1a9e53": "누르는 동안 음성 입력",
               "064a9bd94a": "길게 누르기",
               "6fa48bcd41": "토글",
               "d86f5600da": "모드",
@@ -16211,7 +16211,7 @@
           "94829abdb1": "페어링됨",
           "266c18c105": "Orca Mobile을 열어 중단한 부분부터 다시 시작하거나 다른 기기를 페어링하세요.",
           "5410d55d79": "Orca 모바일",
-          "10d27b4cba": "시작하기",
+          "10d27b4cba": "시작",
           "da1d5e5ed0": "지원 플랫폼",
           "ec0607bf66": "지원되는 모바일 플랫폼",
           "b4ccce5cb7": "휴대폰에서 Orca를 제어하세요. 자리를 비운 동안 에이전트를 확인하고, 변경 사항을 리뷰하고, 작업을 시작하세요.",
@@ -16666,7 +16666,7 @@
                       "42525ba8a4": "주요 저장소를 Orca로 가져와 폴더를 일일이 찾을 필요 없이 에이전트 작업을 시작하세요.",
                       "agentSkillsName": "에이전트에 Orca 스킬 제공",
                       "agentSkillsDescription": "에이전트가 Orca 브라우저를 조작하고, 컴퓨터를 제어하고, 여러 단계 작업을 조율하는 데 쓰는 스킬을 설치하세요.",
-                      "workOnTwoTasks": "두 작업을 동시에 진행하기"
+                      "workOnTwoTasks": "두 작업 동시 진행"
                     }
                   }
                 }
@@ -18019,7 +18019,7 @@
                   "workspace": {
                     "board": {
                       "plan": {
-                        "title": "보드에서 작업 계획하기",
+                        "title": "보드에서 작업 계획",
                         "body": "프로젝트별이 아니라 상태별로 워크스페이스를 보고 싶을 때 보드를 사용하세요."
                       },
                       "lanes": {
@@ -18033,7 +18033,7 @@
                         "body": "Orca는 각 작업을 기준 브랜치에서 만든 자체 워크트리로 분리합니다."
                       },
                       "name": {
-                        "title": "이름을 정하거나 기존 작업에서 시작하기",
+                        "title": "이름 지정 또는 기존 작업에서 시작",
                         "body": "연결된 작업에서 시작하면 짧은 이슈나 PR 이름을 사용합니다. 비워 두면 첫 에이전트 메시지에서 이름이 자동으로 지정됩니다."
                       },
                       "agent": {
@@ -18050,7 +18050,7 @@
                         "action": "터미널 분할"
                       },
                       "parallel": {
-                        "title": "다른 작업을 병렬로 시작하기",
+                        "title": "다른 작업 병렬 시작",
                         "body": "워크트리마다 자체 브랜치를 가지므로 병렬로 진행하는 작업이 서로 섞이지 않습니다."
                       }
                     }
@@ -18080,11 +18080,11 @@
                       "body": "페이지를 이동하지 않고 연결된 공급자와 프로젝트 필터를 전환하세요."
                     },
                     "filter": {
-                      "title": "필요한 작업만 필터링하기",
+                      "title": "필요한 작업만 필터링",
                       "body": "사전 설정과 검색으로 이슈, 리뷰, MR, 작업의 범위를 좁히세요."
                     },
                     "start": {
-                      "title": "작업 항목에서 시작하기",
+                      "title": "작업 항목에서 시작",
                       "body": "작업, 이슈, 리뷰, MR에서 시작 또는 열기를 눌러 해당 컨텍스트를 워크스페이스로 가져오세요."
                     }
                   },
@@ -18095,7 +18095,7 @@
                         "body": "이곳의 에이전트는 선택한 어떤 폴더에서도 실행됩니다. 서비스들의 상위 디렉터리를 지정하면 모든 저장소에서 한 번에 작업할 수 있습니다."
                       },
                       "scratchpad": {
-                        "title": "메모장처럼 사용하기",
+                        "title": "메모장처럼 사용",
                         "body": "집중하고 있는 워크트리를 어지럽히지 않고 에이전트, 임시 터미널, 노트, 브라우저 탭을 열 수 있습니다."
                       }
                     }
@@ -19569,7 +19569,7 @@
           "more": "더 많은 아티팩트 작업"
         },
         "ArtifactCollection": {
-          "loadMore": "더 로드하기",
+          "loadMore": "더 보기",
           "noMatches": "일치하는 항목 없음"
         },
         "ArtifactDetailHeader": {
@@ -19942,7 +19942,7 @@
       },
       "agent-workspace-trust-decision": {
         "trust-repository": "저장소 신뢰",
-        "let-agents-ask": "에이전트가 묻도록 하기",
+        "let-agents-ask": "에이전트가 묻도록 허용",
         "setting-title": "에이전트 폴더 신뢰",
         "setting-description": "이 저장소의 워크트리에서 Orca가 시작한 에이전트가 \"Do you trust this folder?\" 확인을 건너뛰고 프로젝트의 에이전트 설정과 훅을 바로 불러올지 정합니다.",
         "setting-global-off": "에이전트 설정에서 폴더 신뢰가 꺼져 있으므로 에이전트가 항상 확인을 요청합니다.",
@@ -20184,7 +20184,7 @@
       },
       "skipConfirmation": {
         "skip": "건너뛰기",
-        "keepGoing": "아니요, 계속하기"
+        "keepGoing": "아니요, 계속"
       },
       "theme": {
         "hints": {
@@ -20267,7 +20267,7 @@
         "preview": {
           "userMessage": "fetchUser에 재시도 추가",
           "agentMessage": "실패한 요청은 이제 최대 3번 다시 시도합니다.",
-          "composerPlaceholder": "후속 질문하기…"
+          "composerPlaceholder": "후속 질문…"
         }
       },
       "launchDemo": {
@@ -21400,7 +21400,7 @@
         "resumeSession": "세션 재개. 인수가 없으면 터미널에서 선택",
         "forkChat": "현재 채팅 포크",
         "forkMessage": "터미널에서 이전 메시지부터 포크",
-        "app": "Codex Desktop에서 계속하기",
+        "app": "Codex Desktop에서 계속",
         "planSwitch": "계획 모드로 전환",
         "planToggle": "계획 모드 전환",
         "goal": "목표 설정 또는 보기",
@@ -21717,10 +21717,10 @@
       "splitRight": "오른쪽으로 분할",
       "splitDown": "아래로 분할",
       "sideChat": {
-        "description": "이 채팅 옆의 포크에서 곁가지 질문하기",
+        "description": "이 채팅 옆의 포크에서 곁가지 질문",
         "argumentHint": "<question>",
         "pill": "사이드 채팅",
-        "placeholder": "곁가지 질문하기",
+        "placeholder": "곁가지 질문",
         "notReady": "사이드 채팅이 아직 준비되지 않았습니다. 잠시 후 다시 시도하세요.",
         "replyRunning": "이 응답이 끝나면 사용할 수 있습니다.",
         "noReply": "첫 응답 이후에 사용할 수 있습니다.",
@@ -22696,7 +22696,7 @@
         "composerSpellcheckCopy": "메시지 입력란에서 틀린 단어에 밑줄을 긋고 시스템 텍스트 대치를 적용합니다. 끄면 시스템 전체 설정은 바꾸지 않고 이곳에서만 둘 다 중지합니다.",
         "composerSpellcheckSearchSpelling": "맞춤법 검사",
         "composerSpellcheckSearchAutocorrect": "자동 고침",
-        "usageLimitContinueTitle": "사용 한도가 재설정되면 채팅을 자동으로 계속하기",
+        "usageLimitContinueTitle": "사용 한도가 재설정되면 채팅 자동 계속",
         "usageLimitContinueCopy": "한도가 재설정되면 Orca가 \"Continue where you left off.\"를 보냅니다. 재설정 시간을 알 수 있는 모든 채팅에 적용됩니다.",
         "usageLimitContinueSearchLimit": "사용 한도",
         "usageLimitContinueSearchReset": "재설정",
@@ -23057,7 +23057,7 @@
         },
         "search": {
           "cleanup": "정리",
-          "cleanUp": "정리하기",
+          "cleanUp": "정리",
           "delete": "삭제",
           "automatic": "자동",
           "pullRequest": "PR",
@@ -24357,7 +24357,7 @@
       "ageMinutes": "12분",
       "ageYesterday": "1일",
       "agentsInstruction": "에이전트도 검색할 수 있습니다. 에이전트에게 “로그인 시간 초과를 수정한 세션을 찾아줘”라고 요청해 보세요.",
-      "continueInBackground": "백그라운드에서 계속하기",
+      "continueInBackground": "백그라운드에서 계속",
       "demoHit1Age": "3일",
       "demoHit1Snippet": "[[로그인 시간 초과]]를 30초로 늘리고 토큰 새로고침에 재시도를 추가했습니다.",
       "demoHit1Title": "불안정한 인증 리디렉션 수정",
@@ -24394,7 +24394,7 @@
       "recent2Title": "잠금 파일 업데이트",
       "recent3Text": "초안 메모입니다. 영역별로 정리했습니다.",
       "recent3Title": "릴리스 노트 초안",
-      "startSearching": "검색 시작하기",
+      "startSearching": "검색 시작",
       "changeInSettings": "<link>설정 → 에이전트 세션 검색</link>에서 언제든 변경하거나 끌 수 있습니다.",
       "title": "모든 에이전트 세션 검색",
       "description": "대화 내용으로 이전 대화를 찾아 에이전트가 멈춘 지점부터 이어가세요.",
@@ -27588,7 +27588,7 @@
         "events": {
           "linear-assigned": {
             "trigger": "Linear 이슈가 나에게 할당될 때",
-            "action": "조사하기"
+            "action": "조사"
           }
         }
       },
@@ -27658,7 +27658,7 @@
         "events": {
           "pr-merged": {
             "trigger": "PR이 병합될 때",
-            "action": "확인하기"
+            "action": "확인"
           }
         }
       },
@@ -27724,7 +27724,7 @@
         "events": {
           "deploy-called": {
             "trigger": "배포 도구가 호출할 때",
-            "action": "배포 요약하기"
+            "action": "배포 요약"
           }
         }
       },
@@ -27772,7 +27772,7 @@
         "events": {
           "bug-posted": {
             "trigger": "버그 채널에 누군가 글을 올릴 때",
-            "action": "이슈 초안 작성하기"
+            "action": "이슈 초안 작성"
           }
         }
       },
@@ -27788,7 +27788,7 @@
         "events": {
           "issue-opened": {
             "trigger": "이슈가 열릴 때",
-            "action": "라벨과 중복 후보 제안하기"
+            "action": "라벨과 중복 후보 제안"
           }
         }
       },
@@ -27862,7 +27862,7 @@
         "events": {
           "incident-posted": {
             "trigger": "장애 채널에 누군가 글을 올릴 때",
-            "action": "타임라인에 추가하기"
+            "action": "타임라인에 추가"
           }
         }
       },
