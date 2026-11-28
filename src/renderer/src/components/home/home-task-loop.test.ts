@@ -27,6 +27,7 @@ const LABELS = {
 const script = () => ({
   question: 'Which?',
   choices: [],
+  draft: 'The message.',
   note: 'Drafted the message.',
   basis: ['Report page 2']
 })
@@ -75,6 +76,19 @@ describe('an agent proposal for inAX', () => {
     const declined = decideHomeProposal(STARTED, 'report', 'final', { kind: 'declined' }, PROPOSED)
     expect(declined.inax).toEqual({})
     expect(board(PROPOSED + 1, { ...STARTED, ...declined }).status).toBe('todo')
+  })
+
+  it('keeps working after my answer when nothing was prepared: no proposal, nothing to confirm', () => {
+    const unprepared = applyHomeTaskLoops(
+      [TASK],
+      STARTED,
+      PROPOSED,
+      () => ({ ...script(), draft: null, note: '' }),
+      LABELS
+    )[0]
+    expect(unprepared.loop).toBe('working')
+    expect(unprepared.proposal).toBeUndefined()
+    expect(unprepared.hasDraft).toBeUndefined()
   })
 
   it('applies what I confirmed, as I corrected it, and records who wrote and who confirmed', () => {

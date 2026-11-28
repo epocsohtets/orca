@@ -21,7 +21,14 @@ export function applyHomeTaskLoops(
   script: (
     task: HomeTask,
     loop: HomeTaskLoop
-  ) => { question: string; choices: HomeChoice[]; note: string; basis: string[] },
+  ) => {
+    question: string
+    choices: HomeChoice[]
+    /** Null when nothing was prepared for the task: the agent then has nothing to propose. */
+    draft: string | null
+    note: string
+    basis: string[]
+  },
   labels: {
     working: (minutes: number) => string
     question: string
@@ -41,7 +48,11 @@ export function applyHomeTaskLoops(
     if (!loop) {
       return base
     }
-    const phase = homeLoopPhase(loop, now)
+    const scripted = script(task, loop)
+    const reached = homeLoopPhase(loop, now)
+    // With no draft there is no closing proposal: after my answer the agent keeps working.
+    const phase =
+      scripted.draft === null && loop.answer && reached !== 'question' ? 'working' : reached
     const mine = {
       ...base,
       loop: phase,
@@ -56,7 +67,7 @@ export function applyHomeTaskLoops(
         whoLabel: labels.working(Math.floor((now - since) / 60_000))
       }
     }
-    const { question, choices, note, basis } = script(task, loop)
+    const { question, choices, note, basis } = scripted
     if (phase === 'question') {
       return { ...mine, who: 'waiting', whoLabel: labels.question, question, choices }
     }

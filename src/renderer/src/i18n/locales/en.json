@@ -32052,8 +32052,8 @@
       "title": "It is on inAX now."
     },
     "chat": {
-      "answerAck": "Thank you. I am writing it that way now.",
-      "ask": "I need one decision from you before I write: {{question}}",
+      "answerAck": "Thank you. I will go that way.",
+      "ask": "I need one thing from you before I go on: {{question}}",
       "back": "The task",
       "confirmed": "Confirmed: the status is “{{status}}”.",
       "confirmedNote": "Confirmed: the status is “{{status}}” and the progress note is on the task.",
@@ -32130,15 +32130,10 @@
       "heading": "The agent’s question"
     },
     "script": {
-      "basis": "The task description: “{{detail}}”",
-      "choiceA": "Short · the main points only",
-      "choiceB": "Detailed · with the reasons",
-      "draft": "**{{title}}**\n\n{{detail}}",
-      "draftLong": "**{{title}}**\n\n{{detail}}\n\nTo check when you read it:\n- Is anything missing?\n- Is the order right?",
-      "note": "Wrote a short first draft for “{{title}}”. It follows the task description. It needs a review before it is used.",
-      "noteLong": "Wrote a detailed first draft for “{{title}}”, with the reason for each point. It follows the task description. It needs a review before it is used.",
-      "plan": "This is how I will do it.\n\n1. Put the task description and its earlier notes in order.\n2. Write a draft.\n3. Show you the draft, then propose a status and a progress note.",
-      "question": "How long should the draft be?",
+      "choiceA": "Me first",
+      "choiceB": "The project team at once",
+      "plan": "This is how I will do it.\n\n1. Read the task description and its earlier notes.\n2. Ask you the one thing I need to know.\n3. Split the work into items and put the list in this conversation.",
+      "question": "Who should see the result first?",
       "reportA": "Kim Jiwoo only · short",
       "reportB": "The whole campaign team · with a summary",
       "reportBasis1": "Visitors, 112% of the target: report page 2, “Visits” table, total row",
@@ -32152,7 +32147,9 @@
       "reportNumbers": "- Visitors: 112% of the target\n- Sign-up conversion: 3.4% (2.9% the month before)\n- Ad spend: 96% of the budget",
       "reportPlan": "The report is already written, so I will prepare what sharing it needs.\n\n1. Pull the three key numbers out of the report.\n2. Draft the message that shares it.\n3. Show you the draft, then propose a status and a progress note.",
       "reportQuestion": "Who should the sharing message be written for?",
-      "requested": "You asked for: “{{text}}”"
+      "requested": "You asked for: “{{text}}”",
+      "next": "I am splitting the task description into items now. When the list is ready I will put it in this conversation for you to read first.",
+      "nextTeam": "I am splitting the task description into items now. When the list is ready I will put it in this conversation, written for the project team to read."
     },
     "settings": {
       "cardDescription": "Sign in and your tasks appear on Home and in Tasks.",

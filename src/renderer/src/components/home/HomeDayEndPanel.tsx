@@ -121,7 +121,8 @@ export function HomeDayEndPanel({
       text,
       byAgent: text !== '' && text === card.suggestion,
       status,
-      current
+      current,
+      answersProposal: task.proposalStep === 'final'
     }
     shared =
       [

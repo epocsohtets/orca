@@ -117,6 +117,7 @@ describe('day-end cards', () => {
       byAgent: true,
       status: 'review',
       current: 'inProgress',
+      answersProposal: false,
       at: 1
     })
     expect(plan(saved.dayEnd, { pages: 'notWork' })).toEqual([])
@@ -135,6 +136,7 @@ describe('day-end cards', () => {
         byAgent: false,
         status: null,
         current: 'inProgress',
+        answersProposal: false,
         at: 1
       })
     ).toBe(before)
@@ -144,6 +146,7 @@ describe('day-end cards', () => {
       byAgent: false,
       status: 'review',
       current: 'inProgress',
+      answersProposal: false,
       at: 2
     })
     expect(saved.inax.moved).toMatchObject({ status: 'review', notes: [{ by: 'me' }] })

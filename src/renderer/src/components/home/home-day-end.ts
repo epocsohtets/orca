@@ -77,6 +77,8 @@ export type HomeDayEndSave =
       status: InaxStatus | null
       /** The status the task shows before the save. */
       current: InaxStatus
+      /** The card held the agent's closing proposal: the save is my answer to it. */
+      answersProposal: boolean
     }
   | { kind: 'meeting'; meetingId: string; rows: { followUpId: string; assigneeId: string }[] }
   | { kind: 'records'; answers: { recordId: string; answer: string }[] }
@@ -172,6 +174,7 @@ export function saveHomeDayEndTask(
     status: InaxStatus | null
     /** The status the task shows now, stamped on the note. */
     current: InaxStatus
+    answersProposal: boolean
     at: number
   }
 ): DayEndState {
@@ -182,8 +185,7 @@ export function saveHomeDayEndTask(
   const record = state.inax[args.taskId]
   const noteId = text ? `note-${args.at}` : null
   const loop = state.loops[args.taskId]
-  // The agent's closing proposal waits on this task: the save is my answer to it.
-  const closedLoop = Boolean(loop?.start && loop.answer && !loop.final)
+  const closedLoop = Boolean(args.answersProposal && loop && !loop.final)
   return {
     ...state,
     loops:

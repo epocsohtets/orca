@@ -40,4 +40,15 @@ describe('the scripted agent', () => {
     expect(asked.note).toBe(`${base.note}\nYou asked for: “Mention the budget first”`)
     expect(asked.draft).toBe(base.draft)
   })
+
+  it('claims no draft for a task with nothing prepared: it says what it does next', () => {
+    const script = buildHomeLoopScript(
+      t,
+      { ...REPORT, id: 'other', detail: 'Sort them.' },
+      loop('a')
+    )
+    expect(script.draft).toBeNull()
+    expect(script.note).toBe('')
+    expect(`${script.plan} ${script.question} ${script.next}`).not.toMatch(/draft|Sort them/i)
+  })
 })

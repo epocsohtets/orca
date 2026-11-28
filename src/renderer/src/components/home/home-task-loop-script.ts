@@ -15,8 +15,13 @@ export type HomeLoopScript = {
   plan: string
   question: string
   choices: HomeChoice[]
-  /** The output for the answer I gave, as markdown. */
-  draft: string
+  /**
+   * The output for the answer I gave, as markdown. Null for a task with nothing prepared: the agent then says
+   * what it does next (`next`) and proposes nothing, because it has nothing to show.
+   */
+  draft: string | null
+  /** What the agent says after my answer when there is no draft. */
+  next: string
   /** The progress note the agent proposes, with what I asked for after "not yet". */
   note: string
   /** Where each claim of the note comes from, one line each. */
@@ -78,6 +83,7 @@ export function buildHomeLoopScript(
         { id: 'a', label: t('taskLoop.script.reportA', 'Kim Jiwoo only · short') },
         { id: 'b', label: t('taskLoop.script.reportB', 'The whole campaign team · with a summary') }
       ],
+      next: '',
       draft: second
         ? `${t(
             'taskLoop.script.reportDraftTeam',
@@ -117,39 +123,25 @@ export function buildHomeLoopScript(
   return {
     plan: t(
       'taskLoop.script.plan',
-      'This is how I will do it.\n\n1. Put the task description and its earlier notes in order.\n2. Write a draft.\n3. Show you the draft, then propose a status and a progress note.'
+      'This is how I will do it.\n\n1. Read the task description and its earlier notes.\n2. Ask you the one thing I need to know.\n3. Split the work into items and put the list in this conversation.'
     ),
-    question: t('taskLoop.script.question', 'How long should the draft be?'),
+    question: t('taskLoop.script.question', 'Who should see the result first?'),
     choices: [
-      { id: 'a', label: t('taskLoop.script.choiceA', 'Short · the main points only') },
-      { id: 'b', label: t('taskLoop.script.choiceB', 'Detailed · with the reasons') }
+      { id: 'a', label: t('taskLoop.script.choiceA', 'Me first') },
+      { id: 'b', label: t('taskLoop.script.choiceB', 'The project team at once') }
     ],
-    draft: second
+    draft: null,
+    next: second
       ? t(
-          'taskLoop.script.draftLong',
-          '**{{title}}**\n\n{{detail}}\n\nTo check when you read it:\n- Is anything missing?\n- Is the order right?',
-          { title: task.title, detail: task.detail }
+          'taskLoop.script.nextTeam',
+          'I am splitting the task description into items now. When the list is ready I will put it in this conversation, written for the project team to read.'
         )
-      : t('taskLoop.script.draft', '**{{title}}**\n\n{{detail}}', {
-          title: task.title,
-          detail: task.detail
-        }),
-    note: withRequests(
-      second
-        ? t(
-            'taskLoop.script.noteLong',
-            'Wrote a detailed first draft for “{{title}}”, with the reason for each point. It follows the task description. It needs a review before it is used.',
-            { title: task.title }
-          )
-        : t(
-            'taskLoop.script.note',
-            'Wrote a short first draft for “{{title}}”. It follows the task description. It needs a review before it is used.',
-            { title: task.title }
-          )
-    ),
-    basis: [
-      t('taskLoop.script.basis', 'The task description: “{{detail}}”', { detail: task.detail })
-    ]
+      : t(
+          'taskLoop.script.next',
+          'I am splitting the task description into items now. When the list is ready I will put it in this conversation for you to read first.'
+        ),
+    note: '',
+    basis: []
   }
 }
 
@@ -233,7 +225,7 @@ export function buildHomeLoopTranscript(
         'loop-question',
         'assistant',
         questionAt,
-        t('taskLoop.chat.ask', 'I need one decision from you before I write: {{question}}', {
+        t('taskLoop.chat.ask', 'I need one thing from you before I go on: {{question}}', {
           question: script.question
         })
       )
@@ -247,25 +239,30 @@ export function buildHomeLoopTranscript(
         'loop-answer-ack',
         'assistant',
         loop.answer.at + 1,
-        t('taskLoop.chat.answerAck', 'Thank you. I am writing it that way now.')
+        t('taskLoop.chat.answerAck', 'Thank you. I will go that way.')
       )
     )
   }
   const draftAt = homeLoopDraftAt(loop)
   if (draftAt !== null && now >= draftAt) {
-    rows.push(
-      message(HOME_LOOP_DRAFT_MESSAGE_ID, 'assistant', draftAt, script.draft),
-      message(
-        'loop-propose-final',
-        'assistant',
-        draftAt + 1,
-        t(
-          'taskLoop.chat.proposeFinal',
-          'The draft is ready. May I change the status {{to}} and leave a progress note?',
-          { to: to.review }
+    if (script.draft === null) {
+      // Nothing was prepared for this task: the agent says what it does next and asks for no confirmation.
+      rows.push(message('loop-next', 'assistant', draftAt, script.next))
+    } else {
+      rows.push(
+        message(HOME_LOOP_DRAFT_MESSAGE_ID, 'assistant', draftAt, script.draft),
+        message(
+          'loop-propose-final',
+          'assistant',
+          draftAt + 1,
+          t(
+            'taskLoop.chat.proposeFinal',
+            'The draft is ready. May I change the status {{to}} and leave a progress note?',
+            { to: to.review }
+          )
         )
       )
-    )
+    }
   }
   if (loop.final) {
     decided('loop-final-decision', loop.final, status.review, true)
