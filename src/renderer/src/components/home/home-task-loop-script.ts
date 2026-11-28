@@ -65,6 +65,35 @@ export function homeStatusMovedLine(t: Translate, title: string, status: InaxSta
   })
 }
 
+/** The sample tasks' own drafts, by task id. */
+const SAMPLE_DRAFTS: Record<string, (t: Translate) => string> = {
+  'INAX-132': (t) =>
+    t(
+      'taskLoop.script.draftQuotes',
+      '**Comparing the two vendor quotes (draft)**\n\n- Vendor A: 18.4 million won, delivery in 12 working days, 3 revisions\n- Vendor B: 15.9 million won, delivery in 20 working days, 2 revisions\n\nVendor B costs 2.5 million won less. But vendor B delivers after the campaign starts. I recommend vendor A.'
+    ),
+  'INAX-133': (t) =>
+    t(
+      'taskLoop.script.draftSchedule',
+      '**Next week’s schedule changes (draft)**\n\nThree changes to make in the campaign calendar.\n\n- Tuesday shoot: 10:00 → 14:00\n- Wednesday draft review: move to Thursday 11:00\n- Friday 15:00 launch check meeting: add'
+    ),
+  'newsletter-review-f1': (t) =>
+    t(
+      'taskLoop.script.draftSurvey',
+      '**Unsubscribe survey (draft)**\n\nPick why you are leaving.\n\n- The emails come too often\n- The content is not right for me\n- I get the same information somewhere else\n- Another reason (type it)'
+    ),
+  'newsletter-review-f2': (t) =>
+    t(
+      'taskLoop.script.draftSendTime',
+      '**Send time test (draft)**\n\n- Split the next issue in two groups: 620 people at 08:00, 620 at the usual send time.\n- After 3 days, compare the open rate of the two groups.\n- If the 08:00 group is 2 points higher or more, send at 08:00 from the issue after.'
+    ),
+  'newsletter-review-f3': (t) =>
+    t(
+      'taskLoop.script.draftTopics',
+      '**Topics for the next issue (draft)**\n\n1. A first look at the year-end promotion: promotion news got the most clicks in the last issue.\n2. The five questions customers asked most this month: the answers come from the inquiries themselves.\n3. Behind the brand renewal: shows the drafts before next month’s launch.'
+    )
+}
+
 /** The script for one task, as far as my answer has shaped it. */
 export function buildHomeLoopScript(
   t: Translate,
@@ -84,7 +113,11 @@ export function buildHomeLoopScript(
       ),
       question: t('taskLoop.script.reportQuestion', 'Should the report include the agency’s fee?'),
       choices: [
-        { id: 'a', label: t('taskLoop.script.reportA', 'Include it'), recommended: true },
+        {
+          id: 'a',
+          label: t('taskLoop.script.reportA', 'Include it'),
+          recommended: true
+        },
         { id: 'b', label: t('taskLoop.script.reportB', 'Leave it out') }
       ],
       next: '',
@@ -112,7 +145,11 @@ export function buildHomeLoopScript(
       ),
       question: t('taskLoop.script.reviewQuestion', 'How should the comment be written?'),
       choices: [
-        { id: 'a', label: t('taskLoop.script.reviewA', 'Compare both drafts'), recommended: true },
+        {
+          id: 'a',
+          label: t('taskLoop.script.reviewA', 'Compare both drafts'),
+          recommended: true
+        },
         { id: 'b', label: t('taskLoop.script.reviewB', 'Recommend one draft') }
       ],
       next: '',
@@ -132,6 +169,8 @@ export function buildHomeLoopScript(
       )
     }
   }
+  // A sample task with a draft of its own: what the agent would really bring back for it.
+  const own = SAMPLE_DRAFTS[task.id]
   // Any other task: a draft named after the task, so every task an agent starts reaches a result.
   // Written for me is the plain case and says nothing; written for the team says so.
   const reader = second
@@ -145,14 +184,22 @@ export function buildHomeLoopScript(
     ),
     question: t('taskLoop.script.question', 'Who should the draft be written for?'),
     choices: [
-      { id: 'a', label: t('taskLoop.script.choiceA', 'For me'), recommended: true },
+      {
+        id: 'a',
+        label: t('taskLoop.script.choiceA', 'For me'),
+        recommended: true
+      },
       { id: 'b', label: t('taskLoop.script.choiceB', 'For the project team') }
     ],
-    draft: `${t('taskLoop.script.draft', '**{{title}} (draft)**', { title: task.title })}\n\n${reader}${t(
-      'taskLoop.script.draftBody',
-      '1. Settled: the scope and the due date in the task description.\n2. Left to do: check the material, finish the draft, share it, in that order.\n3. To check before it goes out: who receives it, and the numbers.'
-    )}`,
-    output: t('taskLoop.script.output', '{{title}} (draft)', { title: task.title }),
+    draft: own
+      ? `${reader}${own(t)}`
+      : `${t('taskLoop.script.draft', '**{{title}} (draft)**', { title: task.title })}\n\n${reader}${t(
+          'taskLoop.script.draftBody',
+          '1. Settled: the scope and the due date in the task description.\n2. Left to do: check the material, finish the draft, share it, in that order.\n3. To check before it goes out: who receives it, and the numbers.'
+        )}`,
+    output: t('taskLoop.script.output', '{{title}} (draft)', {
+      title: task.title
+    }),
     next: '',
     note: t('taskLoop.script.note', 'Wrote the draft of “{{title}}”. Please review it.', {
       title: task.title
@@ -170,7 +217,13 @@ function message(
   at: number,
   text: string
 ): NativeChatMessage {
-  return { id, role, source: 'transcript', timestamp: at, blocks: [{ type: 'text', text }] }
+  return {
+    id,
+    role,
+    source: 'transcript',
+    timestamp: at,
+    blocks: [{ type: 'text', text }]
+  }
 }
 
 /** My answer to the question, in my words or the choice's. */
@@ -194,35 +247,44 @@ export function buildHomeLoopTranscript(
   now: number
 ): NativeChatMessage[] {
   const script = buildHomeLoopScript(t, task, loop)
-  const rows = [
-    message(
-      'loop-kickoff',
-      'user',
-      loop.startedAt,
-      t('taskLoop.chat.kickoff', 'Please take this task: {{title}}', { title: task.title })
-    ),
-    message('loop-plan', 'assistant', loop.startedAt + 2, script.plan)
-  ]
+  const rows = loop.chatOnly
+    ? []
+    : [
+        message(
+          'loop-kickoff',
+          'user',
+          loop.startedAt,
+          t('taskLoop.chat.kickoff', 'Please take this task: {{title}}', {
+            title: task.title
+          })
+        ),
+        message('loop-plan', 'assistant', loop.startedAt + 2, script.plan)
+      ]
   const draftAt = homeLoopDraftAt(loop)
-  if (draftAt !== null && now >= draftAt) {
+  if (!loop.chatOnly && draftAt !== null && now >= draftAt) {
     rows.push(message('loop-draft', 'assistant', draftAt, script.draft ?? script.next))
   }
   loop.said.forEach((said, index) => {
     rows.push(
       message(`loop-said-${index}`, 'user', said.at, said.text),
-      message(
-        `loop-said-reply-${index}`,
-        'assistant',
-        said.at + 1,
-        t('taskLoop.chat.noted', 'Noted. I will apply it to what I am writing now.')
-      )
+      message(`loop-said-reply-${index}`, 'assistant', said.at + 1, homeLoopNoted(t, loop))
     )
   })
   return rows.sort((a, b) => (a.timestamp ?? 0) - (b.timestamp ?? 0))
 }
 
+/** The agent's reply to a line I wrote: about its draft, or, with nothing handed over, about the task. */
+export function homeLoopNoted(t: Translate, loop: HomeTaskLoop): string {
+  return loop.chatOnly
+    ? t('taskLoop.chat.notedOnTask', 'I have added it to the activity.')
+    : t('taskLoop.chat.noted', 'Noted. I will apply it to what I am writing now.')
+}
+
 /** When the lines between messages fall: the status I moved at the start, and the agent's question. */
 export function homeLoopEventTimes(loop: HomeTaskLoop, now: number): Record<string, number> {
+  if (loop.chatOnly) {
+    return {}
+  }
   const asked = homeLoopQuestionAt(loop)
   return {
     [HOME_LOOP_MOVED_ROW]: loop.startedAt + 1,

@@ -96,7 +96,7 @@ export function HomeTasksCard({
                 title={task.title}
                 tip={task.whoLabel}
                 chip={task.who && !task.done ? chips[task.who] : undefined}
-                project={task.dayEndRecords ? undefined : projects[task.project]}
+                project={projects[task.project]}
                 date={task.dueLabel}
                 dateAlert={task.due === 'overdue' && !task.done}
                 onClick={go}

@@ -5,28 +5,20 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { HOME_FOCUS_RING_CLASS, HOME_META_CLASS } from './HomeCard'
 import type { HomeBoardCounts } from './home-board'
-import type { HomePhase } from './home-day'
 
-/** Greeting and date; the actions sit at the right. */
+/** Greeting and date; the actions sit at the right. One greeting all day. */
 export function HomeGreeting({
-  phase,
   name,
   date,
   children
 }: {
-  phase: HomePhase
   name: string
   date: string
   children: React.ReactNode
 }): React.JSX.Element {
   const t = useTranslate()
-  const greeting = {
-    morning: t('home.header.morning', 'Good morning, {{name}}', { name }),
-    day: t('home.header.day', 'Hello, {{name}}', { name }),
-    evening: t('home.header.evening', 'Good work today, {{name}}', { name })
-  }[phase]
   return (
-    <HomePageHeading title={greeting} line={date}>
+    <HomePageHeading title={t('home.header.day', 'Hello, {{name}}', { name })} line={date}>
       {children}
     </HomePageHeading>
   )
@@ -120,7 +112,10 @@ export type HomeTile<Id extends string> = {
   alert?: boolean
 }
 
-const TONE_CLASS = { done: 'text-status-success', alert: 'text-destructive' } as const
+const TONE_CLASS = {
+  done: 'text-status-success',
+  alert: 'text-destructive'
+} as const
 
 /** One container of four numbers split by hairlines; each is a button that shows the rows behind it. */
 export function HomeTileRow<Id extends string>({

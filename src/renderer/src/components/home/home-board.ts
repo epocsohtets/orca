@@ -39,8 +39,6 @@ export type HomeTask = {
   meetingTitle?: string
   /** Who asks what the row waits on, when it is a person or the meeting agent rather than a task agent. */
   askedBy?: string
-  /** The day's records with no task, as one row of 내 확인 필요 at day end: not a task of inAX. */
-  dayEndRecords?: true
   /** A follow-up task: the meeting it came from and the sentence it rests on. */
   origin?: { meetingId: string; turnId: string | null }
   /** Set when the task belongs to someone else: it opens, but I cannot start or finish it. */
@@ -127,7 +125,12 @@ export function applyHomeBoardState(
     const answered = state.answers[task.id] !== undefined
     next.push(
       answered && task.who === 'waiting'
-        ? { ...task, who: 'agentWorking', whoLabel: labels.resumed, question: undefined }
+        ? {
+            ...task,
+            who: 'agentWorking',
+            whoLabel: labels.resumed,
+            question: undefined
+          }
         : task
     )
   }
@@ -150,7 +153,12 @@ export function applyHomeBoardState(
   )
 }
 
-const DUE_ORDER: Record<HomeDue, number> = { today: 0, overdue: 1, tomorrow: 2, week: 3 }
+const DUE_ORDER: Record<HomeDue, number> = {
+  today: 0,
+  overdue: 1,
+  tomorrow: 2,
+  week: 3
+}
 
 /** What waits on me first, then due today, then what is late, then later days. */
 export function sortHomeTasks(tasks: readonly HomeTask[]): HomeTask[] {
@@ -198,7 +206,12 @@ export function countHomeBoard(tasks: readonly HomeTask[]): HomeBoardCounts {
   }
 }
 
-const AGENT_ORDER: Record<HomeAgentState, number> = { waiting: 0, blocked: 1, working: 2, idle: 3 }
+const AGENT_ORDER: Record<HomeAgentState, number> = {
+  waiting: 0,
+  blocked: 1,
+  working: 2,
+  idle: 3
+}
 
 /** Agents with their state after my answers; the ones waiting on me come first. */
 export function orderHomeAgents(
@@ -223,7 +236,11 @@ export function orderHomeAgents(
       }
       if (agent.state === 'blocked') {
         const task = tasks.find((entry) => entry.id === agent.taskId)
-        return task?.who === 'blocked' ? { ...agent, stateLabel: task.whoLabel } : agent
+        // Its task's wait cleared by my status pick: nothing waits any more.
+        if (task && task.who !== 'blocked') {
+          return { ...agent, state: 'idle' }
+        }
+        return task ? { ...agent, stateLabel: task.whoLabel } : agent
       }
       return agent.state === 'waiting' && !stillWaiting.has(agent.id)
         ? { ...agent, state: 'working', stage: 2, last: labels.resumedLast }

@@ -7,7 +7,7 @@ import type { HomeProjectId, HomeTask } from '@/components/home/home-board'
 import type { HomeProject } from '@/components/home/home-board-mock'
 import { botItemsFor } from './meeting-rules'
 import { openHomeNeedsYou } from '@/components/home/home-task-items-host'
-import { homeRowItemUid } from '@/components/home/home-task-item-model'
+import { taskItemUid } from '@/components/home/home-task-item-model'
 import { useMeetingText } from './MeetingParts'
 import { useMeetings } from './meetings-store'
 
@@ -29,18 +29,14 @@ export function MeetingWaitingCard({
       {rows.length === 0 ? null : (
         <ul className="mx-4">
           {rows.map((row) => {
-            const open = (): void => openHomeNeedsYou(homeRowItemUid(row))
+            const open = (): void => openHomeNeedsYou(taskItemUid(row.id))
             return (
               <HomeRow
                 key={row.id}
                 button={{ 'data-meeting-waiting': row.id }}
                 icon={<HomeStateIcon state="waiting" />}
                 title={row.title}
-                tip={[
-                  row.title,
-                  row.whoLabel,
-                  row.dayEndRecords ? null : projects[row.project].name
-                ]
+                tip={[row.title, row.whoLabel, projects[row.project].name]
                   .filter(Boolean)
                   .join(' · ')}
                 chip={t('home.chip.waiting', 'Needs me')}
@@ -82,12 +78,16 @@ export function MeetingAgentCard({ onOpen }: { onOpen: () => void }): React.JSX.
           {items.map((item) => {
             const title =
               item.kind === 'minutes'
-                ? t('meetings.bot.rowMinutes', 'Minutes: {{title}}', { title: item.meeting.title })
+                ? t('meetings.bot.rowMinutes', 'Minutes: {{title}}', {
+                    title: item.meeting.title
+                  })
                 : item.kind === 'shared'
                   ? t('meetings.bot.rowShared', 'Shared minutes: {{title}}', {
                       title: item.meeting.title
                     })
-                  : t('meetings.bot.rowTask', 'New task: {{title}}', { title: item.task.title })
+                  : t('meetings.bot.rowTask', 'New task: {{title}}', {
+                      title: item.task.title
+                    })
             return (
               <HomeRow
                 key={item.key}
@@ -97,7 +97,9 @@ export function MeetingAgentCard({ onOpen }: { onOpen: () => void }): React.JSX.
                 tip={`${title} · ${text.day(item.at)} ${text.time(item.at)}`}
                 chip={
                   item.kind === 'minutes' && item.proposals.length > 0
-                    ? t('meetings.chip.mine', 'Mine: {{count}}', { count: item.proposals.length })
+                    ? t('meetings.chip.mine', 'Mine: {{count}}', {
+                        count: item.proposals.length
+                      })
                     : undefined
                 }
                 date={text.whenShort({ startsAt: item.at })}

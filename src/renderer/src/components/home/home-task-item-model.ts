@@ -43,11 +43,17 @@ export type HomeItemEntry = {
   item: BotItem
   events: BotItemEvent[]
   /** The open ask's event and what answering it does; null with nothing asked. */
-  ask: { eventId: string; shape: BotItemQuestionShape; answer: HomeItemAnswer } | null
+  ask: {
+    eventId: string
+    shape: BotItemQuestionShape
+    answer: HomeItemAnswer
+  } | null
   /** The task it is; null for a decision of its own. */
   taskId: string | null
   /** Where its chat row goes: the task's conversation, the meeting, or Home. */
   chat: { kind: 'task'; taskId: string } | { kind: 'meeting'; meetingId: string } | { kind: 'home' }
+  /** Opened from elsewhere only, never a row of the list: the day's records, a colleague's view of a task. */
+  unlisted?: true
 }
 
 /** A comment of mine this window sent, kept so the host's read names its request id. */
@@ -58,6 +64,8 @@ export type HomeItemsInput = {
   view: HomeBoardView
   board: HomeBoardState
   evening: boolean
+  /** The viewer is 마코, whose 업무 these are; a colleague reads them only. */
+  own: boolean
   agentName: string
   /** A moment that stays put across reads: the first one asked for `key`, never later than now. */
   stamp: (key: string, proposed: number) => number
@@ -92,9 +100,14 @@ export function taskItemUid(taskId: string): string {
   return `task:${generation}:${taskId}`
 }
 
-/** The item a row of 내 업무 opens: its task's, or the day's records with no task. */
-export function homeRowItemUid(row: { id: string; dayEndRecords?: true }): string {
-  return row.dayEndRecords ? `records:${generation}` : taskItemUid(row.id)
+/** 마코's task as a colleague reads it: an item of its own, so no view mixes it with 마코's. */
+export function peerTaskItemUid(taskId: string): string {
+  return `peer:${generation}:${taskId}`
+}
+
+/** The day's records with no task, asked as one item. */
+export function homeRecordsItemUid(): string {
+  return `records:${generation}`
 }
 
 export type Draft = {
@@ -156,11 +169,21 @@ export function homeItemAnswerWrite(
     }
     case 'board': {
       const choice = answer.choices.find((entry) => entry.label === first)
-      return first ? { kind: 'board', taskId: answer.taskId, choiceId: choice?.id ?? first } : null
+      return first
+        ? {
+            kind: 'board',
+            taskId: answer.taskId,
+            choiceId: choice?.id ?? first
+          }
+        : null
     }
     case 'invitation':
       return first
-        ? { kind: 'invitation', meetingId: answer.meetingId, yes: first === answer.yes }
+        ? {
+            kind: 'invitation',
+            meetingId: answer.meetingId,
+            yes: first === answer.yes
+          }
         : null
     case 'request':
       return first
@@ -186,9 +209,11 @@ export function homeItemAnswerWrite(
           // A status picked keeps the agent's note; my own words are the note and leave the status.
           text: status ? (card.suggestion ?? '') : first,
           byAgent: status !== undefined && Boolean(card.suggestion),
-          status: status && status !== current ? status : null,
+          // Picked on a task waiting on someone's reply, even the status it has: the pick clears the wait.
+          status: status && (status !== current || card.task.who === 'blocked') ? status : null,
           current,
-          answersProposal: card.task.proposal !== undefined
+          answersProposal: card.task.proposal !== undefined,
+          answer: first
         }
       }
     }

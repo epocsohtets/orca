@@ -31,10 +31,14 @@ import { HomeNewTaskButton } from './HomeNewTaskButton'
 import { HomePreviewMenu } from './HomePreviewMenu'
 import { FIRST_NEEDS_YOU, HomeItemsPanel } from './HomeItemsPanel'
 import { openHomeItem } from './home-task-items-host'
-import { homeRowItemUid, taskItemUid } from './home-task-item-model'
+import { taskItemUid } from './home-task-item-model'
 import { HomeDayEndResult, useHomeDayEndRows } from './HomeDayEndResult'
 
-const DATE_OPTIONS: Intl.DateTimeFormatOptions = { weekday: 'long', month: 'long', day: 'numeric' }
+const DATE_OPTIONS: Intl.DateTimeFormatOptions = {
+  weekday: 'long',
+  month: 'long',
+  day: 'numeric'
+}
 const TILE_TAB: Partial<Record<HomeTileId, HomeTaskTab>> = {
   tasks: 'today',
   waiting: 'waiting',
@@ -45,7 +49,10 @@ const TILE_TAB: Partial<Record<HomeTileId, HomeTaskTab>> = {
 function focusRow(selector: string): void {
   requestAnimationFrame(() => {
     const row = document.querySelector<HTMLElement>(`[data-home-page] ${selector}`)
-    row?.scrollIntoView({ block: 'center', behavior: motionSafeScrollBehavior() })
+    row?.scrollIntoView({
+      block: 'center',
+      behavior: motionSafeScrollBehavior()
+    })
     ;(row?.matches('button') ? row : row?.querySelector<HTMLElement>('button'))?.focus({
       preventScroll: true
     })
@@ -98,7 +105,9 @@ export default function HomePage(): React.JSX.Element {
   }
   const addTask = (title: string, agent: boolean): void => {
     const id = `added-${Date.now()}`
-    useHomeBoardStore.setState((state) => ({ addedTasks: [...state.addedTasks, { id, title }] }))
+    useHomeBoardStore.setState((state) => ({
+      addedTasks: [...state.addedTasks, { id, title }]
+    }))
     if (agent) {
       // Handing over is the same path as "Start with an agent" on a task's row.
       startHomeLoop(id, title)
@@ -150,7 +159,6 @@ export default function HomePage(): React.JSX.Element {
           {/* Why pb-24: the last row scrolls clear of the floating panel toggle. */}
           <div className={HOME_BOARD_PAGE_CLASS}>
             <HomeGreeting
-              phase={phase}
               name={viewerId === MAKO ? t('home.header.me', 'Mako') : personName(viewerId)}
               date={uiDateTimeFormat(DATE_OPTIONS, intlLocale).format(sampleDay)}
             >
@@ -234,13 +242,7 @@ export default function HomePage(): React.JSX.Element {
                           projects={projects}
                           tab={tab}
                           onTabChange={setTab}
-                          onOpenTask={(taskId) =>
-                            openHomeItem(
-                              homeRowItemUid(
-                                tasks.find((task) => task.id === taskId) ?? { id: taskId }
-                              )
-                            )
-                          }
+                          onOpenTask={(taskId) => openHomeItem(taskItemUid(taskId))}
                           onStart={(task) => {
                             startHomeLoop(task.id, task.title, task.status)
                             openInaxTask(task.id)

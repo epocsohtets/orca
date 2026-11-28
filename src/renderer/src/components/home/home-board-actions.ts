@@ -25,7 +25,11 @@ function withStatus(
     doneTaskIds: status === 'done' ? [...done, taskId] : done,
     inax: {
       ...state.inax,
-      [taskId]: { notes: state.inax[taskId]?.notes ?? [], status, statusAt: at }
+      [taskId]: {
+        notes: state.inax[taskId]?.notes ?? [],
+        status,
+        statusAt: at
+      }
     }
   }
 }
@@ -45,15 +49,41 @@ export function setHomeTaskStatus(taskId: string, status: InaxStatus, title?: st
  * workspace is made. Starting again keeps the conversation that exists.
  */
 export function startHomeLoop(taskId: string, title: string, status: InaxStatus = 'todo'): void {
-  if (useHomeBoardStore.getState().loops[taskId]) {
+  const known = useHomeBoardStore.getState().loops[taskId]
+  if (known && !known.chatOnly) {
     return
   }
   const at = Date.now()
   useHomeBoardStore.setState((state) => ({
-    loops: { ...state.loops, [taskId]: { startedAt: at, said: [] } },
+    // Handed over after a line I wrote: the same conversation, now with the agent on the task.
+    loops: {
+      ...state.loops,
+      [taskId]: {
+        startedAt: at,
+        said: known?.said ?? [],
+        folder: known?.folder,
+        workspaceId: known?.workspaceId
+      }
+    },
     ...(status === 'todo' ? withStatus(state, taskId, 'inProgress', at) : {})
   }))
   void ensureTaskWorkspace(taskId, title)
+}
+
+/**
+ * The task's conversation, made when I first write on a task I have not handed over: the comment box and the
+ * chat tab are one conversation for every task.
+ */
+export function ensureHomeTaskChat(taskId: string, title: string): Promise<string | null> {
+  if (!useHomeBoardStore.getState().loops[taskId]) {
+    useHomeBoardStore.setState((state) => ({
+      loops: {
+        ...state.loops,
+        [taskId]: { startedAt: Date.now(), said: [], chatOnly: true }
+      }
+    }))
+  }
+  return ensureTaskWorkspace(taskId, title)
 }
 
 /** My answer to the agent's question: one of its choices, or my own words. */
@@ -75,8 +105,16 @@ export function answerHomeLoop(taskId: string, choiceId: string | null, text?: s
  * What I write on a task, from its item's comment box or its chat: one progress note on inAX, and my line in
  * the conversation when the task has one. Returns the note's id.
  */
-export function commentHomeTask(taskId: string, text: string, at = Date.now()): string {
+export function commentHomeTask(
+  taskId: string,
+  text: string,
+  at = Date.now(),
+  title?: string
+): string {
   const id = `note-${at}`
+  if (title) {
+    void ensureHomeTaskChat(taskId, title)
+  }
   useHomeBoardStore.setState((state) => {
     const record = state.inax[taskId]
     const loop = state.loops[taskId]
@@ -87,16 +125,53 @@ export function commentHomeTask(taskId: string, text: string, at = Date.now()): 
           ...record,
           notes: [
             ...(record?.notes ?? []),
-            { id, at, text, status: record?.status ?? 'inProgress', by: 'me', statusChanged: false }
+            {
+              id,
+              at,
+              text,
+              status: record?.status ?? 'inProgress',
+              by: 'me',
+              statusChanged: false
+            }
           ]
         }
       },
       ...(loop
-        ? { loops: { ...state.loops, [taskId]: { ...loop, said: [...loop.said, { at, text }] } } }
+        ? {
+            loops: {
+              ...state.loops,
+              [taskId]: { ...loop, said: [...loop.said, { at, text }] }
+            }
+          }
         : {})
     }
   })
   return id
+}
+
+/**
+ * One day-end pass asks at most one question per task: answering its agent's question in the evening settles the
+ * day for it, so no status question follows. Marked as a saved card that saved nothing.
+ */
+export function settleHomeDayEnd(taskId: string): void {
+  useHomeBoardStore.setState((state) =>
+    state.dayEnd.some((entry) => entry.kind === 'task' && entry.id === taskId)
+      ? state
+      : {
+          dayEnd: [
+            ...state.dayEnd,
+            {
+              kind: 'task',
+              id: taskId,
+              noteId: null,
+              status: null,
+              prevStatus: null,
+              closedLoop: false,
+              at: Date.now()
+            }
+          ]
+        }
+  )
 }
 
 /** Saves one day-end card: from here colleagues see it. */

@@ -37,16 +37,20 @@ export function applyHomeTaskLoops(
       task.status ??
       (task.done ? 'done' : task.who === null || task.meetingId ? 'todo' : 'inProgress')
     const loop = state.loops[task.id]
+    // A status I picked is the task's whole state: a wait on someone's reply goes with it (owner, item 93).
+    const picked = record?.status !== undefined && task.who === 'blocked'
     const base = {
       ...task,
+      ...(picked ? { who: null, whoLabel: undefined } : {}),
       status,
       statusAt: record?.statusAt,
       done: status === 'done',
       // Notes from before the sample day come first; what I save adds to them.
       notes: [...(task.notes ?? []), ...(record?.notes ?? [])]
     }
-    if (!loop) {
-      return base
+    // A conversation I opened by writing on the task asks and drafts nothing: the task stays as it is.
+    if (!loop || loop.chatOnly) {
+      return loop ? { ...base, folder: loop.folder } : base
     }
     const scripted = script(task, loop)
     const reached = homeLoopPhase(loop, now)
@@ -70,7 +74,13 @@ export function applyHomeTaskLoops(
     }
     if (phase === 'question') {
       const { question, choices } = scripted
-      return { ...mine, who: 'waiting', whoLabel: labels.question, question, choices }
+      return {
+        ...mine,
+        who: 'waiting',
+        whoLabel: labels.question,
+        question,
+        choices
+      }
     }
     if (phase === 'result') {
       // Not "waiting": the proposal asks nothing of me until I open the day-end cards.

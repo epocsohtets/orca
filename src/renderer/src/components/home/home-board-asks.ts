@@ -25,8 +25,8 @@ export function homeSampleAsks(
 }
 
 /**
- * At day end each card is an ask inside its task, so 내 확인 필요 holds them, and the day's records with no task
- * are one row of their own: one number for tile, tab and panel.
+ * At day end each card is an ask inside its task, so 내 확인 필요 holds them: one number for tile, tab and panel.
+ * The day's records with no task are not a 업무 and are not counted (Riko R4).
  */
 export function withDayEndAsks(
   t: Translate,
@@ -34,28 +34,9 @@ export function withDayEndAsks(
   dayEnd: readonly HomeDayEndCard[]
 ): HomeTask[] {
   const needsMe = t('home.task.requestWho', 'Needs me')
-  return [
-    ...tasks.map((task) =>
-      !task.done && dayEnd.some((card) => card.kind === 'task' && card.id === task.id)
-        ? { ...task, who: 'waiting' as const, whoLabel: needsMe }
-        : task
-    ),
-    ...(dayEnd.some((card) => card.kind === 'records')
-      ? [
-          {
-            id: 'day-records',
-            title: t('home.day.unconfirmed', 'Records without a task'),
-            // shortcut: records belong to no project; the row hides this one (dayEndRecords).
-            project: 'campaign' as const,
-            due: 'today' as const,
-            dueLabel: t('home.task.today', 'Today'),
-            done: false,
-            who: 'waiting' as const,
-            whoLabel: needsMe,
-            detail: '',
-            dayEndRecords: true as const
-          }
-        ]
-      : [])
-  ]
+  return tasks.map((task) =>
+    !task.done && dayEnd.some((card) => card.kind === 'task' && card.id === task.id)
+      ? { ...task, who: 'waiting' as const, whoLabel: needsMe }
+      : task
+  )
 }

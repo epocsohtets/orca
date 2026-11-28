@@ -21,18 +21,25 @@ import { useHomeBoardStore } from './home-board-store'
 import {
   answerHomeLoop,
   commentHomeTask,
+  ensureHomeTaskChat,
   saveHomeDayEnd,
-  setHomeTaskStatus
+  setHomeTaskStatus,
+  settleHomeDayEnd
 } from './home-board-actions'
+import { inaxStatusLabels } from './home-task-loop-script'
+import { MAKO } from '@/components/meetings/meeting-people'
 import { buildHomeTaskItems } from './home-task-items'
 import {
+  BOT_STATUS,
   HOME_TASKS_BOT_ID,
+  ME,
   homeItemAnswerWords,
   homeItemAnswerWrite,
   inaxStatusOfItem,
   type HomeItemEntry,
   type HomeSentComment
 } from './home-task-item-model'
+import { INAX_STATUSES } from './home-task-loop'
 
 /** The task agent as Orca's item panel names it: the owner of every 업무 item. */
 export function homeTasksBot(name: string): Bot {
@@ -45,7 +52,11 @@ export function homeTasksBot(name: string): Bot {
     agent: 'claude',
     avatar: mascotAvatar('B1'),
     paused: false,
-    notifications: { needsPermission: true, taskComplete: true, couldNotFinish: true },
+    notifications: {
+      needsPermission: true,
+      taskComplete: true,
+      couldNotFinish: true
+    },
     members: [],
     slack: null,
     linear: null,
@@ -57,13 +68,22 @@ export function homeTasksBot(name: string): Bot {
   }
 }
 
-/** Which 업무 Home's panel shows, so a click elsewhere on Home (a row, 업무 정리) opens it there. */
-export const useHomeItemsPanel = create<{ request: { uid: string; at: number } | null }>(() => ({
-  request: null
-}))
+/**
+ * Which 업무 Home's panel shows, so a click elsewhere on Home (a row, 업무 정리) opens it there; and the last
+ * item whose ask I answered, so the day-end pass goes on to the next by itself.
+ */
+export const useHomeItemsPanel = create<{
+  request: { uid: string; at: number } | null
+  answered: { uid: string; at: number } | null
+}>(() => ({ request: null, answered: null }))
 
 export function openHomeItem(uid: string): void {
   useHomeItemsPanel.setState({ request: { uid, at: Date.now() } })
+}
+
+/** Whether the host holds `uid` with an ask waiting on me. */
+export function homeItemIsOpen(uid: string): boolean {
+  return listed().some((entry) => entry.item.uid === uid && entry.ask !== null)
 }
 
 /** From another screen: Home, with `uid` open in its panel. */
@@ -79,14 +99,30 @@ const sent = new Map<string, HomeSentComment>()
 const noteRequests = new Map<string, string>()
 const snoozed = new Map<string, number>()
 const askedAt = new Map<string, number>()
-/** Decisions with no task, answered here: their row goes from the board, and they stay as closed items. */
+/** Each item's number, given once: a row leaving the list never moves another item's number. */
+const numbers = new Map<string, number>()
+const numberOf = (uid: string): number => {
+  const known = numbers.get(uid)
+  if (known !== undefined) {
+    return known
+  }
+  numbers.set(uid, numbers.size + 1)
+  return numbers.size
+}
+/** Decisions with no task, answered here: their row goes from the board, and they stay as closed items of the
+ *  person who answered them, by `<viewer>\0<uid>`. */
 const kept = new Map<string, HomeItemEntry>()
+/** Who the demo shows the app as. */
+let viewer = ''
+const keptKey = (uid: string): string => `${viewer}\u0000${uid}`
 let entries: HomeItemEntry[] = []
 let seenEventId = 'e0'
+/** The board's time of day as the host last built it: an answer in the evening settles the task's day. */
+let evening = false
 
 /** Starting the sample over: what this window sent and when each ask came go with the board. */
 export function resetHomeTaskItems(): void {
-  for (const map of [stamps, sent, noteRequests, snoozed, kept, askedAt]) {
+  for (const map of [stamps, sent, noteRequests, snoozed, kept, askedAt, numbers]) {
     map.clear()
   }
 }
@@ -103,7 +139,10 @@ const stamp = (key: string, proposed: number): number => {
 
 function listed(): HomeItemEntry[] {
   const live = new Set(entries.map((entry) => entry.item.uid))
-  return [...entries, ...[...kept.values()].filter((entry) => !live.has(entry.item.uid))]
+  const mine = [...kept.entries()].flatMap(([key, entry]) =>
+    key === keptKey(entry.item.uid) && !live.has(entry.item.uid) ? [entry] : []
+  )
+  return [...entries, ...mine]
 }
 
 function entryOf(uid: unknown): HomeItemEntry {
@@ -143,15 +182,17 @@ function comment(params: Record<string, unknown>): void {
             ? write.kind
             : ask.eventId
       sent.set(`${entry.item.uid}\u0000${key}`, { at, text, requestId })
-      if (!entry.taskId) {
+      // A decision of its own stays as a closed item with my answer as my line; the day's records are no
+      // 업무 and leave once answered.
+      if (!entry.taskId && !entry.unlisted) {
         const answer: BotItemEvent = {
           id: `e${Math.max(at, newest(entry.events) + 1)}`,
-          kind: 'commented',
-          actor: { kind: 'owner' },
-          data: { text, ...(requestId ? { requestId } : {}) },
+          kind: 'status',
+          actor: ME,
+          data: { answer: text, ...(requestId ? { requestId } : {}) },
           at
         }
-        kept.set(entry.item.uid, {
+        kept.set(keptKey(entry.item.uid), {
           ...entry,
           ask: null,
           events: [...entry.events, answer],
@@ -168,11 +209,16 @@ function comment(params: Record<string, unknown>): void {
         })
       }
       applyWrite(write)
+      if (evening && (write.kind === 'loop' || write.kind === 'board') && entry.taskId) {
+        settleHomeDayEnd(entry.taskId)
+      }
+      useHomeItemsPanel.setState({ answered: { uid: entry.item.uid, at } })
       return
     }
   }
   if (entry.taskId) {
-    const noteId = commentHomeTask(entry.taskId, text, at)
+    // My line is the task's conversation too: the chat holds it, and the agent replies there and here.
+    const noteId = commentHomeTask(entry.taskId, text, at, entry.item.title)
     if (requestId) {
       noteRequests.set(noteId, requestId)
     }
@@ -185,7 +231,7 @@ function comment(params: Record<string, unknown>): void {
     data: { text, ...(requestId ? { requestId } : {}) },
     at
   }
-  kept.set(entry.item.uid, { ...entry, events: [...entry.events, note] })
+  kept.set(keptKey(entry.item.uid), { ...entry, events: [...entry.events, note] })
 }
 
 function applyWrite(write: NonNullable<ReturnType<typeof homeItemAnswerWrite>>): void {
@@ -218,7 +264,7 @@ async function call(method: string, raw: unknown): Promise<unknown> {
   const params = isRecord(raw) ? raw : {}
   switch (method) {
     case 'bots.items.owner.list': {
-      const items: BotItem[] = listed().map((entry) => entry.item)
+      const items: BotItem[] = listed().flatMap((entry) => (entry.unlisted ? [] : [entry.item]))
       const counts: Record<string, number> = {}
       for (const item of items) {
         counts[item.status] = (counts[item.status] ?? 0) + 1
@@ -285,7 +331,9 @@ function openChat(chatId: string): void {
     return
   }
   if (entry.chat.kind === 'task') {
-    openInaxTask(entry.chat.taskId)
+    const { taskId } = entry.chat
+    // Every task has its conversation: one I have not handed over gets it now.
+    void ensureHomeTaskChat(taskId, entry.item.title).then(() => openInaxTask(taskId))
   } else if (entry.chat.kind === 'meeting') {
     openMeeting(entry.chat.meetingId)
   } else {
@@ -293,18 +341,31 @@ function openChat(chatId: string): void {
   }
 }
 
+function numbered(input: Parameters<typeof buildHomeTaskItems>[0]): HomeItemEntry[] {
+  return buildHomeTaskItems(input).map((entry) => ({
+    ...entry,
+    // A colleague's view of a task has the task's number.
+    item: { ...entry.item, number: numberOf(entry.item.uid.replace(/^peer:/, 'task:')) }
+  }))
+}
+
 /** Keeps the 업무 bot's items in step with the board; mount once. */
 export function HomeTaskItemsHost(): null {
   const t = useTranslate()
-  const { view, board, phase } = useHomeBoard()
+  const { view, board, phase, viewerId } = useHomeBoard()
   const agentName = t('taskLoop.agent.name', 'Task agent')
+  useEffect(() => {
+    evening = phase === 'evening'
+    viewer = viewerId
+  }, [phase, viewerId])
   const built = useMemo(
     () =>
-      buildHomeTaskItems({
+      numbered({
         t,
         view,
         board,
         evening: phase === 'evening',
+        own: viewerId === MAKO,
         agentName,
         stamp,
         sent,
@@ -312,9 +373,17 @@ export function HomeTaskItemsHost(): null {
         snoozed,
         askedAt
       }),
-    [t, view, board, phase, agentName]
+    [t, view, board, phase, viewerId, agentName]
   )
-  useEffect(() => serveLocalBotItems(HOME_TASKS_BOT_ID, { call, openChat }), [])
+  useEffect(() => {
+    // A 업무 has inAX's four statuses, by their inAX names: Needs you and Canceled are not offered.
+    const labels = inaxStatusLabels(t)
+    const statuses = INAX_STATUSES.map((status) => ({
+      status: BOT_STATUS[status],
+      label: labels[status]
+    }))
+    return serveLocalBotItems(HOME_TASKS_BOT_ID, { call, openChat, statuses })
+  }, [t])
   useEffect(() => {
     const before = JSON.stringify(entries.map((entry) => [entry.item, entry.events.length]))
     entries = built

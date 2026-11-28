@@ -44,6 +44,10 @@ export function useHomeDayEndRows(
   // The cards are 마코's: seen as someone else, the board holds none of them.
   return (viewerId === MAKO ? saved : []).flatMap((entry, index): HomeDayEndResultRow[] => {
     if (entry.kind === 'task') {
+      // A task the pass settled by answering its agent's question saved nothing of its own.
+      if (entry.noteId === null && entry.status === null) {
+        return []
+      }
       const task = tasks.find((item) => item.id === entry.id)
       return task
         ? [
@@ -109,7 +113,9 @@ export function HomeDayEndResult({
             onClick={row.open}
             action={
               <HomeRowMenu
-                label={t('meetings.followUps.more', 'Menu for “{{text}}”', { text: row.title })}
+                label={t('meetings.followUps.more', 'Menu for “{{text}}”', {
+                  text: row.title
+                })}
               >
                 <DropdownMenuItem data-home-day-end-undo="" onSelect={row.undo}>
                   {t('home.day.undo', 'Undo')}

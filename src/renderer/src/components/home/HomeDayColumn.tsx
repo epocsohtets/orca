@@ -50,16 +50,26 @@ export function HomeDayColumn({
   for (let hour = start / 60; hour <= end / 60; hour += 1) {
     hours.push(hour)
   }
-  // Each block at its time; one that would overlap the one before moves down. Its start time still says when.
-  const placed = [...blocks]
-    .filter((block) => block.from < end)
-    .sort((a, b) => a.from - b.from)
-    .reduce<{ block: HomeDayBlock; top: number; height: number }[]>((rows, block) => {
-      const last = rows.at(-1)
-      const top = Math.max(y(block.from), last ? last.top + last.height + 1 : 0)
-      const height = Math.max(BLOCK_MIN_PX, y(Math.min(block.to, end)) - y(block.from) - 1)
-      return [...rows, { block, top, height }]
-    }, [])
+  // Each block at its real start. Only a start inside the one before's name row moves down, and only that far;
+  // a block ends where the next begins, so no push carries on down the day. Its start time still says when.
+  const sorted = [...blocks].filter((block) => block.from < end).sort((a, b) => a.from - b.from)
+  const tops = sorted.reduce<number[]>(
+    (list, block) => [
+      ...list,
+      Math.max(y(block.from), (list.at(-1) ?? -BLOCK_MIN_PX) + BLOCK_MIN_PX)
+    ],
+    []
+  )
+  const placed = sorted.map((block, index) => {
+    const top = tops[index]!
+    const next = tops[index + 1]
+    const lasted = Math.max(BLOCK_MIN_PX, y(Math.min(block.to, end)) - y(block.from)) - 1
+    return {
+      block,
+      top,
+      height: next === undefined ? lasted : Math.min(lasted, next - top - 1)
+    }
+  })
   const last = placed.at(-1)
   const bottom = last ? last.top + last.height + 1 : 0
   const columnHeight = Math.max(y(end), bottom)

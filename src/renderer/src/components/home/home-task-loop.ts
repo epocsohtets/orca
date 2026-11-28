@@ -37,6 +37,8 @@ export type HomeTaskLoop = {
   final?: { at: number }
   /** What I typed in the conversation. */
   said: { at: number; text: string }[]
+  /** Opened by a line I wrote on a task I had not handed over: no plan, no question, no draft. */
+  chatOnly?: true
 }
 
 /**
@@ -60,6 +62,9 @@ export function homeLoopDraftAt(loop: HomeTaskLoop): number | null {
 }
 
 export function homeLoopPhase(loop: HomeTaskLoop, now: number): HomeLoopPhase {
+  if (loop.chatOnly) {
+    return 'confirmed'
+  }
   if (now < homeLoopQuestionAt(loop)) {
     return 'working'
   }

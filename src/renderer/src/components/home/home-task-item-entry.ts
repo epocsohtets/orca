@@ -7,16 +7,18 @@ import {
 } from '../../../../shared/bots/bot-item-ask'
 import type { BotItemActor, BotItemStatus } from '../../../../shared/bots/bot-items'
 import type { HomeTask } from './home-board'
-import type { InaxStatus } from './home-task-loop'
+import { INAX_STATUSES, type InaxStatus } from './home-task-loop'
 import { inaxStatusLabels } from './home-task-loop-script'
 import {
   BOT_STATUS,
   HOME_TASKS_BOT_ID,
+  ME,
   askData,
   withIds,
   type Draft,
   type HomeItemAnswer,
-  type HomeItemEntry
+  type HomeItemEntry,
+  type HomeSentComment
 } from './home-task-item-model'
 
 export type HomeItemEntryContext = {
@@ -45,7 +47,11 @@ export function makeHomeItemEntry(
   }
 ): HomeItemEntry {
   const { t, agentName, now } = ctx
-  const bot: BotItemActor = { kind: 'bot', botId: HOME_TASKS_BOT_ID, chatId: 'agent' }
+  const bot: BotItemActor = {
+    kind: 'bot',
+    botId: HOME_TASKS_BOT_ID,
+    chatId: 'agent'
+  }
   const labels = inaxStatusLabels(t)
   const asker: BotItemActor = rest.asker
     ? { kind: 'bot', botId: `asker:${rest.asker}`, chatId: uid }
@@ -53,10 +59,26 @@ export function makeHomeItemEntry(
   if (open) {
     drafts.push(
       { kind: 'commented', actor: asker, data: askData(open.ask), at: open.at },
-      { kind: 'status', actor: asker, data: { from: null, to: 'needs_you' }, at: open.at }
+      {
+        kind: 'status',
+        actor: asker,
+        data: { from: null, to: 'needs_you' },
+        at: open.at
+      }
     )
   }
-  const events = withIds(drafts)
+  // Only asks I saw: one a later ask took the place of before I answered it is not part of the history.
+  const events = withIds(drafts).filter((event, index, all) => {
+    if (event.kind !== 'commented' || !event.data.ask) {
+      return true
+    }
+    const next = all
+      .slice(index + 1)
+      .find(
+        (later) => later.actor.kind === 'owner' || (later.kind === 'commented' && later.data.ask)
+      )
+    return !next || next.actor.kind === 'owner'
+  })
   const askEvent = open
     ? events.findLast((event) => event.kind === 'commented' && event.data.ask === open.ask)
     : undefined
@@ -129,5 +151,46 @@ export function makeHomeItemEntry(
     ask: askEvent && shape && open ? { eventId: askEvent.id, shape, answer: open.answer } : null,
     taskId: rest.taskId,
     chat: rest.chat
+  }
+}
+
+/** The day-end question: the question, the agent's note under it as its evidence, then the statuses. */
+export function homeDayEndAsk(
+  t: Translate,
+  labels: Record<InaxStatus, string>,
+  note: string | null,
+  proposed: InaxStatus | null
+): BotItemAsk {
+  return {
+    questions: [
+      {
+        prompt: [t('home.dayEnd.question', 'How far did this task get today?'), note]
+          .filter(Boolean)
+          .join('\n\n'),
+        options: INAX_STATUSES.map((value) => ({ label: labels[value] })),
+        ...(proposed ? { recommended: INAX_STATUSES.indexOf(proposed) } : {})
+      }
+    ]
+  }
+}
+
+/**
+ * My answer to an ask that is settled, as my own line under it (`answer`), or as the status I moved it to
+ * (`to`). It carries the request id of the send this window made, so the item's view knows it arrived.
+ */
+export function homeAnsweredLine(
+  sent: HomeSentComment | undefined,
+  words: string,
+  at: number,
+  to?: InaxStatus
+): Draft {
+  return {
+    kind: 'status',
+    actor: ME,
+    data: {
+      ...(to ? { from: null, to: BOT_STATUS[to] } : { answer: sent?.text ?? words }),
+      ...(sent?.requestId ? { requestId: sent.requestId } : {})
+    },
+    at: sent?.at ?? at
   }
 }

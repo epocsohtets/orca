@@ -75,10 +75,15 @@ export function HomeMyDayCard({
         <section aria-label={t('home.day.unconfirmed', 'Records without a task')}>
           <h3 className={HOME_GROUP_RULED_CLASS}>
             {t('home.day.unconfirmed', 'Records without a task')}
-            <span aria-hidden>·</span>
-            <span className="tabular-nums" data-home-records-open="">
-              {open.length}
-            </span>
+            {/* A count only while there is something to do. */}
+            {open.length > 0 ? (
+              <>
+                <span aria-hidden>·</span>
+                <span className="tabular-nums" data-home-records-open="">
+                  {open.length}
+                </span>
+              </>
+            ) : null}
           </h3>
           <ul className="mx-4" onMouseLeave={() => setHovered(null)}>
             {open.map((record) => (

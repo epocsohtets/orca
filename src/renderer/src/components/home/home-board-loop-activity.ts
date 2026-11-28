@@ -16,7 +16,8 @@ export function buildHomeLoopActivity(
 ): HomeActivity[] {
   return Object.entries(args.board.loops).flatMap(([taskId, loop]): HomeActivity[] => {
     const task = args.tasks.find((entry) => entry.id === taskId)
-    if (!task) {
+    // A conversation I opened by writing a line started nothing.
+    if (!task || loop.chatOnly) {
       return []
     }
     const script = buildHomeLoopScript(t, task, loop)

@@ -4,10 +4,14 @@
 import type { BotItemAsk } from '../../../../shared/bots/bot-item-ask'
 import type { BotItemActor } from '../../../../shared/bots/bot-items'
 import type { HomeDayEndCard } from './home-day-end'
-import { homeLoopDraftAt, homeLoopQuestionAt, INAX_STATUSES } from './home-task-loop'
-import { buildHomeLoopScript, homeLoopAnswerText, inaxStatusLabels } from './home-task-loop-script'
+import { homeLoopDraftAt, homeLoopQuestionAt, type InaxStatus } from './home-task-loop'
 import {
-  homeRowItemUid,
+  buildHomeLoopScript,
+  homeLoopAnswerText,
+  homeLoopNoted,
+  inaxStatusLabels
+} from './home-task-loop-script'
+import {
   HOME_TASKS_BOT_ID,
   BOT_STATUS,
   ME,
@@ -18,12 +22,17 @@ import {
   type HomeItemEntry,
   type HomeItemsInput
 } from './home-task-item-model'
-import { makeHomeItemEntry } from './home-task-item-entry'
+import { homeAnsweredLine, homeDayEndAsk, makeHomeItemEntry } from './home-task-item-entry'
+import { buildPeerTaskItems, buildRecordsItem } from './home-task-items-unlisted'
 import { meetingRowAsk } from './home-task-item-asks'
 
 export function buildHomeTaskItems(input: HomeItemsInput): HomeItemEntry[] {
   const { t, view, board, agentName, stamp } = input
-  const bot: BotItemActor = { kind: 'bot', botId: HOME_TASKS_BOT_ID, chatId: 'agent' }
+  const bot: BotItemActor = {
+    kind: 'bot',
+    botId: HOME_TASKS_BOT_ID,
+    chatId: 'agent'
+  }
   const labels = inaxStatusLabels(t)
   const now = Date.now()
   const entries: HomeItemEntry[] = []
@@ -38,28 +47,22 @@ export function buildHomeTaskItems(input: HomeItemsInput): HomeItemEntry[] {
   }
   const pushEntry = (
     ...args: Parameters<typeof makeHomeItemEntry> extends [unknown, ...infer R] ? R : never
-  ): void => {
-    entries.push(makeHomeItemEntry(ctx, ...args))
+  ): HomeItemEntry => {
+    const entry = makeHomeItemEntry(ctx, ...args)
+    entries.push(entry)
+    return entry
   }
+  const dayEndAsk = (note: string | null, proposed: InaxStatus | null): BotItemAsk =>
+    homeDayEndAsk(t, labels, note, proposed)
+  const answered = (uid: string, key: string, words: string, at: number, to?: InaxStatus): Draft =>
+    homeAnsweredLine(input.sent.get(`${uid}\u0000${key}`), words, at, to)
 
-  /** My answer to an ask that is settled: the comment I sent here, else the answer as its words. */
-  const answered = (uid: string, key: string, words: string, at: number): Draft => {
-    const sent = input.sent.get(`${uid}\u0000${key}`)
-    return {
-      kind: 'commented',
-      actor: ME,
-      data: {
-        text: sent?.text ?? words,
-        ...(sent?.requestId ? { requestId: sent.requestId } : {})
-      },
-      at: sent?.at ?? at
-    }
+  // A colleague reads 마코's tasks only.
+  if (!input.own) {
+    entries.push(...buildPeerTaskItems(ctx, view.boardTasks))
   }
 
   view.tasks.forEach((task, index) => {
-    if (task.dayEndRecords) {
-      return
-    }
     const uid = taskItemUid(task.id)
     const drafts: Draft[] = []
     const loop = board.loops[task.id]
@@ -68,36 +71,43 @@ export function buildHomeTaskItems(input: HomeItemsInput): HomeItemEntry[] {
     )
     const savedNotes = new Set(saved.map((entry) => entry.noteId))
     for (const entry of saved) {
+      // An agent's question answered in the day-end pass closed the day for it: nothing more was asked.
+      if (entry.noteId === null && entry.status === null && !entry.answer) {
+        continue
+      }
       const savedAt = entry.at ?? now
       const note = (task.notes ?? []).find((candidate) => candidate.id === entry.noteId)
       const status = entry.status ?? task.status ?? 'todo'
-      const ask: BotItemAsk = {
-        ...(note?.by === 'agentConfirmed' ? { context: note.text } : {}),
-        questions: [
-          {
-            prompt: t('taskLoop.detail.status', 'Status'),
-            options: INAX_STATUSES.map((value) => ({ label: labels[value] })),
-            recommended: INAX_STATUSES.indexOf(status)
-          }
-        ]
-      }
+      const ask = dayEndAsk(note?.by === 'agentConfirmed' ? note.text : null, null)
       const askAt = Math.min(input.askedAt.get(uid) ?? savedAt - 2, savedAt - 2)
-      drafts.push({ kind: 'commented', actor: bot, data: askData(ask), at: askAt })
+      drafts.push({
+        kind: 'commented',
+        actor: bot,
+        data: askData(ask),
+        at: askAt
+      })
       drafts.push(
-        answered(uid, 'dayend', note?.by === 'me' ? note.text : labels[status], savedAt - 1)
+        answered(
+          uid,
+          'dayend',
+          entry.answer ?? (note?.by === 'me' ? note.text : labels[status]),
+          savedAt + 1,
+          entry.status ?? undefined
+        )
       )
     }
     for (const note of task.notes ?? []) {
       const requestId = input.noteRequests.get(note.id)
       // A line saved from the day-end ask is that ask and my answer below, not a second copy.
-      if (!savedNotes.has(note.id)) {
-        drafts.push({
-          kind: 'commented',
-          actor: note.by === 'me' ? ME : bot,
-          data: { text: note.text, ...(requestId ? { requestId } : {}) },
-          at: note.at
-        })
+      if (savedNotes.has(note.id)) {
+        continue
       }
+      drafts.push({
+        kind: 'commented',
+        actor: note.by === 'me' ? ME : bot,
+        data: { text: note.text, ...(requestId ? { requestId } : {}) },
+        at: note.at
+      })
       if (note.statusChanged !== false) {
         drafts.push({
           kind: 'status',
@@ -119,7 +129,16 @@ export function buildHomeTaskItems(input: HomeItemsInput): HomeItemEntry[] {
       })
     }
     let open: { ask: BotItemAsk; at: number; answer: HomeItemAnswer } | null = null
-    if (loop) {
+    if (loop?.chatOnly) {
+      for (const said of loop.said) {
+        drafts.push({
+          kind: 'commented',
+          actor: bot,
+          data: { text: homeLoopNoted(t, loop) },
+          at: said.at + 1
+        })
+      }
+    } else if (loop) {
       const script = buildHomeLoopScript(t, task, loop)
       const askAt = homeLoopQuestionAt(loop)
       // The conversation as the chat tab has it: my hand-over, the agent's plan, its reply to each line I wrote.
@@ -146,14 +165,25 @@ export function buildHomeTaskItems(input: HomeItemsInput): HomeItemEntry[] {
             prompt: script.question,
             options: script.choices.map((choice) => ({ label: choice.label })),
             ...(script.choices.some((choice) => choice.recommended)
-              ? { recommended: script.choices.findIndex((choice) => choice.recommended) }
+              ? {
+                  recommended: script.choices.findIndex((choice) => choice.recommended)
+                }
               : {})
           }
         ]
       }
-      const answer: HomeItemAnswer = { kind: 'loop', taskId: task.id, choices: script.choices }
+      const answer: HomeItemAnswer = {
+        kind: 'loop',
+        taskId: task.id,
+        choices: script.choices
+      }
       if (loop.answer) {
-        drafts.push({ kind: 'commented', actor: bot, data: askData(ask), at: askAt })
+        drafts.push({
+          kind: 'commented',
+          actor: bot,
+          data: askData(ask),
+          at: askAt
+        })
         drafts.push(answered(uid, `loop`, homeLoopAnswerText(script, loop), loop.answer.at))
         const draftAt = homeLoopDraftAt(loop)
         if (draftAt !== null && draftAt <= now) {
@@ -171,13 +201,16 @@ export function buildHomeTaskItems(input: HomeItemsInput): HomeItemEntry[] {
         drafts.push({
           kind: 'commented',
           actor: bot,
-          data: {
-            text: t('taskLoop.chat.noted', 'Noted. I will apply it to what I am writing now.')
-          },
+          data: { text: homeLoopNoted(t, loop) },
           at: said.at + 1
         })
         if (!(task.notes ?? []).some((note) => note.at === said.at)) {
-          drafts.push({ kind: 'commented', actor: ME, data: { text: said.text }, at: said.at })
+          drafts.push({
+            kind: 'commented',
+            actor: ME,
+            data: { text: said.text },
+            at: said.at
+          })
         }
       }
     }
@@ -188,18 +221,31 @@ export function buildHomeTaskItems(input: HomeItemsInput): HomeItemEntry[] {
         questions: [
           {
             prompt: sampleAsk.question,
-            options: sampleAsk.choices.map((choice) => ({ label: choice.label })),
+            options: sampleAsk.choices.map((choice) => ({
+              label: choice.label
+            })),
             ...(sampleAsk.choices.some((choice) => choice.recommended)
-              ? { recommended: sampleAsk.choices.findIndex((choice) => choice.recommended) }
+              ? {
+                  recommended: sampleAsk.choices.findIndex((choice) => choice.recommended)
+                }
               : {})
           }
         ]
       }
       const askAt = stamp(`ask:${uid}`, sampleAsk.at)
       const choice = board.answers[task.id]
-      const answer: HomeItemAnswer = { kind: 'board', taskId: task.id, choices: sampleAsk.choices }
+      const answer: HomeItemAnswer = {
+        kind: 'board',
+        taskId: task.id,
+        choices: sampleAsk.choices
+      }
       if (choice !== undefined) {
-        drafts.push({ kind: 'commented', actor: bot, data: askData(ask), at: askAt })
+        drafts.push({
+          kind: 'commented',
+          actor: bot,
+          data: askData(ask),
+          at: askAt
+        })
         const label = sampleAsk.choices.find((entry) => entry.id === choice)?.label ?? choice
         drafts.push(answered(uid, 'board', label, askAt + 60_000))
       } else if (!task.done) {
@@ -212,17 +258,8 @@ export function buildHomeTaskItems(input: HomeItemsInput): HomeItemEntry[] {
     )
     if (!open && card) {
       open = {
-        ask: {
-          ...(card.suggestion ? { context: card.suggestion } : {}),
-          questions: [
-            {
-              prompt: t('taskLoop.detail.status', 'Status'),
-              options: INAX_STATUSES.map((status) => ({ label: labels[status] })),
-              // A star only for a status the agent proposes: never on the one the task already has.
-              ...(card.proposed ? { recommended: INAX_STATUSES.indexOf(card.proposed) } : {})
-            }
-          ]
-        },
+        // A star only for a status the agent proposes: never on the one the task already has.
+        ask: dayEndAsk(card.suggestion, card.proposed),
         // After what the task already holds: the ask is the day's last word on it.
         at: openDayEndAt(uid, drafts),
         answer: { kind: 'dayEnd', card, labels }
@@ -257,43 +294,9 @@ export function buildHomeTaskItems(input: HomeItemsInput): HomeItemEntry[] {
     )
   })
 
-  const records = view.tasks.find((task) => task.dayEndRecords)
-  const recordCards = dayEndCards.flatMap((card) => (card.kind === 'records' ? [card] : []))
-  if (records && recordCards.length > 0) {
-    const tasks = view.openTasks.slice(0, 7).map((task) => ({ id: task.id, label: task.title }))
-    const notWork = t('home.day.notWork', 'Not work')
-    const shown = recordCards.slice(0, 5)
-    pushEntry(
-      homeRowItemUid(records),
-      view.tasks.length + 1,
-      records,
-      [],
-      {
-        ask: {
-          questions: shown.map((card) => {
-            const suggested = tasks.findIndex((task) => task.id === card.record.suggestTaskId)
-            return {
-              prompt: card.record.text,
-              options: [...tasks.map((task) => ({ label: task.label })), { label: notWork }],
-              ...(suggested !== -1 ? { recommended: suggested } : {})
-            }
-          })
-        },
-        at: stamp(`dayend:${homeRowItemUid(records)}`, now),
-        answer: {
-          kind: 'records',
-          records: shown.map((card) => ({ id: card.record.id })),
-          tasks,
-          notWork
-        }
-      },
-      {
-        taskId: null,
-        chat: { kind: 'home' },
-        chatTitle: t('home.day.title', 'My day'),
-        withDue: false
-      }
-    )
+  const records = buildRecordsItem(ctx, input, dayEndCards)
+  if (records) {
+    entries.push(records)
   }
   return entries
 }
