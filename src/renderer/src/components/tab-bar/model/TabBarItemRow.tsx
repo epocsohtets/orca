@@ -1,3 +1,5 @@
+import { MessageSquare } from 'lucide-react'
+import { taskIdOfRoom } from '@/components/work/work-task-workspace'
 import { memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { shallow } from 'zustand/shallow'
@@ -255,13 +257,23 @@ function TabBarItemRow({
         canSplitTerminal={false}
         // A room's name is its group's or its thread's, kept on the group's host, not on this tab.
         onSetCustomTitle={(_tabId, name) => {
+          // A task's conversation carries the task's title.
+          if (taskIdOfRoom(item.data.entityId) !== null) {
+            return
+          }
           renameBotGroupRoom(
             item.data.entityId,
             name,
             item.data.customLabel ?? item.data.label
           ).catch((error: unknown) => toast.error(botGroupRenameErrorMessage(error)))
         }}
-        identityIcon={<BotGroupTabIcon members={roomMembers} />}
+        identityIcon={
+          taskIdOfRoom(item.data.entityId) === null ? (
+            <BotGroupTabIcon members={roomMembers} />
+          ) : (
+            <MessageSquare className="size-3" aria-hidden />
+          )
+        }
         identityDetail={
           roomMembers.length > 0 ? roomMembers.map((member) => member.name).join(', ') : undefined
         }

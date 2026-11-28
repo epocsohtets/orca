@@ -2,6 +2,7 @@ import { translate } from '@/i18n/i18n'
 import { translateSearchKeyword } from '../search/settings-search-keywords'
 import { createLocalizedCatalog } from '@/i18n/localized-catalog'
 import {
+  INAX_INTEGRATION_SECTION_ID,
   JIRA_INTEGRATION_SECTION_ID,
   LINEAR_INTEGRATION_SECTION_ID
 } from '../../integrations/task-trackers/task-provider-integration-section-ids'
@@ -18,6 +19,19 @@ export const INTEGRATION_SETTING_TARGET_IDS = {
 } as const
 
 export const getIntegrationsPaneSearchEntries = createLocalizedCatalog(() => [
+  {
+    targetSectionId: INAX_INTEGRATION_SECTION_ID,
+    title: translate('taskLoop.settings.searchTitle', 'inAX account'),
+    description: translate(
+      'taskLoop.settings.searchDescription',
+      'Sign in to inAX, see the connected account, or disconnect it.'
+    ),
+    keywords: [
+      ...translateSearchKeyword('taskLoop.settings.keywordInax', 'inax'),
+      ...translateSearchKeyword('taskLoop.settings.keywordTasks', 'my work'),
+      ...translateSearchKeyword('taskLoop.settings.keywordSignIn', 'sign in')
+    ]
+  },
   {
     targetSectionId: INTEGRATION_SETTING_TARGET_IDS.github,
     title: translate(

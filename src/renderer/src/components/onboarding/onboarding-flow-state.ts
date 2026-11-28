@@ -31,7 +31,7 @@ export function shouldSkipWindowsTerminalStep(isWindows: boolean): boolean {
 export type OnboardingStepSkipOptions = {
   skipIntegrations: boolean
   skipWindowsTerminal: boolean
-  /** The person chose work styles without Code: no Chat/Terminal, GitHub CLI or terminal pages. */
+  /** The person chose work styles without Code: their pages are How you work, then inAX sign-in. */
   skipDeveloperSteps?: boolean
 }
 
@@ -50,14 +50,20 @@ export function useOnboardingStepSkipOptions(
 
 export function isSkippedStepIndex(index: number, options: OnboardingStepSkipOptions): boolean {
   const step = STEPS[index]
+  if (options.skipDeveloperSteps === true) {
+    // No agent picker, terminal look, GitHub CLI or notification page: agents default to chat silently.
+    return step?.id !== 'work_style' && step?.id !== 'inax'
+  }
   return (
+    step?.id === 'inax' ||
     (options.skipIntegrations && step?.id === 'integrations') ||
-    (options.skipWindowsTerminal && step?.id === 'windows_terminal') ||
-    (options.skipDeveloperSteps === true &&
-      (step?.id === 'agent_surface' ||
-        step?.id === 'integrations' ||
-        step?.id === 'windows_terminal'))
+    (options.skipWindowsTerminal && step?.id === 'windows_terminal')
   )
+}
+
+/** The pages a person walks, in order, for their work styles and this computer. */
+export function onboardingPageIds(options: OnboardingStepSkipOptions): string[] {
+  return STEPS.filter((_, index) => !isSkippedStepIndex(index, options)).map((step) => step.id)
 }
 
 export function resolveStepIndex(

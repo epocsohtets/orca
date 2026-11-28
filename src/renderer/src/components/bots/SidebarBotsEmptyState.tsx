@@ -15,7 +15,10 @@ export function SidebarBotsEmptyState({ onNewBot }: { onNewBot: () => void }): J
 
   return (
     // Opaque fill (not alpha) so the faces' ring can match the card and leave no halo.
-    <div className="mx-2 rounded-[10px] bg-(--bots-onboarding-card) p-3 shadow-xs ring-1 ring-foreground/[0.08] ring-inset [--bots-onboarding-card:var(--background)] dark:shadow-none dark:ring-foreground/10 dark:[--bots-onboarding-card:color-mix(in_srgb,var(--foreground)_7%,var(--sidebar))]">
+    <div
+      data-sidebar-bots-empty=""
+      className="mx-2 rounded-[10px] bg-(--bots-onboarding-card) p-3 shadow-xs ring-1 ring-foreground/[0.08] ring-inset [--bots-onboarding-card:var(--background)] dark:shadow-none dark:ring-foreground/10 dark:[--bots-onboarding-card:color-mix(in_srgb,var(--foreground)_7%,var(--sidebar))]"
+    >
       {/* The title wraps beside the faces, and drops below them before it would split a word. */}
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
         <span className="flex shrink-0 -space-x-1" aria-hidden="true">
@@ -29,7 +32,7 @@ export function SidebarBotsEmptyState({ onNewBot }: { onNewBot: () => void }): J
           ))}
         </span>
         <div className="max-w-full grow basis-16 text-[13px] leading-tight font-semibold break-words text-foreground">
-          {t('bots.section.emptyCardTitle', 'Your AI teammate')}
+          {t('bots.section.emptyCardTitle', 'Make a bot to hand work to')}
         </div>
       </div>
       <div className="mt-2.5 flex flex-wrap gap-1.5">

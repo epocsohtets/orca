@@ -63,6 +63,20 @@ export function createUiViewActions(set: UISliceSet, get: UISliceGet): Partial<U
         worktreeNavHistoryIndex: rewindHistoryIndexPastView(state, 'automations'),
         automationsPageNextVisitMode: 'push'
       })),
+    openMeetingsPage: () =>
+      set((state) => ({
+        activeView: 'meetings',
+        previousViewBeforeMeetings:
+          state.activeView === 'meetings' ? state.previousViewBeforeMeetings : state.activeView
+      })),
+    closeMeetingsPage: () => set((state) => ({ activeView: state.previousViewBeforeMeetings })),
+    openMeetingBotPage: () =>
+      set((state) => ({
+        activeView: 'meetingBot',
+        previousViewBeforeMeetingBot:
+          state.activeView === 'meetingBot' ? state.previousViewBeforeMeetingBot : state.activeView
+      })),
+    closeMeetingBotPage: () => set((state) => ({ activeView: state.previousViewBeforeMeetingBot })),
     openSpacePage: () => {
       get().recordFeatureInteraction?.('workspace-cleanup')
       if (typeof window !== 'undefined' && window.api?.workspaceSpace?.openWindow) {
@@ -136,6 +150,16 @@ export function createUiViewActions(set: UISliceSet, get: UISliceGet): Partial<U
     closeMobilePage: () =>
       set((state) => ({
         activeView: state.previousViewBeforeMobile
+      })),
+    openHomePage: () =>
+      set((state) => ({
+        activeView: 'home',
+        previousViewBeforeHome:
+          state.activeView === 'home' ? state.previousViewBeforeHome : state.activeView
+      })),
+    closeHomePage: () =>
+      set((state) => ({
+        activeView: state.previousViewBeforeHome
       })),
     setNewWorkspaceDraft: (draft) => set({ newWorkspaceDraft: draft }),
     clearNewWorkspaceDraft: () => set({ newWorkspaceDraft: null })

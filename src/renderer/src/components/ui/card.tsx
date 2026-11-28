@@ -11,6 +11,8 @@ const cardVariants = cva(
         default: 'gap-6 py-6',
         sm: 'gap-3 py-2.5 shadow-xs',
         list: 'gap-6 py-1',
+        // A board card: its 44px header sits at the top edge; the header and body own their padding.
+        board: 'gap-0 py-0 shadow-xs',
         // A bottom-right notification card: content owns its padding; notice surface, edge and shadow.
         notice: 'gap-0 border-(--notice-border) bg-(--notice-surface) py-0 shadow-notice'
       }

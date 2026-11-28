@@ -1,6 +1,7 @@
 export type StepNumber = 1 | 2 | 3 | 4 | 5
 export type StepId =
   | 'work_style'
+  | 'inax'
   | 'agent_surface'
   | 'agent'
   | 'theme'
@@ -17,6 +18,8 @@ export const STEPS: readonly {
   valueKind: 'agent' | 'theme' | 'integrations' | 'windows_terminal' | 'notifications'
 }[] = [
   { id: 'work_style', stepNumber: 1, valueKind: 'agent' },
+  // Only for people who work without code; it is their last page.
+  { id: 'inax', stepNumber: 1, valueKind: 'agent' },
   { id: 'agent_surface', stepNumber: 1, valueKind: 'agent' },
   { id: 'agent', stepNumber: 1, valueKind: 'agent' },
   { id: 'theme', stepNumber: 2, valueKind: 'theme' },

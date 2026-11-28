@@ -96,7 +96,9 @@ export function MyAppsPane({ settings, updateSettings }: MyAppsPaneProps): React
                 placeholder={t('settings.myApps.searchPlaceholder', 'Search installed apps…')}
               />
               <CommandList className="max-h-72">
-                <CommandEmpty>{t('settings.myApps.noMatches', 'No apps found.')}</CommandEmpty>
+                <CommandEmpty>
+                  {t('settings.myApps.noMatches', 'No app has that name. Check the name.')}
+                </CommandEmpty>
                 <CommandGroup>
                   {available.map((app) => (
                     <CommandItem
@@ -126,7 +128,10 @@ export function MyAppsPane({ settings, updateSettings }: MyAppsPaneProps): React
             {t('settings.myApps.emptyTitle', 'No apps registered')}
           </p>
           <p className="text-xs text-muted-foreground">
-            {t('settings.myApps.emptyDescription', 'Add the apps you work in to watch them.')}
+            {t(
+              'settings.myApps.emptyDescription',
+              'Add the apps you work in and their time collects in My day.'
+            )}
           </p>
         </div>
       ) : (
@@ -146,7 +151,7 @@ export function MyAppsPane({ settings, updateSettings }: MyAppsPaneProps): React
                   ) : (
                     <Badge variant="outline">
                       <span className="size-1.5 rounded-full bg-status-success" />
-                      {t('settings.myApps.watching', 'Watching')}
+                      {t('settings.myApps.watching', 'Recording time')}
                     </Badge>
                   )}
                 </div>
@@ -156,7 +161,7 @@ export function MyAppsPane({ settings, updateSettings }: MyAppsPaneProps): React
             <div className="flex shrink-0 items-center gap-2">
               <Switch
                 checked={!app.paused}
-                aria-label={t('settings.myApps.watchToggle', 'Watch {{name}}', {
+                aria-label={t('settings.myApps.watchToggle', 'Record time in {{name}}', {
                   name: app.name
                 })}
                 onCheckedChange={(checked) =>

@@ -133,12 +133,15 @@ export type UiViewHistory =
   | 'terminal'
   | 'settings'
   | 'tasks'
+  | 'meetings'
+  | 'meetingBot'
   | 'activity'
   | 'automations'
   | 'space'
   | 'skills'
   | 'artifacts'
   | 'mobile'
+  | 'home'
 
 export type UISliceCore = {
   sidebarOpen: boolean
@@ -172,12 +175,15 @@ export type UISliceCore = {
   clearManuallyUnreadTurns: (paneKeys: string[]) => void
   activeView: TopLevelView
   previousViewBeforeTasks: Exclude<UiViewHistory, 'tasks'>
+  previousViewBeforeMeetings: Exclude<UiViewHistory, 'meetings'>
+  previousViewBeforeMeetingBot: Exclude<UiViewHistory, 'meetingBot'>
   previousViewBeforeSettings: Exclude<UiViewHistory, 'settings'>
   previousViewBeforeActivity: Exclude<UiViewHistory, 'activity'>
   previousViewBeforeAutomations: Exclude<UiViewHistory, 'automations'>
   previousViewBeforeSpace: Exclude<UiViewHistory, 'space'>
   previousViewBeforeSkills: Exclude<UiViewHistory, 'skills'>
   previousViewBeforeMobile: Exclude<UiViewHistory, 'mobile'>
+  previousViewBeforeHome: Exclude<UiViewHistory, 'home'>
   previousViewBeforeArtifacts: Exclude<UiViewHistory, 'artifacts'>
   setActiveView: (view: UISliceCore['activeView']) => void
   taskPageData: TaskPageData
@@ -193,6 +199,10 @@ export type UISliceCore = {
     options?: { recordTasksInteraction?: boolean }
   ) => void
   closeTaskPage: () => void
+  openMeetingsPage: () => void
+  closeMeetingsPage: () => void
+  openMeetingBotPage: () => void
+  closeMeetingBotPage: () => void
   openActivityPage: () => void
   closeActivityPage: () => void
   selectedAutomationId: string | null
@@ -232,6 +242,8 @@ export type UISliceCore = {
   closeArtifactsPage: () => void
   openMobilePage: () => void
   closeMobilePage: () => void
+  openHomePage: () => void
+  closeHomePage: () => void
   setNewWorkspaceDraft: (draft: NonNullable<UISliceCore['newWorkspaceDraft']>) => void
   clearNewWorkspaceDraft: () => void
   pendingRevealWorktree: PendingSidebarWorktreeReveal | null

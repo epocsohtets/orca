@@ -5,12 +5,15 @@ const TOP_LEVEL_VIEW_LOOKUP: Record<TopLevelView, true> = {
   terminal: true,
   settings: true,
   tasks: true,
+  meetings: true,
+  meetingBot: true,
   activity: true,
   automations: true,
   space: true,
   skills: true,
   artifacts: true,
-  mobile: true
+  mobile: true,
+  home: true
 }
 
 export function isTopLevelView(value: unknown): value is TopLevelView {

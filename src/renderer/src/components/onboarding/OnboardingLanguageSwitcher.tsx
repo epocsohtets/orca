@@ -1,12 +1,13 @@
 import { useRef } from 'react'
 import { Languages } from 'lucide-react'
+import { useTranslate } from '@/i18n/use-translate'
 import { Button } from '@/components/ui/button'
 import { LanguagePickerDialog } from '@/components/languages/LanguagePickerDialog'
 import { currentFocusTarget, firstConnected } from '@/components/languages/focus-return'
 import type { OnboardingLanguageOffer } from './use-onboarding-language-offer'
 
 /**
- * Header language control: always the English "Language" escape hatch; with an offer it also
+ * Header language control: the language mark and the word in the current language; with an offer it also
  * names the offered language in its own script, e.g. "Language · italiano".
  */
 export function OnboardingLanguageSwitcherButton({
@@ -18,13 +19,14 @@ export function OnboardingLanguageSwitcherButton({
   onOpen: () => void
   buttonRef?: React.Ref<HTMLButtonElement>
 }): React.JSX.Element {
+  const t = useTranslate()
   return (
-    // Why English literal: the escape hatch for anyone who can't read the current UI.
-    <Button ref={buttonRef} variant="ghost" size="sm" lang="en" onClick={onOpen}>
+    // Why the icon: it is the way out for anyone who cannot read the current language.
+    <Button ref={buttonRef} variant="ghost" size="sm" onClick={onOpen}>
       <Languages />
       {/* Why a span: Button is flex with a gap, which would split the label's text runs. */}
       <span>
-        Language
+        {t('settings.appearance.language.title', 'Language')}
         {offer ? (
           <>
             {' · '}

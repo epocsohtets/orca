@@ -53,7 +53,8 @@ export function renderTabBarSurface(
     itemActions,
     surfaceRef,
     bot,
-    botGroup
+    botGroup,
+    hideCreate
   }: {
     props: TabBarProps
     runtime: TabBarRuntimeModel
@@ -70,6 +71,7 @@ export function renderTabBarSurface(
     bot: Bot | null
     /** Set in a group's home, where the menu leads with a new thread. */
     botGroup: BotGroup | null
+    hideCreate: boolean
   },
   t: Translate = translate
 ): React.JSX.Element {
@@ -259,7 +261,8 @@ export function renderTabBarSurface(
         <DropdownMenuTrigger asChild>
           {/* Why: "+" hides whole rather than clip, so Tab never lands on it (rendered-tab-strip.ts). */}
           <button
-            className={`ml-2 my-auto flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent/50 hover:text-foreground ${newTabButtonHideClassName(
+            // A task's workspace of someone who left Code out holds its conversation; no agent or terminal starts there.
+            className={`ml-2 my-auto ${hideCreate ? 'hidden' : 'flex'} h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent/50 hover:text-foreground ${newTabButtonHideClassName(
               strip
             )}`}
             style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}

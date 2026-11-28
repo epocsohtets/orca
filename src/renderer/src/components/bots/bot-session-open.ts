@@ -2,6 +2,7 @@ import { activateAiVaultStructuredSession } from '@/lib/agent-session/open/activ
 import { cancelPendingBotThreadOpen } from '@/lib/agent-session/open/bot-thread-open-lifecycle'
 import { targetBotChatLatest } from '@/lib/agent-session/open/bot-link-item-target'
 import { callBotRpc } from '@/lib/bot-hosts'
+import { localBotItems } from '@/lib/local-bot-items'
 import { selectFocusedChatTab } from '@/lib/focused-chat-workers'
 import { useAppStore } from '@/store'
 import { requestNativeChatComposerFocus } from '@/components/native-chat/composer/focus/native-chat-composer-focus-intent'
@@ -36,6 +37,11 @@ function shownChatTab(bot: Bot, sessionId: string): { id: string } | null {
 /** Opens one of the bot's chats as a focused tab; a thread's or a run's gets its tab here. The chat
  *  already on screen goes to its newest output, its composer focused with the usual glow. */
 export function openBotSession(bot: Bot, sessionId: string): void {
+  const local = localBotItems(bot.id)
+  if (local) {
+    local.openChat(sessionId)
+    return
+  }
   const shown = shownChatTab(bot, sessionId)
   if (shown) {
     cancelPendingBotThreadOpen()

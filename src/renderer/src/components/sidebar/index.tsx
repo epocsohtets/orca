@@ -33,7 +33,7 @@ import { LocalGitToolchainScanBanner } from '../repo/toolchain/LocalGitToolchain
 import { SeveredTerminalDaemonBanner } from '../maintenance/terminal-daemon/SeveredTerminalDaemonBanner'
 import { StalledTerminalDaemonBanner } from '../maintenance/terminal-daemon/StalledTerminalDaemonBanner'
 import { SidebarBotsSection } from '@/components/bots/SidebarBotsSection'
-import { SidebarBotsSplit, SidebarProjectsListSlot } from './SidebarBotsSplit'
+import { SidebarBotsSplit, SidebarProjectsListSlot, useShowsProjects } from './SidebarBotsSplit'
 import { SidebarChatSection } from '@/components/sidebar-chat/SidebarChatSection'
 import { SidebarPinnedSection } from '@/components/sidebar-chat/SidebarPinnedSection'
 import { SidebarContentViewport } from './SidebarContentViewport'
@@ -119,7 +119,7 @@ function Sidebar({
   const sidebarWidth = useAppStore((s) => s.sidebarWidth)
   const setSidebarWidth = useAppStore((s) => s.setSidebarWidth)
   const repos = useAppStore((s) => s.repos)
-  const botsEnabled = useBotsEnabled()
+  const [botsEnabled, showsProjects] = [useBotsEnabled(), useShowsProjects()]
   const startupWorktreeRefreshCompleted = useAppStore((s) => s.startupWorktreeRefreshCompleted)
   const settings = useAppStore((s) => s.settings)
   const sidebarBody = useAppStore((s) => s.sidebarBody ?? 'workspaces')
@@ -301,7 +301,7 @@ function Sidebar({
     </React.Fragment>
   )
 
-  const sections = [botsSection, chatSection, projectsSection]
+  const sections = [botsSection, chatSection, ...(showsProjects ? [projectsSection] : [])]
   return (
     <TooltipProvider>
       {/* Why: the handle lives outside the clipped sidebar so its outer half isn't cut off. */}

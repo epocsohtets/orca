@@ -1,5 +1,15 @@
 import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { BookOpen, CalendarClock, Files, Layers, List, Smartphone } from 'lucide-react'
+import {
+  BookOpen,
+  CalendarClock,
+  Files,
+  House,
+  Layers,
+  List,
+  Smartphone,
+  SquareKanban
+} from 'lucide-react'
+import { hidesDeveloperChrome } from '../../../../shared/settings/work-styles'
 import { useAppStore } from '@/store/index'
 import { useTranslate } from '@/i18n/use-translate'
 import { useHelpMenuController } from '@/components/sidebar/chrome/help-menu-controller'
@@ -36,6 +46,7 @@ import {
   type AppRailDestinationId
 } from './app-rail-destinations'
 import { getTitlebarSidebarToggle } from '@/app-shell/chrome/titlebar-sidebar-toggle-ref'
+import { MeetingsRailIcon } from '@/components/meetings/meetings-rail-icon'
 
 /** Icon-only app navigation below the left titlebar; one tab stop, arrow keys move within it. */
 export function AppRail({
@@ -48,6 +59,8 @@ export function AppRail({
   const t = useTranslate()
   const workspacesActive = useAppStore(isWorkspacesRailItemActive)
   const settingsActive = useAppStore((s) => s.activeView === 'settings')
+  const homeActive = useAppStore((s) => s.activeView === 'home')
+  const hideDeveloper = useAppStore((s) => hidesDeveloperChrome(s.settings))
   const shownDestinationsKey = useAppStore(selectShownRailDestinationsKey)
   const currentDestination = useAppStore(selectCurrentRailDestination)
   const listShowsWorkspaces = useAppStore((s) => (s.sidebarBody ?? 'workspaces') === 'workspaces')
@@ -56,10 +69,10 @@ export function AppRail({
   // The account menu's Milestones row and ring read the app-wide setup reading; the rail runs no setup checks itself.
   const milestones = useMemo(
     () =>
-      setupProgress?.ready && setupProgress.done < setupProgress.total
+      !hideDeveloper && setupProgress?.ready && setupProgress.done < setupProgress.total
         ? { done: setupProgress.done, total: setupProgress.total }
         : null,
-    [setupProgress]
+    [hideDeveloper, setupProgress]
   )
   // Milestones sits at the top of the account menu, so Help's own list leaves it out; the menu has its own groups, so
   // Help's rows come grouped. The rail owns the controller so its feedback dialog outlives the account menu closing.
@@ -96,28 +109,32 @@ export function AppRail({
   )
   // Hidden destinations are left out before partitioning; hidden is never folded.
   const shownDestinations = shownRailDestinationsFromKey(shownDestinationsKey)
-  const partition = partitionAppRail(shownDestinations.length, capacity)
+  // Home is one more fixed slot above Workspaces.
+  const partition = partitionAppRail(shownDestinations.length, capacity - 1)
   const railDestinations = shownDestinations.slice(0, partition.shownDestinations)
   const foldedDestinations = shownDestinations.slice(partition.shownDestinations)
   const destinationActive = (id: AppRailDestinationId): boolean => id === currentDestination
 
   const renderedItems: AppRailItemId[] = [
-    'workspaces',
+    'home',
+    ...(hideDeveloper ? [] : (['workspaces'] as const)),
     ...railDestinations,
     partition.more ? 'more' : 'customize',
     'account'
   ]
   const shownCurrentDestination =
     currentDestination && shownDestinations.includes(currentDestination) ? currentDestination : null
-  const activeItem: AppRailItemId | null = workspacesActive
-    ? 'workspaces'
-    : shownCurrentDestination
-      ? railDestinations.includes(shownCurrentDestination)
-        ? shownCurrentDestination
-        : 'more'
-      : settingsActive
-        ? 'account'
-        : null
+  const activeItem: AppRailItemId | null = homeActive
+    ? 'home'
+    : workspacesActive
+      ? 'workspaces'
+      : shownCurrentDestination
+        ? railDestinations.includes(shownCurrentDestination)
+          ? shownCurrentDestination
+          : 'more'
+        : settingsActive
+          ? 'account'
+          : null
   const [lastFocusedItem, setLastFocusedItem] = useState<AppRailItemId | null>(null)
   const tabStopItem =
     lastFocusedItem && renderedItems.includes(lastFocusedItem)
@@ -186,11 +203,16 @@ export function AppRail({
   // The toolbar inside the landmark gets its own name so screen readers don't hear "App navigation" twice.
   const toolsLabel = t('appRail.toolsLabel', 'App tools')
   const workspacesLabel = t('appRail.workspaces', 'Workspaces')
+  const homeLabel = t('appRail.home', 'Home')
   // The list rows' labels and icons, so the rail reads the same.
   const destinationLabel = (id: AppRailDestinationId): string => {
     switch (id) {
       case 'tasks':
-        return t('auto.components.sidebar.SidebarNav.fee535205b', 'Tasks')
+        return hideDeveloper
+          ? t('appRail.work', 'Work')
+          : t('auto.components.sidebar.SidebarNav.fee535205b', 'Tasks')
+      case 'meetings':
+        return t('meetings.title', 'Meetings')
       case 'automations':
         return t('auto.components.sidebar.SidebarNav.f323383e9a', 'Automations')
       case 'artifacts':
@@ -210,7 +232,9 @@ export function AppRail({
     const props = { size, strokeWidth, className, 'aria-hidden': true }
     switch (id) {
       case 'tasks':
-        return <List {...props} />
+        return hideDeveloper ? <SquareKanban {...props} /> : <List {...props} />
+      case 'meetings':
+        return <MeetingsRailIcon {...props} />
       case 'automations':
         return <CalendarClock {...props} />
       case 'artifacts':
@@ -284,27 +308,52 @@ export function AppRail({
         onFocus={handleFocus}
       >
         <div className="flex flex-col items-center gap-2.5">
-          <RailItem tooltip={workspacesLabel}>
+          <RailItem tooltip={homeLabel}>
             <AppRailButton
-              itemId="workspaces"
+              itemId="home"
               icon={
-                <Layers
+                <House
                   size={APP_RAIL_ICON_SIZE}
                   strokeWidth={APP_RAIL_ICON_STROKE_WIDTH}
                   aria-hidden
                 />
               }
-              label={workspacesLabel}
-              active={workspacesActive}
-              // Expansion describes only the content actually in the list column.
-              aria-expanded={listShowsWorkspaces ? listVisible : undefined}
-              aria-controls={
-                listShowsWorkspaces && listRegionPresent ? WORKSPACE_LIST_REGION_ID : undefined
+              label={homeLabel}
+              active={homeActive}
+              tabStop={tabStopItem === 'home'}
+              onClick={() =>
+                navigateFromRail(() => {
+                  if (useAppStore.getState().activeView === 'settings') {
+                    useAppStore.getState().closeSettingsPage()
+                  }
+                  useAppStore.getState().openHomePage()
+                })
               }
-              tabStop={tabStopItem === 'workspaces'}
-              onClick={() => navigateFromRail(() => activateWorkspacesRailItem(useAppStore))}
             />
           </RailItem>
+          {hideDeveloper ? null : (
+            <RailItem tooltip={workspacesLabel}>
+              <AppRailButton
+                itemId="workspaces"
+                icon={
+                  <Layers
+                    size={APP_RAIL_ICON_SIZE}
+                    strokeWidth={APP_RAIL_ICON_STROKE_WIDTH}
+                    aria-hidden
+                  />
+                }
+                label={workspacesLabel}
+                active={workspacesActive}
+                // Expansion describes only the content actually in the list column.
+                aria-expanded={listShowsWorkspaces ? listVisible : undefined}
+                aria-controls={
+                  listShowsWorkspaces && listRegionPresent ? WORKSPACE_LIST_REGION_ID : undefined
+                }
+                tabStop={tabStopItem === 'workspaces'}
+                onClick={() => navigateFromRail(() => activateWorkspacesRailItem(useAppStore))}
+              />
+            </RailItem>
+          )}
           {railDestinations.map((id) => (
             <RailItem key={id} tooltip={destinationLabel(id)}>
               <AppRailButton

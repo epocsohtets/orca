@@ -15,6 +15,8 @@ import { useIntegrationProviderStatusRefresh } from '../../../runtime/hosts/obse
 import { SettingsGroup } from '../section-layout/SettingsGroup'
 import { INTEGRATION_SETTING_TARGET_IDS } from './integrations-search'
 import { useTranslate } from '@/i18n/use-translate'
+import { useAppStore } from '@/store'
+import { worksWithoutCode } from '../../../../../shared/settings/work-styles'
 
 // Flat presentation turns each provider into one row: -mx-4 cancels its inset, and inner rules are dropped so only rows divide.
 function ProviderRow({
@@ -35,51 +37,58 @@ function ProviderRow({
 export function IntegrationsPane(): React.JSX.Element {
   const t = useTranslate()
   useIntegrationProviderStatusRefresh()
+  const withoutCode = useAppStore((state) => worksWithoutCode(state.settings))
+  const reviewProviders = (
+    <SettingsGroup
+      title={t('auto.components.settings.IntegrationsPane.298c65ecac', 'Review providers')}
+      description={t(
+        'auto.components.settings.IntegrationsPane.1683acbac4',
+        'Connect the source hosts Orca can use for pull requests, merge requests, checks, and review status.'
+      )}
+    >
+      <ProviderRow id={INTEGRATION_SETTING_TARGET_IDS.github}>
+        <GitHubIntegrationCard />
+      </ProviderRow>
+      <ProviderRow id={INTEGRATION_SETTING_TARGET_IDS.gitlab}>
+        <GitLabIntegrationCard />
+      </ProviderRow>
+      <ProviderRow id={INTEGRATION_SETTING_TARGET_IDS.bitbucket}>
+        <BitbucketIntegrationCard />
+      </ProviderRow>
+      <ProviderRow id={INTEGRATION_SETTING_TARGET_IDS.azuredevops}>
+        <AzureDevOpsIntegrationCard />
+      </ProviderRow>
+      <ProviderRow id={INTEGRATION_SETTING_TARGET_IDS.gitea}>
+        <GiteaIntegrationCard />
+      </ProviderRow>
+    </SettingsGroup>
+  )
+  const taskProviders = (
+    <SettingsGroup
+      title={t('auto.components.settings.IntegrationsPane.70e885705b', 'Task providers')}
+      description={t(
+        'auto.components.settings.IntegrationsPane.3ba07f933b',
+        'Connect issue trackers Orca can use to browse tasks and start workspaces with linked context.'
+      )}
+    >
+      <ProviderRow>
+        <InaxIntegrationCard />
+      </ProviderRow>
+      <ProviderRow>
+        <LinearIntegrationCard />
+      </ProviderRow>
+      <ProviderRow>
+        <JiraIntegrationCard />
+      </ProviderRow>
+    </SettingsGroup>
+  )
 
   return (
     <IntegrationCardPresentationProvider value="setup-guide">
       <div className="space-y-8">
-        <SettingsGroup
-          title={t('auto.components.settings.IntegrationsPane.298c65ecac', 'Review providers')}
-          description={t(
-            'auto.components.settings.IntegrationsPane.1683acbac4',
-            'Connect the source hosts Orca can use for pull requests, merge requests, checks, and review status.'
-          )}
-        >
-          <ProviderRow id={INTEGRATION_SETTING_TARGET_IDS.github}>
-            <GitHubIntegrationCard />
-          </ProviderRow>
-          <ProviderRow id={INTEGRATION_SETTING_TARGET_IDS.gitlab}>
-            <GitLabIntegrationCard />
-          </ProviderRow>
-          <ProviderRow id={INTEGRATION_SETTING_TARGET_IDS.bitbucket}>
-            <BitbucketIntegrationCard />
-          </ProviderRow>
-          <ProviderRow id={INTEGRATION_SETTING_TARGET_IDS.azuredevops}>
-            <AzureDevOpsIntegrationCard />
-          </ProviderRow>
-          <ProviderRow id={INTEGRATION_SETTING_TARGET_IDS.gitea}>
-            <GiteaIntegrationCard />
-          </ProviderRow>
-        </SettingsGroup>
-
-        <SettingsGroup
-          title={t('auto.components.settings.IntegrationsPane.70e885705b', 'Task providers')}
-          description={t(
-            'auto.components.settings.IntegrationsPane.3ba07f933b',
-            'Connect issue trackers Orca can use to browse tasks and start workspaces with linked context.'
-          )}
-        >
-          <ProviderRow>
-            <InaxIntegrationCard />
-          </ProviderRow>
-          <ProviderRow>
-            <LinearIntegrationCard />
-          </ProviderRow>
-          <ProviderRow>
-            <JiraIntegrationCard />
-          </ProviderRow>
-        </SettingsGroup>
+        {/* Someone who works without code looks for their task account first. */}
+        {withoutCode ? taskProviders : reviewProviders}
+        {withoutCode ? reviewProviders : taskProviders}
       </div>
     </IntegrationCardPresentationProvider>
   )

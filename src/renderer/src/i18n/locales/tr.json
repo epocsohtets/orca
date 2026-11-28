@@ -16918,8 +16918,7 @@
           "f396db9f20": "Kendi evinizdeymiş gibi hissettirin",
           "198b148b3c": "Varsayılan ajanınızı seçin",
           "windowsTerminalTitle": "Windows terminal varsayılanlarını ayarla",
-          "windowsTerminalSubtitle": "Yeni bölmeler için varsayılan kabuğu ve terminaldeki sağ tık davranışını seçin.",
-          "stepOfTotal": "{{current}} / {{total}}"
+          "windowsTerminalSubtitle": "Yeni bölmeler için varsayılan kabuğu ve terminaldeki sağ tık davranışını seçin."
         },
         "OnboardingFooter": {
           "ba58547306": "Geri",
@@ -28431,8 +28430,7 @@
         "showEarlier": "Öncekileri göster",
         "place": "{{index}} / {{total}}",
         "deleted": "Bu öğe silindi.",
-        "loading": "Öğe yükleniyor…",
-        "subWhere": "Öğe {{number}} · {{chat}}"
+        "loading": "Öğe yükleniyor…"
       },
       "activity": {
         "linked": "{{links}} bağlantılarını bağladı",
@@ -28445,7 +28443,6 @@
         "made": "bu öğeyi ekledi",
         "madeNeedsYou": "bu öğeyi sizden işlem bekleyenlere ekledi",
         "moved": "bunu şuraya taşıdı",
-        "noComments": "Henüz yorum yok.",
         "notSent": "Gönderilmedi.",
         "retry": "Yeniden dene",
         "discard": "Vazgeç",

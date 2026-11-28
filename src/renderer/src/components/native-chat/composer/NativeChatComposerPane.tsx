@@ -48,6 +48,7 @@ export const NativeChatComposerPane = forwardRef<ComposerHandle, C.NativeChatCom
       agent,
       canSend = true,
       unavailableHint,
+      plainPlaceholder,
       isWorking = false,
       isStopping = false,
       afterStop,
@@ -374,7 +375,7 @@ export const NativeChatComposerPane = forwardRef<ComposerHandle, C.NativeChatCom
             hasPty={hasPty}
             canSend={canSend}
             placeholderHint={unavailableHint}
-            idleHint={afterStop ? undefined : mentions.hint}
+            idleHint={afterStop ? undefined : (mentions.hint ?? plainPlaceholder)}
             autocomplete={autocomplete}
             mentionFiles={mentions.listed}
             activeSuggestion={mentions.activeIndex ?? activeSuggestion}

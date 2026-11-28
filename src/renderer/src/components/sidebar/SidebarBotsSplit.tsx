@@ -4,6 +4,7 @@ import { useSidebarResize } from '@/hooks/useSidebarResize'
 import { cn } from '@/lib/class-names'
 import { useTranslate } from '@/i18n/use-translate'
 import { BOTS_GROUP_KEY } from '../../../../shared/sidebar-list/sections/group-keys'
+import { hidesDeveloperChrome } from '../../../../shared/settings/work-styles'
 import {
   SIDEBAR_BOTS_MIN_HEIGHT,
   SIDEBAR_PROJECTS_MIN_LIST_HEIGHT,
@@ -184,6 +185,8 @@ export function SidebarBotsSplit({
         projectsFirst ? 'scroll-mt-1 border-t' : 'scroll-mb-1 border-b',
         '[[data-sidebar-content-viewport]>&]:-mr-1 [[data-sidebar-content-viewport]>&]:pr-1',
         'has-[[data-bot-sidebar-search=single-row]]:min-h-34 has-[[data-bot-sidebar-search=multiple-rows]]:min-h-47',
+        // The card that makes the first bot is never cut: the list below gives up its height first.
+        'has-[[data-sidebar-bots-empty]]:shrink-0',
         SPLIT_SCROLL_GUTTER,
         fillsSidebar ? 'flex-1' : 'max-h-[40%]'
       )}
@@ -249,4 +252,9 @@ export function SidebarBotsSplit({
       )}
     </div>
   )
+}
+
+/** A project row opens a terminal workspace, so the list is not shown to someone who left Code out. */
+export function useShowsProjects(): boolean {
+  return useAppStore((s) => !hidesDeveloperChrome(s.settings))
 }

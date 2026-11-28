@@ -1,4 +1,5 @@
 import type { GlobalSettings } from '../../../../shared/settings/global-settings-types'
+import { hidesDeveloperChrome } from '../../../../shared/settings/work-styles'
 import type { UISlice } from '@/store/slices/ui/ui-slice-contract'
 
 /** Matches the right sidebar's side activity bar. */
@@ -17,9 +18,10 @@ export function selectAppRailWidth(state: AppRailSettingsState): number {
   return selectAppRailVisible(state) ? APP_RAIL_WIDTH : 0
 }
 
-/** Pages that live on the rail below Workspaces, in this order. With the rail on, each fills the page and hides the list. */
+/** Pages that live on the rail below Workspaces, in this order. With the rail on, each fills the page and hides the list (not for someone who left Code out). */
 export const APP_RAIL_DESTINATION_IDS = [
   'tasks',
+  'meetings',
   'automations',
   'artifacts',
   'skills',
@@ -27,12 +29,17 @@ export const APP_RAIL_DESTINATION_IDS = [
 ] as const
 export type AppRailDestinationId = (typeof APP_RAIL_DESTINATION_IDS)[number]
 
-type AppRailPageState = AppRailSettingsState & Pick<UISlice, 'activeView'>
+type AppRailPageState = Pick<UISlice, 'activeView'> & {
+  settings: Pick<GlobalSettings, 'experimentalAppRail' | 'workStyles' | 'showAllSettings'> | null
+}
 
 /** A rail destination is open with the rail on: the page fills the width and the workspace list body collapses. */
 export function selectRailPageHidesWorkspaceList(state: AppRailPageState): boolean {
   return (
-    selectAppRailVisible(state) && APP_RAIL_DESTINATION_IDS.some((id) => id === state.activeView)
+    selectAppRailVisible(state) &&
+    // Without Code the list holds Chat, and there is no Workspaces page to show it on: it stays beside every page.
+    !hidesDeveloperChrome(state.settings) &&
+    (state.activeView === 'home' || APP_RAIL_DESTINATION_IDS.some((id) => id === state.activeView))
   )
 }
 

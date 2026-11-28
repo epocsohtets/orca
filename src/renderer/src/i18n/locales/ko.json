@@ -477,7 +477,7 @@
       },
       "activitySuggestions": {
         "title": "활동 기반 제안",
-        "description": "내장 브라우저에서 연 페이지(시간, 쿼리를 뺀 주소, 제목)를 기록하고, 반복하는 웹 작업을 에이전트에게 맡기도록 제안합니다. 기록은 이 기기의 메모리에만 있습니다.",
+        "description": "이 앱의 브라우저에서 연 페이지의 주소, 제목, 시간을 기록하고, 자주 반복하는 일을 에이전트에게 맡기도록 제안합니다. 기록은 이 컴퓨터에만 있습니다.",
         "searchKeywords": {
           "activity": "활동",
           "suggestions": "제안",
@@ -1273,16 +1273,16 @@
       "add": "앱 추가",
       "registered": "등록한 앱",
       "searchPlaceholder": "설치된 앱 검색…",
-      "noMatches": "앱을 찾을 수 없습니다.",
+      "noMatches": "그 이름의 앱이 없습니다. 이름을 다시 입력하세요.",
       "emptyTitle": "등록한 앱이 없습니다",
-      "emptyDescription": "작업하는 앱을 추가하면 Orca가 지켜봅니다.",
+      "emptyDescription": "업무에 쓰는 앱을 추가하면 사용 시간이 “내 하루”에 모입니다.",
       "paused": "일시 중지됨",
-      "watching": "지켜보는 중",
-      "watchToggle": "{{name}} 지켜보기",
+      "watching": "기록 중",
+      "watchToggle": "{{name}} 사용 시간 기록",
       "remove": "제거",
       "title": "내 앱",
-      "description": "작업하는 앱입니다. 등록한 앱을 Orca가 지켜봅니다.",
-      "removeTitle": "{{name}}을(를) 제거하시겠습니까?",
+      "description": "업무에 쓰는 앱입니다. 등록한 앱의 사용 시간을 기록합니다.",
+      "removeTitle": "{{name}} 앱을 제거할까요?",
       "removeDescription": "등록한 앱에서 이 앱을 제거합니다. 앱은 이 Mac에 그대로 설치되어 있습니다."
     }
   },
@@ -1290,7 +1290,7 @@
     "checkForUpdates": "업데이트 확인...",
     "settings": "설정",
     "exploreOrca": "Orca 둘러보기",
-    "gettingStarted": "Orca 시작하기",
+    "gettingStarted": "Orca 시작",
     "reportCrash": "크래시 신고...",
     "file": "파일",
     "exit": "종료",
@@ -2501,8 +2501,8 @@
         "2b043783ef": "연동",
         "2cd4ea75da": "워크스페이스 기본값, 앱 설정 및 유지 관리.",
         "13241992bd": "일반",
-        "724c440e72": "시작하기",
-        "0505d0df29": "Orca 시작하기",
+        "724c440e72": "시작",
+        "0505d0df29": "Orca 시작",
         "ea0b1bc7b8": "설정 가이드",
         "17005c73d4": "설정 및 마일스톤 단계에 대한 온보딩 체크리스트를 엽니다.",
         "ded9e9032f": "온보딩 체크리스트",
@@ -2686,7 +2686,7 @@
         "4d555d3796": "설명 수정",
         "9df4e74bdf": "저장",
         "a154ec5224": "GitHub에서 댓글 열기",
-        "bca8eb39ac": "댓글에 답장하기",
+        "bca8eb39ac": "답장",
         "68cb993d61": "해결됨",
         "10f4ff5be8": "답글이 게시되었습니다.",
         "745c9089ec": "저장소 경로가 없으면 답글을 달 수 없습니다.",
@@ -2740,7 +2740,7 @@
         "21860b58d0": "PR 닫기",
         "5932578f51": "병합하려면 등록된 로컬 저장소가 필요합니다.",
         "080d071d48": "@{{value0}}에 답장",
-        "86f809e2ce": "이 리뷰 스레드에 답변하기",
+        "86f809e2ce": "이 리뷰 스레드에 답변",
         "136542c9ba": ":L{{value0}}",
         "283699bc82": "답글을 게시하지 못했습니다.",
         "d1c0dad471": "-L{{value0}}",
@@ -3185,7 +3185,7 @@
         "da9aaa8bcf": "설명 수정",
         "4a337ac05f": "저장",
         "0ac19bb52e": "GitHub에서 댓글 열기",
-        "d6c6679de7": "댓글에 답장하기",
+        "d6c6679de7": "답장",
         "76b2a0ac5b": "해결됨",
         "11505c7a71": "답글이 게시되었습니다.",
         "6885c619e7": "저장소 경로가 없으면 답글을 달 수 없습니다.",
@@ -3229,7 +3229,7 @@
         "96d013ed28": "PR 닫기",
         "eca289e593": "병합하려면 등록된 로컬 저장소가 필요합니다.",
         "31a7b202f2": "@{{value0}}에 답장",
-        "408e634fbb": "이 리뷰 스레드에 답변하기",
+        "408e634fbb": "이 리뷰 스레드에 답변",
         "34b9f7c264": ":L{{value0}}",
         "5821aab360": "답글을 게시하지 못했습니다.",
         "1378d79e83": "나란히",
@@ -3617,11 +3617,7 @@
           "linearViewRestoreFailed": "저장된 Linear 보기를 복원하지 못했습니다."
         },
         "shownCount_one": "{{count}}개 표시됨",
-        "inaxSource": "inAX",
-        "inaxSampleData": "inAX · 샘플 데이터",
-        "inaxStatusOpen": "열림",
-        "inaxStatusInProgress": "진행 중",
-        "inaxSignedOut": "inAX로 로그인하여 작업을 확인하세요"
+        "inaxSource": "inAX"
       },
       "Terminal": {
         "73768427cf": "닫기",
@@ -7975,7 +7971,7 @@
         "guide": {
           "SetupGuideModal": {
             "3598a3ca0c": "Orca를 병렬 에이전트 작업에 유용하게 만드는 핵심 워크플로를 완료합니다.",
-            "48a9e5ef2d": "시작하기",
+            "48a9e5ef2d": "시작",
             "f3b5ffb2a6": "체크리스트 숨기기"
           },
           "SetupGuideProgressRing": {
@@ -11837,7 +11833,7 @@
               "080202facb": "모델",
               "7640ed9848": "음성",
               "56defcd6c3": "받아쓰기에 사용할 로컬 또는 클라우드 음성-텍스트 모델을 선택하세요.",
-              "931b1a9e53": "누르고 말하기",
+              "931b1a9e53": "누르는 동안 음성 입력",
               "064a9bd94a": "길게 누르기",
               "6fa48bcd41": "토글",
               "d86f5600da": "모드",
@@ -12954,9 +12950,7 @@
         },
         "inaxAccount": {
           "signIn": "inAX로 로그인",
-          "providerConnected": "계정 1개 연결됨",
-          "providerDescription": "inAX로 로그인하여 inAX 작업을 탐색하고 작업을 시작합니다.",
-          "providerCredentialCopy": "inAX 계정으로 로그인합니다. 이 미리보기는 샘플 계정을 사용합니다. 아무것도 전송하거나 저장하지 않으며, Orca를 다시 로드하면 로그인이 초기화됩니다."
+          "providerConnected": "계정 1개 연결됨"
         },
         "orcaAccount": {
           "connected": "연결됨",
@@ -16003,8 +15997,7 @@
           "f396db9f20": "집처럼 느껴지도록 하세요",
           "198b148b3c": "기본 에이전트를 선택하세요",
           "windowsTerminalTitle": "Windows 터미널 기본값 설정",
-          "windowsTerminalSubtitle": "새 창에서 사용할 기본 셸과 터미널에서 오른쪽 클릭이 동작하는 방식을 선택하세요.",
-          "stepOfTotal": "{{current}} / {{total}}"
+          "windowsTerminalSubtitle": "새 창에서 사용할 기본 셸과 터미널에서 오른쪽 클릭이 동작하는 방식을 선택하세요."
         },
         "OnboardingFooter": {
           "ba58547306": "뒤로",
@@ -16217,7 +16210,7 @@
           "94829abdb1": "페어링됨",
           "266c18c105": "Orca Mobile을 열어 중단한 부분부터 다시 시작하거나 다른 기기를 페어링하세요.",
           "5410d55d79": "Orca 모바일",
-          "10d27b4cba": "시작하기",
+          "10d27b4cba": "시작",
           "da1d5e5ed0": "지원 플랫폼",
           "ec0607bf66": "지원되는 모바일 플랫폼",
           "b4ccce5cb7": "휴대폰에서 Orca를 제어하세요. 자리를 비운 동안 에이전트를 확인하고, 변경 사항을 리뷰하고, 작업을 시작하세요.",
@@ -16672,7 +16665,7 @@
                       "42525ba8a4": "주요 저장소를 Orca로 가져와 폴더를 일일이 찾을 필요 없이 에이전트 작업을 시작하세요.",
                       "agentSkillsName": "에이전트에 Orca 스킬 제공",
                       "agentSkillsDescription": "에이전트가 Orca 브라우저를 조작하고, 컴퓨터를 제어하고, 여러 단계 작업을 조율하는 데 쓰는 스킬을 설치하세요.",
-                      "workOnTwoTasks": "두 작업을 동시에 진행하기"
+                      "workOnTwoTasks": "두 작업 동시 진행"
                     }
                   }
                 }
@@ -18025,7 +18018,7 @@
                   "workspace": {
                     "board": {
                       "plan": {
-                        "title": "보드에서 작업 계획하기",
+                        "title": "보드에서 작업 계획",
                         "body": "프로젝트별이 아니라 상태별로 워크스페이스를 보고 싶을 때 보드를 사용하세요."
                       },
                       "lanes": {
@@ -18039,7 +18032,7 @@
                         "body": "Orca는 각 작업을 기준 브랜치에서 만든 자체 워크트리로 분리합니다."
                       },
                       "name": {
-                        "title": "이름을 정하거나 기존 작업에서 시작하기",
+                        "title": "이름 지정 또는 기존 작업에서 시작",
                         "body": "연결된 작업에서 시작하면 짧은 이슈나 PR 이름을 사용합니다. 비워 두면 첫 에이전트 메시지에서 이름이 자동으로 지정됩니다."
                       },
                       "agent": {
@@ -18056,7 +18049,7 @@
                         "action": "터미널 분할"
                       },
                       "parallel": {
-                        "title": "다른 작업을 병렬로 시작하기",
+                        "title": "다른 작업 병렬 시작",
                         "body": "워크트리마다 자체 브랜치를 가지므로 병렬로 진행하는 작업이 서로 섞이지 않습니다."
                       }
                     }
@@ -18086,11 +18079,11 @@
                       "body": "페이지를 이동하지 않고 연결된 공급자와 프로젝트 필터를 전환하세요."
                     },
                     "filter": {
-                      "title": "필요한 작업만 필터링하기",
+                      "title": "필요한 작업만 필터링",
                       "body": "사전 설정과 검색으로 이슈, 리뷰, MR, 작업의 범위를 좁히세요."
                     },
                     "start": {
-                      "title": "작업 항목에서 시작하기",
+                      "title": "작업 항목에서 시작",
                       "body": "작업, 이슈, 리뷰, MR에서 시작 또는 열기를 눌러 해당 컨텍스트를 워크스페이스로 가져오세요."
                     }
                   },
@@ -18101,7 +18094,7 @@
                         "body": "이곳의 에이전트는 선택한 어떤 폴더에서도 실행됩니다. 서비스들의 상위 디렉터리를 지정하면 모든 저장소에서 한 번에 작업할 수 있습니다."
                       },
                       "scratchpad": {
-                        "title": "메모장처럼 사용하기",
+                        "title": "메모장처럼 사용",
                         "body": "집중하고 있는 워크트리를 어지럽히지 않고 에이전트, 임시 터미널, 노트, 브라우저 탭을 열 수 있습니다."
                       }
                     }
@@ -19575,7 +19568,7 @@
           "more": "더 많은 아티팩트 작업"
         },
         "ArtifactCollection": {
-          "loadMore": "더 로드하기",
+          "loadMore": "더 보기",
           "noMatches": "일치하는 항목 없음"
         },
         "ArtifactDetailHeader": {
@@ -19948,7 +19941,7 @@
       },
       "agent-workspace-trust-decision": {
         "trust-repository": "저장소 신뢰",
-        "let-agents-ask": "에이전트가 묻도록 하기",
+        "let-agents-ask": "에이전트가 묻도록 허용",
         "setting-title": "에이전트 폴더 신뢰",
         "setting-description": "이 저장소의 워크트리에서 Orca가 시작한 에이전트가 \"Do you trust this folder?\" 확인을 건너뛰고 프로젝트의 에이전트 설정과 훅을 바로 불러올지 정합니다.",
         "setting-global-off": "에이전트 설정에서 폴더 신뢰가 꺼져 있으므로 에이전트가 항상 확인을 요청합니다.",
@@ -20190,7 +20183,7 @@
       },
       "skipConfirmation": {
         "skip": "건너뛰기",
-        "keepGoing": "아니요, 계속하기"
+        "keepGoing": "아니요, 계속"
       },
       "theme": {
         "hints": {
@@ -20273,7 +20266,7 @@
         "preview": {
           "userMessage": "fetchUser에 재시도 추가",
           "agentMessage": "실패한 요청은 이제 최대 3번 다시 시도합니다.",
-          "composerPlaceholder": "후속 질문하기…"
+          "composerPlaceholder": "후속 질문…"
         }
       },
       "launchDemo": {
@@ -21406,7 +21399,7 @@
         "resumeSession": "세션 재개. 인수가 없으면 터미널에서 선택",
         "forkChat": "현재 채팅 포크",
         "forkMessage": "터미널에서 이전 메시지부터 포크",
-        "app": "Codex Desktop에서 계속하기",
+        "app": "Codex Desktop에서 계속",
         "planSwitch": "계획 모드로 전환",
         "planToggle": "계획 모드 전환",
         "goal": "목표 설정 또는 보기",
@@ -21723,10 +21716,10 @@
       "splitRight": "오른쪽으로 분할",
       "splitDown": "아래로 분할",
       "sideChat": {
-        "description": "이 채팅 옆의 포크에서 곁가지 질문하기",
+        "description": "이 채팅 옆에서 곁가지 질문",
         "argumentHint": "<question>",
         "pill": "사이드 채팅",
-        "placeholder": "곁가지 질문하기",
+        "placeholder": "곁가지 질문",
         "notReady": "사이드 채팅이 아직 준비되지 않았습니다. 잠시 후 다시 시도하세요.",
         "replyRunning": "이 응답이 끝나면 사용할 수 있습니다.",
         "noReply": "첫 응답 이후에 사용할 수 있습니다.",
@@ -22702,7 +22695,7 @@
         "composerSpellcheckCopy": "메시지 입력란에서 틀린 단어에 밑줄을 긋고 시스템 텍스트 대치를 적용합니다. 끄면 시스템 전체 설정은 바꾸지 않고 이곳에서만 둘 다 중지합니다.",
         "composerSpellcheckSearchSpelling": "맞춤법 검사",
         "composerSpellcheckSearchAutocorrect": "자동 고침",
-        "usageLimitContinueTitle": "사용 한도가 재설정되면 채팅을 자동으로 계속하기",
+        "usageLimitContinueTitle": "사용 한도가 재설정되면 채팅 자동 계속",
         "usageLimitContinueCopy": "한도가 재설정되면 Orca가 \"Continue where you left off.\"를 보냅니다. 재설정 시간을 알 수 있는 모든 채팅에 적용됩니다.",
         "usageLimitContinueSearchLimit": "사용 한도",
         "usageLimitContinueSearchReset": "재설정",
@@ -23063,7 +23056,7 @@
         },
         "search": {
           "cleanup": "정리",
-          "cleanUp": "정리하기",
+          "cleanUp": "정리",
           "delete": "삭제",
           "automatic": "자동",
           "pullRequest": "PR",
@@ -24363,7 +24356,7 @@
       "ageMinutes": "12분",
       "ageYesterday": "1일",
       "agentsInstruction": "에이전트도 검색할 수 있습니다. 에이전트에게 “로그인 시간 초과를 수정한 세션을 찾아줘”라고 요청해 보세요.",
-      "continueInBackground": "백그라운드에서 계속하기",
+      "continueInBackground": "백그라운드에서 계속",
       "demoHit1Age": "3일",
       "demoHit1Snippet": "[[로그인 시간 초과]]를 30초로 늘리고 토큰 새로고침에 재시도를 추가했습니다.",
       "demoHit1Title": "불안정한 인증 리디렉션 수정",
@@ -24400,7 +24393,7 @@
       "recent2Title": "잠금 파일 업데이트",
       "recent3Text": "초안 메모입니다. 영역별로 정리했습니다.",
       "recent3Title": "릴리스 노트 초안",
-      "startSearching": "검색 시작하기",
+      "startSearching": "검색 시작",
       "changeInSettings": "<link>설정 → 에이전트 세션 검색</link>에서 언제든 변경하거나 끌 수 있습니다.",
       "title": "모든 에이전트 세션 검색",
       "description": "대화 내용으로 이전 대화를 찾아 에이전트가 멈춘 지점부터 이어가세요.",
@@ -26024,12 +26017,11 @@
   },
   "workStyles": {
     "title": "일하는 방식",
-    "description": "일하는 방식을 모두 선택하세요. 필요하지 않은 설정과 설정 단계를 숨깁니다. 아무것도 선택하지 않으면 모두 표시합니다.",
     "hiddenHint": "일하는 방식에 맞춰 숨김",
     "options": {
       "code": {
         "label": "코드",
-        "description": "터미널, Git, 저장소의 에이전트"
+        "description": "프로그램의 코드를 직접 쓰고 고칩니다"
       },
       "web": {
         "label": "웹",
@@ -26045,13 +26037,16 @@
       }
     },
     "showAll": {
-      "label": "모든 설정 보기",
-      "description": "일하는 방식에 맞춰 숨긴 페이지를 포함해 모든 설정 페이지를 표시합니다."
+      "label": "모든 설정 보기"
     },
     "onboarding": {
       "title": "어떤 방식으로 일하시나요?",
-      "subtitle": "해당하는 항목을 모두 선택하세요. 필요한 설정만 보여 드립니다.",
-      "switchNote": "아무것도 선택하지 않으면 모두 표시합니다. <em>설정 → 일반</em>에서 언제든지 바꿀 수 있습니다."
+      "subtitle": "해당하는 항목을 모두 선택하세요. 고른 방식에 맞춰 첫 화면을 준비합니다.",
+      "switchNote": "잘 모르겠으면 가장 가까운 것을 고르세요. 나중에 <em>설정 → 일반</em>에서 바꿀 수 있습니다."
+    },
+    "workFolder": {
+      "label": "업무 폴더 위치",
+      "change": "변경"
     }
   },
   "resourceManager": {
@@ -27594,7 +27589,7 @@
         "events": {
           "linear-assigned": {
             "trigger": "Linear 이슈가 나에게 할당될 때",
-            "action": "조사하기"
+            "action": "조사"
           }
         }
       },
@@ -27664,7 +27659,7 @@
         "events": {
           "pr-merged": {
             "trigger": "PR이 병합될 때",
-            "action": "확인하기"
+            "action": "확인"
           }
         }
       },
@@ -27730,7 +27725,7 @@
         "events": {
           "deploy-called": {
             "trigger": "배포 도구가 호출할 때",
-            "action": "배포 요약하기"
+            "action": "배포 요약"
           }
         }
       },
@@ -27778,7 +27773,7 @@
         "events": {
           "bug-posted": {
             "trigger": "버그 채널에 누군가 글을 올릴 때",
-            "action": "이슈 초안 작성하기"
+            "action": "이슈 초안 작성"
           }
         }
       },
@@ -27794,7 +27789,7 @@
         "events": {
           "issue-opened": {
             "trigger": "이슈가 열릴 때",
-            "action": "라벨과 중복 후보 제안하기"
+            "action": "라벨과 중복 후보 제안"
           }
         }
       },
@@ -27868,7 +27863,7 @@
         "events": {
           "incident-posted": {
             "trigger": "장애 채널에 누군가 글을 올릴 때",
-            "action": "타임라인에 추가하기"
+            "action": "타임라인에 추가"
           }
         }
       },
@@ -28189,13 +28184,39 @@
         "previous": "이전 항목",
         "next": "다음 항목",
         "loading": "항목 로드 중…",
-        "subWhere": "항목 {{number}} · {{chat}}"
+        "activity": "활동",
+        "canceledNote": "취소:",
+        "doneNote": "완료:",
+        "links": "링크",
+        "showLess": "접기",
+        "showMore": "더 보기",
+        "showEarlier": "이전 활동",
+        "place": "{{index}} / {{total}}",
+        "deleted": "이 항목은 삭제되었습니다.",
+        "moreLinks": "링크 {{count}}개 더"
       },
       "activity": {
         "linked": "이(가) {{links}}을(를) 연결함",
         "anotherAgent": "다른 에이전트",
         "you": "나",
-        "waitingOn": "기다리는 대상"
+        "waitingOn": "기다리는 대상",
+        "canceled": "취소함",
+        "changed": "{{field}} 바꿈",
+        "closed": "완료로 표시함",
+        "commentLabel": "{{name}}, {{time}}",
+        "replyingTo": "답변 대상: {{question}}. 질문으로 이동",
+        "made": "항목을 만듦",
+        "madeNeedsYou": "내 확인 필요 항목으로 만듦",
+        "moved": "상태를 바꿈:",
+        "notSent": "보내지 못함",
+        "retry": "다시 시도",
+        "discard": "삭제",
+        "reopened": "다시 엶",
+        "snoozed": "{{when}}까지 미룸",
+        "snoozedBare": "미룸",
+        "unsnoozed": "미룸 해제함",
+        "snoozeEnded": "미룸이 일찍 끝남",
+        "answered": "답함:"
       },
       "chat": {
         "moreItems": "+{{count}}개 더",
@@ -28206,10 +28227,19 @@
         "label": "댓글",
         "submit": "댓글",
         "replyingToShow": "답변 대상: {{question}}. 질문 보기",
-        "showQuestion": "질문 보기"
+        "showQuestion": "질문 보기",
+        "showLess": "접기",
+        "replyOrPick": "답변…",
+        "replyingTo": "답변 대상:",
+        "hideReplyingTo": "숨김",
+        "replyTo": "{{name}}에게 답장…"
       },
       "group": {
-        "new": "새 항목 {{count}}개"
+        "new": "새 항목 {{count}}개",
+        "closed": "끝남",
+        "showMore": "{{count}}개 더 보기",
+        "stale": "오래됨",
+        "snoozed": "미룸"
       },
       "link": {
         "automation": "자동화",
@@ -28217,16 +28247,25 @@
         "automationEnded": "종료됨"
       },
       "menu": {
-        "waiting": "대기 중…"
+        "waiting": "대기 중…",
+        "cancel": "취소",
+        "done": "완료"
       },
       "row": {
-        "more": "더 보기"
+        "more": "더 보기",
+        "done": "완료",
+        "select": "{{title}} 선택"
       },
       "stale": {
         "cancelAll": "모두 취소"
       },
       "status": {
-        "waiting": "대기 중"
+        "waiting": "대기",
+        "canceled": "취소됨",
+        "done": "완료",
+        "needsYou": "내 확인 필요",
+        "planned": "할 일",
+        "working": "진행 중"
       },
       "tab": "홈",
       "loading": "항목 로드 중…",
@@ -28237,7 +28276,15 @@
         "time": "시간",
         "back": "뒤로",
         "week": "일주일 후",
-        "pickCustom": "직접 시간 지정"
+        "pickCustom": "직접 시간 지정",
+        "until": "{{when}}까지 미룸",
+        "unsnooze": "미룸 해제",
+        "pick": "시간 선택…",
+        "later": "오늘 나중에",
+        "tomorrow": "내일",
+        "monday": "월요일",
+        "inHours_one": "{{count}}시간 뒤",
+        "inHours_other": "{{count}}시간 뒤"
       },
       "ask": {
         "notSentYet": "아직 보내지 않음",
@@ -28250,7 +28297,9 @@
         "sendSomeLabel": "답변 {{total}}개 중 {{count}}개 보내기",
         "changeAnswer": "{{question}}: {{answer}}. 답변 변경",
         "heldImagesLimit": "답변은 댓글 하나로 보내지며, 이미지는 최대 {{max}}개까지 담을 수 있어요. 지금까지 보류된 답변을 먼저 보내거나 일부를 빼 주세요.",
-        "heldSkillsLimit": "답변은 댓글 하나로 보내지며, 스킬은 최대 {{max}}개까지 담을 수 있어요. 지금까지 보류된 답변을 먼저 보내거나 일부를 빼 주세요."
+        "heldSkillsLimit": "답변은 댓글 하나로 보내지며, 스킬은 최대 {{max}}개까지 담을 수 있어요. 지금까지 보류된 답변을 먼저 보내거나 일부를 빼 주세요.",
+        "recommended": "추천",
+        "typeAnswer": "직접 입력"
       },
       "readMoreClosedFailed": "닫힌 항목을 더 읽지 못했습니다",
       "wait": {
@@ -28259,7 +28308,19 @@
         "placeholder": "기다리는 대상",
         "keep": "취소",
         "confirm": "대기 중으로 설정"
-      }
+      },
+      "field": {
+        "chat": "채팅",
+        "description": "설명",
+        "title": "제목",
+        "doneMeans": "완료 기준",
+        "doneMeansLower": "완료 기준"
+      },
+      "homeChat": "홈 채팅",
+      "chatFallback": "채팅",
+      "readFailed": "항목을 불러오지 못했습니다.",
+      "readFailedStale": "목록을 새로 고치지 못했습니다.",
+      "retry": "다시 시도"
     },
     "hover": {
       "asksQuestion": "답변을 기다리는 중",
@@ -28326,8 +28387,11 @@
     "section": {
       "scrollLeft": "왼쪽으로 스크롤 · 숨겨진 봇 {{amount}}개",
       "scrollRight": "오른쪽으로 스크롤 · 숨겨진 봇 {{amount}}개",
-      "title": "Bots",
-      "startFromScratch": "처음부터 시작"
+      "title": "봇",
+      "startFromScratch": "처음부터 시작",
+      "emptyCardTitle": "업무를 맡길 봇을 만드세요",
+      "newBot": "새 봇",
+      "emptyTemplates": "템플릿"
     },
     "errors": {
       "avatarHomeUnreadable": "저장된 사진을 읽지 못했습니다. 다시 선택하세요.",
@@ -29076,7 +29140,256 @@
     "customize": "사용자 지정",
     "pageRegion": "페이지",
     "account": "계정",
-    "signIn": "로그인"
+    "signIn": "로그인",
+    "home": "홈",
+    "work": "업무"
+  },
+  "meetings": {
+    "recording": {
+      "statusAria": "녹음 중인 회의 {{title}} 열기",
+      "on": "녹음 중",
+      "everyoneSees": "회의에 있는 {{count}}명 모두에게 이 표시가 보입니다.",
+      "start": "녹음 시작",
+      "sent": "회의 에이전트가 회의에 있던 {{count}}명 모두에게 회의록을 보냈습니다.",
+      "stop": "녹음 종료",
+      "card": "녹음"
+    },
+    "title": "회의",
+    "schedule": "회의 생성",
+    "pane": {
+      "agenda": "일정",
+      "upcoming": "다가오는 회의",
+      "past": "지난 회의"
+    },
+    "form": {
+      "titleRequired": "참석자가 무슨 회의인지 알 수 있게 제목을 입력하세요.",
+      "titleTooLong": "{{max}}자 이하로 입력하세요.",
+      "attendeesRequired": "주최자 말고 한 명 이상을 넣으세요.",
+      "fromChat": "채팅 「{{name}}」에서 생성하는 회의",
+      "title": "제목",
+      "when": "언제",
+      "now": "지금 시작 · 녹음",
+      "attendees": "참석자",
+      "place": "장소",
+      "outline": "사전 개요",
+      "materials": "회의 자료",
+      "submit": "생성",
+      "removeMaterial": "「{{name}}」 제거",
+      "linkInvalid": "https://로 시작하는 전체 주소를 넣으세요. 예: https://example.com/file",
+      "dropNow": "여기에 놓으면 붙습니다.",
+      "dropHere": "파일을 여기에 끌어다 놓거나",
+      "pickFiles": "파일 선택",
+      "addLink": "링크 추가",
+      "linkUrl": "링크 주소",
+      "linkName": "보일 이름 (선택)",
+      "attach": "추가",
+      "startDate": "시작 날짜",
+      "startTime": "시작 시각",
+      "endDate": "끝 날짜",
+      "endTime": "끝 시각",
+      "timeInvalid": "입력한 “{{typed}}” 값은 시각이 아닙니다. 15:30처럼 적거나 목록에서 고르세요.",
+      "endBeforeStart": "끝이 시작보다 늦어야 합니다. 끝 시각이나 끝 날짜를 뒤로 옮기세요.",
+      "rangeTooLong": "기간이 14일을 넘습니다. 끝 날짜를 앞당기세요.",
+      "fromWhisper": "회의 에이전트가 채팅 「{{name}}」에서 읽은 내용으로 채웠습니다. 틀린 곳만 고치세요.",
+      "spansDays": "{{count}}일에 걸친 회의입니다.",
+      "lengthHours": "회의 길이 {{h}}시간 {{m}}분",
+      "lengthMinutes": "회의 길이 {{count}}분",
+      "recentPlaces": "최근 장소",
+      "attendeesFromChat": "「{{name}}」의 사람들이 들어 있습니다. 오지 않아도 되는 사람은 빼세요.",
+      "saving": "생성 중",
+      "submitNow": "생성 · 녹음 시작",
+      "removePerson": "{{name}} 제외",
+      "host": "주최자",
+      "findPerson": "이름 검색",
+      "people": "사람",
+      "noPerson": "“{{query}}” 이름이 없습니다. 이름을 다시 입력하세요.",
+      "everyoneIn": "모두 들어 있습니다.",
+      "inChat": "이 채팅",
+      "card": "새 회의"
+    },
+    "cancel": "취소",
+    "day": {
+      "today": "오늘",
+      "tomorrow": "내일",
+      "yesterday": "어제"
+    },
+    "due": "마감 {{date}}",
+    "elapsed": {
+      "hours": "{{h}}시간 {{m}}분",
+      "minutes": "{{m}}분 {{s}}초",
+      "seconds": "{{s}}초"
+    },
+    "status": {
+      "todo": "할 일",
+      "inProgress": "진행 중",
+      "done": "끝남"
+    },
+    "chat": {
+      "setUp": "{{name}} 님이 회의를 생성했습니다: {{title}}",
+      "open": "회의 열기"
+    },
+    "save": "저장",
+    "prep": {
+      "outline": "사전 개요",
+      "edit": "개요와 자료 수정",
+      "materials": "회의 자료",
+      "editShort": "수정"
+    },
+    "bot": {
+      "minutesReady": "**{{title}}** 회의록이 준비됐습니다.",
+      "noProposals": "이 회의에서 나온 내 업무는 없습니다.",
+      "sharedMessage": "{{name}} 님이 **{{title}}** 회의록 전체를 공유했습니다.",
+      "assignedMessage": "{{name}} 님이 **{{title}}**에서 나온 업무를 할당했습니다.",
+      "name": "회의 에이전트",
+      "about": "회의록과 회의에서 나온 내 업무를 보냅니다",
+      "aboutOutside": "할당된 업무와 그 업무가 나온 부분을 보냅니다",
+      "emptyTitle": "아직 받은 메시지가 없습니다",
+      "emptyDetail": "참석한 회의의 녹음이 끝나면 회의록이 여기로 옵니다. 회의에서 나에게 할당된 업무도 여기로 옵니다.",
+      "minutesCard": "회의록",
+      "openMinutes": "회의록 열기",
+      "sharedBy": "{{name}} 님이 공유함",
+      "sentTo": "회의에 있던 {{count}}명 모두에게 보냄",
+      "givenToOther": "{{name}} 님에게 할당됨",
+      "taken": "내 업무 · {{status}}",
+      "assignedByHost": "{{name}} 님이 할당함 · {{status}}",
+      "declined": "내 몫이 아니라고 답함",
+      "proposalCard": "이 회의에서 나온 내 업무",
+      "declinedHelp": "{{name}} 님이 내 답 “내 몫 아님”을 봅니다.",
+      "assignedCard": "“{{title}}”에서 나온 내 업무",
+      "rowMinutes": "회의록: {{title}}",
+      "rowShared": "공유받은 회의록: {{title}}",
+      "rowTask": "새 업무: {{title}}",
+      "rowEmpty": "회의록과 내 업무가 여기로 옵니다",
+      "heardMessage": "**{{title}}**에서 나온 업무입니다."
+    },
+    "source": "나온 부분 보기",
+    "ask": {
+      "noAnswer": "이 회의에서 그 내용은 찾지 못했습니다. 회의에서 나온 낱말로 다시 묻거나, 대화록에서 검색해 보세요.",
+      "label": "이 회의에 대해 회의 에이전트에게 질문"
+    },
+    "followUps": {
+      "title": "후속 업무",
+      "mine": "내 몫",
+      "accepted": "본인이 받음",
+      "stateDeclined": "본인 몫이 아니라고 답함",
+      "owner": "“{{text}}”의 담당자",
+      "chooseOwner": "담당자 선택",
+      "colTask": "업무",
+      "colOwner": "담당자",
+      "colActions": "동작",
+      "stateUnasked": "담당자 없음",
+      "assignedByMe": "내가 할당함",
+      "heard": "회의 에이전트가 만듦",
+      "unassign": "담당자 해제",
+      "more": "“{{text}}” 메뉴"
+    },
+    "openTask": "업무 열기",
+    "excerpt": {
+      "task": "내 업무",
+      "assignedBy": "{{name}} 님이 할당함",
+      "where": "이 업무가 나온 부분"
+    },
+    "response": {
+      "yes": "참석",
+      "no": "불참",
+      "none": "참석 미정",
+      "label": "“{{title}}”에 참석하나요?"
+    },
+    "minutes": {
+      "depth": "회의록에서 볼 것",
+      "brief": "핵심",
+      "summary": "요약",
+      "full": "대화록",
+      "ask": "에이전트에게 질문",
+      "decisions": "결정 사항",
+      "find": "대화록에서 검색",
+      "found": "발언 {{total}}개 중 {{count}}개",
+      "turns": "발언 {{total}}개",
+      "card": "회의록"
+    },
+    "share": {
+      "done": "회의 에이전트가 {{name}} 님에게 회의록 전체의 링크를 보냈습니다.",
+      "button": "링크 공유",
+      "decline": "거절",
+      "approve": "승인",
+      "requestDeclined": "{{name}} 님이 회의록 전체를 공유하지 않았습니다.",
+      "requested": "{{name}} 님에게 요청했습니다.",
+      "requestButton": "회의록 보기 요청",
+      "card": "보는 범위",
+      "whole": "회의록 전체",
+      "excerpt": "발췌"
+    },
+    "agenda": {
+      "previousWeek": "이전 주",
+      "thisWeek": "이번 주",
+      "nextWeek": "다음 주",
+      "host": "주최 {{name}}"
+    },
+    "state": {
+      "recording": "녹음 중",
+      "minutes": "회의록 도착",
+      "minutesFollowUps": "회의록 도착 · 후속 업무 {{total}}건 중 {{done}}건 끝남",
+      "myTasks": "여기서 나온 내 업무 {{count}}건",
+      "scheduledPrep": "예정 · 준비 자료 있음",
+      "scheduledNoPrep": "예정"
+    },
+    "notice": {
+      "recordingTitle": "녹음이 시작됐습니다",
+      "recordingBody": "{{name}} 님이 “{{title}}” 회의를 녹음하고 있습니다.",
+      "minutesTitle": "회의 에이전트: 회의록이 도착했습니다",
+      "sharedTitle": "회의 에이전트: 회의록을 공유받았습니다",
+      "taskTitle": "회의 에이전트: 새 업무가 할당됐습니다",
+      "openMessage": "메시지 열기",
+      "requestTitle": "{{name}} 님의 회의록 보기 요청",
+      "openRequest": "요청 보기",
+      "soonTitle": "{{count}}분 뒤에 시작합니다",
+      "openOutline": "개요 읽기",
+      "dismiss": "닫기"
+    },
+    "task": {
+      "from": "회의 「{{title}}」에서 나온 업무 · {{day}}",
+      "source": "나온 부분 보기"
+    },
+    "whisper": {
+      "whoGroup": "이 채팅의 {{count}}명",
+      "whoDm": "나와 {{name}} 님 2명",
+      "question": "{{details}}으로 회의를 생성할까요?",
+      "onlyMe": "나만 봅니다",
+      "title": "제목: 「{{title}}」.",
+      "guessed": "제안한 시간",
+      "created": "회의를 생성했습니다. {{count}}명의 일정에 들어갔습니다.",
+      "create": "생성",
+      "edit": "고쳐서 생성",
+      "dismiss": "안 만듦"
+    },
+    "detail": {
+      "attendees": "사람",
+      "originChat": "채팅 「{{name}}」",
+      "host": "주최"
+    },
+    "list": {},
+    "tiles": {
+      "today": "오늘 회의",
+      "next": "다음 {{time}} · {{title}}",
+      "week": "이번 주",
+      "done": "끝난 업무"
+    },
+    "mine": "내 회의",
+    "viewerLabel": "로그인한 사람",
+    "agent": {
+      "aside": "나에게 보낸 것",
+      "open": "대화 열기"
+    },
+    "role": {
+      "host": "주최",
+      "attendee": "참석",
+      "shared": "공유받음",
+      "assignee": "내 업무"
+    },
+    "chip": {
+      "mine": "내 몫 {{count}}건",
+      "recording": "녹음 중"
+    }
   },
   "chats": {
     "delete": {
@@ -29121,9 +29434,7 @@
     },
     "conversation": {
       "close": "대화 닫기",
-      "send": "보내기",
-      "now": "방금",
-      "placeholder": "{{name}}에게 메시지 보내기"
+      "now": "방금"
     },
     "members": "멤버 {{count}}명",
     "section": {
@@ -29143,6 +29454,348 @@
       "title": "고정됨",
       "expand": "고정됨 펼치기",
       "collapse": "고정됨 접기"
+    }
+  },
+  "home": {
+    "activity": {
+      "title": "최근 활동",
+      "aside": "이번 주",
+      "less": "접기",
+      "all": "모두 보기 {{count}}",
+      "filter": "활동 종류",
+      "filterAll": "전체",
+      "filterFinished": "에이전트가 끝낸 작업",
+      "confirmed": "내가 확인함",
+      "unconfirmed": "내 확인 전",
+      "budgetDone": "· 캠페인 예산표를 고쳤습니다",
+      "quarterSummary": "· 지난 분기 캠페인 성과를 요약했습니다",
+      "inquiryCounts": "· 지난주 문의 건수를 표로 정리했습니다",
+      "inquiriesDraft": "· “이번 달 고객 문의 유형 정리”의 초안을 올렸습니다",
+      "noticeStop": "· 물류팀의 회신이 없어 “배송 지연 안내문 수정”을 멈췄습니다",
+      "researchStart": "· “경쟁사 프로모션 조사”를 시작했습니다",
+      "copyDraft": "· 출시 페이지 머리 문구 두 안을 올리고 내 선택을 기다립니다",
+      "draftsUp": "· 브랜드 가이드 시안 2안을 올렸습니다",
+      "researchTable": "· 경쟁사 두 곳의 프로모션을 표로 정리했습니다",
+      "researchDone": "· “경쟁사 프로모션 조사”를 끝냈습니다",
+      "me": "나",
+      "answered": "· 답을 골랐습니다: {{choice}}",
+      "meetingStarted": "· 녹음하는 회의를 시작했습니다",
+      "minutesSent": "· 「{{title}}」의 회의록을 {{count}}명에게 보냈습니다",
+      "tookFollowUp": "· 회의 「{{title}}」에서 「{{task}}」 업무를 내 업무로 받았습니다",
+      "assignedFollowUp": "· 회의 「{{title}}」에서 「{{task}}」 업무를 나에게 할당했습니다",
+      "copyComment": "· 댓글: “두 번째 안이 더 낫습니다”",
+      "heardFollowUp": "· 회의 「{{title}}」에서 나온 「{{task}}」 업무를 ‘내 업무’에 넣었습니다"
+    },
+    "agents": {
+      "waiting": "내 확인 필요",
+      "working": "작업 중",
+      "blocked": "막힘",
+      "idle": "쉬는 중",
+      "title": "에이전트",
+      "colWho": "이름",
+      "colDoing": "지금 하는 작업",
+      "colState": "상태",
+      "colLast": "마지막 활동",
+      "answerInTask": "답변",
+      "showTask": "맡은 업무 보기"
+    },
+    "header": {
+      "day": "안녕하세요, {{name}} 님",
+      "handOff": "에이전트에게 맡기기",
+      "startMeeting": "회의 시작",
+      "newTask": "새 업무",
+      "me": "마코",
+      "openMeeting": "진행 중인 회의"
+    },
+    "tiles": {
+      "tasks": "내 업무",
+      "waiting": "내 확인 필요",
+      "agentDone": "에이전트가 끝낸 작업",
+      "late": "지연"
+    },
+    "firstRun": {
+      "title": "여기에서 시작합니다",
+      "inax": "inAX에 로그인",
+      "inaxDetail": "내 업무, 마감, 나를 기다리는 것이 보입니다",
+      "app": "업무에 쓰는 앱 등록 (선택)",
+      "appDetail": "사용 시간이 “내 하루”에 모입니다. 나만 봅니다",
+      "register": "등록"
+    },
+    "day": {
+      "title": "내 하루",
+      "manage": "기록 관리",
+      "manageApps": "기록하는 앱",
+      "manageBrowser": "브라우저 활동 기록",
+      "unconfirmed": "업무를 정하지 않은 기록",
+      "hours": "{{count}}시간",
+      "minutes": "{{count}}분",
+      "undo": "실행 취소",
+      "pickTask": "이 기록을 연결할 업무",
+      "notWork": "업무 아님",
+      "browser": "브라우저",
+      "recordBrowser": "브라우저 · 경쟁사 프로모션 페이지 3곳 · {{range}}",
+      "recordApp": "{{app}} · {{range}}",
+      "tomorrow": "내일",
+      "yesterday": "어제",
+      "pick": "업무 선택",
+      "recordQuestion": "이 기록은 어느 업무입니까?"
+    },
+    "wrapUp": {
+      "title": "업무 정리"
+    },
+    "newTask": {
+      "label": "업무 제목",
+      "placeholder": "예: 촬영 스튜디오 예약",
+      "error": "업무 제목을 입력하세요.",
+      "add": "추가",
+      "due": "마감"
+    },
+    "tasks": {
+      "title": "내 업무",
+      "today": "남은 업무",
+      "waiting": "내 확인 필요",
+      "late": "지연",
+      "done": "완료",
+      "answer": "답변",
+      "openList": "업무 목록"
+    },
+    "signedOut": {
+      "line": "inAX에 로그인하면 내 업무, 나를 기다리는 것, 에이전트의 작업이 여기에 보입니다."
+    },
+    "preview": {
+      "label": "시각",
+      "auto": "지금",
+      "morning": "아침",
+      "day": "낮",
+      "evening": "저녁",
+      "firstRun": "로그인 전",
+      "reset": "처음으로"
+    },
+    "upcoming": {
+      "today": "오늘",
+      "tomorrow": "내일",
+      "week": "이번 주",
+      "nextWeek": "다음 주",
+      "title": "다가오는 일",
+      "calendar": "캘린더",
+      "deadline": "마감",
+      "endOfDay": "퇴근 전",
+      "recording": "녹음 중"
+    },
+    "agent": {
+      "research": "자료 조사 에이전트",
+      "writer": "문서 작성 에이전트",
+      "triage": "문의 분류 에이전트",
+      "meeting": "회의 에이전트",
+      "justNow": "방금",
+      "researchDoneLine": "경쟁사 세 곳을 모두 표에 넣었습니다. 읽어 보실 수 있습니다.",
+      "researchLine": "두 곳은 정리를 끝냈습니다. 마지막 한 곳의 할인 조건을 확인하고 있습니다.",
+      "writerLine1": "머리 문구 두 안을 올렸습니다. A안은 만남을, B안은 빠름을 앞에 둡니다.",
+      "writerLine2": "고르시면 본문과 버튼의 문구를 그 안에 맞추겠습니다.",
+      "triageLine1": "안내문을 고치려면 새 배송 일정이 필요합니다.",
+      "triageLine2": "이민아 님이 물류팀에 다시 물었습니다. 회신이 오면 이어서 하겠습니다.",
+      "calendar": "일정 에이전트",
+      "calendarDoing": "맡은 작업 없음",
+      "calendarLine": "다음 주 일정이 바뀌면 알려 드리겠습니다.",
+      "recording": "「{{title}}」 녹음 중"
+    },
+    "task": {
+      "copy": "출시 페이지 머리 문구 확정",
+      "inquiries": "이번 달 고객 문의 유형 정리",
+      "copyDue": "오늘 17:00",
+      "copyWho": "내 확인 필요 · 문서 작성 에이전트",
+      "copyQuestion": "머리 문구를 어느 안으로 할까요?",
+      "copyA": "A안 · 가장 먼저 만나는 방법",
+      "copyB": "B안 · 누구보다 먼저, 지금",
+      "copyRedo": "두 안 모두 재작성",
+      "copyDetail": "문서 작성 에이전트가 머리 문구 두 안을 올렸습니다. 고르면 본문과 버튼의 문구를 그 안에 맞춥니다.",
+      "research": "경쟁사 프로모션 조사",
+      "today": "오늘",
+      "researchReady": "조사 결과가 올라옴 · 자료 조사 에이전트",
+      "researchWho": "에이전트 작업 중 · {{time}}째",
+      "researchDoneDetail": "자료 조사 에이전트가 경쟁사 3곳의 프로모션을 표 하나로 정리했습니다. 읽고 틀린 곳만 고칩니다.",
+      "researchDetail": "자료 조사 에이전트가 경쟁사 3곳의 프로모션을 표 하나로 정리하고 있습니다.",
+      "review": "브랜드 가이드 시안 의견 작성",
+      "reviewDue": "오늘 15:00 전",
+      "reviewDetail": "최현우 님이 시안 2안을 올렸습니다. 15:00 시안 리뷰 전에 의견을 남깁니다.",
+      "offerAccept": "내 업무에 추가",
+      "offerDecline": "내 몫 아님",
+      "inquiriesWho": "초안이 올라옴 · 문의 분류 에이전트",
+      "inquiriesDetail": "문의 분류 에이전트가 문의 214건을 6개 유형으로 나눴습니다. 초안을 읽고 틀린 곳만 고칩니다.",
+      "notice": "배송 지연 안내문 수정",
+      "dueWas": "{{day}} 마감",
+      "noticeWho": "회신 대기 · 물류팀",
+      "noticeDetail": "안내문에는 새 배송 일정이 필요합니다. 이민아 님이 오늘 아침에 물류팀에 다시 물었습니다.",
+      "report": "지난달 캠페인 결과 보고서 공유",
+      "reportDetail": "지난달 캠페인의 결과를 보고서로 정리해 공유합니다. 김지우 님이 이번 주 안에 달라고 했습니다.",
+      "newsletter": "이번 달 뉴스레터 발송 목록 확인",
+      "finishedOn": "{{day}} 끝냄",
+      "newsletterDetail": "주소 1,240개를 확인하고 12개를 뺐습니다.",
+      "budget": "캠페인 예산표 수정",
+      "budgetDetail": "문서 작성 에이전트가 고쳤고, 숫자는 내가 확인했습니다.",
+      "resumed": "에이전트 작업 중 · 내 답을 받아 이어감",
+      "addedAgent": "에이전트 작업 중 · 방금 맡김",
+      "fromMeetingAccepted": "회의 「{{title}}」에서 나온 후속 업무입니다. 회의 에이전트가 제안했고 {{name}} 님이 받았습니다.",
+      "fromMeetingAssigned": "회의 「{{title}}」에서 나온 후속 업무입니다. {{host}} 님이 {{name}} 님에게 할당했습니다.",
+      "request": "{{name}} 님의 「{{title}}」 회의록 보기 요청",
+      "requestWho": "내 확인 필요",
+      "fromMeetingHeard": "회의 「{{title}}」의 후속 업무입니다. 회의에서 {{name}} 님이 맡기로 했습니다.",
+      "invitation": "{{name}} 님의 「{{title}}」 초대"
+    },
+    "project": {
+      "campaign": "신제품 출시 캠페인",
+      "support": "고객 지원 운영",
+      "brand": "브랜드 리뉴얼",
+      "promo": "연말 프로모션"
+    },
+    "report": {
+      "copy": "문서 작성 에이전트가 머리 문구 두 안을 썼습니다. 내가 고를 차례입니다.",
+      "researchDone": "경쟁사 3곳의 프로모션을 표 하나로 정리했습니다. 검토 부탁드립니다.",
+      "research": "자료 조사 에이전트가 경쟁사 3곳 가운데 2곳의 프로모션을 표로 정리했습니다. 내 확인이 남았습니다.",
+      "inquiries": "문의 214건을 6개 유형으로 나눴습니다. 검토 부탁드립니다.",
+      "notice": "물류팀이 새 배송 일정을 보내 줄 때까지 문의 분류 에이전트가 이어서 할 수 없습니다. 마감을 넘겼습니다.",
+      "done": "내가 이 업무를 끝냈습니다.",
+      "copyChosen": "문서 작성 에이전트가 머리 문구 두 안을 썼고, 내가 그중 하나를 골랐습니다. 에이전트가 본문과 버튼의 문구를 그 안에 맞추고 있습니다."
+    },
+    "person": {
+      "hyunwoo": "최현우",
+      "jiwoo": "김지우"
+    },
+    "dayEnd": {
+      "progress": "진행 기록",
+      "sharedOwners": "후속 업무 {{count}}건의 담당자",
+      "resultTitle": "오늘 저장한 기록",
+      "question": "오늘 이 업무는 어디까지 했습니까?"
+    },
+    "chip": {
+      "waiting": "내 확인 필요",
+      "blocked": "회신 대기",
+      "working": "작업 중",
+      "draft": "초안 올라옴",
+      "prep": "준비 자료"
+    },
+    "chat": {
+      "placeholder": "메시지",
+      "placeholderTo": "{{name}} 님에게 메시지"
+    },
+    "note": {
+      "copy1": "머리 문구 방향을 세 가지로 좁혔습니다.",
+      "copy2": "세 방향 중 두 방향으로 초안을 쓰기 시작했습니다.",
+      "copy3": "초안을 경쟁사 머리 문구와 비교했습니다.",
+      "copy4": "법무 검토가 필요한 표현을 뺐습니다."
+    }
+  },
+  "taskLoop": {
+    "activity": {
+      "result": "· “{{title}}”에 결과물을 붙였습니다",
+      "started": "· 에이전트와 “{{title}}” 업무를 시작했습니다"
+    },
+    "agent": {
+      "name": "업무 에이전트"
+    },
+    "chat": {
+      "kickoff": "이 업무를 맡아 주세요: {{title}}",
+      "noted": "알겠습니다. 지금 쓰는 내용에 반영하겠습니다.",
+      "moved": "{{title}} {{to}} 옮겼습니다",
+      "asked": "질문 {{items}}",
+      "notedOnTask": "활동에 남겼습니다."
+    },
+    "demo": {
+      "chip": "데모"
+    },
+    "detail": {
+      "due": "마감",
+      "project": "프로젝트",
+      "start": "에이전트와 시작",
+      "status": "상태"
+    },
+    "gate": {
+      "line": "inAX에 로그인하면 내 업무가 여기에 보입니다."
+    },
+    "onboarding": {
+      "found": "내게 할당된 업무 {{open}}건 · 오늘 마감 {{due}}건",
+      "skip": "건너뛰기",
+      "start": "시작",
+      "subtitle": "로그인하면 내게 할당된 업무가 이 앱에 보입니다.",
+      "title": "inAX에 로그인"
+    },
+    "script": {
+      "choiceA": "내가 읽게",
+      "choiceB": "프로젝트 팀이 읽게",
+      "plan": "이렇게 진행하겠습니다.\n\n1. 업무 설명과 붙은 자료를 읽습니다.\n2. “{{title}}”의 초안을 씁니다.\n3. 초안을 이 대화와 업무에 붙입니다.",
+      "question": "초안은 누가 읽게 쓸까요?",
+      "reportA": "넣음",
+      "reportB": "뺌",
+      "reportNumbers": "- 방문자: 목표의 112%\n- 신청 전환율: 3.4% (그 전달 2.9%)\n- 광고비: 예산의 96% 사용",
+      "reportPlan": "이렇게 진행하겠습니다.\n\n1. 지난달 캠페인의 숫자를 모읍니다: 방문자, 신청 전환율, 광고비.\n2. 결과 보고서의 초안을 씁니다.\n3. 초안을 이 대화와 업무에 붙입니다.",
+      "reportQuestion": "보고서에 대행사 비용도 넣습니까?",
+      "reportDraft": "**지난달 캠페인 결과 보고서 (초안)**\n\n**요약**\n\n목표보다 많은 사람이 방문했고, 그중 신청한 사람의 비율도 올랐습니다. 광고비는 예산 안에서 썼습니다.",
+      "reportAgency": "- 대행사 비용: 광고비의 18%",
+      "reportNote": "지난달 캠페인 결과 보고서의 초안을 썼습니다. 방문자, 신청 전환율, 광고비, 대행사 비용이 들어 있습니다. 검토를 부탁드립니다.",
+      "reportNoteWithout": "지난달 캠페인 결과 보고서의 초안을 썼습니다. 방문자, 신청 전환율, 광고비가 들어 있고, 대행사 비용은 뺐습니다. 검토를 부탁드립니다.",
+      "reportOutput": "지난달 캠페인 결과 보고서 (초안)",
+      "reviewPlan": "이렇게 진행하겠습니다.\n\n1. 브랜드 가이드 시안 두 가지를 봅니다.\n2. 안마다 좋은 점과 걸리는 점을 적습니다.\n3. 의견 초안을 이 대화와 업무에 붙입니다.",
+      "reviewQuestion": "의견을 어떻게 쓸까요?",
+      "reviewA": "두 안 비교",
+      "reviewB": "한 안 추천",
+      "reviewOutput": "브랜드 가이드 시안 의견 (초안)",
+      "reviewDraftOne": "**브랜드 가이드 시안 의견 (초안)**\n\n2안을 추천합니다.\n\n- 본문 글자가 긴 글에서 읽기 편합니다.\n- 강조 색이 버튼에서 약합니다. 대비를 한 단계 올리면 좋겠습니다.\n- 1안은 로고가 더 뚜렷하지만, 작은 크기에서 여백이 좁습니다.",
+      "reviewDraftBoth": "**브랜드 가이드 시안 의견 (초안)**\n\n**1안**\n- 좋은 점: 로고가 뚜렷해서 알아보기 쉽습니다.\n- 걸리는 점: 작은 크기에서 로고 둘레의 여백이 좁습니다.\n\n**2안**\n- 좋은 점: 본문 글자가 긴 글에서 읽기 편합니다.\n- 걸리는 점: 강조 색이 버튼에서 약합니다.",
+      "reviewNote": "브랜드 가이드 시안 두 가지에 대한 의견 초안을 썼습니다. 검토를 부탁드립니다.",
+      "readerTeam": "프로젝트 팀이 읽게 썼습니다.",
+      "draft": "**{{title}} (초안)**",
+      "draftBody": "1. 정해진 것: 업무 설명에 적힌 범위와 마감입니다.\n2. 남은 일: 자료 확인, 초안 보완, 공유 순서입니다.\n3. 보내기 전에 확인할 것: 받는 사람과 숫자입니다.",
+      "output": "{{title}} (초안)",
+      "note": "“{{title}}”의 초안을 썼습니다. 검토를 부탁드립니다.",
+      "draftQuotes": "**협력사 견적 두 건 비교 (초안)**\n\n- A사: 1,840만 원, 납기 12영업일, 수정 3회\n- B사: 1,590만 원, 납기 20영업일, 수정 2회\n\nB사가 250만 원 더 저렴합니다. 그러나 B사의 납기는 캠페인 시작일보다 늦습니다. A사를 추천합니다.",
+      "draftSchedule": "**다음 주 일정 변경 (초안)**\n\n캠페인 일정표에서 바꿀 일정 3건입니다.\n\n- 화요일 촬영: 오전 10시 → 오후 2시\n- 수요일 시안 리뷰: 목요일 오전 11시로 옮김\n- 금요일 오후 3시 출시 점검 회의: 새로 넣음",
+      "draftSurvey": "**구독 해지 사유 설문 (초안)**\n\n구독을 해지하는 이유를 골라 주세요.\n\n- 메일이 너무 자주 옵니다\n- 내용이 저와 맞지 않습니다\n- 같은 정보를 다른 곳에서 받습니다\n- 그 밖의 이유 (직접 입력)",
+      "draftSendTime": "**발송 시간 시험 계획 (초안)**\n\n- 다음 호를 두 그룹으로 나눕니다: 오전 8시 620명, 기존 발송 시간 620명.\n- 3일 뒤 두 그룹의 오픈율을 비교합니다.\n- 오전 8시 그룹이 2%p 이상 높으면 그다음 호부터 오전 8시에 보냅니다.",
+      "draftTopics": "**다음 호 주제 후보 (초안)**\n\n1. 연말 프로모션 미리 보기: 지난 호에서 프로모션 소식의 클릭이 가장 많았습니다.\n2. 이번 달 고객이 가장 많이 물은 질문 5가지: 문의 내용을 그대로 답으로 씁니다.\n3. 브랜드 리뉴얼 뒷이야기: 다음 달 공개 전에 시안을 먼저 보입니다."
+    },
+    "settings": {
+      "cardDescription": "로그인하면 내 업무가 홈과 업무 목록에 보입니다.",
+      "keywordInax": "inax",
+      "keywordSignIn": "로그인",
+      "keywordTasks": "내 업무",
+      "pointerLink": "inAX 계정",
+      "searchDescription": "inAX에 로그인하거나, 연결된 계정을 보거나, 연결을 끊습니다.",
+      "searchTitle": "inAX 계정",
+      "viewTasks": "내 업무 보기"
+    },
+    "source": {
+      "chip": "inAX · 내 업무"
+    },
+    "status": {
+      "done": "완료",
+      "inProgress": "진행 중",
+      "review": "검토 요청",
+      "todo": "할 일"
+    },
+    "statusTo": {
+      "done": "완료로",
+      "inProgress": "진행 중으로",
+      "review": "검토 요청으로",
+      "todo": "할 일로"
+    },
+    "who": {
+      "confirmed": "{{status}} · 에이전트가 쓰고 내가 확인함",
+      "justStarted": "에이전트 작업 중 · 방금 시작",
+      "question": "내 확인 필요 · {{agent}}",
+      "result": "결과물 있음",
+      "confirmedBy": "{{status}} · 에이전트가 쓰고 {{name}} 님이 확인함"
+    },
+    "notice": {
+      "title": "확인이 필요합니다",
+      "open": "답변"
+    }
+  },
+  "time": {
+    "shortAgo": {
+      "now": "방금",
+      "minutes": "{{count}}분",
+      "hours": "{{count}}시간",
+      "days": "{{count}}일"
     }
   }
 }

@@ -24,11 +24,37 @@ import { addAppKeyListener, removeAppKeyListener } from '@/lib/keyboard/app-keyb
 import { useScrollEdgeFades } from '@/lib/list-interaction/use-scroll-edge-fades'
 import { AgentSurfaceStep } from './AgentSurfaceStep'
 import { WorkStyleStep } from './WorkStyleStep'
+import { InaxStep } from './InaxStep'
+import { normalizeWorkStyles } from '../../../../shared/settings/work-styles'
+import { useInaxMockAccount } from '@/lib/inax-mock-account'
 import { stepCopy, stepTooltipLabels } from './onboarding-step-copy'
+import { STEPS } from './use-onboarding-flow-types'
 
 type OnboardingFlowProps = {
   onboarding: OnboardingState
   onOnboardingChange: (state: OnboardingState) => void
+}
+
+/**
+ * The line above a page's title. Every page keeps its place, so the title does not jump between pages; only
+ * the first page shows it.
+ */
+function OnboardingEyebrow({ shown }: { shown: boolean }): React.JSX.Element {
+  const t = useTranslate()
+  const welcome = t('auto.components.onboarding.OnboardingFlow.1b5e182e9f', 'Welcome to Orca')
+  return (
+    <div
+      aria-hidden={!shown}
+      className={cn(
+        'mb-2 text-xs font-medium uppercase text-muted-foreground',
+        // Latin capitals only: the same tracking pulls Korean or Japanese syllables apart.
+        /^[\u0020-\u024f]*$/.test(welcome) && 'tracking-[0.18em]',
+        !shown && 'invisible'
+      )}
+    >
+      {welcome}
+    </div>
+  )
 }
 
 export default function OnboardingFlow({
@@ -45,12 +71,19 @@ export default function OnboardingFlow({
       ? stepCopy.agent_chat
       : stepCopy[currentStep.id]
   const shouldShowSetUpLater = currentStep.id !== 'notifications'
+  const inaxSignedIn = useInaxMockAccount((state) => state.signedIn)
+  const onInaxPage = currentStep.id === 'inax'
+  const workStyles = normalizeWorkStyles(flow.settings?.workStyles)
+  const worksWithCode = workStyles.includes('code')
+  const pageCountUnknown = currentStep.id === 'work_style' && workStyles.length === 0
   const shouldShowFooterBusy = Boolean(busyLabel)
   const footerPrimaryLabel =
     busyLabel ??
-    (currentStep.id === 'notifications' && !flow.hasSelectedWorkspace
-      ? t('components.onboarding.flow.actions.addFirstProject', 'Add your first project')
-      : t('components.onboarding.flow.actions.continue', 'Continue'))
+    (onInaxPage
+      ? t('taskLoop.onboarding.start', 'Start')
+      : currentStep.id === 'notifications' && !flow.hasSelectedWorkspace
+        ? t('components.onboarding.flow.actions.addFirstProject', 'Add your first project')
+        : t('components.onboarding.flow.actions.continue', 'Continue'))
   const languageOffer = useOnboardingLanguageOffer(onboarding.lastCompletedStep)
   const [languagePickerOpen, setLanguagePickerOpen] = useState(false)
   const [skipConfirmOpen, setSkipConfirmOpen] = useState(false)
@@ -110,7 +143,11 @@ export default function OnboardingFlow({
   return (
     <TooltipProvider skipDelayDuration={0}>
       <div
-        className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-black/50 p-4 text-foreground"
+        className={cn(
+          'fixed inset-0 z-[100] flex items-center justify-center overflow-hidden p-4 text-foreground',
+          // Until someone picks Code, the terminal workspace behind this is not shown to them.
+          worksWithCode ? 'bg-black/50' : 'bg-background'
+        )}
         data-onboarding-overlay
         onPointerDown={(event) => {
           if (!shouldRequestOnboardingSkipConfirmation(event)) {
@@ -153,8 +190,19 @@ export default function OnboardingFlow({
               />
             </div>
 
-            <div className="mt-10 flex items-center gap-2 transition-[margin-top] duration-[760ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none">
-              {flow.progressSteps.map(({ step, index: realStepIndex }, progressIdx) => {
+            <div
+              className={cn(
+                'mt-10 flex items-center gap-2 transition-[margin-top] duration-[760ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none',
+                'min-h-4'
+              )}
+            >
+              {(pageCountUnknown
+                ? // Before the choice on page 1, the bar shows the shortest way: this page and the sign-in.
+                  STEPS.map((step, index) => ({ step, index })).filter(
+                    ({ step }) => step.id === 'work_style' || step.id === 'inax'
+                  )
+                : flow.progressSteps
+              ).map(({ step, index: realStepIndex }, progressIdx) => {
                 const isActive = realStepIndex === stepIndex
                 const isDone = realStepIndex < stepIndex
                 const stepTooltipLabel = stepTooltipLabels[step.id].value
@@ -166,6 +214,7 @@ export default function OnboardingFlow({
                         className={cn(
                           // Expand the invisible hit area while keeping the stepper bars 4px tall.
                           'relative h-1 rounded-full outline-none transition-all duration-300 before:absolute before:-inset-y-2 before:-inset-x-1 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card',
+                          'disabled:pointer-events-none',
                           isActive
                             ? 'w-10 bg-foreground'
                             : isDone
@@ -178,6 +227,8 @@ export default function OnboardingFlow({
                           { value0: progressIdx + 1, value1: stepTooltipLabel }
                         )}
                         aria-current={isActive ? 'step' : undefined}
+                        // No way past the choice on page 1 before it is made.
+                        disabled={pageCountUnknown && progressIdx > 0}
                         onClick={() => flow.jumpToStep(realStepIndex)}
                       />
                     </TooltipTrigger>
@@ -187,21 +238,10 @@ export default function OnboardingFlow({
                   </Tooltip>
                 )
               })}
-              <span className="ml-3 text-xs font-medium text-muted-foreground">
-                {t(
-                  'auto.components.onboarding.OnboardingFlow.stepOfTotal',
-                  '{{current}} of {{total}}',
-                  { current: flow.progressStepIndex + 1, total: flow.progressSteps.length }
-                )}
-              </span>
             </div>
 
             <div className="mt-8 shrink-0">
-              {stepIndex === 0 && (
-                <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                  {t('auto.components.onboarding.OnboardingFlow.1b5e182e9f', 'Welcome to Orca')}
-                </div>
-              )}
+              <OnboardingEyebrow shown={stepIndex === 0} />
               <h1 className="text-[34px] font-semibold leading-[1.15] tracking-tight text-foreground">
                 {copy.title}
               </h1>
@@ -225,6 +265,7 @@ export default function OnboardingFlow({
               {currentStep.id === 'work_style' && flow.settings ? (
                 <WorkStyleStep settings={flow.settings} updateSettings={flow.updateSettings} />
               ) : null}
+              {onInaxPage ? <InaxStep signedIn={inaxSignedIn} /> : null}
               {currentStep.id === 'agent_surface' && (
                 <AgentSurfaceStep
                   agentSurface={flow.agentSurface}
@@ -274,15 +315,20 @@ export default function OnboardingFlow({
             </div>
 
             <OnboardingFooter
-              shouldShowSetUpLater={shouldShowSetUpLater}
+              // Signed in, the only way on is Start.
+              shouldShowSetUpLater={shouldShowSetUpLater && !(onInaxPage && inaxSignedIn)}
+              setUpLaterLabel={
+                onInaxPage ? t('taskLoop.onboarding.skip', 'Skip for now') : undefined
+              }
               busyLabel={busyLabel}
               onSetUpLater={() => void flow.setUpLater()}
               stepIndex={stepIndex}
               onBack={flow.back}
-              showPrimary
+              // Signed out, the way on keeps its place and waits for the sign-in.
+              primaryDisabled={onInaxPage && !inaxSignedIn}
               primaryBusy={shouldShowFooterBusy}
               primaryLabel={footerPrimaryLabel}
-              shortcutModifierLabel={continueShortcutModifierLabel}
+              shortcutModifierLabel={worksWithCode ? continueShortcutModifierLabel : null}
               onPrimary={() => void flow.next()}
             />
           </div>

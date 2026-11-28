@@ -16459,8 +16459,7 @@
           "f396db9f20": "讓這裡有家的感覺",
           "198b148b3c": "選擇預設代理程式",
           "windowsTerminalTitle": "設定 Windows 終端機預設值",
-          "windowsTerminalSubtitle": "為新窗格選擇預設 Shell，以及終端機中右鍵按一下的行為。",
-          "stepOfTotal": "{{current}} / {{total}}"
+          "windowsTerminalSubtitle": "為新窗格選擇預設 Shell，以及終端機中右鍵按一下的行為。"
         },
         "OnboardingFooter": {
           "ba58547306": "返回",
@@ -27162,8 +27161,7 @@
         "lastItem": "最後一個項目",
         "previous": "上一個項目",
         "next": "下一個項目",
-        "loading": "正在載入項目…",
-        "subWhere": "事項 {{number}} · {{chat}}"
+        "loading": "正在載入項目…"
       },
       "activity": {
         "linked": "連結了 {{links}}",

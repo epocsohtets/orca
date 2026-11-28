@@ -1,3 +1,4 @@
+import { hidesDeveloperChrome } from '../../../../../shared/settings/work-styles'
 import { useCallback, useEffect, useMemo } from 'react'
 import { useAppStore } from '../../../store/index'
 import { hasFeatureInteraction } from '../../../../../shared/feature-education/interactions/feature-interactions'
@@ -103,6 +104,7 @@ export function useTerminalWorkspaceProjection(controller: TerminalWorkspaceStor
       activeWorktreeId
     )
   )
+  const hideDeveloper = useAppStore((state) => hidesDeveloperChrome(state.settings))
   const hasSplitTab = useAppStore((state) =>
     hasFeatureInteraction(state.featureInteractions, 'tab-splits')
   )
@@ -117,7 +119,9 @@ export function useTerminalWorkspaceProjection(controller: TerminalWorkspaceStor
         (activeTabType === 'terminal' && Boolean(activeTabId)) ||
         // Splitting a chat focuses the new pane's landing; the tour continues there.
         focusesSplitLanding) &&
-      nextTourTipReachable
+      nextTourTipReachable &&
+      // The tour teaches agents, terminals and splits: not for someone who left Code out.
+      !hideDeveloper
     ),
     'workspace_agent_sessions_visible',
     {

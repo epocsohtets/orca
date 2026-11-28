@@ -16073,8 +16073,7 @@
           "f396db9f20": "让这里有家的感觉",
           "198b148b3c": "选择默认代理",
           "windowsTerminalTitle": "设置 Windows 终端默认值",
-          "windowsTerminalSubtitle": "为新面板选择默认 Shell，以及终端中右键单击的行为",
-          "stepOfTotal": "{{current}} / {{total}}"
+          "windowsTerminalSubtitle": "为新面板选择默认 Shell，以及终端中右键单击的行为"
         },
         "OnboardingFooter": {
           "ba58547306": "返回",
@@ -28470,7 +28469,6 @@
         "links": "链接",
         "showLess": "收起",
         "showMore": "展开",
-        "subWhere": "事项 {{number}} · {{chat}}",
         "showEarlier": "显示更早的",
         "place": "{{index}} / {{total}}",
         "deleted": "此事项已被删除",
@@ -28487,7 +28485,6 @@
         "made": "添加了此事项",
         "madeNeedsYou": "添加了此事项，并标记为“需要你处理”",
         "moved": "将此事项移至",
-        "noComments": "还没有评论",
         "notSent": "未发送",
         "retry": "重试",
         "discard": "放弃",

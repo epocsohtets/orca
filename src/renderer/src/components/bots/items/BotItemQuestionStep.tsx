@@ -28,7 +28,7 @@ import type { BotItemQuestionSteps, BotItemQuickReplyActions } from './use-bot-i
 export const BOT_ITEM_CHIP =
   'min-h-8 w-fit max-w-full rounded-[16px] border border-question-option-border px-3.5 py-1.5 text-left text-[13px] leading-[18px] [overflow-wrap:anywhere]'
 
-const CHIP_ACTION =
+export const BOT_ITEM_CHIP_ACTION =
   'outline-none hover:bg-foreground/5 focus-visible:ring-2 focus-visible:ring-ring/50'
 
 /** The recommended reply of an open line: the same pill as its siblings, filled; the one the owner
@@ -40,8 +40,33 @@ export const BOT_ITEM_CHIP_RECOMMENDED =
 export const BOT_ITEM_OPEN_QUESTION =
   'font-semibold [&_p]:font-semibold [&>*]:text-sm [&>*]:leading-5'
 
+/** A question's words: its first line in `className`, the lines under it (the agent's evidence) one
+ *  gray step down, body size. */
+export function BotItemQuestionWords({
+  question,
+  className
+}: {
+  question: string
+  className?: string
+}): React.JSX.Element {
+  const [head, ...rest] = question.split('\n')
+  const evidence = rest.join('\n').trim()
+  return (
+    <>
+      <div className={cn('min-w-0', className)}>
+        <BotItemMarkdown text={head ?? ''} />
+      </div>
+      {evidence ? (
+        <div className="mt-1 text-[13px] leading-5 text-muted-foreground [&_*]:text-muted-foreground">
+          <BotItemMarkdown text={evidence} />
+        </div>
+      ) : null}
+    </>
+  )
+}
+
 /** A line's pick: solid, with a check. */
-const CHIP_PICKED =
+export const BOT_ITEM_CHIP_PICKED =
   'flex items-center gap-1.5 border-foreground bg-foreground text-background hover:bg-foreground/90'
 
 /** Your own words, muted, with a pencil: Type your answer on an open line. */
@@ -244,16 +269,21 @@ export function BotItemQuestionStep({
                     pick
                       ? () => {
                           steps.reopen(index)
-                          focusNext.current = { kind: 'chip', index, label: pick.words }
+                          focusNext.current = {
+                            kind: 'chip',
+                            index,
+                            label: pick.words
+                          }
                         }
                       : undefined
                   }
                 />
               ) : (
                 // Answered by a comment that named no line: the comment shows as itself.
-                <div className="font-medium text-muted-foreground [&_*]:text-muted-foreground [&_p]:font-medium">
-                  <BotItemMarkdown text={decision.question} />
-                </div>
+                <BotItemQuestionWords
+                  question={decision.question}
+                  className="font-medium text-muted-foreground [&_*]:text-muted-foreground [&_p]:font-medium"
+                />
               )}
             </div>
           )
@@ -267,7 +297,7 @@ export function BotItemQuestionStep({
               aria-label={iconOnly ? typeAnswer : undefined}
               className={cn(
                 BOT_ITEM_CHIP,
-                CHIP_ACTION,
+                BOT_ITEM_CHIP_ACTION,
                 CHIP_OWN_WORDS,
                 iconOnly && 'size-8 shrink-0 justify-center self-start rounded-full p-0'
               )}
@@ -279,9 +309,7 @@ export function BotItemQuestionStep({
           ) : null
         return (
           <div key={decision.question} className={divider}>
-            <div className={cn('min-w-0', BOT_ITEM_OPEN_QUESTION)}>
-              <BotItemMarkdown text={decision.question} />
-            </div>
+            <BotItemQuestionWords question={decision.question} className={BOT_ITEM_OPEN_QUESTION} />
             <div className="mt-2.5 flex flex-wrap gap-2">
               {decision.replies.map((reply, at) => {
                 const picked = botItemHeldAnswerIsReply(pick, reply.label)
@@ -299,9 +327,9 @@ export function BotItemQuestionStep({
                     aria-pressed={picked}
                     className={cn(
                       BOT_ITEM_CHIP,
-                      CHIP_ACTION,
+                      BOT_ITEM_CHIP_ACTION,
                       // Recommended reads by its star alone: only a pick is filled.
-                      picked ? CHIP_PICKED : 'text-foreground'
+                      picked ? BOT_ITEM_CHIP_PICKED : 'text-foreground'
                     )}
                     onClick={(event) => {
                       if (event.altKey || event.shiftKey) {
@@ -325,7 +353,7 @@ export function BotItemQuestionStep({
                   // Reopening a typed pick focuses it, as a picked reply would be.
                   ref={target(`${index}:reply:${pick.words}`)}
                   type="button"
-                  className={cn(BOT_ITEM_CHIP, CHIP_ACTION, CHIP_PICKED)}
+                  className={cn(BOT_ITEM_CHIP, BOT_ITEM_CHIP_ACTION, BOT_ITEM_CHIP_PICKED)}
                   onClick={() => ownWords(index, pick)}
                 >
                   <Pencil className="size-3 shrink-0" />

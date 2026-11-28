@@ -2,6 +2,7 @@ import { memo, Suspense, useCallback, useRef } from 'react'
 import { lazyWithRetry as lazy } from '@/app-shell/startup/lazy-with-retry'
 import { useTranslate } from '@/i18n/use-translate'
 import { useAppStore } from '@/store/index'
+import { hidesDeveloperChrome } from '../../../shared/settings/work-styles'
 import { usePluginViewCaptureStore } from '@/store/plugins/capture/plugin-view-capture'
 import { useBotShareReceiveRequest } from '@/components/bots/sharing/bot-share-receive-open'
 import { useHandToBotRequest } from '@/components/bots/hand-to-bot/hand-to-bot-open'
@@ -39,9 +40,13 @@ const AutomationsPage = lazy(() => import('../components/automations/Automations
 const ActivityPrototypePage = lazy(() => import('../components/activity/ActivityPrototypePage'))
 const Settings = lazy(() => import('../components/settings/Settings'))
 const SkillsPage = lazy(() => import('../components/skills/SkillsPage'))
+const MeetingsPage = lazy(() => import('../components/meetings/MeetingsPage'))
+const MeetingBotChatPage = lazy(() => import('../components/meetings/MeetingBotChatPage'))
 const ArtifactsPage = lazy(() => import('../components/artifacts/ArtifactsPage'))
 const WorkspaceSpacePage = lazy(() => import('../components/workspace-space/WorkspaceSpacePage'))
 const MobilePage = lazy(() => import('../components/mobile/MobilePage'))
+const HomePage = lazy(() => import('../components/home/HomePage'))
+const WorkPage = lazy(() => import('../components/work/WorkPage'))
 const HandToBotFlow = lazy(() =>
   import('../components/bots/hand-to-bot/HandToBotFlow').then((module) => ({
     default: module.HandToBotFlow
@@ -140,16 +145,21 @@ function HandToBotMount(): React.JSX.Element | null {
 
 function ActivePage({ layout }: { layout: AppChromeLayout }): React.JSX.Element {
   const { activeView, hasActiveWorktree, activePendingCreationId, creationLayoutActive } = layout
+  // Without Code the Tasks slot is the work board; the code trackers are not this person's.
+  const hideDeveloper = useAppStore((s) => hidesDeveloperChrome(s.settings))
   return (
     <>
       {activeView === 'settings' ? <Settings /> : null}
       {activeView === 'skills' ? <SkillsPage /> : null}
       {activeView === 'artifacts' ? <ArtifactsPage /> : null}
-      {activeView === 'tasks' ? <TaskPage /> : null}
+      {activeView === 'tasks' ? hideDeveloper ? <WorkPage /> : <TaskPage /> : null}
+      {activeView === 'meetings' ? <MeetingsPage /> : null}
+      {activeView === 'meetingBot' ? <MeetingBotChatPage /> : null}
       {activeView === 'automations' ? <AutomationsPage /> : null}
       {activeView === 'activity' ? <ActivityPrototypePage /> : null}
       {activeView === 'space' ? <WorkspaceSpacePage /> : null}
       {activeView === 'mobile' ? <MobilePage /> : null}
+      {activeView === 'home' ? <HomePage /> : null}
       <BotShareReceiveMount />
       <BotTemplatesMount />
       <HandToBotMount />
@@ -186,6 +196,7 @@ export function AppWorkspaceShell(props: {
   const { setOpenWithFocus } = floatingWorkspace
   // `orca plugin shot` captures the right sidebar, which the parked launcher floats over.
   const capturingPluginShot = usePluginViewCaptureStore((s) => s.capturing)
+  const hideDeveloper = useAppStore((s) => hidesDeveloperChrome(s.settings))
   const toggleFloatingWorkspace = useCallback(
     () => setOpenWithFocus((open) => !open),
     [setOpenWithFocus]
@@ -303,7 +314,7 @@ export function AppWorkspaceShell(props: {
                   </Suspense>
                 </div>
                 <SidebarChatConversationMount />
-                {floatingWorkspace.showToggleButton && !capturingPluginShot ? (
+                {floatingWorkspace.showToggleButton && !capturingPluginShot && !hideDeveloper ? (
                   <MemoFloatingTerminalToggleButton
                     open={floatingWorkspace.open}
                     onToggle={toggleFloatingWorkspace}

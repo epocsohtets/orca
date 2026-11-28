@@ -4,7 +4,6 @@
 // The comment box always stays at the bottom: a reply to the agent's question is a comment, typed there
 // or picked from the question's quick replies.
 import { useDeferredValue, useEffect, useMemo, useRef } from 'react'
-import { ExternalLink, House, MessageSquare } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { useLatestHandler } from '@/lib/use-latest-handler'
@@ -25,7 +24,6 @@ import {
 } from '../../native-chat/media/images/native-chat-markdown-image-owner'
 import { NativeChatTextAttachmentScope } from '../../native-chat/media/text/NativeChatTextAttachments'
 import { botErrorMessage } from '../bot-presentation'
-import { openBotSession } from '../bot-session-open'
 import { useBotTranscriptFollow } from '../use-bot-transcript-follow'
 import { useBotGroupFileContexts } from '../BotGroupTranscriptOwner'
 import { LinkActionPopover } from '@/components/link-actions/LinkActionPopover'
@@ -48,6 +46,8 @@ import { BotItemsReadFailed } from './BotItemsReadFailed'
 import { BotItemNavRow } from './BotItemStepper'
 import { BotItemLoading } from './BotItemLoading'
 import { BotItemCloseNote } from './BotItemCloseNote'
+import { BotItemChatRow } from './BotItemChatRow'
+import { localBotItems } from '@/lib/local-bot-items'
 
 const NO_FOLDERS: never[] = []
 
@@ -60,11 +60,14 @@ export function BotItemView({
   nav,
   onShown,
   onLoading,
-  onGone
+  onGone,
+  readOnly = false
 }: {
   bot: Bot
   uid: string
   listed?: BotItem
+  /** Someone else's item, shared to read: no status, no answers, no comment, no chat. */
+  readOnly?: boolean
   commentRef?: React.RefObject<BotItemCommentBoxHandle | null>
   /** Whether the item should take focus as it shows (nothing else in the pane holds it). */
   takeFocus?: () => boolean
@@ -107,6 +110,7 @@ export function BotItemView({
       item={item}
       notice={deleted ? <BotItemDeletedNotice /> : null}
       deleted={deleted}
+      readOnly={readOnly}
       takeFocus={takeFocus}
       commentRef={commentRef}
       nav={nav}
@@ -163,7 +167,8 @@ export function BotItemBody({
   view,
   item,
   notice,
-  deleted = false,
+  deleted: gone = false,
+  readOnly = false,
   takeFocus,
   commentRef,
   nav
@@ -174,6 +179,8 @@ export function BotItemBody({
   notice?: React.ReactNode
   /** Gone from the host: shown as last read, with no status or comment. */
   deleted?: boolean
+  /** Shared to read: as a gone item, with no notice and no chat. */
+  readOnly?: boolean
   takeFocus?: () => boolean
   /** Where the comment box's handle goes, for the pane's type-to-focus. */
   commentRef?: React.RefObject<BotItemCommentBoxHandle | null>
@@ -181,6 +188,7 @@ export function BotItemBody({
   nav?: React.ReactNode
 }): React.JSX.Element {
   const t = useTranslate()
+  const deleted = gone || readOnly
   const snoozing = useBotItemSnoozing(bot)
   const pane = useRef<HTMLDivElement | null>(null)
   const ownComment = useRef<BotItemCommentBoxHandle | null>(null)
@@ -201,7 +209,6 @@ export function BotItemBody({
       toast.error(botErrorMessage(error))
     )
   const notes = useBotItemStatusNotes((_items, to, note) => setStatus(to, note))
-  const ChatIcon = item.chat.kind === 'home' ? House : MessageSquare
   const pending = useBotItemPendingComments(bot, item.uid, view.events)
   // The header and comment box paint first; the Activity, the costly part, renders right after.
   const activityMounted = useDeferredValue(true, false)
@@ -327,7 +334,10 @@ export function BotItemBody({
                         item={item}
                         chatTitle={chatTitle}
                         deleted={deleted}
-                        onStatus={(to) => notes.move([item], to)}
+                        onStatus={(to) =>
+                          // A server's own statuses ask nothing first.
+                          localBotItems(bot.id)?.statuses ? setStatus(to) : notes.move([item], to)
+                        }
                         snoozing={snoozing}
                         scrollRef={scrollRef}
                       />
@@ -344,20 +354,9 @@ export function BotItemBody({
                           <BotItemCloseNote item={item} />
                         ) : null}
                         <dl className="grid grid-cols-[84px_minmax(0,1fr)] items-start gap-x-2 gap-y-1 text-xs @max-[284px]:grid-cols-[72px_minmax(0,1fr)]">
-                          <dt className="leading-6 text-muted-foreground">
-                            {t('bots.items.field.chat', 'Chat')}
-                          </dt>
-                          <dd className="flex h-6 items-center">
-                            <button
-                              type="button"
-                              className="flex min-w-0 items-center gap-1.5 text-foreground hover:underline"
-                              onClick={() => openBotSession(bot, item.chat.id)}
-                            >
-                              <ChatIcon className="size-3 shrink-0 text-muted-foreground" />
-                              <span className="truncate">{chatTitle}</span>
-                              <ExternalLink className="size-3 shrink-0 text-muted-foreground" />
-                            </button>
-                          </dd>
+                          {readOnly ? null : (
+                            <BotItemChatRow bot={bot} item={item} title={chatTitle} />
+                          )}
                           {item.doneMeans ? (
                             <>
                               <dt className="leading-[18px] text-muted-foreground">

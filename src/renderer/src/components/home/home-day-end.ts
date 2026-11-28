@@ -1,0 +1,291 @@
+import { followUpState } from '@/components/meetings/meeting-rules'
+import type { Meeting, MeetingTask } from '@/components/meetings/meeting-types'
+import type { HomeBoardState, HomeProjectId, HomeRecordAnswer, HomeTask } from './home-board'
+import type { InaxStatus } from './home-task-loop'
+
+/** One line of a card's "Recent": who did what, when. */
+export type HomeDayEndLine = {
+  id: string
+  /** Working days before the sample day (0 or negative). */
+  day: number
+  who: string
+  text: string
+  when: string
+  taskId?: string
+  meetingId?: string
+}
+
+export type HomeDayEndCard =
+  | {
+      kind: 'task'
+      id: string
+      task: HomeTask
+      timeline: HomeDayEndLine[]
+      /** The progress line the agent wrote ahead; null when it does not know one. */
+      suggestion: string | null
+      /** The status the agent proposes; null when it proposes none. */
+      proposed: InaxStatus | null
+    }
+  | {
+      /** One follow-up of a meeting I host that the meeting gave nobody. */
+      kind: 'meeting'
+      /** The follow-up's id. */
+      id: string
+      meetingId: string
+      meetingTitle: string
+      project: HomeProjectId
+      timeline: HomeDayEndLine[]
+      /** `returnedBy`: the person the meeting named, who said it is not theirs. */
+      followUp: { id: string; text: string; returnedBy: string | null }
+      /** Who can take it: the host and the attendees. */
+      peopleIds: string[]
+    }
+  | {
+      /** One day record the app could not place. */
+      kind: 'records'
+      id: string
+      record: { id: string; text: string; suggestTaskId: string }
+    }
+
+/** What one saved card put where; enough to take exactly that back. */
+export type HomeDayEndSaved = (
+  | {
+      kind: 'task'
+      id: string
+      noteId: string | null
+      /** The status the card set; null when it left the status alone. */
+      status: InaxStatus | null
+      /** What inAX held before, to restore; null when the task had no record of its own. */
+      prevStatus: InaxStatus | null
+      /** The save also answered the agent's waiting proposal. */
+      closedLoop: boolean
+      /** My answer to the day-end question as I gave it; absent for a task the pass settled another way. */
+      answer?: string
+      /** The status picked was the one the task had (set only to clear a wait): an answer, not a change. */
+      kept?: true
+    }
+  | { kind: 'meeting'; id: string; taskIds: string[] }
+  | { kind: 'records'; id: 'records'; recordIds: string[] }
+) & {
+  /** When it was saved: the time column of Home's list. */
+  at?: number
+}
+
+export const HOME_RECORD_NOT_WORK = 'notWork'
+
+/** What I changed on a card before saving it. `picks`: follow-up to person, or record to answer. */
+export type HomeDayEndDraft = { text?: string; status?: InaxStatus; picks?: Record<string, string> }
+
+/** What a save carries: the card and my draft of it, with the agent's suggestions filled in where I left them. */
+export type HomeDayEndSave =
+  | {
+      kind: 'task'
+      taskId: string
+      text: string
+      byAgent: boolean
+      status: InaxStatus | null
+      /** The status the task shows before the save. */
+      current: InaxStatus
+      /** The card held the agent's closing proposal: the save is my answer to it. */
+      answersProposal: boolean
+      /** My answer as I gave it: a status kept as it was is an answer too. */
+      answer?: string
+    }
+  | { kind: 'meeting'; meetingId: string; rows: { followUpId: string; assigneeId: string }[] }
+  | { kind: 'records'; answers: { recordId: string; answer: string }[] }
+
+const SHOWN_LINES = 3
+
+/**
+ * The day-end cards: one per task of mine that moved today, one per meeting I host with follow-ups the meeting gave nobody,
+ * and one for day records the app could not place. A card I saved does not come back.
+ */
+export function planHomeDayEnd(args: {
+  tasks: readonly HomeTask[]
+  /** Newest first. */
+  activity: readonly HomeDayEndLine[]
+  records: readonly { id: string; text: string; suggestTaskId: string }[]
+  recordAnswers: Readonly<Record<string, HomeRecordAnswer | undefined>>
+  viewerId: string
+  meetings: readonly Meeting[]
+  meetingTasks: readonly MeetingTask[]
+  saved: readonly HomeDayEndSaved[]
+  suggestion: (task: HomeTask) => string | null
+}): HomeDayEndCard[] {
+  // A follow-up's card and a record's card stay while it is still open.
+  const saved = new Set(args.saved.flatMap((entry) => (entry.kind === 'task' ? [entry.id] : [])))
+  const cards: HomeDayEndCard[] = []
+  for (const task of args.tasks) {
+    const lines = args.activity.filter((line) => line.taskId === task.id)
+    // "Moved today": someone (me, an agent, a colleague) did something on it today. A task that only arrived
+    // from a meeting today has nothing to report yet; its arrival line is `task:<id>`.
+    if (
+      task.meetingId ||
+      task.assignee ||
+      saved.has(task.id) ||
+      !lines.some((line) => line.day === 0 && line.id !== `task:${task.id}`)
+    ) {
+      continue
+    }
+    cards.push({
+      kind: 'task',
+      id: task.id,
+      task,
+      timeline: lines.slice(0, SHOWN_LINES),
+      suggestion: task.proposal?.note || args.suggestion(task),
+      // A finished draft that still reads "in progress" is the one change the agent proposes by itself.
+      proposed:
+        task.proposal?.status ??
+        (task.who === 'draft' && task.status === 'inProgress' ? 'review' : null)
+    })
+  }
+  for (const meeting of args.meetings) {
+    const open = meeting.followUps.filter(
+      (followUp) => followUpState(followUp, args.meetingTasks).kind !== 'task'
+    )
+    if (meeting.hostId !== args.viewerId || !meeting.minutes || open.length === 0) {
+      continue
+    }
+    const timeline = args.activity
+      .filter((line) => line.meetingId === meeting.id)
+      .slice(0, SHOWN_LINES)
+    for (const { id, text, declined, suggestedOwnerId } of open) {
+      cards.push({
+        kind: 'meeting',
+        id,
+        meetingId: meeting.id,
+        meetingTitle: meeting.title,
+        project: meeting.project,
+        timeline,
+        followUp: { id, text, returnedBy: declined ? suggestedOwnerId : null },
+        peopleIds: [meeting.hostId, ...meeting.attendeeIds]
+      })
+    }
+  }
+  for (const record of args.records) {
+    if (args.recordAnswers[record.id] === undefined) {
+      cards.push({ kind: 'records', id: record.id, record })
+    }
+  }
+  return cards
+}
+
+type DayEndState = Pick<HomeBoardState, 'inax' | 'loops' | 'records' | 'dayEnd'>
+
+/**
+ * Saving a task card is the one moment its line and status reach colleagues. Nothing to say and no status
+ * change saves nothing: the card was skipped.
+ */
+export function saveHomeDayEndTask(
+  state: DayEndState,
+  args: {
+    taskId: string
+    text: string
+    /** The agent's line, taken as it was. */
+    byAgent: boolean
+    /** The status to set; null leaves it alone. */
+    status: InaxStatus | null
+    /** The status the task shows now, stamped on the note. */
+    current: InaxStatus
+    answersProposal: boolean
+    answer?: string
+    at: number
+  }
+): DayEndState {
+  const text = args.text.trim()
+  if (!text && args.status === null && !args.answer) {
+    return state
+  }
+  const record = state.inax[args.taskId]
+  const noteId = text ? `note-${args.at}` : null
+  const loop = state.loops[args.taskId]
+  const closedLoop = Boolean(args.answersProposal && loop && !loop.final)
+  return {
+    ...state,
+    loops:
+      closedLoop && loop
+        ? { ...state.loops, [args.taskId]: { ...loop, final: { at: args.at } } }
+        : state.loops,
+    inax: {
+      ...state.inax,
+      [args.taskId]: {
+        status: args.status ?? record?.status,
+        notes: noteId
+          ? [
+              ...(record?.notes ?? []),
+              {
+                id: noteId,
+                at: args.at,
+                text,
+                status: args.status ?? args.current,
+                by: args.byAgent ? 'agentConfirmed' : 'me',
+                statusChanged: args.status !== null
+              }
+            ]
+          : (record?.notes ?? [])
+      }
+    },
+    dayEnd: [
+      ...state.dayEnd,
+      {
+        kind: 'task',
+        id: args.taskId,
+        noteId,
+        status: args.status,
+        prevStatus: record?.status ?? null,
+        ...(args.status !== null && args.status === args.current ? { kept: true as const } : {}),
+        closedLoop,
+        ...(args.answer ? { answer: args.answer } : {}),
+        at: args.at
+      }
+    ]
+  }
+}
+
+/** The status a saved task card moved the task to; none when it kept the one it had (that is my answer). */
+export function homeDayEndMove(
+  entry: Extract<HomeDayEndSaved, { kind: 'task' }>
+): InaxStatus | undefined {
+  return entry.kept ? undefined : (entry.status ?? undefined)
+}
+
+/** Takes back what one saved card sent. `meetingTaskIds` are the follow-up tasks to remove. */
+export function undoHomeDayEnd(
+  state: DayEndState,
+  index: number
+): { state: DayEndState; meetingTaskIds: string[] } {
+  const entry = state.dayEnd[index]
+  const dayEnd = state.dayEnd.filter((_, at) => at !== index)
+  if (!entry || entry.kind === 'meeting') {
+    return { state: { ...state, dayEnd }, meetingTaskIds: entry ? entry.taskIds : [] }
+  }
+  if (entry.kind === 'records') {
+    const records = { ...state.records }
+    for (const id of entry.recordIds) {
+      delete records[id]
+    }
+    return { state: { ...state, records, dayEnd }, meetingTaskIds: [] }
+  }
+  const inax = { ...state.inax }
+  const record = inax[entry.id]
+  const notes = (record?.notes ?? []).filter((note) => note.id !== entry.noteId)
+  const status = entry.status === null ? record?.status : (entry.prevStatus ?? undefined)
+  if (notes.length === 0 && status === undefined) {
+    delete inax[entry.id]
+  } else {
+    inax[entry.id] = { status, notes }
+  }
+  const loop = state.loops[entry.id]
+  return {
+    state: {
+      ...state,
+      inax,
+      loops:
+        entry.closedLoop && loop
+          ? { ...state.loops, [entry.id]: { ...loop, final: undefined } }
+          : state.loops,
+      dayEnd
+    },
+    meetingTaskIds: []
+  }
+}

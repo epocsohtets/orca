@@ -4,16 +4,23 @@ import { TaskPageSourceBar } from './SourceBar'
 import { AlertCircle } from 'lucide-react'
 import { TaskPageGitHubModeControls } from './github/listing/ModeControls'
 import { TaskPageProviderFilters } from './ProviderFilters'
-import { useInaxSourceSelection } from './inax/inax-source-selection'
+import { useInaxSelected, useInaxSourceSelection } from './inax/inax-source-selection'
 export function TaskPageListChrome({
   model
 }: {
   model: TaskPageComposerActionsModel
 }): React.JSX.Element | null {
   const { taskSourceAvailabilityNotice, taskPageListChromeHidden } = model
-  const inaxSelected = useInaxSourceSelection((state) => state.selected)
+  const inaxSelected = useInaxSelected()
+  // A task's page and its conversation take the whole content area, as a GitHub item's page does.
+  const inaxTaskOpen = useInaxSourceSelection((state) => state.taskId !== null) && inaxSelected
   return (
-    <div className={cn('flex-none flex flex-col gap-2', taskPageListChromeHidden && 'hidden')}>
+    <div
+      className={cn(
+        'flex-none flex flex-col gap-2',
+        (taskPageListChromeHidden || inaxTaskOpen) && 'hidden'
+      )}
+    >
       <section className="flex flex-col gap-2">
         <div className="flex flex-col gap-2">
           <TaskPageSourceBar model={model} />

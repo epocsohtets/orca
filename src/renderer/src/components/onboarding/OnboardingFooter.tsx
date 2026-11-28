@@ -3,24 +3,29 @@ import { useTranslate } from '@/i18n/use-translate'
 
 type OnboardingFooterProps = {
   shouldShowSetUpLater: boolean
+  /** Replaces "Set up later" where leaving the page has a plainer name. */
+  setUpLaterLabel?: string
   busyLabel: string | null
   onSetUpLater: () => void
   stepIndex: number
   onBack: () => void
-  showPrimary: boolean
+  /** The way on keeps its place and waits, e.g. for a sign-in on the page. */
+  primaryDisabled?: boolean
   primaryBusy: boolean
   primaryLabel: string
-  shortcutModifierLabel: string
+  /** Null leaves the keyboard hint off the button; the shortcut itself still works. */
+  shortcutModifierLabel: string | null
   onPrimary: () => void
 }
 
 export function OnboardingFooter({
   shouldShowSetUpLater,
+  setUpLaterLabel,
   busyLabel,
   onSetUpLater,
   stepIndex,
   onBack,
-  showPrimary,
+  primaryDisabled = false,
   primaryBusy,
   primaryLabel,
   shortcutModifierLabel,
@@ -35,7 +40,8 @@ export function OnboardingFooter({
           disabled={Boolean(busyLabel)}
           onClick={onSetUpLater}
         >
-          {t('auto.components.onboarding.OnboardingFooter.111d3f8d92', 'Set up later')}
+          {setUpLaterLabel ??
+            t('auto.components.onboarding.OnboardingFooter.111d3f8d92', 'Set up later')}
         </button>
       ) : (
         <span />
@@ -51,21 +57,21 @@ export function OnboardingFooter({
             {t('auto.components.onboarding.OnboardingFooter.ba58547306', 'Back')}
           </button>
         )}
-        {showPrimary && (
-          <button
-            className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
-            aria-busy={primaryBusy}
-            disabled={Boolean(busyLabel)}
-            onClick={onPrimary}
-          >
-            {primaryBusy ? <Loader2 className="size-4 animate-spin" /> : null}
-            {primaryLabel}
+        <button
+          className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+          aria-busy={primaryBusy}
+          disabled={Boolean(busyLabel) || primaryDisabled}
+          onClick={onPrimary}
+        >
+          {primaryBusy ? <Loader2 className="size-4 animate-spin" /> : null}
+          {primaryLabel}
+          {shortcutModifierLabel === null ? null : (
             <span className="ml-1 inline-flex items-center gap-0.5 rounded border border-primary-foreground/20 px-1.5 py-0.5 text-[10px] font-medium leading-none text-current/80">
               <span>{shortcutModifierLabel}</span>
               <CornerDownLeft className="size-3" />
             </span>
-          </button>
-        )}
+          )}
+        </button>
       </div>
     </footer>
   )

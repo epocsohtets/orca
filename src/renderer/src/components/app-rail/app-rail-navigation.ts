@@ -8,6 +8,8 @@ import { selectRailPageHidesWorkspaceList } from './app-rail-layout'
 type PageCloseActions = Pick<
   UISlice,
   | 'closeTaskPage'
+  | 'closeMeetingsPage'
+  | 'closeMeetingBotPage'
   | 'closeAutomationsPage'
   | 'closeArtifactsPage'
   | 'closeSkillsPage'
@@ -15,6 +17,7 @@ type PageCloseActions = Pick<
   | 'closeActivityPage'
   | 'closeSpacePage'
   | 'closeMobilePage'
+  | 'closeHomePage'
 >
 
 /** The store API the rail navigates through (the real `useAppStore`, or a fake in tests). */
@@ -25,13 +28,16 @@ export type RailNavigationStore = {
 
 const CLOSE_PAGE: Record<Exclude<UISlice['activeView'], 'terminal'>, keyof PageCloseActions> = {
   tasks: 'closeTaskPage',
+  meetings: 'closeMeetingsPage',
+  meetingBot: 'closeMeetingBotPage',
   automations: 'closeAutomationsPage',
   artifacts: 'closeArtifactsPage',
   skills: 'closeSkillsPage',
   settings: 'closeSettingsPage',
   activity: 'closeActivityPage',
   space: 'closeSpacePage',
-  mobile: 'closeMobilePage'
+  mobile: 'closeMobilePage',
+  home: 'closeHomePage'
 }
 
 /** Nearest earlier entry that is a live workspace (folder workspaces included), never a page view. */

@@ -14,6 +14,7 @@ import RunningTerminalCloseDialog from './components/terminal-pane/layout/close/
 import WorktreeBaseFallbackDialog from './components/sidebar/workspace-creation/base-ref-update/WorktreeBaseFallbackDialog'
 import ClaudeAccountSwitchDialog from './components/provider-accounts/claude/ClaudeAccountSwitchDialog'
 import { AppBackgroundServices } from './app-shell/AppBackgroundServices'
+import { HomeTaskItemsHost } from './components/home/home-task-items-host'
 import { AppRootSurfaces } from './app-shell/AppRootSurfaces'
 import { AppWorkspaceShell } from './app-shell/AppWorkspaceShell'
 import { WindowControls } from './app-shell/chrome/WindowControls'
@@ -35,6 +36,7 @@ import { useDocumentAppearance } from './app-shell/appearance/use-document-appea
 import { useFloatingWorkspacePanel } from './components/floating-terminal/workspace/use-floating-workspace-panel'
 import { useGlobalKeybindings } from './hooks/app-commands/use-global-keybindings'
 import { useOnboardingAndFeatureTips } from './app-shell/startup/use-onboarding-and-feature-tips'
+import { useLandOnHomeWithoutCode } from './app-shell/startup/use-land-on-home-without-code'
 import { usePersistedUIWriter } from './app-shell/storage/use-persisted-ui-writer'
 import { useRuntimeGraphSync } from './runtime/sync-runtime-graph/use-runtime-graph-sync'
 import { useWindowVisibilityEffects } from './app-shell/chrome/use-window-visibility-effects'
@@ -61,6 +63,7 @@ function App(): React.JSX.Element {
   }
   const floatingWorkspace = useFloatingWorkspacePanel()
   const onboardingGate = useOnboardingAndFeatureTips()
+  useLandOnHomeWithoutCode()
 
   useAppShellServices()
   // Load drafts before the startup chain so no failed step can skip them.
@@ -111,6 +114,7 @@ function App(): React.JSX.Element {
           <AddToChatPointMenuHost />
           <LinkRoutingPreferenceDialogProvider>
             <AppBackgroundServices />
+            <HomeTaskItemsHost />
             <SpaceWindowStatePublisher />
             <AppWorkspaceShell layout={layout} floatingWorkspace={floatingWorkspace} />
             <AppRootSurfaces

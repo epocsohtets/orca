@@ -4,6 +4,8 @@ import { AgentCliUpdateCard } from '../../components/agent-cli-update/AgentCliUp
 import { lazyWithRetry as lazy } from '@/app-shell/startup/lazy-with-retry'
 import { CodexSharedSettingsNoticeCard } from '../../components/terminal-pane/provider-notices/codex-settings/CodexSharedSettingsNoticeCard'
 import { NotificationCardStack } from '../../components/notifications/NotificationCardStack'
+import { MeetingNoticeCard } from '../../components/meetings/MeetingNoticeCard'
+import { WorkAskNoticeCard } from '../../components/work/WorkAskNoticeCard'
 import { StarNagCard } from '../../components/star-nag/StarNagCard'
 import { WorkspaceCleanupRunCard } from '../../components/workspace-cleanup/removal/run/WorkspaceCleanupRunCard'
 import { OverlayBoundary } from './app-root-surface-boundaries'
@@ -67,6 +69,12 @@ export function AppNotificationCards({
       </Suspense>
       <OverlayBoundary boundaryId="overlay.workspace-cleanup-run" resetKey={activeView}>
         <WorkspaceCleanupRunCard />
+      </OverlayBoundary>
+      <OverlayBoundary boundaryId="overlay.meeting-notice" resetKey={activeView}>
+        <MeetingNoticeCard />
+      </OverlayBoundary>
+      <OverlayBoundary boundaryId="overlay.work-ask-notice" resetKey={activeView}>
+        <WorkAskNoticeCard />
       </OverlayBoundary>
       <OverlayBoundary boundaryId="overlay.star-nag" resetKey={activeView}>
         <StarNagCard />

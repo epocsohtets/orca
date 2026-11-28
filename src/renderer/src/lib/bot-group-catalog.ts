@@ -85,9 +85,20 @@ export async function openBotGroupRoom(
       outcome.refused.failureNotified
     )
   }
-  const workspace = folderWorkspaceKey(group.folderWorkspaceId)
+  openRoomTab(folderWorkspaceKey(group.folderWorkspaceId), group.hostId, roomId, label)
+}
+
+/** Focuses the room's tab in an active folder workspace, adding the tab the first time. */
+export function openRoomTab(
+  workspace: string,
+  hostId: BotGroup['hostId'],
+  roomId: string,
+  label: string
+): void {
   const state = useAppStore.getState()
-  const existing = roomTab(state, group, roomId)
+  const existing = state.unifiedTabsByWorktree[workspace]?.find(
+    (tab) => tab.contentType === 'room' && tab.entityId === roomId
+  )
   if (existing) {
     showRoomTab(workspace, existing.id)
     return
@@ -96,7 +107,7 @@ export async function openBotGroupRoom(
     state.createUnifiedTab(workspace, 'room', {
       ...(tabId ? { id: tabId } : {}),
       entityId: roomId,
-      executionHostId: group.hostId,
+      executionHostId: hostId,
       label
     }).id
   const groupId = ORCA_LAYOUT_OWNER_IS_MAIN

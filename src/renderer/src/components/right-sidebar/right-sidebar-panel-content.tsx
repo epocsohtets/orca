@@ -1,6 +1,7 @@
 import { useAppStore } from '@/store/index'
 import { Suspense } from 'react'
 import { lazyWithRetry as lazy } from '@/app-shell/startup/lazy-with-retry'
+import { useTaskIdOfWorkspace } from '../work/work-task-workspace'
 import { BotChatsSkeleton } from '../bots/BotChatsSkeleton'
 import type { ActiveRightSidebarTab } from '../../../../shared/ui-chrome/ui-chrome-types'
 import '../../../../shared/plugins/manifest/plugin-manifest'
@@ -22,6 +23,7 @@ const FolderWorkspacePrChecksPanel = lazy(
 )
 const PluginPanel = lazy(() => import('./plugin-panels/PluginPanel'))
 const BotActivityPanel = lazy(() => import('../bots/BotActivityPanel'))
+const WorkTaskSidebarPanel = lazy(() => import('../work/WorkTaskSidebarPanel'))
 const BotConnectorsPanel = lazy(() => import('../bots/BotConnectorsPanel'))
 const BotChatsPanel = lazy(() => import('../bots/BotChatsPanel'))
 
@@ -41,6 +43,7 @@ export function RightSidebarPanelContent({
   const isFolderWorkspace = useAppStore(
     (state) => state.activeWorkspaceKey?.startsWith('folder:') ?? false
   )
+  const isTask = useTaskIdOfWorkspace(useAppStore((state) => state.activeWorkspaceKey)) !== null
   return (
     <div
       className="flex min-h-0 flex-1 flex-col overflow-hidden"
@@ -74,7 +77,8 @@ export function RightSidebarPanelContent({
             isVisible={rightSidebarOpen && effectiveTab === 'pr-checks'}
           />
         )}
-        {effectiveTab === 'bot-activity' && <BotActivityPanel />}
+        {effectiveTab === 'bot-activity' &&
+          (isTask ? <WorkTaskSidebarPanel /> : <BotActivityPanel />)}
         {effectiveTab === 'bot-connectors' && <BotConnectorsPanel />}
         {effectiveTab === 'bot-chats' && <BotChatsPanel />}
         {/* Remount on plugin changes so an old iframe cannot post through the next plugin's rebound bridge. */}

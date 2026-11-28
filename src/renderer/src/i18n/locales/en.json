@@ -1204,7 +1204,7 @@
       },
       "activitySuggestions": {
         "title": "Activity suggestions",
-        "description": "Records the pages you open in the built-in browser (time, address without query, title) to suggest handing repeated web work to an agent. The record stays in memory on this device.",
+        "description": "Records the address, title and time of pages you open in this app’s browser, and suggests handing repeated work to an agent. The record stays on this computer.",
         "searchKeywords": {
           "activity": "activity",
           "suggestions": "suggestions",
@@ -2266,15 +2266,15 @@
       "add": "Add app",
       "registered": "Registered apps",
       "searchPlaceholder": "Search installed apps…",
-      "noMatches": "No apps found.",
+      "noMatches": "No app has that name. Check the name.",
       "emptyTitle": "No apps registered",
-      "emptyDescription": "Add the apps you work in to watch them.",
+      "emptyDescription": "Add the apps you work in and their time collects in My day.",
       "paused": "Paused",
-      "watching": "Watching",
-      "watchToggle": "Watch {{name}}",
+      "watching": "Recording time",
+      "watchToggle": "Record time in {{name}}",
       "remove": "Remove",
       "title": "My apps",
-      "description": "The apps you work in. Orca watches the ones you register.",
+      "description": "The apps you work in. Orca records the time you spend in the ones you register.",
       "removeTitle": "Remove {{name}}?",
       "removeDescription": "This removes the app from your registered apps. The app stays installed on this Mac."
     }
@@ -4632,11 +4632,7 @@
           "linearViewRestoreFailed": "Failed to restore saved Linear view."
         },
         "shownCount_one": "{{count}} shown",
-        "inaxSource": "inAX",
-        "inaxSampleData": "inAX · sample data",
-        "inaxStatusOpen": "Open",
-        "inaxStatusInProgress": "In progress",
-        "inaxSignedOut": "Sign in with inAX to see your tasks"
+        "inaxSource": "inAX"
       },
       "Terminal": {
         "73768427cf": "Close",
@@ -13992,9 +13988,7 @@
         },
         "inaxAccount": {
           "signIn": "Sign in with inAX",
-          "providerConnected": "1 account connected",
-          "providerDescription": "Sign in with inAX to browse and start work from your inAX tasks.",
-          "providerCredentialCopy": "Sign in with your inAX account. This preview uses a sample account: nothing is sent or stored, and the sign-in resets when Orca reloads."
+          "providerConnected": "1 account connected"
         },
         "orcaAccount": {
           "connected": "Connected",
@@ -17020,8 +17014,7 @@
           "f396db9f20": "Make it feel like home",
           "198b148b3c": "Pick your default agent",
           "windowsTerminalTitle": "Set Windows terminal defaults",
-          "windowsTerminalSubtitle": "Choose the DEFAULT Shell for new panes and how right-click behaves in the terminal.",
-          "stepOfTotal": "{{current}} of {{total}}"
+          "windowsTerminalSubtitle": "Choose the DEFAULT Shell for new panes and how right-click behaves in the terminal."
         },
         "OnboardingFooter": {
           "ba58547306": "Back",
@@ -26603,12 +26596,11 @@
   },
   "workStyles": {
     "title": "How you work",
-    "description": "Choose every way you work. Orca hides the settings and setup steps you do not need. With nothing chosen, everything shows.",
     "hiddenHint": "Hidden for your work style",
     "options": {
       "code": {
         "label": "Code",
-        "description": "Terminal, Git and agents in repositories"
+        "description": "I write and change program code myself"
       },
       "web": {
         "label": "Web",
@@ -26620,17 +26612,20 @@
       },
       "meetings": {
         "label": "Meetings",
-        "description": "Calls, notes and dictation"
+        "description": "Calls, minutes and dictation"
       }
     },
     "showAll": {
-      "label": "Show all settings",
-      "description": "Show every Settings page, including the pages hidden for your work style."
+      "label": "Show all settings"
     },
     "onboarding": {
       "title": "How do you work?",
-      "subtitle": "Choose all that apply. Orca shows only the setup you need.",
-      "switchNote": "Nothing chosen shows everything. Change any time in <em>Settings → General</em>."
+      "subtitle": "Choose all that apply. The first screens follow what you choose.",
+      "switchNote": "Not sure? Pick the closest one. You can change it later in <em>Settings → General</em>."
+    },
+    "workFolder": {
+      "label": "Work folder location",
+      "change": "Change"
     }
   },
   "resourceManager": {
@@ -27969,7 +27964,7 @@
       "title": "Bots",
       "newBot": "New bot",
       "startFromScratch": "Start from scratch",
-      "emptyCardTitle": "Your AI teammate",
+      "emptyCardTitle": "Make a bot to hand work to",
       "emptyTemplates": "Templates",
       "expand": "Expand Bots",
       "collapse": "Collapse Bots",
@@ -30621,7 +30616,6 @@
         "made": "added this item",
         "madeNeedsYou": "added this item as Needs you",
         "moved": "moved this to",
-        "noComments": "No comments yet.",
         "notSent": "Not sent.",
         "retry": "Retry",
         "discard": "Discard",
@@ -30635,7 +30629,8 @@
         "snoozedBare": "snoozed this",
         "unsnoozed": "unsnoozed this",
         "snoozeEnded": "Back from snooze early",
-        "waitingOn": "Waiting on"
+        "waitingOn": "Waiting on",
+        "answered": "answered:"
       },
       "cancel": {
         "confirmMany": "Cancel {{count}}",
@@ -30777,7 +30772,6 @@
         "links": "Links",
         "showLess": "Show less",
         "showMore": "Show more",
-        "subWhere": "Item {{number}} · {{chat}}",
         "showEarlier": "Show earlier",
         "next": "Next item",
         "previous": "Previous item",
@@ -31450,7 +31444,256 @@
     "customize": "Customize",
     "pageRegion": "Page",
     "account": "Account",
-    "signIn": "Sign in"
+    "signIn": "Sign in",
+    "home": "Home",
+    "work": "Work"
+  },
+  "meetings": {
+    "recording": {
+      "statusAria": "Open the meeting being recorded: {{title}}",
+      "on": "Recording",
+      "everyoneSees": "All {{count}} people in the meeting see this.",
+      "start": "Start recording",
+      "sent": "The meeting agent sent the minutes to all {{count}} people in the meeting.",
+      "stop": "End recording",
+      "card": "Recording"
+    },
+    "title": "Meetings",
+    "schedule": "Create meeting",
+    "pane": {
+      "agenda": "Schedule",
+      "upcoming": "Coming up",
+      "past": "Past"
+    },
+    "form": {
+      "titleRequired": "Enter a title so attendees know what the meeting is for.",
+      "titleTooLong": "Use {{max}} characters or fewer.",
+      "attendeesRequired": "Add at least one person besides the host.",
+      "fromChat": "From the chat “{{name}}”",
+      "title": "Title",
+      "when": "When",
+      "now": "Start now and record",
+      "attendees": "Attendees",
+      "place": "Place",
+      "outline": "Outline",
+      "materials": "Materials",
+      "submit": "Create",
+      "removeMaterial": "Remove “{{name}}”",
+      "linkInvalid": "Enter the full address, starting with https://, such as https://example.com/file.",
+      "dropNow": "Drop to attach.",
+      "dropHere": "Drop files here, or",
+      "pickFiles": "Choose files",
+      "addLink": "Attach a link",
+      "linkUrl": "Link address",
+      "linkName": "Name to show (optional)",
+      "attach": "Attach",
+      "startDate": "Start date",
+      "startTime": "Start time",
+      "endDate": "End date",
+      "endTime": "End time",
+      "timeInvalid": "“{{typed}}” is not a time. Write it like 15:30, or pick one from the list.",
+      "endBeforeStart": "The end must be after the start. Move the end time or the end date later.",
+      "rangeTooLong": "This is longer than 14 days. Move the end date earlier.",
+      "fromWhisper": "The meeting agent filled this in from the chat “{{name}}”. Change what is wrong.",
+      "spansDays": "Runs over {{count}} days.",
+      "lengthHours": "{{h}} hr {{m}} min long",
+      "lengthMinutes": "{{count}} min long",
+      "recentPlaces": "Used recently",
+      "attendeesFromChat": "The people of “{{name}}” are in. Take out anyone who need not come.",
+      "saving": "Creating",
+      "submitNow": "Create and record",
+      "removePerson": "Remove {{name}}",
+      "host": "Host",
+      "findPerson": "Find by name",
+      "people": "People",
+      "noPerson": "Nobody is called “{{query}}”. Check the name.",
+      "everyoneIn": "Everyone is already in.",
+      "inChat": "In this chat",
+      "card": "New meeting"
+    },
+    "cancel": "Cancel",
+    "day": {
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "yesterday": "Yesterday"
+    },
+    "due": "Due {{date}}",
+    "elapsed": {
+      "hours": "{{h}} hr {{m}} min",
+      "minutes": "{{m}} min {{s}} sec",
+      "seconds": "{{s}} sec"
+    },
+    "status": {
+      "todo": "To do",
+      "inProgress": "In progress",
+      "done": "Done"
+    },
+    "chat": {
+      "setUp": "{{name}} created a meeting: {{title}}",
+      "open": "Open the meeting"
+    },
+    "save": "Save",
+    "prep": {
+      "outline": "Outline",
+      "edit": "Edit outline and materials",
+      "materials": "Materials",
+      "editShort": "Edit"
+    },
+    "bot": {
+      "minutesReady": "The minutes of **{{title}}** are ready.",
+      "noProposals": "Nothing in this meeting looks like yours.",
+      "sharedMessage": "{{name}} shared the full minutes of **{{title}}** with you.",
+      "assignedMessage": "{{name}} assigned you a task from **{{title}}**.",
+      "name": "Meeting agent",
+      "about": "Sends you the minutes and the items that look like yours",
+      "aboutOutside": "Sends you assigned tasks and the part they came from",
+      "emptyTitle": "No messages yet",
+      "emptyDetail": "When a meeting you are in ends its recording, the minutes come here. So do tasks assigned to you from a meeting.",
+      "minutesCard": "Minutes",
+      "openMinutes": "Open the minutes",
+      "sharedBy": "Shared with you by {{name}}",
+      "sentTo": "Sent to all {{count}} people in the meeting",
+      "givenToOther": "Assigned to {{name}}",
+      "taken": "Yours · {{status}}",
+      "assignedByHost": "Assigned by {{name}} · {{status}}",
+      "declined": "You said this is not yours",
+      "proposalCard": "My task from this meeting",
+      "declinedHelp": "{{name}} sees your answer: “Not mine”.",
+      "assignedCard": "A task for you from “{{title}}”",
+      "rowMinutes": "Minutes: {{title}}",
+      "rowShared": "Shared minutes: {{title}}",
+      "rowTask": "New task: {{title}}",
+      "rowEmpty": "Minutes and your tasks arrive here",
+      "heardMessage": "A task for you from **{{title}}**."
+    },
+    "source": "Where it was said",
+    "ask": {
+      "noAnswer": "I did not find that in this meeting. Try a word that was said, or search the full transcript.",
+      "label": "Ask the meeting agent about this meeting"
+    },
+    "followUps": {
+      "title": "Follow-up tasks",
+      "mine": "Mine",
+      "accepted": "Taken by the owner",
+      "stateDeclined": "Says not theirs",
+      "owner": "Owner of “{{text}}”",
+      "chooseOwner": "Choose owner",
+      "colTask": "Task",
+      "colOwner": "Owner",
+      "colActions": "Actions",
+      "stateUnasked": "No owner",
+      "assignedByMe": "Assigned by me",
+      "heard": "Made by the meeting agent",
+      "unassign": "Remove owner",
+      "more": "Menu for “{{text}}”"
+    },
+    "openTask": "Open task",
+    "excerpt": {
+      "task": "My task",
+      "assignedBy": "Assigned by {{name}}",
+      "where": "The part of the meeting it came from"
+    },
+    "detail": {
+      "attendees": "People",
+      "originChat": "Chat “{{name}}”",
+      "host": "Host"
+    },
+    "response": {
+      "yes": "Coming",
+      "no": "Not coming",
+      "none": "Not answered",
+      "label": "Will you come to “{{title}}”?"
+    },
+    "minutes": {
+      "depth": "What to read",
+      "brief": "Key points",
+      "summary": "Summary",
+      "full": "Transcript",
+      "ask": "Ask the agent",
+      "decisions": "Decisions",
+      "find": "Find in the transcript",
+      "found": "{{count}} of {{total}} remarks",
+      "turns": "{{total}} remarks",
+      "card": "Minutes"
+    },
+    "share": {
+      "done": "The meeting agent sent {{name}} the link to the full minutes.",
+      "button": "Share link",
+      "decline": "Decline",
+      "approve": "Approve",
+      "requestDeclined": "{{name}} did not share the full minutes.",
+      "requested": "Asked {{name}}.",
+      "requestButton": "Ask to see the full minutes",
+      "card": "Who sees what",
+      "whole": "Full minutes",
+      "excerpt": "Excerpt"
+    },
+    "agenda": {
+      "previousWeek": "Previous week",
+      "thisWeek": "This week",
+      "nextWeek": "Next week",
+      "host": "Host {{name}}"
+    },
+    "state": {
+      "recording": "Recording now",
+      "minutes": "Minutes ready",
+      "minutesFollowUps": "Minutes ready · {{done}} of {{total}} follow-ups done",
+      "myTasks": "My tasks from it: {{count}}",
+      "scheduledPrep": "Scheduled · prep ready",
+      "scheduledNoPrep": "Scheduled"
+    },
+    "list": {},
+    "notice": {
+      "recordingTitle": "Recording has started",
+      "recordingBody": "{{name}} is recording “{{title}}”.",
+      "minutesTitle": "Meeting agent: the minutes are here",
+      "sharedTitle": "Meeting agent: minutes were shared with you",
+      "taskTitle": "Meeting agent: a task was assigned to you",
+      "openMessage": "Open the message",
+      "requestTitle": "{{name}} asks to see the minutes",
+      "openRequest": "See the request",
+      "soonTitle": "Starts in {{count}} minutes",
+      "openOutline": "Read the outline",
+      "dismiss": "Dismiss"
+    },
+    "task": {
+      "from": "From the meeting “{{title}}” · {{day}}",
+      "source": "See where it was said"
+    },
+    "whisper": {
+      "whoGroup": "the {{count}} people in this chat",
+      "whoDm": "{{name}} and me",
+      "question": "Create a meeting for {{details}}?",
+      "onlyMe": "Only I see this",
+      "title": "Title: “{{title}}”.",
+      "guessed": "Suggested time",
+      "created": "Meeting created. It is on {{count}} people’s schedule.",
+      "create": "Create",
+      "edit": "Edit, then create",
+      "dismiss": "Don’t create"
+    },
+    "tiles": {
+      "today": "Today’s meetings",
+      "next": "Next {{time}} · {{title}}",
+      "week": "This week",
+      "done": "Tasks done"
+    },
+    "mine": "My meetings",
+    "viewerLabel": "Signed in as",
+    "agent": {
+      "aside": "What it sent me",
+      "open": "Open the conversation"
+    },
+    "role": {
+      "host": "I host",
+      "attendee": "I attend",
+      "shared": "Shared with me",
+      "assignee": "My task"
+    },
+    "chip": {
+      "mine": "Mine: {{count}}",
+      "recording": "Recording"
+    }
   },
   "chats": {
     "delete": {
@@ -31495,9 +31738,7 @@
     },
     "conversation": {
       "close": "Close conversation",
-      "send": "Send",
-      "now": "Now",
-      "placeholder": "Message {{name}}"
+      "now": "Now"
     },
     "members": "{{count}} members",
     "section": {
@@ -31517,6 +31758,348 @@
       "title": "Pinned",
       "expand": "Expand Pinned",
       "collapse": "Collapse Pinned"
+    }
+  },
+  "home": {
+    "activity": {
+      "title": "Recent activity",
+      "aside": "This week",
+      "less": "Show fewer",
+      "all": "View all {{count}}",
+      "filter": "Activity type",
+      "filterAll": "Everything",
+      "filterFinished": "Finished by agents",
+      "confirmed": "Confirmed by me",
+      "unconfirmed": "Not confirmed by me yet",
+      "budgetDone": "updated the campaign budget sheet",
+      "quarterSummary": "summarised last quarter’s campaign results",
+      "inquiryCounts": "put last week’s inquiry counts into a table",
+      "inquiriesDraft": "drafted “Sort this month’s customer inquiries by type”",
+      "noticeStop": "stopped “Revise the delivery delay notice”: no reply from logistics",
+      "researchStart": "started “Survey competitors’ promotions”",
+      "copyDraft": "drafted two launch page headlines and asked me to choose",
+      "draftsUp": "uploaded two brand guide drafts",
+      "researchTable": "put two competitors’ promotions into a table",
+      "researchDone": "finished “Survey competitors’ promotions”",
+      "me": "I",
+      "answered": "answered: {{choice}}",
+      "meetingStarted": "started a recorded meeting",
+      "minutesSent": "sent the minutes of “{{title}}” to {{count}} people",
+      "tookFollowUp": "took “{{task}}” from the meeting “{{title}}”",
+      "assignedFollowUp": "assigned me “{{task}}” from the meeting “{{title}}”",
+      "copyComment": "commented: “The second one reads better”",
+      "heardFollowUp": "put “{{task}}” from the meeting “{{title}}” into My work"
+    },
+    "agents": {
+      "waiting": "Needs me",
+      "working": "Working",
+      "blocked": "Blocked",
+      "idle": "Resting",
+      "title": "Agents",
+      "colWho": "Name",
+      "colDoing": "Doing now",
+      "colState": "State",
+      "colLast": "Last activity",
+      "answerInTask": "Answer it",
+      "showTask": "Show its task"
+    },
+    "header": {
+      "day": "Hello, {{name}}",
+      "handOff": "Hand to an agent",
+      "startMeeting": "Start meeting",
+      "newTask": "New task",
+      "me": "Mako",
+      "openMeeting": "Meeting in progress"
+    },
+    "tiles": {
+      "tasks": "My work",
+      "waiting": "Needs me",
+      "agentDone": "Finished by agents",
+      "late": "Late"
+    },
+    "firstRun": {
+      "title": "Start here",
+      "inax": "Sign in to inAX",
+      "inaxDetail": "Your tasks, their deadlines and what waits on you",
+      "app": "Register an app you work in (optional)",
+      "appDetail": "Its time collects in My day. Only I see it",
+      "register": "Register"
+    },
+    "day": {
+      "title": "My day",
+      "manage": "Manage records",
+      "manageApps": "Apps that are recorded",
+      "manageBrowser": "Browser activity record",
+      "unconfirmed": "Records without a task",
+      "hours": "{{count}} hr",
+      "minutes": "{{count}} min",
+      "undo": "Undo",
+      "pickTask": "Task to link this record to",
+      "notWork": "Not work",
+      "browser": "Browser",
+      "recordBrowser": "Browser · 3 competitor promotion pages · {{range}}",
+      "recordApp": "{{app}} · {{range}}",
+      "tomorrow": "tomorrow",
+      "yesterday": "yesterday",
+      "pick": "Pick a task",
+      "recordQuestion": "Which task is this record?"
+    },
+    "wrapUp": {
+      "title": "Wrap-up"
+    },
+    "newTask": {
+      "label": "Task title",
+      "placeholder": "For example: book the photo studio",
+      "error": "Type a title for the task.",
+      "add": "Add",
+      "due": "Due"
+    },
+    "tasks": {
+      "title": "My work",
+      "today": "Remaining",
+      "waiting": "Needs me",
+      "late": "Late",
+      "done": "Done",
+      "answer": "Answer",
+      "openList": "Task list"
+    },
+    "signedOut": {
+      "line": "Sign in to inAX to see your work, what waits on you, and what your agents are doing."
+    },
+    "preview": {
+      "label": "Time of day",
+      "auto": "Now",
+      "morning": "Morning",
+      "day": "Midday",
+      "evening": "Evening",
+      "firstRun": "Before sign-in",
+      "reset": "Start over"
+    },
+    "upcoming": {
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "week": "This week",
+      "nextWeek": "Next week",
+      "title": "Coming up",
+      "calendar": "Calendar",
+      "deadline": "Deadline",
+      "endOfDay": "End of day",
+      "recording": "Recording now"
+    },
+    "agent": {
+      "research": "Research agent",
+      "writer": "Writing agent",
+      "triage": "Inquiry agent",
+      "meeting": "Meeting agent",
+      "justNow": "Just now",
+      "researchDoneLine": "All three competitors are in the table. It is ready for you to read.",
+      "researchLine": "Two competitors are done. I am checking the discount terms of the last one.",
+      "writerLine1": "I uploaded two headlines. A leads with the meeting, B with speed.",
+      "writerLine2": "When you choose, I will match the body text and the button to it.",
+      "triageLine1": "I need the new delivery dates to revise the notice.",
+      "triageLine2": "Lee Mina asked the logistics team again. I continue when they reply.",
+      "calendar": "Calendar agent",
+      "calendarDoing": "Nothing assigned",
+      "calendarLine": "I will tell you when next week’s schedule changes.",
+      "recording": "Recording “{{title}}”"
+    },
+    "person": {
+      "hyunwoo": "Choi Hyunwoo",
+      "jiwoo": "Kim Jiwoo"
+    },
+    "task": {
+      "copy": "Settle the launch page headline",
+      "inquiries": "Sort this month’s customer inquiries by type",
+      "copyDue": "Today 17:00",
+      "copyWho": "Needs me · Writing agent",
+      "copyQuestion": "Which headline should the page use?",
+      "copyA": "A · The first way to meet it",
+      "copyB": "B · Before anyone else, now",
+      "copyRedo": "Write both again",
+      "copyDetail": "The writing agent drafted two headlines. Once you choose, it matches the body text and the button to it.",
+      "research": "Survey competitors’ promotions",
+      "today": "Today",
+      "researchReady": "Result ready · Research agent",
+      "researchWho": "Agent working · {{time}}",
+      "researchDoneDetail": "The research agent put three competitors’ promotions into one table. Read it and correct only what is wrong.",
+      "researchDetail": "The research agent is putting three competitors’ promotions into one table.",
+      "review": "Comment on the brand guide drafts",
+      "reviewDue": "Today, before 15:00",
+      "reviewDetail": "Choi Hyunwoo uploaded two drafts. Leave your comments before the 15:00 draft review.",
+      "offerAccept": "Add to My work",
+      "offerDecline": "Not mine",
+      "inquiriesWho": "Draft ready · Inquiry agent",
+      "inquiriesDetail": "The inquiry agent sorted 214 inquiries into 6 types. Read the draft and correct only what is wrong.",
+      "notice": "Revise the delivery delay notice",
+      "dueWas": "Due {{day}}",
+      "noticeWho": "Awaiting a reply · logistics team",
+      "noticeDetail": "The notice needs the new delivery dates. Lee Mina asked the logistics team again this morning.",
+      "report": "Share last month’s campaign report",
+      "reportDetail": "Put last month’s campaign results into a report and share it. Kim Jiwoo asked for it this week.",
+      "newsletter": "Check this month’s newsletter mailing list",
+      "finishedOn": "Finished {{day}}",
+      "newsletterDetail": "You checked 1,240 addresses and removed 12.",
+      "budget": "Update the campaign budget sheet",
+      "budgetDetail": "The writing agent updated it; you confirmed the numbers.",
+      "resumed": "Agent working · picked up my answer",
+      "addedAgent": "Agent working · just handed over",
+      "fromMeetingAccepted": "A follow-up from the meeting “{{title}}”. The meeting agent offered it and {{name}} took it.",
+      "fromMeetingAssigned": "A follow-up from the meeting “{{title}}”. {{host}} assigned it to {{name}}.",
+      "request": "{{name}} asks to see the minutes of “{{title}}”",
+      "requestWho": "Needs me",
+      "fromMeetingHeard": "A follow-up task from the meeting “{{title}}”. {{name}} agreed to take it in the meeting.",
+      "invitation": "{{name}} invites me to “{{title}}”"
+    },
+    "project": {
+      "campaign": "Product launch campaign",
+      "support": "Customer support",
+      "brand": "Brand renewal",
+      "promo": "Year-end promotion"
+    },
+    "report": {
+      "copy": "The writing agent drafted two headlines. It is my turn to choose.",
+      "researchDone": "I put three competitors’ promotions into one table. Please review it.",
+      "research": "The research agent has two of three competitors’ promotions in a table. My check is left.",
+      "inquiries": "I sorted 214 inquiries into 6 types. Please review them.",
+      "notice": "The inquiry agent cannot continue until the logistics team sends the new delivery dates. The deadline has passed.",
+      "done": "I finished this task.",
+      "copyChosen": "The writing agent drafted two headlines and I chose one. It is matching the body text and the button to it."
+    },
+    "dayEnd": {
+      "progress": "Progress note",
+      "sharedOwners": "Owners of {{count}} follow-ups",
+      "resultTitle": "Saved today",
+      "question": "How far did this task get today?"
+    },
+    "chip": {
+      "waiting": "Needs me",
+      "blocked": "Awaiting reply",
+      "working": "Working",
+      "draft": "Draft ready",
+      "prep": "Prep"
+    },
+    "chat": {
+      "placeholder": "Message",
+      "placeholderTo": "Message {{name}}"
+    },
+    "note": {
+      "copy1": "Narrowed the headline down to three directions.",
+      "copy2": "Started drafts for two of the three directions.",
+      "copy3": "Compared the drafts with competitors’ headlines.",
+      "copy4": "Took out a phrase that needs a legal review."
+    }
+  },
+  "taskLoop": {
+    "activity": {
+      "result": "· attached the result to “{{title}}”",
+      "started": "· started the task “{{title}}” with an agent"
+    },
+    "agent": {
+      "name": "Task agent"
+    },
+    "chat": {
+      "kickoff": "Please take this task: {{title}}",
+      "noted": "Noted. I will apply it to what I am writing now.",
+      "moved": "Moved {{title}} {{to}}",
+      "asked": "Asked you about {{items}}",
+      "notedOnTask": "I have added it to the activity."
+    },
+    "demo": {
+      "chip": "Demo"
+    },
+    "detail": {
+      "due": "Due",
+      "project": "Project",
+      "start": "Start with an agent",
+      "status": "Status"
+    },
+    "gate": {
+      "line": "Sign in to inAX and your tasks appear here."
+    },
+    "onboarding": {
+      "found": "{{open}} tasks assigned to you · {{due}} due today",
+      "skip": "Skip for now",
+      "start": "Start",
+      "subtitle": "Sign in and the work assigned to you appears in this app.",
+      "title": "Sign in to inAX"
+    },
+    "script": {
+      "choiceA": "For me",
+      "choiceB": "For the project team",
+      "plan": "This is how I will do it.\n\n1. Read the task description and what is attached to it.\n2. Write the draft of “{{title}}”.\n3. Attach the draft to this conversation and to the task.",
+      "question": "Who should the draft be written for?",
+      "reportA": "Include it",
+      "reportB": "Leave it out",
+      "reportNumbers": "- Visitors: 112% of the target\n- Sign-up conversion: 3.4% (2.9% the month before)\n- Ad spend: 96% of the budget",
+      "reportPlan": "This is how I will do it.\n\n1. Collect last month’s campaign numbers: visitors, sign-up conversion, ad spend.\n2. Write the draft of the results report.\n3. Attach the draft to this conversation and to the task.",
+      "reportQuestion": "Should the report include the agency’s fee?",
+      "reportDraft": "**Last month’s campaign results report (draft)**\n\n**Summary**\n\nMore people visited than we aimed for, and more of them signed up. Ad spend stayed inside the budget.",
+      "reportAgency": "- Agency fee: 18% of ad spend",
+      "reportNote": "Wrote the draft of last month’s campaign results report: visitors, sign-up conversion, ad spend and the agency’s fee. Please review it.",
+      "reportNoteWithout": "Wrote the draft of last month’s campaign results report: visitors, sign-up conversion and ad spend. The agency’s fee is left out. Please review it.",
+      "reportOutput": "Last month’s campaign results report (draft)",
+      "reviewPlan": "This is how I will do it.\n\n1. Look at the two brand guide drafts.\n2. Write down, for each draft, what works and what gets in the way.\n3. Attach the draft of the comment to this conversation and to the task.",
+      "reviewQuestion": "How should the comment be written?",
+      "reviewA": "Compare both drafts",
+      "reviewB": "Recommend one draft",
+      "reviewOutput": "Comment on the brand guide drafts (draft)",
+      "reviewDraftOne": "**Comment on the brand guide drafts (draft)**\n\nI recommend draft 2.\n\n- Its body text is easier to read in long passages.\n- Its accent colour is weak on buttons: raise the contrast one step.\n- Draft 1 has the stronger logo, but its margins are too tight for small sizes.",
+      "reviewDraftBoth": "**Comment on the brand guide drafts (draft)**\n\n**Draft 1**\n- Works: the logo is strong and easy to recognise.\n- In the way: the margin around the logo is tight at small sizes.\n\n**Draft 2**\n- Works: the body text reads well in long passages.\n- In the way: the accent colour is weak on buttons.",
+      "reviewNote": "Wrote the draft of the comment on the two brand guide drafts. Please review it.",
+      "readerTeam": "Written for the project team to read.",
+      "draft": "**{{title}} (draft)**",
+      "draftBody": "1. Settled: the scope and the due date in the task description.\n2. Left to do: check the material, finish the draft, share it, in that order.\n3. To check before it goes out: who receives it, and the numbers.",
+      "output": "{{title}} (draft)",
+      "note": "Wrote the draft of “{{title}}”. Please review it.",
+      "draftQuotes": "**Comparing the two vendor quotes (draft)**\n\n- Vendor A: 18.4 million won, delivery in 12 working days, 3 revisions\n- Vendor B: 15.9 million won, delivery in 20 working days, 2 revisions\n\nVendor B costs 2.5 million won less. But vendor B delivers after the campaign starts. I recommend vendor A.",
+      "draftSchedule": "**Next week’s schedule changes (draft)**\n\nThree changes to make in the campaign calendar.\n\n- Tuesday shoot: 10:00 → 14:00\n- Wednesday draft review: move to Thursday 11:00\n- Friday 15:00 launch check meeting: add",
+      "draftSurvey": "**Unsubscribe survey (draft)**\n\nPick why you are leaving.\n\n- The emails come too often\n- The content is not right for me\n- I get the same information somewhere else\n- Another reason (type it)",
+      "draftSendTime": "**Send time test (draft)**\n\n- Split the next issue in two groups: 620 people at 08:00, 620 at the usual send time.\n- After 3 days, compare the open rate of the two groups.\n- If the 08:00 group is 2 points higher or more, send at 08:00 from the issue after.",
+      "draftTopics": "**Topics for the next issue (draft)**\n\n1. A first look at the year-end promotion: promotion news got the most clicks in the last issue.\n2. The five questions customers asked most this month: the answers come from the inquiries themselves.\n3. Behind the brand renewal: shows the drafts before next month’s launch."
+    },
+    "settings": {
+      "cardDescription": "Sign in and your tasks appear on Home and in Tasks.",
+      "keywordInax": "inax",
+      "keywordSignIn": "sign in",
+      "keywordTasks": "my work",
+      "pointerLink": "inAX account",
+      "searchDescription": "Sign in to inAX, see the connected account, or disconnect it.",
+      "searchTitle": "inAX account",
+      "viewTasks": "See my work"
+    },
+    "source": {
+      "chip": "inAX · my work"
+    },
+    "status": {
+      "done": "Done",
+      "inProgress": "In progress",
+      "review": "Review requested",
+      "todo": "To do"
+    },
+    "statusTo": {
+      "done": "to Done",
+      "inProgress": "to In progress",
+      "review": "to Review requested",
+      "todo": "to To do"
+    },
+    "who": {
+      "confirmed": "{{status}} · written by the agent, confirmed by me",
+      "justStarted": "Agent working · just started",
+      "question": "Needs me · {{agent}}",
+      "result": "Result ready",
+      "confirmedBy": "{{status}} · written by the agent, confirmed by {{name}}"
+    },
+    "notice": {
+      "title": "Needs your answer",
+      "open": "Answer"
+    }
+  },
+  "time": {
+    "shortAgo": {
+      "now": "now",
+      "minutes": "{{count}}m",
+      "hours": "{{count}}h",
+      "days": "{{count}}d"
     }
   }
 }

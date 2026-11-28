@@ -10,7 +10,8 @@ import {
   Link,
   Pencil,
   Play,
-  Plus
+  Plus,
+  Reply
 } from 'lucide-react'
 import { useTranslate, type Translate } from '@/i18n/use-translate'
 import type { Bot } from '../../../../../shared/bot-types'
@@ -42,6 +43,7 @@ import {
   botItemPendingWordsBesideAnswers
 } from '../../../../../shared/bots/bot-item-sent-answers'
 import { NATIVE_CHAT_QUOTE_SOURCE_PROPS } from '../../../../../shared/native-chat/input/quotes/native-chat-quote-selection'
+import { localBotItemStatus, localBotItems } from '@/lib/local-bot-items'
 
 const ACTOR = 'font-medium text-foreground/80'
 // Where a linked event's refs go in its translated sentence.
@@ -51,9 +53,11 @@ function str(value: unknown): string {
   return typeof value === 'string' ? value : ''
 }
 
-function statusWord(value: unknown, t: Translate): string {
+function statusWord(value: unknown, t: Translate, item: BotItem): string {
   const status = BOT_ITEM_STATUSES.find((entry) => entry === value)
-  return status ? botItemStatusName(status, t) : str(value)
+  // A server with statuses of its own names a move by them, as its status menu does.
+  const own = localBotItems(item.owner.botId)?.statuses?.find((entry) => entry.status === status)
+  return own?.label ?? (status ? botItemStatusName(status, t) : str(value))
 }
 
 function fieldName(field: string, t: Translate): string {
@@ -96,7 +100,9 @@ function FieldChange({
         className="inline-flex items-center gap-0.5 hover:text-foreground"
         onClick={() => setOpen(!open)}
       >
-        {t('bots.items.activity.changed', 'changed {{field}}', { field: fieldName(field, t) })}
+        {t('bots.items.activity.changed', 'changed {{field}}', {
+          field: fieldName(field, t)
+        })}
         <ChevronRight className={open ? 'size-3 rotate-90' : 'size-3'} />
       </button>
       {open ? <Diff from={str(diff.from)} to={str(diff.to)} /> : null}
@@ -122,6 +128,15 @@ function EventBody({ event, item }: { event: BotItemEvent; item: BotItem }): Rea
       )
     }
     case 'status': {
+      // An answer the owner picked, kept as their own line where the server records it so.
+      if (typeof data.answer === 'string') {
+        return (
+          <>
+            {by} {t('bots.items.activity.answered', 'answered:')}{' '}
+            <b className={ACTOR}>{data.answer}</b>
+          </>
+        )
+      }
       const note = str(data.note)
       const closed = (value: unknown) => value === 'done' || value === 'canceled'
       const reopened = closed(data.from) && !closed(data.to)
@@ -138,7 +153,7 @@ function EventBody({ event, item }: { event: BotItemEvent; item: BotItem }): Rea
           {closed(data.to) || reopened ? null : (
             <>
               {' '}
-              <b className={ACTOR}>{statusWord(data.to, t)}</b>
+              <b className={ACTOR}>{statusWord(data.to, t, item)}</b>
             </>
           )}
           {note ? `: ${note}` : null}
@@ -246,6 +261,9 @@ function EntryIcon({
     case 'unsnoozed':
       return <AlarmClockOff className="size-3" />
     case 'status': {
+      if (typeof event.data.answer === 'string') {
+        return <Reply className="size-3" />
+      }
       const status = BOT_ITEM_STATUSES.find((entry) => entry === event.data.to)
       return status ? <BotItemStatusIcon status={status} /> : null
     }
@@ -269,9 +287,14 @@ export function BotItemActivityList({
   /** What the waiting question's quick replies do; absent where the item takes no comment (deleted). */
   quickReplies?: BotItemQuickReplyActions
 }): React.JSX.Element {
-  const t = useTranslate()
   const entries = botItemActivity(item, events)
-  const waitKey = botItemWaitEntryKey(item, entries)
+  // The Waiting card stands in for the move to Waiting; not when it only repeats the status the header
+  // names, so the move shows as itself.
+  const wait =
+    item.status === 'waiting' && item.wait && item.wait.text !== localBotItemStatus(item)?.label
+      ? item.wait
+      : null
+  const waitKey = wait ? botItemWaitEntryKey(item, entries) : null
   const liveAskId = botItemLiveAskKey(entries)
   const list = useRef<HTMLDivElement | null>(null)
   // A reply's quote leads to its question, focused so Tab goes on from there.
@@ -340,9 +363,7 @@ export function BotItemActivityList({
             </div>
           )
         })}
-        {item.status === 'waiting' && item.wait ? (
-          <BotItemWaitCard text={item.wait.text} at={item.wait.at} />
-        ) : null}
+        {wait ? <BotItemWaitCard text={wait.text} at={wait.at} /> : null}
         {/* Last, as sent: never placed by this machine's clock among the host's events. */}
         {pending?.shown.map((sending) => {
           const { event, failed, intent } = sending
@@ -387,12 +408,7 @@ export function BotItemActivityList({
           )
         })}
       </div>
-      {entries.some((entry) => entry.kind !== 'worker' && entry.kind !== 'event') ||
-      pending?.shown.length ? null : (
-        <p className="pt-0.5 text-xs leading-[18px] text-muted-foreground">
-          {t('bots.items.activity.noComments', 'No comments yet.')}
-        </p>
-      )}
+      {/* No line saying there are no comments: an empty Activity stays empty (owner's bar). */}
     </>
   )
 }

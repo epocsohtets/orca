@@ -20,6 +20,7 @@ import {
   type BotItem
 } from '../../../../../shared/bots/bot-items'
 import type { Bot } from '../../../../../shared/bot-types'
+import { localBotItems } from '@/lib/local-bot-items'
 import { botItemQuestionLine } from '../../../../../shared/bots/bot-item-ask'
 import { structuralValuesEqual } from '../../../../../shared/collections/structural-value-equality'
 import { BotRowHoverCard } from '../BotPanelRow'
@@ -91,6 +92,7 @@ const ITEM_FIELD_RULES: Record<keyof BotItem, ItemFieldEqual> = {
   waitingAsk: skipped,
   closeNote: (a, b) => a.closeNote === b.closeNote,
   wait: (a, b) => a.wait?.text === b.wait?.text && a.wait?.at === b.wait?.at,
+  due: (a, b) => structuralValuesEqual(a.due, b.due),
   links: (a, b) => itemLive(a) === itemLive(b),
   version: (a, b) => a.version === b.version,
   lastEventId: (a, b) => a.lastEventId === b.lastEventId,
@@ -179,7 +181,9 @@ function BotItemRowView({
         </span>
         <Checkbox
           tabIndex={tabbable ? undefined : -1}
-          aria-label={t('bots.items.row.select', 'Select {{title}}', { title: item.title })}
+          aria-label={t('bots.items.row.select', 'Select {{title}}', {
+            title: item.title
+          })}
           checked={selected}
           className={cn('size-3.5', !checkbox && 'hidden group-hover/check:flex')}
           onClick={(event) => {
@@ -211,7 +215,8 @@ function BotItemRowView({
           onClick={() => onAction(item, { kind: 'open' })}
         >
           <span className="flex min-w-0 items-start">
-            <BotItemNumberColumn number={item.number} />
+            {/* A server's own items (업무) are named by their title; the open item keeps the number. */}
+            {localBotItems(item.owner.botId) ? null : <BotItemNumberColumn number={item.number} />}
             <span className="min-w-0 flex-1">
               <span className="flex min-w-0 items-center gap-2">
                 <span

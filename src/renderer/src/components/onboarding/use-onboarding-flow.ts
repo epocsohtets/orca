@@ -23,6 +23,7 @@ import {
   useOnboardingStepSkipOptions
 } from './onboarding-flow-state'
 import { useOnboardingFlowActions } from './use-onboarding-flow-actions'
+import { useOnboardingWithoutCodeActions } from './use-onboarding-without-code-actions'
 import { useOnboardingFlowTelemetry } from './use-onboarding-flow-telemetry'
 
 export function useOnboardingFlow(
@@ -268,7 +269,7 @@ export function useOnboardingFlow(
     setError
   })
 
-  const { next, setUpLater, dismissOnboarding, back, jumpToStep } = useOnboardingFlowActions({
+  const actions = useOnboardingFlowActions({
     busyLabel,
     setBusyLabel,
     setError,
@@ -290,6 +291,14 @@ export function useOnboardingFlow(
     setTheme,
     updateSettings: updateSettingsOrThrow,
     skipOptions
+  })
+  const withoutCodeActions = useOnboardingWithoutCodeActions(actions, {
+    withoutCode: skipOptions.skipDeveloperSteps,
+    currentStepId: currentStep.id,
+    settings,
+    updateSettings: updateSettingsOrThrow,
+    closeWith,
+    setError
   })
 
   return {
@@ -315,11 +324,8 @@ export function useOnboardingFlow(
     hasSelectedWorkspace: selectedWorkspaceId !== null,
     detectedSet,
     isDetectingAgents,
-    next,
-    setUpLater,
-    dismissOnboarding,
-    back,
-    jumpToStep,
+    ...actions,
+    ...withoutCodeActions,
     setLifecycleRootRef
   }
 }

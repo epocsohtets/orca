@@ -14,6 +14,7 @@ import type { TuiAgent } from '../../../../shared/agent-launch/catalog/tui-agent
 import { applyAllAgentsPermission } from '../../../../shared/agent-launch/permissions/tui-agent-permission-choice'
 import type { AgentChatPermissionMode } from '../../../../shared/agent-launch/permissions/agent-chat-permission-mode'
 import type { AgentSurface, StepId, StepNumber } from './use-onboarding-flow-types'
+import { worksWithoutCode } from '../../../../shared/settings/work-styles'
 import { agentSurfaceSettingsUpdate } from './onboarding-flow-state'
 
 export async function persistStep(
@@ -135,7 +136,8 @@ export function useCloseWith({ onOnboardingChange, startTimeRef, setError }: Clo
           total_duration_ms: total
         })
       }
-      if (outcome === 'completed') {
+      // Someone who works without code is not asked to star a repository.
+      if (outcome === 'completed' && !worksWithoutCode(useAppStore.getState().settings)) {
         // Wait until the next commit can unmount onboarding before notifying star nag.
         window.setTimeout(() => {
           void window.api.starNag.onboardingCompleted()

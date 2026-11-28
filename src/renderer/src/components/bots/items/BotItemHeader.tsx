@@ -29,6 +29,7 @@ import { BotItemSnoozeMenuItems, type BotItemSnoozing } from './BotItemSnooze'
 import { formatBotItemSnoozeTime } from './bot-item-snooze-time'
 import { botItemPickName, botItemStatusName } from './bot-item-status-name'
 import { botHostTakes } from '../bot-host-capability'
+import { localBotItems } from '@/lib/local-bot-items'
 import { BOTS_ITEM_WAITING_CAPABILITY } from '../../../../../shared/bot-runtime-capabilities'
 import { NativeChatMessageTimestamp } from '../../native-chat/messages/rows/NativeChatMessageTimestamp'
 
@@ -80,13 +81,23 @@ export function BotItemHeader({
             snoozing={snoozing}
           />
           {/* The date stays whole; the chat title truncates, and a narrow pane drops it (the title's
-              number and the Chat row already say both). */}
+              number and the Chat row already say both); so does Needs you beside the status. */}
           <p className="flex min-w-0 gap-1 text-xs text-muted-foreground">
-            <span className="min-w-0 truncate @max-[360px]:hidden">
-              {t('bots.items.view.subWhere', 'Item {{number}} · {{chat}}', {
-                number: item.number,
-                chat: chatTitle
-              })}
+            {item.due ? (
+              <span
+                className={
+                  item.due.late
+                    ? 'shrink-0 font-medium text-destructive'
+                    : 'shrink-0 text-foreground'
+                }
+              >
+                {item.due.label}
+                <span className="font-normal text-muted-foreground"> ·</span>
+              </span>
+            ) : null}
+            {/* The number is the title's already. */}
+            <span className="min-w-0 truncate @max-[360px]:hidden [[data-needs-you]~p_&]:hidden">
+              {chatTitle}
               {Number.isNaN(new Date(item.createdAt).getTime()) ? null : ' ·'}
             </span>
             <NativeChatMessageTimestamp
@@ -161,37 +172,62 @@ function StatusMenu({
   snoozing: BotItemSnoozing
 }): React.JSX.Element {
   const t = useTranslate()
+  // A server with statuses of its own names them; Waiting then asks nothing.
+  const local = localBotItems(item.owner.botId)
+  const own = local?.statuses
+  const name = (status: BotItemStatus): string =>
+    own?.find((entry) => entry.status === status)?.label ?? botItemStatusName(status, t)
+  // The chip shows which of the server's statuses the item is in; Needs you goes beside it.
+  const shown = local?.statusOf?.(item) ?? item.status
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="xs" className="-ml-1.5 shrink-0" disabled={disabled}>
-          <BotItemStatusIcon status={item.status} live={isBotItemLive(item)} />
-          {botItemStatusName(item.status, t)}
-          <ChevronDown className="size-3 text-muted-foreground" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start">
-        {botItemPickerStatuses(waiting).map((status) => (
-          <DropdownMenuItem
-            key={status}
-            // Waiting again edits what it waits on.
-            disabled={status === item.status && status !== 'waiting'}
-            onSelect={() => onStatus(status)}
-          >
-            <span className="flex w-4 justify-center">
-              <BotItemStatusIcon status={status} />
-            </span>
-            <span className="flex-1">{botItemPickName(status, t)}</span>
-            {status === item.status ? <Check className="size-3" /> : null}
-          </DropdownMenuItem>
-        ))}
-        {isOpenBotItemStatus(item.status) ? (
-          <>
-            <DropdownMenuSeparator />
-            <BotItemSnoozeMenuItems items={[item]} snoozing={snoozing} />
-          </>
-        ) : null}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="xs" className="-ml-1.5 shrink-0" disabled={disabled}>
+            <BotItemStatusIcon status={shown} live={shown === item.status && isBotItemLive(item)} />
+            {/* Waiting on something else than the menu's Waiting reads as Orca's Waiting. */}
+            {shown === item.status &&
+            item.status === 'waiting' &&
+            item.wait &&
+            item.wait.text !== name('waiting')
+              ? botItemStatusName('waiting', t)
+              : name(shown)}
+            <ChevronDown className="size-3 text-muted-foreground" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start">
+          {(own?.map((entry) => entry.status) ?? botItemPickerStatuses(waiting)).map((status) => (
+            <DropdownMenuItem
+              key={status}
+              // Waiting again edits what it waits on.
+              disabled={status === item.status && (status !== 'waiting' || own !== undefined)}
+              onSelect={() => onStatus(status)}
+            >
+              <span className="flex w-4 justify-center">
+                <BotItemStatusIcon status={status} />
+              </span>
+              <span className="flex-1">{own ? name(status) : botItemPickName(status, t)}</span>
+              {status === shown ? <Check className="size-3" /> : null}
+            </DropdownMenuItem>
+          ))}
+          {isOpenBotItemStatus(item.status) ? (
+            <>
+              <DropdownMenuSeparator />
+              <BotItemSnoozeMenuItems items={[item]} snoozing={snoozing} />
+            </>
+          ) : null}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {shown !== item.status && item.status === 'needs_you' ? (
+        <span
+          data-needs-you=""
+          className="flex shrink-0 items-center gap-1 text-xs text-foreground"
+        >
+          <BotItemStatusIcon status="needs_you" />
+          {botItemStatusName('needs_you', t)}
+          <span className="text-muted-foreground">·</span>
+        </span>
+      ) : null}
+    </>
   )
 }
