@@ -8,7 +8,6 @@ import { ShortcutKeyCombo } from '@/components/ui/ShortcutKeyCombo'
 import { ImeTextarea } from '@/lib/text-input/ime/ime-text-field'
 import { BotItemStepper } from '@/components/bots/items/BotItemStepper'
 import { useBotItemChords } from '@/components/bots/items/use-bot-item-chords'
-import { InaxStatusBadge } from '@/components/task-page/inax/inax-status-badge'
 import { personName } from '@/components/meetings/meeting-people'
 import { HOME_META_CLASS, HomeProjectDot } from './HomeCard'
 import { HomeDayEndChipLine, HomeDayEndRecords, HomeDayEndTimeline } from './HomeDayEndParts'
@@ -154,13 +153,15 @@ export function HomeDayEndPanel({
         <h3 className="text-[15px] leading-5 font-semibold text-foreground">{task.title}</h3>
         <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
           <HomeProjectDot project={projects[task.project]} />
-          <InaxStatusBadge status={current} />
+          {/* The status is said once, as text, in the "Now" row: a pill here read as a control. */}
           <span
             className={
               task.due === 'overdue' ? 'text-xs font-medium text-destructive' : HOME_META_CLASS
             }
           >
-            {task.dueLabel}
+            {task.due === 'overdue'
+              ? task.dueLabel
+              : `${t('taskLoop.detail.due', 'Due')} ${task.dueLabel}`}
           </span>
         </div>
       </>
