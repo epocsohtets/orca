@@ -13,16 +13,11 @@ import { MeetingViewerRadioGroup } from '@/components/meetings/MeetingViewerMenu
 import { MAKO } from '@/components/meetings/meeting-people'
 import { signInInaxMock } from '@/lib/inax-mock-account'
 import { useHomeBoard } from '@/components/home/use-home-board'
-import { useHomeBoardStore } from '@/components/home/home-board-store'
 import { resetSample } from '@/components/home/home-sample-reset'
-import {
-  answerHomeLoop,
-  setHomeTaskStatus,
-  startHomeLoop
-} from '@/components/home/home-board-actions'
+import { setHomeTaskStatus, startHomeLoop } from '@/components/home/home-board-actions'
 import type { HomeTask } from '@/components/home/home-board'
 import { WorkBoard } from './WorkBoard'
-import { WorkTaskPanel } from './WorkTaskPanel'
+import { HomeTaskItem } from '@/components/home/HomeItemsPanel'
 
 /**
  * Work: the board of my tasks. A task I started with an agent opens its workspace; any other task opens
@@ -31,7 +26,7 @@ import { WorkTaskPanel } from './WorkTaskPanel'
 export function WorkSurface(): React.JSX.Element {
   const t = useTranslate()
   const taskId = useInaxSourceSelection((state) => state.taskId)
-  const { board, view, viewerId, projects, signedIn } = useHomeBoard()
+  const { view, viewerId, projects, signedIn } = useHomeBoard()
   const own = viewerId === MAKO
   // A follow-up task of a meeting that is someone else's opens too, as its panel beside the board.
   const task = [...view.boardTasks, ...view.otherTasks].find((entry) => entry.id === taskId)
@@ -73,26 +68,8 @@ export function WorkSurface(): React.JSX.Element {
     )
   }
 
-  const loop = task ? board.loops[task.id] : undefined
-  const panel = task ? (
-    <WorkTaskPanel
-      // One task's typed answer never shows on the next.
-      key={task.id}
-      task={task}
-      project={projects[task.project]}
-      readOnly={!own}
-      onStatus={(status) => setHomeTaskStatus(task.id, status, task.title)}
-      onAnswer={(choiceId, text) =>
-        loop
-          ? answerHomeLoop(task.id, choiceId, text)
-          : choiceId &&
-            useHomeBoardStore.setState((state) => ({
-              answers: { ...state.answers, [task.id]: choiceId }
-            }))
-      }
-      onStart={own && !loop && !task.who && !task.done ? () => start(task) : undefined}
-    />
-  ) : null
+  // A colleague's view of the board opens no item: the item list is mine.
+  const panel = task && own ? <HomeTaskItem taskId={task.id} /> : null
 
   return (
     <>

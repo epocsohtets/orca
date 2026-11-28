@@ -2,7 +2,7 @@ import React from 'react'
 import { useTranslate } from '@/i18n/use-translate'
 import { useAppStore } from '@/store'
 import { useHomeBoard } from '@/components/home/use-home-board'
-import { sayHomeLoop } from '@/components/home/home-board-actions'
+import { commentHomeTask } from '@/components/home/home-board-actions'
 import { WorkTaskChat } from './WorkTaskChat'
 
 /** The content of a task's chat tab in its workspace. */
@@ -39,7 +39,7 @@ export function WorkTaskTab({
           document.querySelector<HTMLElement>('[data-work-task-ask] [role="radio"]')?.focus()
         )
       }}
-      onSay={(text) => sayHomeLoop(taskId, text)}
+      onSay={(text) => void commentHomeTask(taskId, text)}
     />
   )
 }
