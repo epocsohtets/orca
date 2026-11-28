@@ -22,7 +22,6 @@ import {
   type BotItemAskEnd
 } from '../../../../../shared/bots/bot-item-question-answers'
 import type { BotItemEvent } from '../../../../../shared/bots/bot-items'
-import { BotItemMarkdown } from './BotItemMarkdown'
 import {
   BOT_ITEM_CHIP,
   BotItemAnswerLine,
@@ -30,7 +29,8 @@ import {
   botItemChipTitle,
   BOT_ITEM_CHIP_RECOMMENDED,
   BOT_ITEM_OPEN_QUESTION,
-  BotItemQuestionStep
+  BotItemQuestionStep,
+  BotItemQuestionWords
 } from './BotItemQuestionStep'
 import { BotItemHeldAnswerAttachments, botItemShownAnswer } from './BotItemFoldedAnswer'
 import { useBotItemHeldAnswers } from './bot-item-held-answers'
@@ -138,15 +138,14 @@ export function BotItemQuestionLines({
           return (
             // A decision's question is unique within its ask.
             <div key={decision.question}>
-              <div
-                className={cn(
+              <BotItemQuestionWords
+                question={decision.question}
+                className={
                   open
                     ? BOT_ITEM_OPEN_QUESTION
                     : 'font-medium text-muted-foreground [&_*]:text-muted-foreground [&_p]:font-medium'
-                )}
-              >
-                <BotItemMarkdown text={decision.question} />
-              </div>
+                }
+              />
               {open && actions && decision.replies.length > 0 ? (
                 <div className="mt-2.5 flex flex-wrap gap-2">
                   {decision.replies.map((reply) => (

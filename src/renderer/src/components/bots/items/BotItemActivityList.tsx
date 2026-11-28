@@ -10,7 +10,8 @@ import {
   Link,
   Pencil,
   Play,
-  Plus
+  Plus,
+  Reply
 } from 'lucide-react'
 import { useTranslate, type Translate } from '@/i18n/use-translate'
 import type { Bot } from '../../../../../shared/bot-types'
@@ -96,7 +97,9 @@ function FieldChange({
         className="inline-flex items-center gap-0.5 hover:text-foreground"
         onClick={() => setOpen(!open)}
       >
-        {t('bots.items.activity.changed', 'changed {{field}}', { field: fieldName(field, t) })}
+        {t('bots.items.activity.changed', 'changed {{field}}', {
+          field: fieldName(field, t)
+        })}
         <ChevronRight className={open ? 'size-3 rotate-90' : 'size-3'} />
       </button>
       {open ? <Diff from={str(diff.from)} to={str(diff.to)} /> : null}
@@ -122,6 +125,15 @@ function EventBody({ event, item }: { event: BotItemEvent; item: BotItem }): Rea
       )
     }
     case 'status': {
+      // An answer the owner picked, kept as their own line where the server records it so.
+      if (typeof data.answer === 'string') {
+        return (
+          <>
+            {by} {t('bots.items.activity.answered', 'answered:')}{' '}
+            <b className={ACTOR}>{data.answer}</b>
+          </>
+        )
+      }
       const note = str(data.note)
       const closed = (value: unknown) => value === 'done' || value === 'canceled'
       const reopened = closed(data.from) && !closed(data.to)
@@ -246,6 +258,9 @@ function EntryIcon({
     case 'unsnoozed':
       return <AlarmClockOff className="size-3" />
     case 'status': {
+      if (typeof event.data.answer === 'string') {
+        return <Reply className="size-3" />
+      }
       const status = BOT_ITEM_STATUSES.find((entry) => entry === event.data.to)
       return status ? <BotItemStatusIcon status={status} /> : null
     }

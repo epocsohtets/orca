@@ -1,15 +1,12 @@
 import { useEffect } from 'react'
 
-// The tallest bottom block of a side panel: the day-end card's note box with its Save row.
-const BOTTOM_ROWS = '12rem'
-
-/** While a side panel with its own Save or Send row is open, corner notices stand above that row, not over it. */
-export function useSidePanelInset(): void {
+/** The side panel's width: corner notices stand left of it while it is open, never over it. */
+export function useSidePanelInset(width: string): void {
   useEffect(() => {
     const root = document.documentElement
-    root.style.setProperty('--side-panel-rows', BOTTOM_ROWS)
+    root.style.setProperty('--side-panel-width', width)
     return () => {
-      root.style.removeProperty('--side-panel-rows')
+      root.style.removeProperty('--side-panel-width')
     }
-  }, [])
+  }, [width])
 }

@@ -15,9 +15,10 @@ const ROOM_Y = 'var(--stack-shadow-room-y)'
 const STACK_STYLE: React.CSSProperties & Record<`--${string}`, string> = {
   '--stack-shadow-room-y': `${SHADOW_ROOM_Y_PX}px`,
   padding: `${ROOM_Y} 1rem`,
-  // A side panel keeps its Save or Send row at the bottom right: the stack stands above that row while one is open.
-  bottom: `calc(${NOTIFICATION_CARD_STACK_BOTTOM} + var(--side-panel-rows, 0px) - ${ROOM_Y})`,
-  maxHeight: `calc(100vh - 2.5rem - ${NOTIFICATION_CARD_STACK_BOTTOM} - var(--side-panel-rows, 0px) + 2 * ${ROOM_Y})`
+  // A side panel open at the right edge keeps its whole height: the stack stands left of it.
+  right: 'var(--side-panel-width, 0px)',
+  bottom: `calc(${NOTIFICATION_CARD_STACK_BOTTOM} - ${ROOM_Y})`,
+  maxHeight: `calc(100vh - 2.5rem - ${NOTIFICATION_CARD_STACK_BOTTOM} + 2 * ${ROOM_Y})`
 }
 
 export function NotificationCardStack({ children }: { children: ReactNode }): React.JSX.Element {
@@ -77,7 +78,7 @@ export function NotificationCardStack({ children }: { children: ReactNode }): Re
     <div
       ref={stackRef}
       style={STACK_STYLE}
-      className="notification-card-stack pointer-events-none fixed right-0 z-50 flex w-[calc(360px_+_2rem)] max-w-[100vw] flex-col-reverse gap-2 overflow-y-auto scrollbar-sleek data-overflowing:[--stack-shadow-room-y:0px]! [&>*]:pointer-events-auto [&>*]:relative [&>*]:z-[calc(10_-_sibling-index())] [&>*]:shrink-0 max-[480px]:left-0 max-[480px]:w-auto [&_[data-slot=card]]:border-(--notice-border) [&_[data-slot=card]]:shadow-notice"
+      className="notification-card-stack pointer-events-none fixed z-50 flex w-[calc(360px_+_2rem)] max-w-[100vw] flex-col-reverse gap-2 overflow-y-auto scrollbar-sleek data-overflowing:[--stack-shadow-room-y:0px]! [&>*]:pointer-events-auto [&>*]:relative [&>*]:z-[calc(10_-_sibling-index())] [&>*]:shrink-0 max-[480px]:left-0 max-[480px]:w-auto [&_[data-slot=card]]:border-(--notice-border) [&_[data-slot=card]]:shadow-notice"
     >
       {children}
     </div>

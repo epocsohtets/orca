@@ -18,14 +18,23 @@ import {
   type BotItemFilter
 } from '../../../../shared/bots/bot-item-groups'
 import { botItemWalkReturnRow } from '../../../../shared/bots/bot-item-walk'
-import { homeTasksBot, useHomeItemsPanel } from './home-task-items-host'
-import { taskItemUid } from './home-task-item-model'
+import {
+  homeItemIsOpen,
+  homeTasksBot,
+  openHomeItem,
+  useHomeItemsPanel
+} from './home-task-items-host'
+import { homeRecordsItemUid, peerTaskItemUid, taskItemUid } from './home-task-item-model'
 import { useSidePanelInset } from './use-side-panel-inset'
 
 /** `openHomeItem` with this opens the first row of 내 확인 필요: the start of the day-end pass. */
 export const FIRST_NEEDS_YOU = '\u0000needs-you'
 
-const NO_ASKS: BotNeedsYouAsks = { needs: [], stoppedForSignIn: [], itemOf: () => null }
+const NO_ASKS: BotNeedsYouAsks = {
+  needs: [],
+  stoppedForSignIn: [],
+  itemOf: () => null
+}
 
 /**
  * Home's right panel: my 업무 as Orca's item panel lists a bot's items, in its groups, and one 업무 opened in
@@ -33,7 +42,7 @@ const NO_ASKS: BotNeedsYouAsks = { needs: [], stoppedForSignIn: [], itemOf: () =
  */
 export function HomeItemsPanel({ className }: { className?: string }): React.JSX.Element {
   const t = useTranslate()
-  useSidePanelInset()
+  useSidePanelInset('380px')
   const bot = useMemo(() => homeTasksBot(t('taskLoop.agent.name', 'Task agent')), [t])
   const items = useBotItems(bot)
   const read = items.read
@@ -45,20 +54,62 @@ export function HomeItemsPanel({ className }: { className?: string }): React.JSX
   const walk = useBotItemWalk(list, botRefKey(bot))
   const scroll = useRef<HTMLDivElement | null>(null)
   useBotItemBackFocus(walk.uid !== null, scroll)
-  // A row or 업무 정리 elsewhere on Home opens its 업무 here, once the list has it.
+  // A row or 업무 정리 elsewhere on Home opens its 업무 here, once the list has it. 업무 정리 starts the pass:
+  // the day's records first (not a 업무, so not a row), then 내 확인 필요 from its first row.
   const request = useHomeItemsPanel((state) => state.request)
+  const [pass, setPass] = useState(false)
   useEffect(() => {
     if (!request || !read) {
+      return
+    }
+    const records = request.uid === FIRST_NEEDS_YOU && !pass ? homeRecordsItemUid() : null
+    if (records && homeItemIsOpen(records)) {
+      useHomeItemsPanel.setState({ request: null })
+      setPass(true)
+      setReturnTo(null)
+      walk.open(records)
       return
     }
     const uid = request.uid === FIRST_NEEDS_YOU ? list.groups.needs_you[0]?.uid : request.uid
     if (uid && read.items.some((item) => item.uid === uid)) {
       useHomeItemsPanel.setState({ request: null })
+      setPass(request.uid === FIRST_NEEDS_YOU)
       setReturnTo(null)
       walk.open(uid)
+    } else if (request.uid === FIRST_NEEDS_YOU && pass) {
+      // Nothing left after the records: the pass ends on the list.
+      useHomeItemsPanel.setState({ request: null })
+      setPass(false)
+      walk.close()
     }
-  }, [request, read, list.groups, walk])
+  }, [request, read, list.groups, walk, pass])
+  // In the pass, an answer goes on to the next row by itself; after the last, back to the list.
+  const answered = useHomeItemsPanel((state) => state.answered)
+  const walkNow = useRef(walk)
+  useEffect(() => {
+    walkNow.current = walk
+  })
+  useEffect(() => {
+    if (!pass || !answered || answered.uid !== walkNow.current.uid) {
+      return
+    }
+    // Long enough to see the answer land.
+    const timer = setTimeout(() => {
+      useHomeItemsPanel.setState({ answered: null })
+      const current = walkNow.current
+      if (answered.uid === homeRecordsItemUid()) {
+        openHomeItem(FIRST_NEEDS_YOU)
+      } else if (current.canStep(1)) {
+        current.step(1)
+      } else {
+        setPass(false)
+        current.close()
+      }
+    }, 450)
+    return () => clearTimeout(timer)
+  }, [answered, pass])
   const back = (): void => {
+    setPass(false)
     const left = walk.close()
     const listed = BOT_ITEM_GROUP_IDS.flatMap((id) => list.groups[id].map((item) => item.uid))
     setReturnTo(left ? botItemWalkReturnRow(left.walk, left.uid, listed) : null)
@@ -115,9 +166,12 @@ export function HomeItemsPanel({ className }: { className?: string }): React.JSX
 /** One 업무 as its item, alone: beside the Work board and in a task workspace's sidebar. */
 export function HomeTaskItem({
   taskId,
+  readOnly = false,
   className
 }: {
   taskId: string
+  /** A colleague's view of 마코's task: its history and progress notes, nothing to answer. */
+  readOnly?: boolean
   className?: string
 }): React.JSX.Element {
   const t = useTranslate()
@@ -131,7 +185,12 @@ export function HomeTaskItem({
         className
       )}
     >
-      <BotItemView key={taskId} bot={bot} uid={taskItemUid(taskId)} />
+      <BotItemView
+        key={taskId}
+        bot={bot}
+        uid={readOnly ? peerTaskItemUid(taskId) : taskItemUid(taskId)}
+        readOnly={readOnly}
+      />
     </aside>
   )
 }

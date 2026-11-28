@@ -11,6 +11,7 @@ import {
   type BotItemFilter,
   type BotItemGroups
 } from '../../../../../shared/bots/bot-item-groups'
+import { localBotItems } from '@/lib/local-bot-items'
 import { BotItemsAllClear } from './BotItemsAllClear'
 import { BotItemsList } from './BotItemsList'
 import { BotItemsLoading } from './BotItemsLoading'
@@ -70,6 +71,7 @@ export function BotItemsSection({
   const groups = read ? list.groups : NO_GROUPS
   const filtered = isBotItemFilterOn(filter)
   const asking = asks.needs.length + asks.stoppedForSignIn.length > 0
+  const local = localBotItems(bot.id) !== undefined
   // Every message here speaks for items only; the asks above it stand on their own.
   const itemsNote = (): React.ReactNode => {
     if (!read) {
@@ -79,6 +81,10 @@ export function BotItemsSection({
         // Needs you shows only for counted asks; runs a sign-in stopped, alone, leave it out.
         <BotItemsLoading afterAsks={asks.needs.length > 0} />
       )
+    }
+    // A server's own list (업무) says nothing about what is not there: an empty group is simply absent.
+    if (items.length === 0 && !filtered && local) {
+      return null
     }
     if (items.length === 0 && !filtered) {
       return asking ? (
@@ -112,6 +118,7 @@ export function BotItemsSection({
   }
   // Paused and offline say so elsewhere; the line leads the folded sections rather than trailing them.
   const allClear =
+    !local &&
     read !== null &&
     items.length > 0 &&
     !asking &&
