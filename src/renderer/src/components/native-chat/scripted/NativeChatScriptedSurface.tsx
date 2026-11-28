@@ -25,6 +25,8 @@ export function NativeChatScriptedSurface({
   working = false,
   canSend = true,
   conversationShown,
+  isVisible = true,
+  isFocusedGroup = true,
   onSend,
   children,
   ...dataAttributes
@@ -34,6 +36,9 @@ export function NativeChatScriptedSurface({
   working?: boolean
   canSend?: boolean
   conversationShown: boolean
+  /** For a conversation in a workspace tab: whether its tab is shown, and in the focused group. */
+  isVisible?: boolean
+  isFocusedGroup?: boolean
   onSend: (text: string) => void
   children: (messageListRef: MessageListRef) => React.ReactNode
 } & Record<`data-${string}`, string | undefined>): React.JSX.Element {
@@ -42,8 +47,8 @@ export function NativeChatScriptedSurface({
   const surface = useNativeChatSurface({
     tabId: id,
     sessionId: id,
-    isVisible: true,
-    isFocusedGroup: true,
+    isVisible,
+    isFocusedGroup,
     composerRef,
     transcriptRef: messageListRef,
     fileLinkContext: null,

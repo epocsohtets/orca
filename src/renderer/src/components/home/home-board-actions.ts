@@ -1,6 +1,6 @@
 import { toast } from 'sonner'
 import { translate } from '@/i18n/i18n'
-import { useAppStore } from '@/store'
+import { ensureTaskWorkspace } from '@/components/work/work-task-workspace'
 import { homeStatusMovedLine } from './home-task-loop-script'
 import { useHomeBoardStore } from './home-board-store'
 import type { HomeBoardState, HomeRecordAnswer } from './home-board'
@@ -40,24 +40,9 @@ export function setHomeTaskStatus(taskId: string, status: InaxStatus, title?: st
   }
 }
 
-/** A folder per task under the work folder location, made without asking. */
-async function makeTaskFolder(taskId: string, title: string): Promise<void> {
-  const root = useAppStore.getState().settings?.workspaceDir
-  if (!root) {
-    return
-  }
-  const folder = `${root}${root.includes('\\') ? '\\' : '/'}${title.replace(/[\\/:*?"<>|]/g, ' ').trim()}`
-  // An existing folder of that name is the task's folder from an earlier start.
-  await window.api.fs.createDir({ dirPath: folder }).catch(() => undefined)
-  useHomeBoardStore.setState((state) => {
-    const loop = state.loops[taskId]
-    return loop ? { loops: { ...state.loops, [taskId]: { ...loop, folder } } } : state
-  })
-}
-
 /**
- * Hands a task to its agent: the conversation starts, a "to do" task is in progress at once, and its folder is
- * made. Starting again keeps the conversation that exists.
+ * Hands a task to its agent: the conversation starts, a "to do" task is in progress at once, and its
+ * workspace is made. Starting again keeps the conversation that exists.
  */
 export function startHomeLoop(taskId: string, title: string, status: InaxStatus = 'todo'): void {
   if (useHomeBoardStore.getState().loops[taskId]) {
@@ -68,7 +53,7 @@ export function startHomeLoop(taskId: string, title: string, status: InaxStatus 
     loops: { ...state.loops, [taskId]: { startedAt: at, said: [] } },
     ...(status === 'todo' ? withStatus(state, taskId, 'inProgress', at) : {})
   }))
-  void makeTaskFolder(taskId, title)
+  void ensureTaskWorkspace(taskId, title)
 }
 
 /** My answer to the agent's question: one of its choices, or my own words. */

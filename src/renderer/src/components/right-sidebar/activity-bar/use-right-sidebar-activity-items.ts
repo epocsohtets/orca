@@ -1,4 +1,6 @@
 import { useMemo } from 'react'
+import { ListTodo } from 'lucide-react'
+import { useTaskAsksMe, useTaskIdOfWorkspace } from '../../work/work-task-workspace'
 import { useAppStore } from '@/store'
 import { hidesDeveloperChrome } from '../../../../../shared/settings/work-styles'
 import { useRepoById } from '@/store/repos/use-repository-catalog'
@@ -68,6 +70,9 @@ export function useRightSidebarActivityItems({
   const isBot = bot !== null
   const group = useBotGroupForWorkspace(isFolderWorkspace ? activeWorktreeId : null)
   const isGroupHome = group !== null
+  const taskId = useTaskIdOfWorkspace(isFolderWorkspace ? activeWorktreeId : null)
+  const isTask = taskId !== null
+  const taskAsksMe = useTaskAsksMe(taskId)
   const groupMembers = useBotGroupMembers(group)
   const now = useBotNow(bot)
   const { needs } = now
@@ -75,7 +80,7 @@ export function useRightSidebarActivityItems({
   // its members' as their own tabs do, published by its open panel.
   const botNeedsYou = useBotNeedsYouCount(bot, now)
   const groupNeedsYou = usePublishedBotsNeedsYou(groupMembers)
-  const needsYou = isGroupHome ? groupNeedsYou : botNeedsYou
+  const needsYou = isTask ? Number(taskAsksMe) : isGroupHome ? groupNeedsYou : botNeedsYou
   const showsHomeTab = isBot || isGroupHome
   // The same read as Activity's count, so connector reads aren't repeated for the tab.
   const connectorsNeedingOwner = needs.filter((need) => need.kind === 'connector').length
@@ -114,11 +119,16 @@ export function useRightSidebarActivityItems({
       sourceControlShortcut,
       checksShortcut,
       portsShortcut,
-      isBot,
+      // A task's workspace labels its tabs as a bot's page does.
+      isBot: isBot || isTask,
       showsHomeTab,
       needsYou,
       connectorsNeedingOwner
-    })
+    }).map((item) =>
+      isTask && item.id === 'bot-activity'
+        ? { ...item, icon: ListTodo, title: t('appRail.work', 'Work'), labeledTab: true }
+        : item
+    )
     return [
       ...builtInItems,
       // Append plugin tabs to preserve built-in navigation positions. Checked against every built-in
@@ -141,6 +151,7 @@ export function useRightSidebarActivityItems({
     portsShortcut,
     sourceControlShortcut,
     isBot,
+    isTask,
     showsHomeTab,
     needsYou,
     connectorsNeedingOwner,
@@ -159,7 +170,8 @@ export function useRightSidebarActivityItems({
           isBot,
           isGroupHome,
           hasChatWorkers,
-          hideCode
+          hideCode,
+          isTask
         }),
         (item) => activityItemStatus(item, checksStatus)
       ),
@@ -172,6 +184,7 @@ export function useRightSidebarActivityItems({
       isGroupHome,
       hasChatWorkers,
       hideCode,
+      isTask,
       checksStatus
     ]
   )
@@ -184,6 +197,6 @@ export function useRightSidebarActivityItems({
     pluginSystemEnabled,
     pluginFetchStatus,
     installedPluginTabKeys,
-    isBotPage: isBot
+    isBotPage: isBot || isTask
   }
 }

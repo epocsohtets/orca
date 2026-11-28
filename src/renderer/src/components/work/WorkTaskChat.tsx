@@ -9,7 +9,6 @@ import { NATIVE_CHAT_INLINE_CHIP } from '@/components/native-chat/messages/event
 import type { NativeChatTimedRow } from '@/components/native-chat/conversation/slots/native-chat-timed-rows'
 import type { NativeChatLiveSession } from '@/components/native-chat/session/terminal/read/native-chat-live-session-contract'
 import { BotItemStatusIcon } from '@/components/bots/items/BotItemStatusIcon'
-import type { NativeChatMessage } from '../../../../shared/native-chat/native-chat-types'
 import type { HomeTask } from '@/components/home/home-board'
 import type { HomeTaskLoop } from '@/components/home/home-task-loop'
 import {
@@ -24,26 +23,27 @@ import {
 } from '@/components/home/home-task-loop-script'
 
 /**
- * A task's conversation on the chat's own surface, transcript and composer, as every other chat page. The
+ * A task's conversation in its workspace's chat tab, on the chat's own surface, transcript and composer. The
  * agent behind it is scripted (home-task-loop-script); what it asks of me is an item ask, answered in the
- * panel beside the conversation, and the transcript only says that it asked.
+ * right sidebar, and the transcript only says that it asked.
  */
 export function WorkTaskChat({
   task,
   loop,
-  sample,
   agentName,
   now,
+  isVisible,
+  isFocusedGroup,
   onOpenQuestion,
   onSay
 }: {
   task: HomeTask
-  /** My conversation with the task's agent; absent for a sample agent's task. */
-  loop: HomeTaskLoop | undefined
-  /** A sample agent's side of its task, shown when I started no conversation. */
-  sample: readonly NativeChatMessage[]
+  /** My conversation with the task's agent. */
+  loop: HomeTaskLoop
   agentName: string
   now: number
+  isVisible: boolean
+  isFocusedGroup: boolean
   onOpenQuestion: () => void
   onSay: (text: string) => void
 }): React.JSX.Element {
@@ -52,7 +52,7 @@ export function WorkTaskChat({
   const working = task.loop === 'working'
   const session = useMemo<NativeChatLiveSession>(
     () => ({
-      messages: loop ? buildHomeLoopTranscript(t, task, loop, now) : [...sample],
+      messages: buildHomeLoopTranscript(t, task, loop, now),
       // The transcript needs a provider to parse rows as; none is named on screen.
       agent: 'claude',
       sessionId: tabId,
@@ -63,12 +63,9 @@ export function WorkTaskChat({
       olderHistoryGeneration: 0,
       loadEarlier: async () => 'exhausted'
     }),
-    [loop, sample, task, now, tabId, t]
+    [loop, task, now, tabId, t]
   )
   const timedRows = useMemo<NativeChatTimedRow[]>(() => {
-    if (!loop) {
-      return []
-    }
     const times = homeLoopEventTimes(loop, now)
     const rows: NativeChatTimedRow[] = [
       {
@@ -147,8 +144,9 @@ export function WorkTaskChat({
     <NativeChatScriptedSurface
       id={tabId}
       working={working}
-      canSend={loop !== undefined}
       conversationShown={session.messages.length > 0}
+      isVisible={isVisible}
+      isFocusedGroup={isFocusedGroup}
       onSend={onSay}
       data-work-chat={task.id}
     >
@@ -157,7 +155,7 @@ export function WorkTaskChat({
           ref={messageListRef}
           session={session}
           isWorking={working}
-          workingStartedAt={loop ? (loop.answer?.at ?? loop.startedAt) : null}
+          workingStartedAt={loop.answer?.at ?? loop.startedAt}
           expandSignal={false}
           timedRows={timedRows}
           turnBot={{ name: agentName, src: null, fallback: agentName.charAt(0) }}

@@ -29,6 +29,8 @@ export type HomeTaskLoop = {
   startedAt: number
   /** The folder made for the task when it started. */
   folder?: string
+  /** The Orca workspace that holds the task's conversation, opened on that folder. */
+  workspaceId?: string
   /** My answer to the agent's one question: a choice, or my own words. */
   answer?: { choiceId: string | null; text?: string; at: number }
   /** Set when I saved the day-end card that held the agent's closing proposal. */

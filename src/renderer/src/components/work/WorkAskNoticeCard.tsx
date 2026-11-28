@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { useAppStore } from '@/store'
 import { useHomeBoard } from '@/components/home/use-home-board'
+import { taskIdOfWorkspace } from './work-task-workspace'
 import { isSeen, markSeen, useMeetings } from '@/components/meetings/meetings-store'
 import {
   openInaxTask,
@@ -16,16 +17,21 @@ export function WorkAskNoticeCard(): React.JSX.Element | null {
   const t = useTranslate()
   const { view, board } = useHomeBoard()
   const seen = useMeetings()
-  const openTaskId = useInaxSourceSelection((state) => state.taskId)
-  const onWork = useAppStore((state) => state.activeView === 'tasks')
+  const boardTaskId = useInaxSourceSelection((state) => state.taskId)
+  const onBoard = useAppStore((state) => state.activeView === 'tasks')
+  // The task whose workspace is in front: its question is already beside its conversation.
+  const workspaceTaskId = useAppStore((state) =>
+    state.activeView === 'terminal'
+      ? taskIdOfWorkspace(board.loops, state.activeWorkspaceKey)
+      : null
+  )
+  const openTaskId = onBoard ? boardTaskId : workspaceTaskId
   // Keyed by the conversation, so a task started again asks again.
   const keyOf = (taskId: string): string =>
     `notice:ask:${taskId}:${board.loops[taskId]?.startedAt ?? 0}`
   const task = view.tasks.find(
     (entry) =>
-      entry.loop === 'question' &&
-      !(onWork && openTaskId === entry.id) &&
-      !isSeen(seen, keyOf(entry.id))
+      entry.loop === 'question' && openTaskId !== entry.id && !isSeen(seen, keyOf(entry.id))
   )
   if (!task) {
     return null

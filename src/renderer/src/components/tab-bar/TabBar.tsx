@@ -1,3 +1,6 @@
+import { useAppStore } from '@/store'
+import { hidesDeveloperChrome } from '../../../../shared/settings/work-styles'
+import { useTaskIdOfWorkspace } from '@/components/work/work-task-workspace'
 import React, { useCallback, useMemo } from 'react'
 import { useTabStripOverflowNavigation } from './strip/tab-strip-overflow-navigation'
 import { useTabStripDragScrollHandlers } from './strip/tab-strip-drag-scroll'
@@ -63,6 +66,8 @@ function TabBarInner(props: TabBarProps): React.JSX.Element {
   } = props
   const runtime = useTabBarRuntimeModel({ worktreeId, groupId })
   const botGroup = useBotGroupForWorkspace(worktreeId)
+  const hideDeveloper = useAppStore((state) => hidesDeveloperChrome(state.settings))
+  const hideCreate = useTaskIdOfWorkspace(worktreeId) !== null && hideDeveloper
   const baseCreateMenu = useTabBarCreateMenuController({
     worktreeId,
     resolvedGroupId: runtime.resolvedGroupId,
@@ -217,7 +222,8 @@ function TabBarInner(props: TabBarProps): React.JSX.Element {
       itemActions,
       surfaceRef,
       bot,
-      botGroup
+      botGroup,
+      hideCreate
     },
     t
   )

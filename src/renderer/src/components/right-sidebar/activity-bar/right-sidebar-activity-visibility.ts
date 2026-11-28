@@ -13,6 +13,8 @@ type RightSidebarActivityVisibilityState = {
   hasChatWorkers?: boolean
   /** The person left Code out: source control, checks and ports are not theirs. */
   hideCode?: boolean
+  /** The workspace holds one task's conversation: the task leads, its folder's files follow. */
+  isTask?: boolean
 }
 
 const CODE_TABS = new Set(['pr-checks', 'source-control', 'checks', 'ports', 'workspaces'])
@@ -26,9 +28,13 @@ export function getVisibleRightSidebarActivityItems(
     isBot,
     isGroupHome = false,
     hasChatWorkers = false,
-    hideCode = false
+    hideCode = false,
+    isTask = false
   }: RightSidebarActivityVisibilityState
 ): ActivityBarItem[] {
+  if (isTask) {
+    return ['bot-activity', 'explorer'].flatMap((id) => items.filter((item) => item.id === id))
+  }
   if (hideCode) {
     items = items.filter((item) => !CODE_TABS.has(item.id))
   }

@@ -11,6 +11,8 @@ import { ActivityPortalContainer } from '@/components/ui/activity-portal-contain
 import { RetainedPaneHost } from '../../../tab-group/retained-pane/RetainedPaneHost'
 import NativeChatView from '../../NativeChatView'
 import { BotGroupChat } from '../../../bots/BotGroupChat'
+import { WorkTaskTab } from '../../../work/WorkTaskTab'
+import { taskIdOfRoom } from '../../../work/work-task-workspace'
 import { NativeChatComposerEditorOwner } from '../../composer/editor/native-chat-composer-editor-owner'
 import { NativeChatHostOutageOwner } from '../../host-access/native-chat-host-outage-owner'
 import { NativeChatPaneLifetime } from '../ownership/native-chat-pane-lifetime'
@@ -98,6 +100,7 @@ const RoomOverlaySlot = memo(function RoomOverlaySlot({
   onFocusOwningGroup: (groupId: string) => void
 }): React.JSX.Element {
   const backdropActive = useWindowBackdropActive()
+  const taskId = taskIdOfRoom(tab.entityId)
   return (
     <RetainedPaneHost
       groupId={tab.groupId}
@@ -106,12 +109,16 @@ const RoomOverlaySlot = memo(function RoomOverlaySlot({
       data-room-overlay-tab-id={tab.id}
       onFocusOwningGroup={onFocusOwningGroup}
     >
-      <BotGroupChat
-        roomId={tab.entityId}
-        tabId={tab.id}
-        isVisible={isActive}
-        isFocusedGroup={isFocusedGroup}
-      />
+      {taskId === null ? (
+        <BotGroupChat
+          roomId={tab.entityId}
+          tabId={tab.id}
+          isVisible={isActive}
+          isFocusedGroup={isFocusedGroup}
+        />
+      ) : (
+        <WorkTaskTab taskId={taskId} isVisible={isActive} isFocusedGroup={isFocusedGroup} />
+      )}
     </RetainedPaneHost>
   )
 })
