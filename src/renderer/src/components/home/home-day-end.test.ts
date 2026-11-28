@@ -43,7 +43,7 @@ const plan = (saved = EMPTY_HOME_BOARD_STATE.dayEnd, answers = {}) =>
 describe('day-end cards', () => {
   it('makes a card only for a task that moved today, with what the agent knows', () => {
     const cards = plan()
-    expect(cards.map((card) => card.id)).toEqual(['moved', 'records'])
+    expect(cards.map((card) => card.id)).toEqual(['moved', 'pages'])
     expect(cards[0]).toMatchObject({ suggestion: 'agent line', proposed: 'review' })
   })
 
@@ -105,12 +105,12 @@ describe('day-end cards', () => {
     expect(cards).toHaveLength(1)
     expect(cards[0]).toMatchObject({
       kind: 'meeting',
-      settled: 1,
-      followUps: [{ id: 'open', returnedBy: null }]
+      meetingId: 'm',
+      followUp: { id: 'open', returnedBy: null }
     })
   })
 
-  it('drops a saved task card and the records card once every record is placed', () => {
+  it('drops a saved task card and the card of a record once it is placed', () => {
     const saved = saveHomeDayEndTask(EMPTY_HOME_BOARD_STATE, {
       taskId: 'moved',
       text: 'agent line',

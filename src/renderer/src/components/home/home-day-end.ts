@@ -27,26 +27,28 @@ export type HomeDayEndCard =
       proposed: InaxStatus | null
     }
   | {
+      /** One follow-up of a meeting I host that the meeting gave nobody. */
       kind: 'meeting'
+      /** The follow-up's id. */
       id: string
-      title: string
+      meetingId: string
+      meetingTitle: string
       project: HomeProjectId
       timeline: HomeDayEndLine[]
       /** `returnedBy`: the person the meeting named, who said it is not theirs. */
-      followUps: { id: string; text: string; returnedBy: string | null }[]
-      /** Follow-ups of this meeting that are tasks already: colleagues see those now. */
-      settled: number
-      /** Who can take a follow-up: the host and the attendees. */
+      followUp: { id: string; text: string; returnedBy: string | null }
+      /** Who can take it: the host and the attendees. */
       peopleIds: string[]
     }
   | {
+      /** One day record the app could not place. */
       kind: 'records'
-      id: 'records'
-      records: { id: string; text: string; suggestTaskId: string }[]
+      id: string
+      record: { id: string; text: string; suggestTaskId: string }
     }
 
 /** What one saved card put where; enough to take exactly that back. */
-export type HomeDayEndSaved =
+export type HomeDayEndSaved = (
   | {
       kind: 'task'
       id: string
@@ -60,8 +62,11 @@ export type HomeDayEndSaved =
     }
   | { kind: 'meeting'; id: string; taskIds: string[] }
   | { kind: 'records'; id: 'records'; recordIds: string[] }
+) & {
+  /** When it was saved: the time column of Home's list. */
+  at?: number
+}
 
-export const HOME_RECORD_YES = 'yes'
 export const HOME_RECORD_NOT_WORK = 'notWork'
 
 /** What I changed on a card before saving it. `picks`: follow-up to person, or record to answer. */
@@ -83,7 +88,7 @@ export type HomeDayEndSave =
   | { kind: 'meeting'; meetingId: string; rows: { followUpId: string; assigneeId: string }[] }
   | { kind: 'records'; answers: { recordId: string; answer: string }[] }
 
-const SHOWN_LINES = 4
+const SHOWN_LINES = 3
 
 /**
  * The day-end cards: one per task of mine that moved today, one per meeting I host with follow-ups the meeting gave nobody,
@@ -101,7 +106,7 @@ export function planHomeDayEnd(args: {
   saved: readonly HomeDayEndSaved[]
   suggestion: (task: HomeTask) => string | null
 }): HomeDayEndCard[] {
-  // A meeting's card and the records card stay while something of theirs is still open.
+  // A follow-up's card and a record's card stay while it is still open.
   const saved = new Set(args.saved.flatMap((entry) => (entry.kind === 'task' ? [entry.id] : [])))
   const cards: HomeDayEndCard[] = []
   for (const task of args.tasks) {
@@ -135,24 +140,26 @@ export function planHomeDayEnd(args: {
     if (meeting.hostId !== args.viewerId || !meeting.minutes || open.length === 0) {
       continue
     }
-    cards.push({
-      kind: 'meeting',
-      id: meeting.id,
-      title: meeting.title,
-      project: meeting.project,
-      timeline: args.activity.filter((line) => line.meetingId === meeting.id).slice(0, SHOWN_LINES),
-      settled: meeting.followUps.length - open.length,
-      followUps: open.map(({ id, text, declined, suggestedOwnerId }) => ({
+    const timeline = args.activity
+      .filter((line) => line.meetingId === meeting.id)
+      .slice(0, SHOWN_LINES)
+    for (const { id, text, declined, suggestedOwnerId } of open) {
+      cards.push({
+        kind: 'meeting',
         id,
-        text,
-        returnedBy: declined ? suggestedOwnerId : null
-      })),
-      peopleIds: [meeting.hostId, ...meeting.attendeeIds]
-    })
+        meetingId: meeting.id,
+        meetingTitle: meeting.title,
+        project: meeting.project,
+        timeline,
+        followUp: { id, text, returnedBy: declined ? suggestedOwnerId : null },
+        peopleIds: [meeting.hostId, ...meeting.attendeeIds]
+      })
+    }
   }
-  const unplaced = args.records.filter((record) => args.recordAnswers[record.id] === undefined)
-  if (unplaced.length > 0) {
-    cards.push({ kind: 'records', id: 'records', records: unplaced })
+  for (const record of args.records) {
+    if (args.recordAnswers[record.id] === undefined) {
+      cards.push({ kind: 'records', id: record.id, record })
+    }
   }
   return cards
 }
@@ -219,7 +226,8 @@ export function saveHomeDayEndTask(
         noteId,
         status: args.status,
         prevStatus: record?.status ?? null,
-        closedLoop
+        closedLoop,
+        at: args.at
       }
     ]
   }

@@ -100,7 +100,7 @@ export function saveHomeDayEnd(save: HomeDayEndSave): void {
       .tasks.filter((task) => !before.has(task.id))
       .map((task) => task.id)
     useHomeBoardStore.setState((state) => ({
-      dayEnd: [...state.dayEnd, { kind: 'meeting', id: save.meetingId, taskIds }]
+      dayEnd: [...state.dayEnd, { kind: 'meeting', id: save.meetingId, taskIds, at: Date.now() }]
     }))
   } else {
     useHomeBoardStore.setState((state) => ({
@@ -115,7 +115,12 @@ export function saveHomeDayEnd(save: HomeDayEndSave): void {
       },
       dayEnd: [
         ...state.dayEnd,
-        { kind: 'records', id: 'records', recordIds: save.answers.map((entry) => entry.recordId) }
+        {
+          kind: 'records',
+          id: 'records',
+          recordIds: save.answers.map((entry) => entry.recordId),
+          at: Date.now()
+        }
       ]
     }))
   }

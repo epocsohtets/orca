@@ -1,15 +1,17 @@
-import React from 'react'
+import React, { useId } from 'react'
 import { Check } from 'lucide-react'
 import { useTranslate } from '@/i18n/use-translate'
 import { cn } from '@/lib/class-names'
 import { Button } from '@/components/ui/button'
 import { ShortcutKeyCombo } from '@/components/ui/ShortcutKeyCombo'
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
 import {
   BOT_ITEM_CHIP,
   BOT_ITEM_CHIP_ACTION,
@@ -19,8 +21,7 @@ import {
 } from '@/components/bots/items/BotItemQuestionStep'
 import { HomeAvatar } from './HomeCard'
 import { HomeActivityItem } from './HomeActivityCard'
-import type { HomeTask } from './home-board'
-import { HOME_RECORD_NOT_WORK, HOME_RECORD_YES, type HomeDayEndLine } from './home-day-end'
+import type { HomeDayEndLine } from './home-day-end'
 
 type Chip = { id: string; label: string; recommended: boolean; person?: boolean }
 
@@ -144,11 +145,9 @@ export function HomeDayEndTimeline({
 }: {
   lines: readonly HomeDayEndLine[]
   onOpen: () => void
-}): React.JSX.Element | null {
+}): React.JSX.Element {
   const t = useTranslate()
-  if (lines.length === 0) {
-    return null
-  }
+  // The heading stays with no rows: the card keeps its shape.
   return (
     <section>
       <h4 className="mb-1 px-3.5 text-xs text-muted-foreground">
@@ -163,92 +162,49 @@ export function HomeDayEndTimeline({
   )
 }
 
-/** The records the app could not place: each with the task the agent picked, to take, change or rule out. */
-export function HomeDayEndRecords({
-  records,
-  openTasks,
-  answer,
-  onAnswer
+/**
+ * The one control a card adds, with its name: a select. `last` comes after a separator (a record's "not work").
+ * Picking does not save: Save does.
+ */
+export function HomeDayEndSelect({
+  label,
+  value,
+  placeholder,
+  options,
+  last,
+  onChange
 }: {
-  records: readonly { id: string; text: string; suggestTaskId: string }[]
-  openTasks: readonly HomeTask[]
-  answer: (recordId: string) => string
-  onAnswer: (recordId: string, answer: string) => void
+  label: string
+  value: string | undefined
+  placeholder?: string
+  options: readonly { id: string; label: string }[]
+  last?: { id: string; label: string }
+  onChange: (id: string) => void
 }): React.JSX.Element {
-  const t = useTranslate()
-  const titleOf = (taskId: string): string =>
-    openTasks.find((task) => task.id === taskId)?.title ?? ''
+  const id = useId()
   return (
-    <div className="mx-3.5 flex flex-col gap-3 rounded-[10px] bg-sidebar-accent/60 p-3">
-      {records.map((record) => {
-        const picked = answer(record.id)
-        const other =
-          picked !== HOME_RECORD_YES && picked !== HOME_RECORD_NOT_WORK ? titleOf(picked) : null
-        return (
-          <HomeDayEndChipLine
-            key={record.id}
-            question={record.text}
-            note={
-              <p className="mt-1 flex items-baseline gap-2 text-xs">
-                <span className="text-muted-foreground">{t('home.dayEnd.task', 'Task')}</span>
-                <span className="min-w-0 text-foreground">
-                  {other ?? titleOf(record.suggestTaskId)}
-                </span>
-              </p>
-            }
-            chips={[
-              {
-                id: HOME_RECORD_YES,
-                label: t('home.dayEnd.recordYes', 'This task'),
-                recommended: true
-              }
-            ]}
-            picked={other ? undefined : picked}
-            onPick={(id) => onAnswer(record.id, id)}
-          >
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  type="button"
-                  aria-pressed={other !== null}
-                  className={cn(
-                    BOT_ITEM_CHIP,
-                    BOT_ITEM_CHIP_ACTION,
-                    other ? BOT_ITEM_CHIP_PICKED : 'text-foreground'
-                  )}
-                >
-                  {other ? <Check aria-hidden className="size-3 shrink-0" /> : null}
-                  {t('home.dayEnd.recordOther', 'Another task')}
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
-                {openTasks
-                  .filter((task) => task.id !== record.suggestTaskId)
-                  .map((task) => (
-                    <DropdownMenuItem key={task.id} onSelect={() => onAnswer(record.id, task.id)}>
-                      {task.title}
-                    </DropdownMenuItem>
-                  ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <button
-              type="button"
-              aria-pressed={picked === HOME_RECORD_NOT_WORK}
-              className={cn(
-                BOT_ITEM_CHIP,
-                BOT_ITEM_CHIP_ACTION,
-                picked === HOME_RECORD_NOT_WORK ? BOT_ITEM_CHIP_PICKED : 'text-foreground'
-              )}
-              onClick={() => onAnswer(record.id, HOME_RECORD_NOT_WORK)}
-            >
-              {picked === HOME_RECORD_NOT_WORK ? (
-                <Check aria-hidden className="size-3 shrink-0" />
-              ) : null}
-              {t('home.day.notWork', 'Not work')}
-            </button>
-          </HomeDayEndChipLine>
-        )
-      })}
+    <div className="flex items-center gap-2 px-2">
+      <label htmlFor={id} className="w-16 shrink-0 text-xs leading-4 text-muted-foreground">
+        {label}
+      </label>
+      <Select value={value ?? ''} onValueChange={onChange}>
+        <SelectTrigger id={id} size="sm" className="min-w-0 flex-1" data-home-day-end-select="">
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((option) => (
+            <SelectItem key={option.id} value={option.id}>
+              {option.label}
+            </SelectItem>
+          ))}
+          {last ? (
+            <>
+              <SelectSeparator />
+              <SelectItem value={last.id}>{last.label}</SelectItem>
+            </>
+          ) : null}
+        </SelectContent>
+      </Select>
     </div>
   )
 }
