@@ -1,13 +1,8 @@
-import React, { useMemo, useRef } from 'react'
+import React, { useMemo } from 'react'
 import { ArrowRightLeft, ListTodo } from 'lucide-react'
 import { useTranslate } from '@/i18n/use-translate'
 import { NativeChatMessageList } from '@/components/native-chat/NativeChatMessageList'
-import { NativeChatSurface } from '@/components/native-chat/NativeChatSurface'
-import { useNativeChatSurface } from '@/components/native-chat/use-native-chat-surface'
-import { NativeChatComposer } from '@/components/native-chat/composer/NativeChatComposer'
-import type { NativeChatComposerHandle } from '@/components/native-chat/composer/native-chat-composer-types'
-import type { NativeChatStructuredComposerTransport } from '@/components/native-chat/composer/submit/native-chat-structured-composer-transport'
-import { useNativeChatRevealLatest } from '@/components/native-chat/messages/actions/use-native-chat-reveal-latest'
+import { NativeChatScriptedSurface } from '@/components/native-chat/scripted/NativeChatScriptedSurface'
 import { NativeChatEventRow } from '@/components/native-chat/messages/events/NativeChatEventRow'
 import { NativeChatUserBubble } from '@/components/native-chat/messages/rows/NativeChatUserBubble'
 import { NATIVE_CHAT_INLINE_CHIP } from '@/components/native-chat/messages/events/native-chat-inline-chip'
@@ -27,13 +22,6 @@ import {
   homeLoopEventTimes,
   homeStatusMovedLine
 } from '@/components/home/home-task-loop-script'
-
-const NO_OPTIONS: NativeChatStructuredComposerTransport['optionsSurface'] = {
-  getSnapshot: () => [],
-  subscribe: () => () => {},
-  setOption: async () => ({ snapshot: [] }),
-  invokeAction: async () => ({ snapshot: [] })
-}
 
 /**
  * A task's conversation on the chat's own surface, transcript and composer, as every other chat page. The
@@ -60,8 +48,6 @@ export function WorkTaskChat({
   onSay: (text: string) => void
 }): React.JSX.Element {
   const t = useTranslate()
-  const composerRef = useRef<NativeChatComposerHandle>(null)
-  const { messageListRef, revealLatest } = useNativeChatRevealLatest()
   const tabId = `work:${task.id}`
   const working = task.loop === 'working'
   const session = useMemo<NativeChatLiveSession>(
@@ -153,59 +139,26 @@ export function WorkTaskChat({
     return rows
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loop, task.title, task.loop, t, onOpenQuestion])
-  const surface = useNativeChatSurface({
-    tabId,
-    sessionId: tabId,
-    isVisible: true,
-    isFocusedGroup: true,
-    composerRef,
-    transcriptRef: messageListRef,
-    fileLinkContext: null,
-    composerReady: true,
-    conversationShown: session.messages.length > 0,
-    menu: { showTerminalPaneActions: false },
-    sessionHistory: 'workspace'
-  })
-  const transport: NativeChatStructuredComposerTransport = {
-    runtime: 'local',
-    sessionId: tabId,
-    runtimeEnvironmentId: null,
-    capturePresentation: () => () => true,
-    acceptsImages: false,
-    optionsSurface: NO_OPTIONS,
-    optionSnapshot: [],
-    send: (text) => {
-      onSay(text)
-      revealLatest()
-      return true
-    },
-    dispatchCommand: async () => ({ handled: false, accepted: false, error: null }),
-    onError: () => {}
-  }
   return (
-    <NativeChatSurface surface={surface} working={working} data-work-chat={task.id}>
-      <NativeChatMessageList
-        ref={messageListRef}
-        session={session}
-        isWorking={working}
-        workingStartedAt={loop ? (loop.answer?.at ?? loop.startedAt) : null}
-        expandSignal={false}
-        timedRows={timedRows}
-        turnBot={{ name: agentName, src: null, fallback: agentName.charAt(0) }}
-      />
-      <NativeChatComposer
-        ref={composerRef}
-        terminalTabId={tabId}
-        paneKey={tabId}
-        draftScopeKey={tabId}
-        targetPtyId={null}
-        agent="claude"
-        structuredTransport={transport}
-        isWorking={working}
-        canSend={loop !== undefined}
-        onStop={() => {}}
-        notices={[]}
-      />
-    </NativeChatSurface>
+    <NativeChatScriptedSurface
+      id={tabId}
+      working={working}
+      canSend={loop !== undefined}
+      conversationShown={session.messages.length > 0}
+      onSend={onSay}
+      data-work-chat={task.id}
+    >
+      {(messageListRef) => (
+        <NativeChatMessageList
+          ref={messageListRef}
+          session={session}
+          isWorking={working}
+          workingStartedAt={loop ? (loop.answer?.at ?? loop.startedAt) : null}
+          expandSignal={false}
+          timedRows={timedRows}
+          turnBot={{ name: agentName, src: null, fallback: agentName.charAt(0) }}
+        />
+      )}
+    </NativeChatScriptedSurface>
   )
 }

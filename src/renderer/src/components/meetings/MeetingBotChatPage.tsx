@@ -1,12 +1,12 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Bot, SendHorizontal } from 'lucide-react'
+import React, { useEffect, useMemo, useRef } from 'react'
+import { Bot } from 'lucide-react'
 import { useTranslate } from '@/i18n/use-translate'
 import { InaxDemoNote } from '@/components/task-page/inax/InaxDemoNote'
 import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
 import { homeSampleMoment } from '@/components/home/home-day'
 import { NativeChatClockContext } from '@/components/native-chat/messages/rows/NativeChatMessageTimestamp'
 import { NativeChatMessageList } from '@/components/native-chat/NativeChatMessageList'
+import { NativeChatScriptedSurface } from '@/components/native-chat/scripted/NativeChatScriptedSurface'
 import type { NativeChatTimedRow } from '@/components/native-chat/conversation/slots/native-chat-timed-rows'
 import type { NativeChatLiveSession } from '@/components/native-chat/session/terminal/read/native-chat-live-session-contract'
 import { RailPage } from '@/components/rail-page/RailPage'
@@ -45,7 +45,6 @@ export default function MeetingBotChatPage(): React.JSX.Element {
   const tasks = useMeetings((state) => state.tasks)
   const asks = useMeetings((state) => state.asks)
   const viewerId = useMeetings((state) => state.viewerId)
-  const [draft, setDraft] = useState('')
   const items = useMemo(() => botItemsFor(viewerId, meetings, tasks), [viewerId, meetings, tasks])
   const itemKeys = items.map((item) => item.key).join(',')
   const chat = useRef<HTMLDivElement | null>(null)
@@ -169,16 +168,7 @@ export default function MeetingBotChatPage(): React.JSX.Element {
     return rows
   }, [items, myAsks, t])
 
-  const send = (): void => {
-    if (askable && draft.trim()) {
-      askMeetingBot(askable.id, draft.trim(), fallback)
-      setDraft('')
-    }
-  }
   const name = t('meetings.bot.name', 'Meeting agent')
-  const askLabel = askable
-    ? t('meetings.bot.askAbout', 'Ask about “{{title}}”', { title: askable.title })
-    : ''
 
   return (
     <RailPage as="main" aria-label={name}>
@@ -215,54 +205,30 @@ export default function MeetingBotChatPage(): React.JSX.Element {
       ) : (
         <div
           ref={chat}
-          className="native-chat-appearance flex min-h-0 flex-1 flex-col bg-chat-pane"
+          className="flex min-h-0 flex-1 flex-col bg-chat-pane"
           data-meeting-bot-chat=""
         >
           <NativeChatClockContext.Provider value={homeSampleMoment}>
-            <NativeChatMessageList
-              session={session}
-              isWorking={false}
-              expandSignal={false}
-              timedRows={timedRows}
-              turnBot={{ name, src: null, fallback: name.charAt(0) }}
-            />
+            <NativeChatScriptedSurface
+              id={`meeting-bot:${viewerId}`}
+              canSend={askable !== undefined}
+              conversationShown
+              onSend={(text) => askable && askMeetingBot(askable.id, text, fallback)}
+            >
+              {(messageListRef) => (
+                <NativeChatMessageList
+                  ref={messageListRef}
+                  session={session}
+                  isWorking={false}
+                  expandSignal={false}
+                  timedRows={timedRows}
+                  turnBot={{ name, src: null, fallback: name.charAt(0) }}
+                />
+              )}
+            </NativeChatScriptedSurface>
           </NativeChatClockContext.Provider>
         </div>
       )}
-      {askable ? (
-        <form
-          // Why pr-20: the floating workspace button sits over this corner on every page.
-          className="flex shrink-0 items-end gap-2 border-t border-border py-3 pr-20 pl-(--rail-page-gutter)"
-          onSubmit={(event) => {
-            event.preventDefault()
-            send()
-          }}
-        >
-          <Textarea
-            rows={1}
-            className="max-h-40 min-h-9 resize-none"
-            value={draft}
-            disabled={!askable}
-            placeholder={askLabel}
-            aria-label={askLabel}
-            onChange={(event) => setDraft(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) {
-                event.preventDefault()
-                send()
-              }
-            }}
-          />
-          <Button
-            type="submit"
-            size="icon"
-            disabled={!askable || !draft.trim()}
-            aria-label={t('meetings.ask.send', 'Ask')}
-          >
-            <SendHorizontal aria-hidden />
-          </Button>
-        </form>
-      ) : null}
     </RailPage>
   )
 }

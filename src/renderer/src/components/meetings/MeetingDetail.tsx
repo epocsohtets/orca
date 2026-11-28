@@ -255,13 +255,14 @@ export function MeetingDetail({
           <div className="grid items-start gap-4 @min-[60rem]/rail-page:grid-cols-[minmax(0,5fr)_minmax(0,3fr)]">
             <div className="flex min-w-0 flex-col gap-4">
               <MeetingMinutes meeting={meeting} minutes={meeting.minutes} />
-              <MeetingFollowUps meeting={meeting} />
             </div>
             <div className="flex min-w-0 flex-col gap-4">
               <MinutesScopeCard meeting={meeting} />
               <MeetingPrep meeting={meeting} isHost={isHost} />
             </div>
           </div>
+          {/* The whole width: a follow-up's words get the room, and stay on one line. */}
+          <MeetingFollowUps meeting={meeting} />
         </>
       ) : (
         <div

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { SendHorizontal, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useTranslate } from '@/i18n/use-translate'
+import { NativeChatScriptedSurface } from '@/components/native-chat/scripted/NativeChatScriptedSurface'
+import { NativeChatTranscriptColumn } from '@/components/native-chat/NativeChatTranscriptColumn'
 import { useAppStore } from '@/store'
 import { ChatMeetingLinks } from '@/components/meetings/ChatMeetingLinks'
 import { ScheduleMeetingFromChatButton } from '@/components/meetings/ScheduleMeetingFromChatButton'
@@ -75,7 +76,6 @@ function SidebarChatConversationView({
     state.whisperDismissed.includes(`${viewerId}:${conversation.id}`)
   )
   const handled = useMeetings((state) => state.whisperHandled)
-  const [draft, setDraft] = useState('')
   // Read once per open: the question is about the day this conversation is being read on.
   const [now] = useState(scenarioNow)
   const messages = [...conversation.messages, ...(sent ?? [])]
@@ -100,19 +100,13 @@ function SidebarChatConversationView({
     offline: t('sidebarChat.presence.offline', 'Offline')
   }
   const closeLabel = t('sidebarChat.conversation.close', 'Close conversation')
-  const sendLabel = t('sidebarChat.conversation.send', 'Send')
-  const send = (): void => {
-    const text = draft.trim()
-    if (!text) {
-      return
-    }
+  const send = (text: string): void => {
     sendSidebarChatMessage(conversation.id, {
       author: personName(viewerId),
       authorId: viewerId,
       time: t('sidebarChat.conversation.now', 'Now'),
       text
     })
-    setDraft('')
   }
 
   return (
@@ -123,10 +117,10 @@ function SidebarChatConversationView({
     >
       <div
         // The tab strip under this header is a window drag region; hit-testing ignores z-index.
-        className="flex h-(--app-header-height) shrink-0 items-center gap-2 border-b border-border px-4 [-webkit-app-region:no-drag]"
+        className="flex h-13 shrink-0 items-center gap-3 border-b border-border px-(--rail-page-gutter) [-webkit-app-region:no-drag]"
       >
         <div className="flex min-w-0 flex-1 items-baseline gap-2">
-          <span className="min-w-0 truncate text-sm font-semibold">{title}</span>
+          <span className="min-w-0 truncate text-[15px] font-semibold tracking-tight">{title}</span>
           <span className="shrink-0 text-xs text-muted-foreground">
             {isGroup
               ? t('sidebarChat.members', '{{count}} members', {
@@ -155,70 +149,48 @@ function SidebarChatConversationView({
           </TooltipContent>
         </Tooltip>
       </div>
-      <div className="scrollbar-sleek flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-4">
-        {messages.map((message) => {
-          const authorId = chatAuthorId(message)
-          // The sample is written from 마코's seat; seen as someone else, "me" is that person.
-          const author = authorId === viewerId ? SIDEBAR_CHAT_SELF : personName(authorId)
-          return (
-            <React.Fragment key={message.id}>
-              <div className="flex gap-2.5" data-sidebar-chat-message={message.id}>
-                <SidebarChatAvatar name={author} kind="dm" />
-                <div className="flex min-w-0 flex-col">
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-sm font-semibold">{author}</span>
-                    <span className="text-xs text-muted-foreground tabular-nums">
-                      {message.time}
-                    </span>
-                  </div>
-                  <div className="text-sm break-words whitespace-pre-wrap">{message.text}</div>
-                </div>
-              </div>
-              {whisper?.messageId === message.id ? (
-                <MeetingWhisperLine conversation={conversation} whisper={whisper} />
-              ) : null}
-            </React.Fragment>
-          )
-        })}
-        <ChatMeetingLinks conversationId={conversation.id} />
+      <div className="flex min-h-0 flex-1 flex-col bg-chat-pane">
+        <NativeChatScriptedSurface
+          id={`people-chat:${conversation.id}`}
+          conversationShown={messages.length > 0}
+          onSend={send}
+        >
+          {() => (
+            // A room of people: each row carries its author's name and face, as Orca's group chat does.
+            <div className="scrollbar-sleek min-h-0 flex-1 overflow-y-auto">
+              <NativeChatTranscriptColumn className="space-y-5 py-6">
+                {messages.map((message) => {
+                  const authorId = chatAuthorId(message)
+                  // The sample is written from 마코's seat; seen as someone else, "me" is that person.
+                  const author = authorId === viewerId ? SIDEBAR_CHAT_SELF : personName(authorId)
+                  return (
+                    <React.Fragment key={message.id}>
+                      <div className="flex gap-2.5" data-sidebar-chat-message={message.id}>
+                        <SidebarChatAvatar name={author} kind="dm" />
+                        <div className="flex min-w-0 flex-col">
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-sm font-semibold">{author}</span>
+                            <span className="text-xs text-muted-foreground tabular-nums">
+                              {message.time}
+                            </span>
+                          </div>
+                          <div className="text-sm break-words whitespace-pre-wrap">
+                            {message.text}
+                          </div>
+                        </div>
+                      </div>
+                      {whisper?.messageId === message.id ? (
+                        <MeetingWhisperLine conversation={conversation} whisper={whisper} />
+                      ) : null}
+                    </React.Fragment>
+                  )
+                })}
+                <ChatMeetingLinks conversationId={conversation.id} />
+              </NativeChatTranscriptColumn>
+            </div>
+          )}
+        </NativeChatScriptedSurface>
       </div>
-      <form
-        className="flex shrink-0 items-end gap-2 border-t border-border px-4 py-3"
-        onSubmit={(event) => {
-          event.preventDefault()
-          send()
-        }}
-      >
-        <Textarea
-          autoFocus
-          rows={1}
-          className="max-h-40 min-h-9 resize-none"
-          value={draft}
-          placeholder={t('sidebarChat.conversation.placeholder', 'Message {{name}}', {
-            name: title
-          })}
-          aria-label={t('sidebarChat.conversation.placeholder', 'Message {{name}}', {
-            name: title
-          })}
-          onChange={(event) => setDraft(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) {
-              event.preventDefault()
-              send()
-            }
-          }}
-        />
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button type="submit" size="icon" aria-label={sendLabel} disabled={!draft.trim()}>
-              <SendHorizontal />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="top" sideOffset={4}>
-            {sendLabel}
-          </TooltipContent>
-        </Tooltip>
-      </form>
     </div>
   )
 }

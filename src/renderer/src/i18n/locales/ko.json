@@ -29227,7 +29227,8 @@
       "stateUnasked": "담당자 없음",
       "assignedByMe": "내가 할당함",
       "heard": "회의 에이전트가 만듦",
-      "unassign": "담당자 해제"
+      "unassign": "담당자 해제",
+      "more": "“{{text}}” 더 보기"
     },
     "openTask": "업무 열기",
     "excerpt": {
@@ -29780,6 +29781,10 @@
       "working": "진행 중",
       "waiting": "대기",
       "closed": "닫힘"
+    },
+    "notice": {
+      "title": "확인이 필요합니다",
+      "open": "질문 열기"
     }
   }
 }

@@ -54,7 +54,8 @@ export function WorkSurface(): React.JSX.Element {
   const { board, view, viewerId, projects, signedIn, now } = useHomeBoard()
   const own = viewerId === MAKO
   const open = (next: string | null): void => useInaxSourceSelection.setState({ taskId: next })
-  const task = view.boardTasks.find((entry) => entry.id === taskId)
+  // A follow-up task of a meeting that is someone else's opens too, as its panel beside the board.
+  const task = [...view.boardTasks, ...view.otherTasks].find((entry) => entry.id === taskId)
   useEffect(() => {
     if (taskId !== null && !task && signedIn) {
       useInaxSourceSelection.setState({ taskId: null })
