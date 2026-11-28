@@ -12,23 +12,30 @@ export function MeetingPersonChip({
   personId,
   tag,
   onRemove,
-  disabled
+  disabled,
+  plain
 }: {
   personId: string
   tag?: string
   onRemove?: () => void
   disabled?: boolean
+  /** In a detail header: avatar and name with no chip around them. */
+  plain?: boolean
 }): React.JSX.Element {
   const t = useTranslate()
   const name = personName(personId)
   return (
     <span
       data-meeting-person-chip={personId}
-      className="inline-flex h-6 items-center gap-1.5 rounded-full border border-border bg-background pr-2 pl-0.5 text-xs text-foreground"
+      className={
+        plain
+          ? 'inline-flex items-center gap-1.5 text-[13px] leading-5 text-foreground'
+          : 'inline-flex h-6 items-center gap-1.5 rounded-full border border-border bg-background pr-2 pl-0.5 text-xs text-foreground'
+      }
     >
       <HomeAvatar name={name} />
       {name}
-      {tag ? <span className="text-muted-foreground">{tag}</span> : null}
+      {tag ? <span className="text-xs leading-4 text-muted-foreground">{tag}</span> : null}
       {onRemove ? (
         <button
           type="button"

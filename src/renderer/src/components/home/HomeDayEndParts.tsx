@@ -15,8 +15,8 @@ import {
   BOT_ITEM_OPEN_QUESTION,
   BotItemChipWords
 } from '@/components/bots/items/BotItemQuestionStep'
-import { HOME_ROW_BUTTON_CLASS, HomeAvatar } from './HomeCard'
-import { HomeActivityLine } from './HomeActivityCard'
+import { HomeAvatar } from './HomeCard'
+import { HomeActivityItem } from './HomeActivityCard'
 import type { HomeTask } from './home-board'
 import { HOME_RECORD_NOT_WORK, HOME_RECORD_YES, type HomeDayEndLine } from './home-day-end'
 
@@ -55,7 +55,7 @@ export function HomeDayEndChipLine({
         className={
           quiet
             ? 'text-xs text-muted-foreground'
-            : cn('min-w-0 text-sm leading-5', BOT_ITEM_OPEN_QUESTION)
+            : cn('min-w-0 text-[13px] leading-5', BOT_ITEM_OPEN_QUESTION)
         }
       >
         {question}
@@ -96,7 +96,7 @@ export function HomeDayEndChipLine({
               <BotItemChipWords reply={{ ...chip, recommended: false }} />
               {/* The agent's pick says so in words: a star alone was guessed at. */}
               {chip.recommended ? (
-                <span className="ml-1.5 text-[11px] opacity-70" data-home-chip-recommended="">
+                <span className="ml-1.5 text-xs opacity-70" data-home-chip-recommended="">
                   <span aria-hidden>★ </span>
                   {t('bots.items.ask.recommended', 'Recommended')}
                 </span>
@@ -126,17 +126,9 @@ export function HomeDayEndTimeline({
       <h4 className="mb-1 px-3.5 text-xs text-muted-foreground">
         {t('home.activity.title', 'Recent activity')}
       </h4>
-      <ol>
+      <ol className="mx-3.5">
         {lines.map((line) => (
-          <li key={line.id}>
-            <button
-              type="button"
-              className={cn(HOME_ROW_BUTTON_CLASS, 'flex items-start gap-2 px-3.5')}
-              onClick={onOpen}
-            >
-              <HomeActivityLine entry={line} />
-            </button>
-          </li>
+          <HomeActivityItem key={line.id} entry={line} onClick={onOpen} />
         ))}
       </ol>
     </section>

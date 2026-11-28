@@ -48,7 +48,7 @@ export function MeetingTranscript({
           ref={run.turns.some((turn) => turn.id === markedTurnId) ? marked : undefined}
           className="scroll-mt-4"
         >
-          <p className="flex items-center gap-2 text-[13px] font-medium text-foreground">
+          <p className="flex items-center gap-2 text-[13px] leading-5 text-foreground">
             <HomeAvatar name={personName(run.speakerId)} />
             {personName(run.speakerId)}
           </p>
@@ -67,9 +67,7 @@ export function MeetingTranscript({
                 <span className="pt-0.5 text-xs leading-5 text-muted-foreground tabular-nums">
                   {text.time(startsAt + turn.at * 1000)}
                 </span>
-                <p className="py-0.5 pr-2 text-[13px] leading-relaxed text-foreground">
-                  {turn.text}
-                </p>
+                <p className="py-0.5 pr-2 text-[13px] leading-5 text-foreground">{turn.text}</p>
               </div>
             )
           })}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useTranslate } from '@/i18n/use-translate'
 import { Button } from '@/components/ui/button'
-import { HOME_META_CLASS, HomeCard } from '@/components/home/HomeCard'
+import { HomeCard } from '@/components/home/HomeCard'
 import { MeetingMaterialList, MeetingMaterialsField } from './MeetingMaterialsField'
 import { MeetingOutlineField } from './MeetingOutlineField'
 import { MeetingFormField } from './MeetingParts'
@@ -35,7 +35,7 @@ export function MeetingPrep({
         data-meeting-card="prep-edit"
       >
         <form
-          className="flex flex-col gap-4 px-4 pb-2"
+          className="flex flex-col gap-4 px-4"
           onSubmit={(event) => {
             event.preventDefault()
             saveOutline(meeting.id, outline.trim(), materials)
@@ -102,20 +102,18 @@ export function MeetingPrep({
             ) : null
           }
         >
-          <div className="px-4 pb-2">
-            {meeting.outline ? (
-              <p className="max-w-prose text-[13px] leading-relaxed whitespace-pre-line text-foreground">
-                {meeting.outline}
-              </p>
-            ) : (
-              <p className={HOME_META_CLASS}>
-                {t(
-                  'meetings.prep.noOutlineHost',
-                  'Write what the meeting must settle, so attendees can read it first.'
-                )}
-              </p>
-            )}
-          </div>
+          {meeting.outline ? (
+            <ul className="mx-4">
+              {meeting.outline.split('\n').map((line, index) => (
+                <li
+                  key={`${index}:${line}`}
+                  className="flex min-h-9 items-center border-t border-border pt-[7px] pb-2 text-[13px] leading-5 text-foreground"
+                >
+                  {line}
+                </li>
+              ))}
+            </ul>
+          ) : null}
         </HomeCard>
       ) : null}
       {/* No materials: nothing to read, so no card; the host adds them from the outline's Edit. */}
@@ -125,7 +123,7 @@ export function MeetingPrep({
           aside={<span className="tabular-nums">{meeting.materials.length}</span>}
           data-meeting-card="materials"
         >
-          <div className="px-4 pb-2">
+          <div className="mx-4">
             <MeetingMaterialList materials={meeting.materials} />
           </div>
         </HomeCard>

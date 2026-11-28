@@ -50,7 +50,7 @@ export function MeetingRecordingCard({
                 aria-hidden
                 className="size-2 shrink-0 rounded-full bg-destructive motion-safe:animate-pulse"
               />
-              <span className="text-[13px] font-medium text-foreground">
+              <span className="text-[13px] leading-5 text-foreground">
                 {t('meetings.recording.on', 'Recording')}
               </span>
               <span

@@ -29173,7 +29173,6 @@
     "prep": {
       "outline": "사전 개요",
       "edit": "개요와 자료 수정",
-      "noOutlineHost": "참석자가 미리 읽을 수 있게, 이 회의에서 정할 것을 적어 두세요.",
       "materials": "회의 자료",
       "editShort": "수정"
     },
@@ -29249,22 +29248,21 @@
       "find": "대화록에서 검색",
       "found": "발언 {{total}}개 중 {{count}}개",
       "turns": "발언 {{total}}개",
-      "notFound": "맞는 발언이 없습니다. 더 짧은 낱말로 찾아보세요.",
       "card": "회의록"
     },
     "share": {
       "done": "회의 에이전트가 {{name}} 님에게 회의록 전체의 링크를 보냈습니다.",
-      "scope": "회의에 있던 {{count}}명이 회의록 전체를 봅니다.",
-      "sharedWith": "링크를 받은 사람: {{names}}",
       "button": "링크 공유",
-      "request": "{{name}} 님이 회의록 전체를 보고 싶어 합니다.",
       "decline": "거절",
       "approve": "승인",
       "requestDeclined": "{{name}} 님이 회의록 전체를 공유하지 않았습니다.",
       "requested": "{{name}} 님에게 요청했습니다.",
       "requestButton": "회의록 보기 요청",
       "card": "보는 범위",
-      "scopeOutside": "{{names}} 님은 자기 업무와 그 업무가 나온 부분만 봅니다."
+      "attendees": "회의 참석자 {{count}}명",
+      "whole": "회의록 전체",
+      "ownPart": "본인 업무와 그 업무가 나온 부분",
+      "byLink": "회의록 전체 · 링크"
     },
     "agenda": {
       "previousWeek": "이전 주",
@@ -29315,20 +29313,14 @@
       "originLabel": "생성한 곳",
       "originChat": "채팅 「{{name}}」"
     },
-    "list": {
-      "emptyUpcoming": "예정된 회의가 없습니다. 회의를 생성하거나 초대를 받으면 여기에 나타납니다.",
-      "emptyPast": "회의록이 아직 없습니다. 녹음이 끝나면 도착합니다."
-    },
+    "list": {},
     "tiles": {
       "today": "오늘 회의",
       "next": "다음 {{time}} · {{title}}",
-      "noNext": "오늘 남은 회의 없음",
-      "waitingSub": "회의 에이전트가 기다립니다",
       "week": "이번 주",
       "weekSub": "주최 {{host}} · 참석 {{attend}}",
       "followUpsSub": "끝남 {{done}} · 진행 중 {{inProgress}} · 할 일 {{todo}} · 담당자 없음 {{open}}",
       "notTasksYet": "담당자 없음 {{count}}건",
-      "allTasks": "모두 담당자가 있습니다",
       "doneSub": "후속 업무 {{total}}건 중",
       "mineOpen": "내 답을 기다리는 것 {{count}}건",
       "done": "끝난 업무",
@@ -29339,14 +29331,16 @@
     "viewerLabel": "로그인한 사람",
     "agent": {
       "aside": "나에게 보낸 것",
-      "open": "대화 열기",
-      "proposals": "내 업무 {{count}}건"
+      "open": "대화 열기"
     },
     "role": {
       "host": "주최",
       "attendee": "참석",
       "shared": "공유받음",
       "assignee": "내 업무"
+    },
+    "chip": {
+      "mine": "내 몫 {{count}}건"
     }
   },
   "chats": {
@@ -29423,7 +29417,6 @@
       "filter": "활동 종류",
       "filterAll": "전체",
       "filterFinished": "에이전트가 끝낸 작업",
-      "empty": "에이전트에게 업무를 맡기면 이번 주 활동이 여기에 모입니다.",
       "confirmed": "내가 확인함",
       "unconfirmed": "내 확인 전",
       "budgetDone": "· 캠페인 예산표를 고쳤습니다",
@@ -29481,8 +29474,7 @@
       "waitingSub": "에이전트 {{agents}}, 회의 {{meetings}}",
       "agentDone": "에이전트가 끝낸 작업",
       "agentDoneSub": "이번 주 · {{total}}건 중 {{confirmed}}건 확인",
-      "late": "지연 · 회신 대기",
-      "lateNone": "늦거나 멈춘 업무가 없습니다"
+      "late": "지연 · 회신 대기"
     },
     "firstRun": {
       "title": "여기에서 시작합니다",
@@ -29494,19 +29486,14 @@
     },
     "day": {
       "title": "내 하루",
-      "privacy": "나만 봅니다. 업무 정리에서 저장한 것만 팀이 봅니다.",
       "manage": "기록 관리",
       "manageApps": "기록하는 앱",
       "manageBrowser": "브라우저 활동 기록",
-      "nothing": "등록한 앱을 쓰거나 회의를 하면 오늘의 기록이 여기에 모입니다.",
-      "scope": "등록한 앱의 사용 시간, 이 앱의 브라우저에서 본 페이지의 주소와 제목, 회의 시간만 기록합니다. 화면 내용은 기록하지 않습니다.",
-      "noApp": "업무에 쓰는 앱을 등록하면 사용 시간이 여기에 모입니다.",
       "unconfirmed": "업무를 정하지 않은 기록",
-      "unconfirmedHint": "업무였는지 골라 주세요.",
       "hours": "{{count}}시간",
       "minutes": "{{count}}분",
-      "excluded": "업무 아님 · 나만 봅니다",
-      "linked": "“{{task}}”에 연결했습니다",
+      "excluded": "업무 아님",
+      "linked": "“{{task}}”에 연결",
       "undo": "실행 취소",
       "pickTask": "이 기록을 연결할 업무",
       "link": "연결",
@@ -29535,12 +29522,8 @@
       "waiting": "내 확인 필요",
       "late": "지연",
       "done": "완료",
-      "emptyToday": "남은 업무가 없습니다. 새 업무를 추가하거나 에이전트에게 맡기세요.",
-      "emptyWaiting": "나를 기다리는 것이 없습니다.",
-      "emptyLate": "늦거나 멈춘 업무가 없습니다.",
       "answer": "답변",
-      "openList": "업무 목록 열기",
-      "open": "열기",
+      "openList": "업무 목록",
       "openMinutes": "회의록 열기"
     },
     "signedOut": {
@@ -29560,13 +29543,11 @@
       "tomorrow": "내일",
       "week": "이번 주",
       "nextWeek": "다음 주",
-      "title": "다가오는 일정",
+      "title": "다가오는 일",
       "calendar": "캘린더",
       "deadline": "마감",
-      "prepReady": "준비 자료 있음",
       "endOfDay": "퇴근 전",
-      "recording": "녹음 중",
-      "minutesWaiting": "회의록 도착 · 내 확인 필요"
+      "recording": "녹음 중"
     },
     "agent": {
       "research": "자료 조사 에이전트",
@@ -29618,7 +29599,6 @@
       "finishedOn": "{{day}} 끝냄",
       "newsletterDetail": "주소 1,240개를 확인하고 12개를 뺐습니다.",
       "budget": "캠페인 예산표 수정",
-      "finishedConfirmed": "{{day}} 끝냄 · 내가 확인함",
       "budgetDetail": "문서 작성 에이전트가 고쳤고, 숫자는 내가 확인했습니다.",
       "resumed": "에이전트 작업 중 · 내 답을 받아 이어감",
       "addedAgent": "에이전트 작업 중 · 방금 맡김",
@@ -29670,6 +29650,13 @@
       "nowMeeting": "회의록 · 후속 업무 {{count}}건",
       "ahead": "에이전트가 쓴 글 ·",
       "take": "사용"
+    },
+    "chip": {
+      "waiting": "내 답 필요",
+      "blocked": "회신 대기",
+      "working": "작업 중",
+      "draft": "초안 올라옴",
+      "prep": "준비 자료"
     }
   },
   "taskLoop": {
@@ -29702,7 +29689,9 @@
       "noteStatus": "상태를 {{to}} 바꿈",
       "activity": "지금",
       "folder": "폴더",
-      "output": "결과물"
+      "output": "결과물",
+      "noteByAgentOf": "에이전트가 쓰고 {{name}} 님이 확인함",
+      "noteBy": "{{name}} 님이 씀"
     },
     "gate": {
       "line": "inAX에 로그인하면 내 업무가 여기에 보입니다."
@@ -29765,7 +29754,8 @@
       "confirmed": "{{status}} · 에이전트가 쓰고 내가 확인함",
       "justStarted": "에이전트 작업 중 · 방금 시작",
       "question": "내 답을 기다림 · {{agent}}",
-      "result": "결과물 있음"
+      "result": "결과물 있음",
+      "confirmedBy": "{{status}} · 에이전트가 쓰고 {{name}} 님이 확인함"
     },
     "group": {
       "needsYou": "확인 필요",

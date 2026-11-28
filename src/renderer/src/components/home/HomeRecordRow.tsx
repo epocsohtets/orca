@@ -31,7 +31,7 @@ export function HomeRecordRow({
   return (
     <li className="flex flex-col gap-2 py-2" data-home-record={answer ? 'answered' : 'open'}>
       <p
-        className={`text-xs ${answer === 'notWork' ? 'text-muted-foreground' : 'text-foreground'}`}
+        className={`text-[13px] leading-5 ${answer === 'notWork' ? 'text-muted-foreground' : 'text-foreground'}`}
       >
         {record.text}
       </p>
@@ -39,7 +39,7 @@ export function HomeRecordRow({
         <div className="flex flex-wrap items-center gap-2" role="status">
           <span className={HOME_META_CLASS}>
             {answer === 'notWork'
-              ? t('home.day.excluded', 'Not work · only I see it')
+              ? t('home.day.excluded', 'Not work')
               : t('home.day.linked', 'Linked to “{{task}}”', { task: linked?.title ?? '' })}
           </span>
           <Button type="button" variant="ghost-muted" size="xs" onClick={() => onAnswer(null)}>

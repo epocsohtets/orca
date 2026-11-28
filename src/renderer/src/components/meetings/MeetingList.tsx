@@ -1,15 +1,12 @@
 import React from 'react'
+import { FileText, Mic, Users } from 'lucide-react'
 import { useTranslate } from '@/i18n/use-translate'
-import { HOME_META_CLASS, HOME_ROW_BUTTON_CLASS, HomeProjectDot } from '@/components/home/HomeCard'
+import { HomeAvatarStack, HomeRow } from '@/components/home/HomeCard'
 import type { HomeProjectId } from '@/components/home/home-board'
 import type { HomeProject } from '@/components/home/home-board-mock'
+import { personName } from './meeting-people'
 import { meetingAccess } from './meeting-rules'
-import {
-  MeetingPeopleStack,
-  MeetingStateMarker,
-  useMeetingState,
-  useMeetingText
-} from './MeetingParts'
+import { useMeetingState, useMeetingText } from './MeetingParts'
 import type { Meeting } from './meeting-types'
 import { useMeetings } from './meetings-store'
 
@@ -34,25 +31,23 @@ export function moveRowFocus(event: React.KeyboardEvent<HTMLElement>, selector: 
   rows[next].focus()
 }
 
-/** Meetings as Home lists tasks: title and state, project, who, when. A row opens its meeting. */
+/** Meetings as Home lists tasks: state, title, state chip, project, who, when. A row opens its meeting. */
 export function MeetingList({
   meetings,
   projects,
-  empty,
   onSelect
 }: {
   meetings: readonly Meeting[]
   projects: Record<HomeProjectId, HomeProject>
-  empty: string
   onSelect: (id: string) => void
-}): React.JSX.Element {
+}): React.JSX.Element | null {
   const t = useTranslate()
   const text = useMeetingText()
   const stateOf = useMeetingState()
   const tasks = useMeetings((state) => state.tasks)
   const viewerId = useMeetings((state) => state.viewerId)
   if (meetings.length === 0) {
-    return <p className={`px-4 py-3 ${HOME_META_CLASS}`}>{empty}</p>
+    return null
   }
   const roleOf = (meeting: Meeting): string =>
     meeting.hostId === viewerId
@@ -63,39 +58,41 @@ export function MeetingList({
           ? t('meetings.role.shared', 'Shared with me')
           : t('meetings.role.assignee', 'My task')
   return (
-    <ul
-      className="divide-y divide-border border-t border-border"
-      onKeyDown={(event) => moveRowFocus(event, '[data-meeting-row]')}
-    >
-      {meetings.map((meeting) => (
-        <li key={meeting.id}>
-          <button
-            type="button"
-            data-meeting-row={meeting.id}
-            className={`${HOME_ROW_BUTTON_CLASS} grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 @min-[38rem]/home-card:grid-cols-[minmax(0,1fr)_8.5rem_4.5rem_3.5rem_9.5rem]`}
-            onClick={() => onSelect(meeting.id)}
-          >
-            <span className="flex min-w-0 flex-col gap-1">
-              <span className="line-clamp-2 text-[13px] font-medium text-foreground">
-                {meeting.title}
+    <ul className="mx-4" onKeyDown={(event) => moveRowFocus(event, '[data-meeting-row]')}>
+      {meetings.map((meeting) => {
+        const state = stateOf(meeting)
+        return (
+          <HomeRow
+            key={meeting.id}
+            button={{ 'data-meeting-row': meeting.id }}
+            icon={
+              state.kind === 'recording' ? (
+                <Mic aria-hidden className="text-destructive" />
+              ) : state.kind === 'minutes' ? (
+                <FileText aria-hidden />
+              ) : (
+                <Users aria-hidden />
+              )
+            }
+            title={meeting.title}
+            tip={[state.label, roleOf(meeting), text.when(meeting)].join(' · ')}
+            chip={state.chip}
+            project={projects[meeting.project]}
+            people={
+              // Why two spans: a display class on one span would win over the container rule that hides it.
+              <span className="@max-[38rem]/home-card:hidden" data-meeting-people-stack="">
+                <span className="flex w-[60px]">
+                  <HomeAvatarStack
+                    names={[meeting.hostId, ...meeting.attendeeIds].map(personName)}
+                  />
+                </span>
               </span>
-              <MeetingStateMarker state={stateOf(meeting)} />
-            </span>
-            <span className="min-w-0 @max-[38rem]/home-card:hidden">
-              <HomeProjectDot project={projects[meeting.project]} />
-            </span>
-            <span className="@max-[38rem]/home-card:hidden">
-              <MeetingPeopleStack meeting={meeting} />
-            </span>
-            <span className={`truncate @max-[38rem]/home-card:hidden ${HOME_META_CLASS}`}>
-              {roleOf(meeting)}
-            </span>
-            <span className={`text-right tabular-nums ${HOME_META_CLASS}`}>
-              {text.when(meeting)}
-            </span>
-          </button>
-        </li>
-      ))}
+            }
+            date={text.whenShort(meeting)}
+            onClick={() => onSelect(meeting.id)}
+          />
+        )
+      })}
     </ul>
   )
 }

@@ -9,7 +9,7 @@ import { ImeTextarea } from '@/lib/text-input/ime/ime-text-field'
 import { BotItemStepper } from '@/components/bots/items/BotItemStepper'
 import { useBotItemChords } from '@/components/bots/items/use-bot-item-chords'
 import { personName } from '@/components/meetings/meeting-people'
-import { HOME_META_CLASS, HomeProjectDot } from './HomeCard'
+import { HOME_BOARD_SCOPE_CLASS, HOME_META_CLASS, HomeProjectDot } from './HomeCard'
 import { useSidePanelInset } from './use-side-panel-inset'
 import { HomeDayEndChipLine, HomeDayEndRecords, HomeDayEndTimeline } from './HomeDayEndParts'
 import type { HomeProjectId, HomeTask } from './home-board'
@@ -152,13 +152,13 @@ export function HomeDayEndPanel({
     })
     header = (
       <>
-        <h3 className="text-[15px] leading-5 font-semibold text-foreground">{task.title}</h3>
+        <h3 className="text-sm leading-5 font-semibold text-foreground">{task.title}</h3>
         <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
           <HomeProjectDot project={projects[task.project]} />
           {/* The status is said once, as text, in the "Now" row: a pill here read as a control. */}
           <span
             className={
-              task.due === 'overdue' ? 'text-xs font-medium text-destructive' : HOME_META_CLASS
+              task.due === 'overdue' ? 'text-xs leading-4 text-destructive' : HOME_META_CLASS
             }
           >
             {task.due === 'overdue'
@@ -204,7 +204,7 @@ export function HomeDayEndPanel({
     viewers = card.peopleIds.map((id, index) => (index === 0 ? me : personName(id))).join(', ')
     header = (
       <>
-        <h3 className="text-[15px] leading-5 font-semibold text-foreground">{card.title}</h3>
+        <h3 className="text-sm leading-5 font-semibold text-foreground">{card.title}</h3>
         <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
           <HomeProjectDot project={projects[card.project]} />
           <span className={HOME_META_CLASS}>
@@ -257,7 +257,7 @@ export function HomeDayEndPanel({
     shared = null
     viewers = me
     header = (
-      <h3 className="text-[15px] leading-5 font-semibold text-foreground">
+      <h3 className="text-sm leading-5 font-semibold text-foreground">
         {t('home.day.unconfirmed', 'Records without a task')}
       </h3>
     )
@@ -284,7 +284,8 @@ export function HomeDayEndPanel({
       aria-label={t('home.wrapUp.title', 'Wrap-up')}
       data-home-day-end={card.kind}
       className={cn(
-        '@container/item-pane flex w-[400px] shrink-0 flex-col border-l border-border bg-sidebar outline-none',
+        '@container/item-pane @container/home-card flex w-[400px] shrink-0 flex-col border-l border-border bg-sidebar outline-none',
+        HOME_BOARD_SCOPE_CLASS,
         '@max-[60rem]/rail-page:absolute @max-[60rem]/rail-page:inset-y-0 @max-[60rem]/rail-page:right-0 @max-[60rem]/rail-page:z-10 @max-[60rem]/rail-page:w-full @max-[60rem]/rail-page:max-w-[400px] @max-[60rem]/rail-page:shadow-lg'
       )}
       onKeyDown={(event) => {
@@ -295,7 +296,7 @@ export function HomeDayEndPanel({
       }}
     >
       <div className="flex shrink-0 items-center gap-2 py-2 pr-2 pl-3.5">
-        <h2 className="min-w-0 flex-1 text-xs font-medium text-muted-foreground">
+        <h2 className="min-w-0 flex-1 text-xs leading-4 text-muted-foreground">
           {t('home.wrapUp.title', 'Wrap-up')}
         </h2>
         <Button
@@ -360,7 +361,7 @@ export function HomeDayEndPanel({
               placeholder={suggestion ?? undefined}
               value={draft.text ?? ''}
               data-home-day-end-box=""
-              className="scrollbar-sleek block max-h-[6lh] min-h-[2lh] w-full resize-none border-0 bg-transparent px-2 py-1 text-sm leading-5 outline-none [field-sizing:content] placeholder:text-muted-foreground"
+              className="scrollbar-sleek block max-h-[6lh] min-h-[2lh] w-full resize-none border-0 bg-transparent px-2 py-1 text-[13px] leading-5 outline-none [field-sizing:content] placeholder:text-muted-foreground"
               onChange={(event) => patch({ text: event.target.value })}
               onKeyDown={(event) => {
                 const plain = !event.shiftKey && !event.altKey && !event.metaKey && !event.ctrlKey
@@ -390,7 +391,7 @@ export function HomeDayEndPanel({
           />
           <Button
             type="button"
-            variant="ghost"
+            variant="outline"
             size="sm"
             data-home-day-end-skip=""
             onClick={advance}

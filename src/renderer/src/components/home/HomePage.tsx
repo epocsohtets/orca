@@ -21,7 +21,7 @@ import { MAKO, personName } from '@/components/meetings/meeting-people'
 import { answerHomeRecord, saveHomeDayEnd, startHomeLoop } from './home-board-actions'
 import { useHomeBoard } from './use-home-board'
 import type { HomePhase } from './home-day'
-import { HomeCard } from './HomeCard'
+import { HOME_BOARD_COLUMNS_CLASS, HOME_BOARD_PAGE_CLASS, HomeCard } from './HomeCard'
 import { HomeFirstSteps, HomeGreeting, HomeTiles, type HomeTileId } from './HomeHeader'
 import { HomeTasksCard } from './HomeTasksCard'
 import { HomeUpcomingCard } from './HomeUpcomingCard'
@@ -58,7 +58,7 @@ export default function HomePage(): React.JSX.Element {
   const bots = useBots()
   const hasAgentThread = useAllAgentPaneThreads().allThreads.length > 0
   const [preview, setPreview] = useState<'auto' | HomePhase>('auto')
-  const { board, view, viewerId, projects, signedIn, myApps, app, phase, sampleDay, duration } =
+  const { board, view, viewerId, projects, signedIn, myApps, phase, sampleDay, duration } =
     useHomeBoard(preview)
   const [previewFirstRun, setPreviewFirstRun] = useState(false)
   const [tab, setTab] = useState<HomeTaskTab>('today')
@@ -138,8 +138,6 @@ export default function HomePage(): React.JSX.Element {
       onAnswer={answerHomeRecord}
       cardsLeft={view.dayEnd.length}
       result={dayEndRows.length > 0 ? <HomeDayEndResult rows={dayEndRows} /> : null}
-      prominent={phase === 'evening'}
-      hasApp={app !== undefined}
       onManageApps={() => openSettings('my-apps')}
       onManageBrowser={() => openSettings('browser', 'browser-activity-suggestions')}
       onWrapUp={() => setWrapUpOpen(true)}
@@ -152,7 +150,7 @@ export default function HomePage(): React.JSX.Element {
       <div className="flex min-h-0 flex-1">
         <RailPageScroll className="scrollbar-sleek min-h-0 min-w-0 flex-1 overflow-y-auto">
           {/* Why pb-24: the last row scrolls clear of the floating panel toggle. */}
-          <div className="rail-page-row-gutter mx-auto flex max-w-6xl flex-col gap-4 pt-6 pb-24">
+          <div className={HOME_BOARD_PAGE_CLASS}>
             <HomeGreeting
               phase={phase}
               name={viewerId === MAKO ? t('home.header.me', 'Mako') : personName(viewerId)}
@@ -229,7 +227,7 @@ export default function HomePage(): React.JSX.Element {
                     onSelect={selectTile}
                   />
                 ) : null}
-                <div className="grid items-start gap-4 @min-[60rem]/rail-page:grid-cols-[minmax(0,5fr)_minmax(0,3fr)]">
+                <div className={HOME_BOARD_COLUMNS_CLASS}>
                   <div className="flex min-w-0 flex-col gap-4">
                     {phase === 'evening' ? myDay : null}
                     {signedIn ? (
@@ -272,7 +270,7 @@ export default function HomePage(): React.JSX.Element {
                         title={t('home.tasks.title', 'My work')}
                         data-home-card="signed-out"
                       >
-                        <div className="flex flex-col items-start gap-2 px-4 pb-2">
+                        <div className="flex flex-col items-start gap-2 px-4">
                           <p className="text-[13px] text-foreground">
                             {t(
                               'home.signedOut.line',

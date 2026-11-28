@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { HOME_META_CLASS, HomeCard } from './HomeCard'
+import { HOME_GROUP_CLASS, HomeCard } from './HomeCard'
 import { HomeRecordRow } from './HomeRecordRow'
 import type { HomeRecordAnswer, HomeTask } from './home-board'
 import type { HomeDayRecord, HomeDaySegment } from './home-board-day-mock'
@@ -19,7 +19,7 @@ const SEGMENT_CLASS: Record<HomeDaySegment['id'], string> = {
   meeting: 'bg-foreground/50'
 }
 
-/** My day as the app recorded it. Only I see it; the sentence beside the title says so. */
+/** My day as the app recorded it. Only I see it. */
 export function HomeMyDayCard({
   segments,
   duration,
@@ -29,8 +29,6 @@ export function HomeMyDayCard({
   onAnswer,
   cardsLeft,
   result,
-  prominent,
-  hasApp,
   onManageApps,
   onManageBrowser,
   onWrapUp
@@ -45,9 +43,6 @@ export function HomeMyDayCard({
   cardsLeft: number
   /** What the cards I saved sent to colleagues. */
   result: React.ReactNode
-  /** Evening: wrapping up is the point of the visit. */
-  prominent: boolean
-  hasApp: boolean
   onManageApps: () => void
   onManageBrowser: () => void
   onWrapUp: () => void
@@ -59,7 +54,6 @@ export function HomeMyDayCard({
   return (
     <HomeCard
       title={t('home.day.title', 'My day')}
-      aside={t('home.day.privacy', 'Only I see this. The team sees only what I save in Wrap-up.')}
       data-home-card="day"
       action={
         <DropdownMenu>
@@ -79,7 +73,7 @@ export function HomeMyDayCard({
         </DropdownMenu>
       }
     >
-      <div className="flex flex-col gap-2 px-4 pb-2">
+      <div className="flex flex-col gap-2 px-4 pb-3">
         {total > 0 ? (
           <>
             <div aria-hidden className="flex h-2 overflow-hidden rounded-full">
@@ -100,40 +94,19 @@ export function HomeMyDayCard({
                     className={`size-2 shrink-0 rounded-sm ${SEGMENT_CLASS[segment.id]}`}
                   />
                   <span>{segment.label}</span>
-                  <span className="font-medium tabular-nums">{duration(segment.minutes)}</span>
+                  <span className="tabular-nums">{duration(segment.minutes)}</span>
                 </li>
               ))}
             </ul>
           </>
-        ) : (
-          <p className="text-[13px] font-medium text-foreground">
-            {t(
-              'home.day.nothing',
-              'Use a registered app or hold a meeting and today’s records collect here.'
-            )}
-          </p>
-        )}
-        <p className={HOME_META_CLASS}>
-          {t(
-            'home.day.scope',
-            'Only time in registered apps, the address and title of pages in this app’s browser, and meeting times are recorded. Never screen content.'
-          )}
-        </p>
-        {hasApp ? null : (
-          <p className={HOME_META_CLASS}>
-            {t('home.day.noApp', 'Register an app you work in and its time collects here.')}
-          </p>
-        )}
+        ) : null}
       </div>
       {records.length > 0 ? (
         <section aria-label={t('home.day.unconfirmed', 'Records without a task')}>
-          <h3 className="flex flex-wrap items-baseline gap-x-2 border-t border-border px-4 pt-2 text-xs font-medium text-foreground">
+          <h3 className={`mx-4 border-t border-border px-0 ${HOME_GROUP_CLASS}`}>
             {t('home.day.unconfirmed', 'Records without a task')}
             <span className="tabular-nums" data-home-records-open="">
               {open}
-            </span>
-            <span className={`font-normal ${HOME_META_CLASS}`}>
-              {t('home.day.unconfirmedHint', 'Choose whether these were work.')}
             </span>
           </h3>
           <ul className="px-4">
@@ -149,10 +122,11 @@ export function HomeMyDayCard({
           </ul>
         </section>
       ) : null}
-      <div className="flex flex-wrap items-center gap-2 border-t border-border px-4 py-2">
+      <div className="mx-4 flex flex-wrap items-center gap-2 border-t border-border pt-3">
+        {/* Outline: the page's one primary is in its header. */}
         <Button
           type="button"
-          variant={prominent && cardsLeft > 0 ? 'default' : 'outline'}
+          variant="outline"
           size="sm"
           disabled={cardsLeft === 0}
           data-home-wrap-up-open=""

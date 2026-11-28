@@ -1,39 +1,41 @@
 import React from 'react'
 import { useTranslate } from '@/i18n/use-translate'
 import { Button } from '@/components/ui/button'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { HOME_META_CLASS, HOME_ROW_BUTTON_CLASS, HomeAvatar, HomeCard } from './HomeCard'
+import { HomeAvatar, HomeCard, HomeRow } from './HomeCard'
 import type { HomeActivityRow } from './home-board-view'
 
 const SHORT = 5
 
 export type HomeActivityFilter = 'all' | 'finished'
 
-/** One line of a log: who, what they did, when. Recent activity and a day-end card draw the same line. */
-export function HomeActivityLine({
-  entry
+/** One line of a log: who (as the avatar), what they did, when. The whole sentence is the tooltip. */
+export function HomeActivityItem({
+  entry,
+  onClick
 }: {
   entry: Pick<HomeActivityRow, 'who' | 'text' | 'when'> &
     Partial<Pick<HomeActivityRow, 'finished' | 'confirmed'>>
+  onClick?: () => void
 }): React.JSX.Element {
   const t = useTranslate()
   return (
-    <>
-      <HomeAvatar name={entry.who} />
-      <span className="flex min-w-0 flex-1 flex-col gap-1 text-xs text-foreground">
-        <span>
-          <span className="font-medium">{entry.who}</span> {entry.text}
-        </span>
-        {entry.finished ? (
-          <span className={HOME_META_CLASS}>
-            {entry.confirmed
-              ? t('home.activity.confirmed', 'Confirmed by me')
-              : t('home.activity.unconfirmed', 'Not confirmed by me yet')}
-          </span>
-        ) : null}
-      </span>
-      <span className={`shrink-0 tabular-nums ${HOME_META_CLASS}`}>{entry.when}</span>
-    </>
+    <HomeRow
+      icon={<HomeAvatar name={entry.who} />}
+      // The sample's lines start with the separator that stood after the name.
+      title={entry.text.replace(/^·\s*/, '')}
+      tip={[
+        `${entry.who} ${entry.text}`,
+        entry.finished
+          ? entry.confirmed
+            ? t('home.activity.confirmed', 'Confirmed by me')
+            : t('home.activity.unconfirmed', 'Not confirmed by me yet')
+          : null
+      ]
+        .filter(Boolean)
+        .join(' · ')}
+      date={entry.when}
+      onClick={onClick}
+    />
   )
 }
 
@@ -61,8 +63,27 @@ export function HomeActivityCard({
   return (
     <HomeCard
       title={t('home.activity.title', 'Recent activity')}
+      titleTip={t('home.activity.aside', 'This week')}
       aside={t('home.activity.aside', 'This week')}
       data-home-card="activity"
+      tabs={{
+        label: t('home.activity.filter', 'Activity type'),
+        value: filter,
+        onValueChange: (value) => onFilterChange(value === 'finished' ? 'finished' : 'all'),
+        items: [
+          {
+            value: 'all',
+            label: t('home.activity.filterAll', 'Everything'),
+            count: entries.length
+          },
+          {
+            value: 'finished',
+            label: t('home.activity.filterFinished', 'Finished by agents'),
+            count: finished.length,
+            data: { 'data-home-activity-filter': 'finished' }
+          }
+        ]
+      }}
       action={
         filtered.length > SHORT ? (
           <Button
@@ -80,50 +101,17 @@ export function HomeActivityCard({
         ) : undefined
       }
     >
-      <div className="px-4 pb-2">
-        <Tabs
-          value={filter}
-          onValueChange={(value) => onFilterChange(value === 'finished' ? 'finished' : 'all')}
-        >
-          <TabsList aria-label={t('home.activity.filter', 'Activity type')}>
-            <TabsTrigger value="all">
-              {t('home.activity.filterAll', 'Everything')}
-              <span className="tabular-nums">{entries.length}</span>
-            </TabsTrigger>
-            <TabsTrigger value="finished" data-home-activity-filter="finished">
-              {t('home.activity.filterFinished', 'Finished by agents')}
-              <span className="tabular-nums">{finished.length}</span>
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-      {shown.length === 0 ? (
-        <p className={`px-4 py-3 ${HOME_META_CLASS}`}>
-          {t(
-            'home.activity.empty',
-            'Hand a task to an agent and this week’s activity collects here.'
-          )}
-        </p>
-      ) : (
-        <ol className="border-t border-border" data-home-activity-list="">
-          {shown.map((entry) => {
-            const body = <HomeActivityLine entry={entry} />
-            return (
-              <li key={entry.id}>
-                {entry.taskId || entry.agentId || entry.meetingId ? (
-                  <button
-                    type="button"
-                    className={`${HOME_ROW_BUTTON_CLASS} flex items-start gap-2`}
-                    onClick={() => onReveal(entry)}
-                  >
-                    {body}
-                  </button>
-                ) : (
-                  <div className="flex items-start gap-2 px-4 py-2">{body}</div>
-                )}
-              </li>
-            )
-          })}
+      {shown.length === 0 ? null : (
+        <ol className="mx-4" data-home-activity-list="">
+          {shown.map((entry) => (
+            <HomeActivityItem
+              key={entry.id}
+              entry={entry}
+              onClick={
+                entry.taskId || entry.agentId || entry.meetingId ? () => onReveal(entry) : undefined
+              }
+            />
+          ))}
         </ol>
       )}
     </HomeCard>

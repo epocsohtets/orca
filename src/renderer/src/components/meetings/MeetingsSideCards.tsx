@@ -2,18 +2,12 @@ import { Bot } from 'lucide-react'
 import React from 'react'
 import { useTranslate } from '@/i18n/use-translate'
 import { Button } from '@/components/ui/button'
-import {
-  HOME_META_CLASS,
-  HOME_ROW_BUTTON_CLASS,
-  HomeCard,
-  HomeProjectDot,
-  HomeWhoMarker
-} from '@/components/home/HomeCard'
+import { HomeCard, HomeRow, HomeStateIcon } from '@/components/home/HomeCard'
 import type { HomeProjectId, HomeTask } from '@/components/home/home-board'
 import type { HomeProject } from '@/components/home/home-board-mock'
 import { botItemsFor } from './meeting-rules'
 import { useMeetingText } from './MeetingParts'
-import { isSeen, useMeetings } from './meetings-store'
+import { useMeetings } from './meetings-store'
 
 /** What meetings wait on me for: the same rows Home lists under Needs me. Each opens its meeting. */
 export function MeetingWaitingCard({
@@ -32,32 +26,33 @@ export function MeetingWaitingCard({
       aside={<span className="tabular-nums">{rows.length}</span>}
       data-meeting-card="waiting"
     >
-      {rows.length === 0 ? (
-        <p className={`px-4 py-2 ${HOME_META_CLASS}`}>
-          {t('home.tasks.emptyWaiting', 'Nothing is waiting for you.')}
-        </p>
-      ) : (
-        <ul className="divide-y divide-border border-t border-border">
-          {rows.map((row) => (
-            <li key={row.id}>
-              <button
-                type="button"
-                data-meeting-waiting={row.id}
-                className={`${HOME_ROW_BUTTON_CLASS} flex flex-col gap-1`}
-                onClick={() => row.meetingId && onSelect(row.meetingId)}
-              >
-                <span className="line-clamp-2 text-[13px] font-medium text-foreground">
-                  {row.title}
-                </span>
-                <span className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
-                  {row.who && row.whoLabel ? (
-                    <HomeWhoMarker who={row.who} label={row.whoLabel} />
-                  ) : null}
-                  <HomeProjectDot project={projects[row.project]} />
-                </span>
-              </button>
-            </li>
-          ))}
+      {rows.length === 0 ? null : (
+        <ul className="mx-4">
+          {rows.map((row) => {
+            const open = (): void => {
+              if (row.meetingId) {
+                onSelect(row.meetingId)
+              }
+            }
+            return (
+              <HomeRow
+                key={row.id}
+                button={{ 'data-meeting-waiting': row.id }}
+                icon={<HomeStateIcon state="waiting" />}
+                title={row.title}
+                tip={[row.title, row.whoLabel, projects[row.project].name]
+                  .filter(Boolean)
+                  .join(' · ')}
+                chip={t('home.chip.waiting', 'Needs my answer')}
+                onClick={open}
+                action={
+                  <Button type="button" variant="outline" size="xs" onClick={open}>
+                    {t('home.tasks.answer', 'Answer')}
+                  </Button>
+                }
+              />
+            )
+          })}
         </ul>
       )}
     </HomeCard>
@@ -82,53 +77,34 @@ export function MeetingAgentCard({ onOpen }: { onOpen: () => void }): React.JSX.
         </Button>
       }
     >
-      {items.length === 0 ? (
-        <p className={`px-4 py-2 ${HOME_META_CLASS}`}>
-          {t('meetings.bot.rowEmpty', 'Minutes and your tasks arrive here')}
-        </p>
-      ) : (
-        <ul>
-          {items.map((item) => (
-            <li key={item.key}>
-              <button
-                type="button"
-                data-meeting-agent-item={item.key}
-                className={`${HOME_ROW_BUTTON_CLASS} flex items-start gap-2`}
+      {items.length === 0 ? null : (
+        <ul className="mx-4">
+          {items.map((item) => {
+            const title =
+              item.kind === 'minutes'
+                ? t('meetings.bot.rowMinutes', 'Minutes: {{title}}', { title: item.meeting.title })
+                : item.kind === 'shared'
+                  ? t('meetings.bot.rowShared', 'Shared minutes: {{title}}', {
+                      title: item.meeting.title
+                    })
+                  : t('meetings.bot.rowTask', 'New task: {{title}}', { title: item.task.title })
+            return (
+              <HomeRow
+                key={item.key}
+                button={{ 'data-meeting-agent-item': item.key }}
+                icon={<Bot aria-hidden />}
+                title={title}
+                tip={`${title} · ${text.day(item.at)} ${text.time(item.at)}`}
+                chip={
+                  item.kind === 'minutes' && item.proposals.length > 0
+                    ? t('meetings.chip.mine', 'Mine: {{count}}', { count: item.proposals.length })
+                    : undefined
+                }
+                date={text.whenShort({ startsAt: item.at })}
                 onClick={onOpen}
-              >
-                <span className="flex size-5 shrink-0 items-center justify-center rounded-full border border-border bg-muted text-muted-foreground">
-                  <Bot aria-hidden className="size-3" />
-                </span>
-                <span className="flex min-w-0 flex-1 flex-col gap-1">
-                  <span
-                    className={`line-clamp-2 text-[13px] text-foreground ${isSeen(state, item.key) ? '' : 'font-medium'}`}
-                  >
-                    {item.kind === 'minutes'
-                      ? t('meetings.bot.rowMinutes', 'Minutes: {{title}}', {
-                          title: item.meeting.title
-                        })
-                      : item.kind === 'shared'
-                        ? t('meetings.bot.rowShared', 'Shared minutes: {{title}}', {
-                            title: item.meeting.title
-                          })
-                        : t('meetings.bot.rowTask', 'New task: {{title}}', {
-                            title: item.task.title
-                          })}
-                  </span>
-                  {item.kind === 'minutes' && item.proposals.length > 0 ? (
-                    <span className={HOME_META_CLASS}>
-                      {t('meetings.agent.proposals', '{{count}} items look like mine', {
-                        count: item.proposals.length
-                      })}
-                    </span>
-                  ) : null}
-                </span>
-                <span className={`shrink-0 pt-px tabular-nums ${HOME_META_CLASS}`}>
-                  {text.day(item.at)} {text.time(item.at)}
-                </span>
-              </button>
-            </li>
-          ))}
+              />
+            )
+          })}
         </ul>
       )}
     </HomeCard>

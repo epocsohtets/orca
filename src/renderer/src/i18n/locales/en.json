@@ -31543,7 +31543,6 @@
     "prep": {
       "outline": "Outline",
       "edit": "Edit outline and materials",
-      "noOutlineHost": "Write what the meeting must settle, so attendees can read it first.",
       "materials": "Materials",
       "editShort": "Edit"
     },
@@ -31624,22 +31623,21 @@
       "find": "Find in the transcript",
       "found": "{{count}} of {{total}} remarks",
       "turns": "{{total}} remarks",
-      "notFound": "Nothing said matches. Try a shorter word.",
       "card": "Minutes"
     },
     "share": {
       "done": "The meeting agent sent {{name}} the link to the full minutes.",
-      "scope": "The {{count}} people who were in the meeting see the full minutes.",
-      "sharedWith": "Got the link: {{names}}",
       "button": "Share link",
-      "request": "{{name}} asks to see the full minutes.",
       "decline": "Decline",
       "approve": "Approve",
       "requestDeclined": "{{name}} did not share the full minutes.",
       "requested": "Asked {{name}}.",
       "requestButton": "Ask to see the full minutes",
       "card": "Who sees what",
-      "scopeOutside": "{{names}} see only their own task and the part it came from."
+      "attendees": "{{count}} attendees",
+      "whole": "Full minutes",
+      "ownPart": "Own task and the part it came from",
+      "byLink": "Full minutes · by link"
     },
     "agenda": {
       "previousWeek": "Previous week",
@@ -31656,10 +31654,7 @@
       "scheduledPrep": "Scheduled · prep ready",
       "scheduledNoPrep": "Scheduled"
     },
-    "list": {
-      "emptyUpcoming": "Nothing is scheduled. A meeting you create or are invited to appears here.",
-      "emptyPast": "No minutes yet. They arrive when a recording ends."
-    },
+    "list": {},
     "notice": {
       "recordingTitle": "Recording has started",
       "recordingBody": "{{name}} is recording “{{title}}”.",
@@ -31692,13 +31687,10 @@
     "tiles": {
       "today": "Today’s meetings",
       "next": "Next {{time}} · {{title}}",
-      "noNext": "None left today",
-      "waitingSub": "The meeting agent is waiting",
       "week": "This week",
       "weekSub": "I host {{host}} · I attend {{attend}}",
       "followUpsSub": "Done {{done}} · in progress {{inProgress}} · to do {{todo}} · no owner {{open}}",
       "notTasksYet": "{{count}} without an owner",
-      "allTasks": "All have an owner",
       "doneSub": "Of {{total}} follow-up tasks",
       "mineOpen": "{{count}} waiting for my answer",
       "done": "Tasks done",
@@ -31709,14 +31701,16 @@
     "viewerLabel": "Signed in as",
     "agent": {
       "aside": "What it sent me",
-      "open": "Open the conversation",
-      "proposals": "{{count}} items look like mine"
+      "open": "Open the conversation"
     },
     "role": {
       "host": "I host",
       "attendee": "I attend",
       "shared": "Shared with me",
       "assignee": "My task"
+    },
+    "chip": {
+      "mine": "Mine: {{count}}"
     }
   },
   "chats": {
@@ -31793,7 +31787,6 @@
       "filter": "Activity type",
       "filterAll": "Everything",
       "filterFinished": "Finished by agents",
-      "empty": "Hand a task to an agent and this week’s activity collects here.",
       "confirmed": "Confirmed by me",
       "unconfirmed": "Not confirmed by me yet",
       "budgetDone": "updated the campaign budget sheet",
@@ -31851,8 +31844,7 @@
       "waitingSub": "Agents {{agents}}, meetings {{meetings}}",
       "agentDone": "Finished by agents",
       "agentDoneSub": "This week · {{confirmed}} of {{total}} confirmed by me",
-      "late": "Late · awaiting others",
-      "lateNone": "Nothing is late or blocked"
+      "late": "Late · awaiting others"
     },
     "firstRun": {
       "title": "Start here",
@@ -31864,18 +31856,13 @@
     },
     "day": {
       "title": "My day",
-      "privacy": "Only I see this. The team sees only what I save in Wrap-up.",
       "manage": "Manage records",
       "manageApps": "Apps that are recorded",
       "manageBrowser": "Browser activity record",
-      "nothing": "Use a registered app or hold a meeting and today’s records collect here.",
-      "scope": "Only time in registered apps, the address and title of pages in this app’s browser, and meeting times are recorded. Never screen content.",
-      "noApp": "Register an app you work in and its time collects here.",
       "unconfirmed": "Records without a task",
-      "unconfirmedHint": "Choose whether these were work.",
       "hours": "{{count}} hr",
       "minutes": "{{count}} min",
-      "excluded": "Not work · only I see it",
+      "excluded": "Not work",
       "linked": "Linked to “{{task}}”",
       "undo": "Undo",
       "pickTask": "Task to link this record to",
@@ -31905,12 +31892,8 @@
       "waiting": "Needs me",
       "late": "Late",
       "done": "Done",
-      "emptyToday": "No tasks remain. Add a new task or hand one to an agent.",
-      "emptyWaiting": "Nothing is waiting for you.",
-      "emptyLate": "Nothing is late or blocked.",
       "answer": "Answer",
-      "openList": "Open the task list",
-      "open": "Open",
+      "openList": "Task list",
       "openMinutes": "Open the minutes"
     },
     "signedOut": {
@@ -31933,10 +31916,8 @@
       "title": "Coming up",
       "calendar": "Calendar",
       "deadline": "Deadline",
-      "prepReady": "Prep ready",
       "endOfDay": "End of day",
-      "recording": "Recording now",
-      "minutesWaiting": "Minutes arrived · waiting for me"
+      "recording": "Recording now"
     },
     "agent": {
       "research": "Research agent",
@@ -31992,7 +31973,6 @@
       "finishedOn": "Finished {{day}}",
       "newsletterDetail": "You checked 1,240 addresses and removed 12.",
       "budget": "Update the campaign budget sheet",
-      "finishedConfirmed": "Finished {{day}} · confirmed by me",
       "budgetDetail": "The writing agent updated it; you confirmed the numbers.",
       "resumed": "Agent working · picked up my answer",
       "addedAgent": "Agent working · just handed over",
@@ -32040,6 +32020,13 @@
       "nowMeeting": "Minutes · {{count}} follow-up tasks",
       "ahead": "Written by the agent",
       "take": "to use"
+    },
+    "chip": {
+      "waiting": "Needs my answer",
+      "blocked": "Awaiting reply",
+      "working": "Working",
+      "draft": "Draft ready",
+      "prep": "Prep"
     }
   },
   "taskLoop": {
@@ -32072,7 +32059,9 @@
       "noteStatus": "Changed status {{to}}",
       "activity": "Now",
       "folder": "Folder",
-      "output": "Result"
+      "output": "Result",
+      "noteByAgentOf": "Written by the agent, confirmed by {{name}}",
+      "noteBy": "Written by {{name}}"
     },
     "gate": {
       "line": "Sign in to inAX and your tasks appear here."
@@ -32135,7 +32124,8 @@
       "confirmed": "{{status}} · written by the agent, confirmed by me",
       "justStarted": "Agent working · just started",
       "question": "Waiting for my answer · {{agent}}",
-      "result": "Result ready"
+      "result": "Result ready",
+      "confirmedBy": "{{status}} · written by the agent, confirmed by {{name}}"
     },
     "group": {
       "needsYou": "Needs you",

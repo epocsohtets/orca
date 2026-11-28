@@ -76,40 +76,53 @@ export function MinutesScopeCard({ meeting }: { meeting: Meeting }): React.JSX.E
     )
   return (
     <HomeCard title={t('meetings.share.card', 'Who sees what')} data-meeting-card="scope">
-      <div className="flex flex-col gap-2" data-meeting-sharing="">
-        <p className="px-4 text-xs text-foreground">
-          {t(
-            'meetings.share.scope',
-            'The {{count}} people who were in the meeting see the full minutes.',
-            { count: meeting.attendeeIds.length + 1 }
-          )}
-          {outside.length > 0
-            ? ` ${t(
-                'meetings.share.scopeOutside',
-                '{{names}} see only their own task and the part it came from.',
-                { names: outside.map(personName).join(', ') }
-              )}`
-            : null}
-        </p>
-        {meeting.shares.length > 0 ? (
-          <p className={`px-4 ${HOME_META_CLASS}`}>
-            {t('meetings.share.sharedWith', 'Got the link: {{names}}', {
-              names: meeting.shares.map((entry) => personName(entry.personId)).join(', ')
-            })}
-          </p>
-        ) : null}
+      <div data-meeting-sharing="">
+        <dl className="mx-4 text-[13px] leading-5">
+          {[
+            {
+              who: t('meetings.share.attendees', '{{count}} attendees', {
+                count: meeting.attendeeIds.length + 1
+              }),
+              what: t('meetings.share.whole', 'Full minutes')
+            },
+            ...(outside.length > 0
+              ? [
+                  {
+                    who: outside.map(personName).join(', '),
+                    what: t('meetings.share.ownPart', 'Own task and the part it came from')
+                  }
+                ]
+              : []),
+            ...(meeting.shares.length > 0
+              ? [
+                  {
+                    who: meeting.shares.map((entry) => personName(entry.personId)).join(', '),
+                    what: t('meetings.share.byLink', 'Full minutes · by link')
+                  }
+                ]
+              : [])
+          ].map((row) => (
+            <div
+              key={row.what}
+              className="flex h-9 items-center justify-between gap-4 border-t border-border"
+            >
+              <dt className="min-w-0 truncate text-foreground">{row.who}</dt>
+              <dd className={`shrink-0 ${HOME_META_CLASS}`}>{row.what}</dd>
+            </div>
+          ))}
+        </dl>
         {meeting.hostId === viewerId && pending.length > 0 ? (
-          <ul className="divide-y divide-border border-t border-border">
+          <ul className="mx-4">
             {pending.map((request) => (
               <li
                 key={request.personId}
                 data-meeting-request={request.personId}
-                className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2"
+                className="flex min-h-9 flex-wrap items-center gap-x-3 gap-y-2 border-t border-border py-1.5"
               >
                 <span className="flex min-w-0 flex-1 basis-48 items-center gap-2">
                   <HomeAvatar name={personName(request.personId)} />
-                  <span className="text-[13px] text-foreground">
-                    {t('meetings.share.request', '{{name}} asks to see the full minutes.', {
+                  <span className="text-[13px] leading-5 text-foreground">
+                    {t('meetings.notice.requestTitle', '{{name}} asks to see the minutes', {
                       name: personName(request.personId)
                     })}
                   </span>

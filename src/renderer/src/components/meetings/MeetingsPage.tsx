@@ -1,11 +1,22 @@
 import React, { useEffect } from 'react'
-import { CalendarPlus, ChevronLeft } from 'lucide-react'
+import {
+  CalendarDays,
+  CalendarPlus,
+  CalendarRange,
+  ChevronLeft,
+  CircleAlert,
+  ListChecks
+} from 'lucide-react'
 import { useIntlLocale, useTranslate } from '@/i18n/use-translate'
 import { uiDateTimeFormat } from '@/i18n/ui-intl-formatters'
 import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { TabsContent } from '@/components/ui/tabs'
 import { RailPage, RailPageScroll } from '@/components/rail-page/RailPage'
-import { HomeCard } from '@/components/home/HomeCard'
+import {
+  HOME_BOARD_COLUMNS_CLASS,
+  HOME_BOARD_PAGE_CLASS,
+  HomeCard
+} from '@/components/home/HomeCard'
 import { HomePageHeading, HomeTileRow, type HomeTile } from '@/components/home/HomeHeader'
 import { useHomeBoard } from '@/components/home/use-home-board'
 import { openMeetingBot, openScheduleForm } from './meeting-navigation'
@@ -70,6 +81,7 @@ export default function MeetingsPage(): React.JSX.Element {
   const tiles: HomeTile<TileId>[] = [
     {
       id: 'today',
+      icon: CalendarDays,
       label: t('meetings.tiles.today', 'Today’s meetings'),
       value: today.length,
       sub: [
@@ -79,22 +91,27 @@ export default function MeetingsPage(): React.JSX.Element {
               time: text.time(next.startsAt),
               title: next.title
             })
-          : t('meetings.tiles.noNext', 'None left today')
+          : null
       ]
         .filter(Boolean)
         .join(' · ')
     },
     {
       id: 'waiting',
+      icon: CircleAlert,
       label: t('home.tiles.waiting', 'Needs me'),
       value: waiting.length,
       sub:
         waiting.length > 0
-          ? t('meetings.tiles.waitingSub', 'The meeting agent is waiting')
-          : t('home.tasks.emptyWaiting', 'Nothing is waiting for you.')
+          ? t('meetings.tiles.mineOpen', '{{count}} waiting for my answer', {
+              count: waiting.length
+            })
+          : '',
+      tone: 'alert'
     },
     {
       id: 'week',
+      icon: CalendarRange,
       label: t('meetings.tiles.week', 'This week'),
       value: thisWeek.length,
       sub: t('meetings.tiles.weekSub', 'I host {{host}} · I attend {{attend}}', {
@@ -104,6 +121,7 @@ export default function MeetingsPage(): React.JSX.Element {
     },
     {
       id: 'followUps',
+      icon: ListChecks,
       label: t('meetings.followUps.title', 'Follow-up tasks'),
       value: counts.total,
       sub: t(
@@ -145,7 +163,7 @@ export default function MeetingsPage(): React.JSX.Element {
     <RailPage as="main" data-meetings-page="" data-meetings-screen={screen}>
       <RailPageScroll className="scrollbar-sleek min-h-0 flex-1 overflow-y-auto">
         {/* Why pb-24: the last row scrolls clear of the floating panel toggle. */}
-        <div className="rail-page-row-gutter mx-auto flex max-w-6xl flex-col gap-4 pt-6 pb-24">
+        <div className={HOME_BOARD_PAGE_CLASS}>
           {composing ? (
             <>
               <HomePageHeading
@@ -157,7 +175,7 @@ export default function MeetingsPage(): React.JSX.Element {
                 before={back}
               />
               <HomeCard title={t('meetings.form.card', 'New meeting')} data-meeting-card="create">
-                <div className="px-4 pb-2">
+                <div className="px-4">
                   <MeetingCreateForm
                     key={composing.conversationId ?? 'blank'}
                     composing={composing}
@@ -201,51 +219,39 @@ export default function MeetingsPage(): React.JSX.Element {
                   }
                 }}
               />
-              <div className="grid items-start gap-4 @min-[60rem]/rail-page:grid-cols-[minmax(0,5fr)_minmax(0,3fr)]">
-                <HomeCard title={t('meetings.mine', 'My meetings')} data-meeting-card="list">
-                  <Tabs
-                    value={pane}
-                    onValueChange={(value) =>
-                      setPane(PANES.find((key) => key === value) ?? 'upcoming')
-                    }
-                  >
-                    <div className="px-4 pb-2">
-                      <TabsList aria-label={t('meetings.mine', 'My meetings')}>
-                        {PANES.map((key) => (
-                          <TabsTrigger key={key} value={key} data-meeting-pane={key}>
-                            {paneLabels[key]}
-                            {key === 'agenda' ? null : (
-                              <span className="tabular-nums">
-                                {key === 'upcoming' ? upcoming.length : past.length}
-                              </span>
-                            )}
-                          </TabsTrigger>
-                        ))}
-                      </TabsList>
-                    </div>
-                    <TabsContent value={pane}>
-                      {pane === 'agenda' ? (
-                        <MeetingAgenda projects={projects} onSelect={select} />
-                      ) : (
-                        <MeetingList
-                          meetings={pane === 'upcoming' ? upcoming : past}
-                          projects={projects}
-                          empty={
-                            pane === 'upcoming'
-                              ? t(
-                                  'meetings.list.emptyUpcoming',
-                                  'Nothing is scheduled. A meeting you create or are invited to appears here.'
-                                )
-                              : t(
-                                  'meetings.list.emptyPast',
-                                  'No minutes yet. They arrive when a recording ends.'
-                                )
-                          }
-                          onSelect={select}
-                        />
-                      )}
-                    </TabsContent>
-                  </Tabs>
+              <div className={HOME_BOARD_COLUMNS_CLASS}>
+                <HomeCard
+                  title={t('meetings.mine', 'My meetings')}
+                  data-meeting-card="list"
+                  tabs={{
+                    label: t('meetings.mine', 'My meetings'),
+                    value: pane,
+                    onValueChange: (value) =>
+                      setPane(PANES.find((key) => key === value) ?? 'upcoming'),
+                    items: PANES.map((key) => ({
+                      value: key,
+                      label: paneLabels[key],
+                      count:
+                        key === 'agenda'
+                          ? undefined
+                          : key === 'upcoming'
+                            ? upcoming.length
+                            : past.length,
+                      data: { 'data-meeting-pane': key }
+                    }))
+                  }}
+                >
+                  <TabsContent value={pane}>
+                    {pane === 'agenda' ? (
+                      <MeetingAgenda projects={projects} onSelect={select} />
+                    ) : (
+                      <MeetingList
+                        meetings={pane === 'upcoming' ? upcoming : past}
+                        projects={projects}
+                        onSelect={select}
+                      />
+                    )}
+                  </TabsContent>
                 </HomeCard>
                 <div className="flex min-w-0 flex-col gap-4">
                   <MeetingWaitingCard rows={waiting} projects={projects} onSelect={select} />

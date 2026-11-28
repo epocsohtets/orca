@@ -38,8 +38,8 @@ export function MeetingAsk({ meeting }: { meeting: Meeting }): React.JSX.Element
         <ol className="flex flex-col gap-4">
           {asks.map((entry) => (
             <li key={entry.id} data-meeting-ask="">
-              <p className="text-[13px] font-medium text-foreground">{entry.question}</p>
-              <p className="mt-1 text-[13px] leading-relaxed text-foreground">{entry.answer}</p>
+              <p className="text-[13px] leading-5 text-foreground">{entry.question}</p>
+              <p className="mt-1 text-[13px] leading-5 text-foreground">{entry.answer}</p>
               {entry.turnId ? (
                 <Button
                   type="button"

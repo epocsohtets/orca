@@ -39,12 +39,16 @@ export function MeetingMaterialList({
     return null
   }
   return (
-    <ul className="divide-y divide-border rounded-md border border-border">
+    <ul className={onRemove ? 'divide-y divide-border rounded-md border border-border' : undefined}>
       {materials.map((material, index) => (
         <li
           key={`${material.name}:${material.kind === 'file' ? material.size : material.url}`}
           data-meeting-material={material.kind}
-          className="flex min-h-9 items-center gap-2.5 px-3 py-1.5"
+          className={
+            onRemove
+              ? 'flex min-h-9 items-center gap-2.5 px-3 py-1.5'
+              : 'flex h-9 items-center gap-2 border-t border-border'
+          }
         >
           {materialIcon(material)}
           <span className="min-w-0 flex-1 truncate text-[13px] text-foreground">

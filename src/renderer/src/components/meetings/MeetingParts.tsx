@@ -2,15 +2,9 @@ import React from 'react'
 import { useIntlLocale, useTranslate } from '@/i18n/use-translate'
 import { uiDateTimeFormat } from '@/i18n/ui-intl-formatters'
 import { Label } from '@/components/ui/label'
-import {
-  HOME_FOCUS_RING_CLASS,
-  HOME_META_CLASS,
-  HomeAvatar,
-  HomeWhoMarker
-} from '@/components/home/HomeCard'
+import { HOME_FOCUS_RING_CLASS, HOME_META_CLASS, HomeWhoMarker } from '@/components/home/HomeCard'
 import type { HomeTaskWho } from '@/components/home/home-board'
-import { personName } from './meeting-people'
-import { followUpCounts, meetingAccess } from './meeting-rules'
+import { followUpCounts, followUpState, meetingAccess } from './meeting-rules'
 import { dayDistance } from './meeting-schedule'
 import type { Meeting, MeetingTaskStatus } from './meeting-types'
 import { useMeetings } from './meetings-store'
@@ -18,7 +12,14 @@ import { useMeetings } from './meetings-store'
 // One focus ring for Home and Meetings.
 export const MEETING_FOCUS_RING = HOME_FOCUS_RING_CLASS
 
-export type MeetingState = { who: NonNullable<HomeTaskWho> | null; label: string }
+export type MeetingState = {
+  who: NonNullable<HomeTaskWho> | null
+  /** The whole state in words: a tooltip, or a line where there is room. */
+  label: string
+  kind: 'recording' | 'scheduled' | 'minutes'
+  /** The one state word a list row shows after the title. */
+  chip?: string
+}
 
 /**
  * Where a meeting stands for the person looking, in Home's own state words and glyphs: recording, waiting on
@@ -30,30 +31,43 @@ export function useMeetingState(): (meeting: Meeting) => MeetingState {
   const viewerId = useMeetings((state) => state.viewerId)
   return (meeting) => {
     if (meeting.recordingStartedAt !== null) {
-      return { who: 'agentWorking', label: t('meetings.state.recording', 'Recording now') }
+      return {
+        who: 'agentWorking',
+        kind: 'recording',
+        label: t('meetings.state.recording', 'Recording now')
+      }
     }
     if (!meeting.minutes) {
+      const prep = Boolean(meeting.outline) || meeting.materials.length > 0
       return {
         who: null,
-        label:
-          meeting.outline || meeting.materials.length > 0
-            ? t('meetings.state.scheduledPrep', 'Scheduled · prep ready')
-            : t('meetings.state.scheduledNoPrep', 'Scheduled')
+        kind: 'scheduled',
+        chip: prep ? t('home.chip.prep', 'Prep') : undefined,
+        label: prep
+          ? t('meetings.state.scheduledPrep', 'Scheduled · prep ready')
+          : t('meetings.state.scheduledNoPrep', 'Scheduled')
       }
     }
     if (meetingAccess(meeting, viewerId, tasks) === 'excerpt') {
+      const count = tasks.filter(
+        (task) => task.meetingId === meeting.id && task.assigneeId === viewerId
+      ).length
       return {
         who: null,
-        label: t('meetings.state.myTasks', 'My tasks from it: {{count}}', {
-          count: tasks.filter(
-            (task) => task.meetingId === meeting.id && task.assigneeId === viewerId
-          ).length
-        })
+        kind: 'minutes',
+        chip: t('meetings.chip.mine', 'Mine: {{count}}', { count }),
+        label: t('meetings.state.myTasks', 'My tasks from it: {{count}}', { count })
       }
     }
     const counts = followUpCounts(meeting.followUps, tasks)
+    const offered = meeting.followUps.some(
+      (followUp) =>
+        followUp.suggestedOwnerId === viewerId && followUpState(followUp, tasks).kind !== 'task'
+    )
     return {
       who: 'draft',
+      kind: 'minutes',
+      chip: offered ? t('home.chip.waiting', 'Needs my answer') : undefined,
       label:
         counts.total === 0
           ? t('meetings.state.minutes', 'Minutes ready')
@@ -75,21 +89,6 @@ export function MeetingStateMarker({ state }: { state: MeetingState }): React.JS
   )
 }
 
-/** Small avatars of a meeting's people, host first; past three they become a count. */
-export function MeetingPeopleStack({ meeting }: { meeting: Meeting }): React.JSX.Element {
-  const ids = [meeting.hostId, ...meeting.attendeeIds]
-  return (
-    <span className="flex items-center gap-0.5" data-meeting-people-stack="">
-      {ids.slice(0, 3).map((id) => (
-        <HomeAvatar key={id} name={personName(id)} />
-      ))}
-      {ids.length > 3 ? (
-        <span className={`ml-0.5 tabular-nums ${HOME_META_CLASS}`}>+{ids.length - 3}</span>
-      ) : null}
-    </span>
-  )
-}
-
 const TIME: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit', hour12: false }
 const DAY: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', weekday: 'short' }
 
@@ -99,6 +98,8 @@ export type MeetingText = {
   day: (timestamp: number) => string
   date: (timestamp: number) => string
   when: (meeting: Pick<Meeting, 'startsAt' | 'endsAt'>) => string
+  /** For a 72px date column: "Today 08:30", or the date alone on another day. */
+  whenShort: (meeting: Pick<Meeting, 'startsAt'>) => string
   /** As `when`, with the weekday beside "today" and "tomorrow" too: "Tomorrow (Tue) 15:00–15:30". */
   whenWithWeekday: (meeting: Pick<Meeting, 'startsAt' | 'endsAt'>) => string
   due: (dateKey: string) => string
@@ -141,6 +142,10 @@ export function useMeetingText(): MeetingText {
     day,
     date,
     when,
+    whenShort: (meeting) =>
+      Math.abs(dayDistance(today, meeting.startsAt)) <= 1
+        ? `${day(meeting.startsAt)} ${time(meeting.startsAt)}`
+        : uiDateTimeFormat({ month: 'short', day: 'numeric' }, intlLocale).format(meeting.startsAt),
     whenWithWeekday: (meeting) => {
       const near = Math.abs(dayDistance(today, meeting.startsAt)) <= 1
       const weekday = uiDateTimeFormat({ weekday: 'short' }, intlLocale).format(meeting.startsAt)
@@ -178,7 +183,7 @@ export function MeetingSection({
   return (
     <section className="min-w-0">
       <div className="mb-1 flex min-h-6 items-center justify-between gap-2">
-        <h3 className="text-xs font-medium text-muted-foreground">{title}</h3>
+        <h3 className="text-xs text-muted-foreground">{title}</h3>
         {action}
       </div>
       {children}

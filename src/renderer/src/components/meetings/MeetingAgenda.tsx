@@ -35,7 +35,7 @@ export function MeetingAgenda({
   return (
     <div className="flex flex-col gap-2 border-t border-border pt-2" data-meeting-agenda="">
       <div className="flex items-center gap-1 px-4">
-        <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-foreground tabular-nums">
+        <span className="min-w-0 flex-1 truncate text-[13px] leading-5 text-foreground tabular-nums">
           {text.date(days[0])} – {text.date(days[4])}
         </span>
         <Button
@@ -75,7 +75,7 @@ export function MeetingAgenda({
           const isToday = sameDay(day, today)
           return (
             <li key={day}>
-              <h3 className="flex items-baseline gap-2 px-4 py-1 text-xs font-medium text-muted-foreground">
+              <h3 className="flex items-baseline gap-2 px-4 py-1 text-xs leading-4 text-muted-foreground">
                 <span className={isToday ? 'text-foreground' : undefined}>{text.date(day)}</span>
                 {isToday ? <span>{t('meetings.day.today', 'Today')}</span> : null}
                 <span className="tabular-nums">{entries.length}</span>
@@ -104,7 +104,7 @@ export function MeetingAgenda({
                             {text.time(meeting.startsAt)}–{text.time(meeting.endsAt)}
                           </span>
                           <span className="flex min-w-0 flex-col gap-1">
-                            <span className="line-clamp-2 text-[13px] font-medium text-foreground">
+                            <span className="line-clamp-2 text-[13px] leading-5 text-foreground">
                               {meeting.title}
                             </span>
                             <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">

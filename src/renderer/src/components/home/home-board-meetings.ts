@@ -186,13 +186,14 @@ export function buildHomeMeetings(
       project: meeting.project,
       meetingId: meeting.id,
       meeting: {
+        recording: meeting.recordingStartedAt !== null,
         note:
           meeting.recordingStartedAt !== null
-            ? t('home.upcoming.recording', 'Recording now')
+            ? ''
             : over
-              ? t('home.upcoming.minutesWaiting', 'Minutes arrived · waiting for me')
+              ? t('home.chip.waiting', 'Needs my answer')
               : meeting.outline || meeting.materials.length > 0
-                ? t('home.upcoming.prepReady', 'Prep ready')
+                ? t('home.chip.prep', 'Prep')
                 : ''
       }
     })

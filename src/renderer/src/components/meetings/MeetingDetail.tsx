@@ -1,8 +1,9 @@
 import React from 'react'
+import { Check, CircleAlert, CircleCheck, List } from 'lucide-react'
 import { useTranslate } from '@/i18n/use-translate'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { HOME_META_CLASS, HomeCard, HomeProjectDot } from '@/components/home/HomeCard'
+import { HOME_BOARD_COLUMNS_CLASS, HOME_META_CLASS, HomeCard } from '@/components/home/HomeCard'
 import { HomePageHeading, HomeTileRow, type HomeTile } from '@/components/home/HomeHeader'
 import type { HomeProjectId } from '@/components/home/home-board'
 import type { HomeProject } from '@/components/home/home-board-mock'
@@ -35,7 +36,7 @@ function MeetingExcerpt({ meeting }: { meeting: Meeting }): React.JSX.Element {
     (task) => task.meetingId === meeting.id && task.assigneeId === viewerId
   )
   return (
-    <div className="grid items-start gap-4 @min-[60rem]/rail-page:grid-cols-[minmax(0,5fr)_minmax(0,3fr)]">
+    <div className={HOME_BOARD_COLUMNS_CLASS}>
       <div className="flex min-w-0 flex-col gap-4">
         {mine.map((task) => {
           const turnId = meeting.followUps.find((f) => f.id === task.followUpId)?.turnId ?? ''
@@ -55,9 +56,9 @@ function MeetingExcerpt({ meeting }: { meeting: Meeting }): React.JSX.Element {
                 </Button>
               }
             >
-              <div className="flex flex-col gap-3 px-4 pb-2">
+              <div className="flex flex-col gap-3 px-4">
                 <div className="flex flex-col gap-1">
-                  <p className="text-[13px] font-medium text-foreground">{task.title}</p>
+                  <p className="text-[13px] leading-5 text-foreground">{task.title}</p>
                   <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
                     <InaxStatusBadge status={task.status} />
                     <span className={HOME_META_CLASS}>
@@ -69,7 +70,7 @@ function MeetingExcerpt({ meeting }: { meeting: Meeting }): React.JSX.Element {
                   </p>
                 </div>
                 <div className="border-t border-border pt-3">
-                  <h3 className="pb-2 text-xs font-medium text-muted-foreground">
+                  <h3 className="pb-2 text-xs leading-4 text-muted-foreground">
                     {t('meetings.excerpt.where', 'The part of the meeting it came from')}
                   </h3>
                   <MeetingTranscript
@@ -85,7 +86,7 @@ function MeetingExcerpt({ meeting }: { meeting: Meeting }): React.JSX.Element {
         })}
       </div>
       <HomeCard title={t('meetings.share.card', 'Who sees what')} data-meeting-card="scope">
-        <div className="flex flex-col items-start gap-2 px-4 pb-2">
+        <div className="flex flex-col items-start gap-2 px-4">
           <MinutesRequestControl meeting={meeting} />
         </div>
       </HomeCard>
@@ -113,34 +114,46 @@ function MeetingFacts({
         ? t('meetings.response.no', 'Not coming')
         : t('meetings.response.none', 'Not answered')
   return (
-    <Card size="sm" data-meeting-facts="">
-      <dl className="flex flex-wrap items-center gap-x-6 gap-y-2 px-4 text-xs">
+    <Card size="board" data-meeting-facts="">
+      <dl className="flex h-9 items-center gap-x-6 overflow-hidden px-4 text-[13px] leading-5 whitespace-nowrap @max-[60rem]/rail-page:h-auto @max-[60rem]/rail-page:min-h-9 @max-[60rem]/rail-page:flex-wrap @max-[60rem]/rail-page:gap-y-2 @max-[60rem]/rail-page:py-2">
         <div className="flex min-w-0 items-center gap-2">
-          <dt className="text-muted-foreground">{t('taskLoop.detail.project', 'Project')}</dt>
-          <dd className="min-w-0">
-            <HomeProjectDot project={project} />
+          <dt className={HOME_META_CLASS}>{t('taskLoop.detail.project', 'Project')}</dt>
+          <dd className="flex min-w-0 items-center gap-1.5 text-foreground">
+            <span
+              aria-hidden
+              className="size-1.5 shrink-0 rounded-full"
+              style={{ backgroundColor: project.color }}
+            />
+            <span className="truncate">{project.name}</span>
           </dd>
         </div>
-        <div className="flex min-w-0 flex-wrap items-center gap-2" data-meeting-people="">
-          <dt className="text-muted-foreground">{t('meetings.detail.attendees', 'People')}</dt>
-          <dd className="flex min-w-0 flex-wrap items-center gap-1.5">
-            <MeetingPersonChip personId={meeting.hostId} tag={t('meetings.form.host', 'Host')} />
+        <div className="flex min-w-0 items-center gap-2" data-meeting-people="">
+          <dt className={HOME_META_CLASS}>{t('meetings.detail.attendees', 'People')}</dt>
+          <dd className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
+            <MeetingPersonChip
+              plain
+              personId={meeting.hostId}
+              tag={t('meetings.form.host', 'Host')}
+            />
             {meeting.attendeeIds.map((id) => (
               // Before the meeting each person carries the answer to the invitation.
-              <MeetingPersonChip key={id} personId={id} tag={before ? answer(id) : undefined} />
+              <MeetingPersonChip
+                key={id}
+                plain
+                personId={id}
+                tag={before ? answer(id) : undefined}
+              />
             ))}
           </dd>
         </div>
         {origin && showOrigin ? (
           <div className="flex min-w-0 items-center gap-2">
-            <dt className="text-muted-foreground">
-              {t('meetings.detail.originLabel', 'Created in')}
-            </dt>
+            <dt className={HOME_META_CLASS}>{t('meetings.detail.originLabel', 'Created in')}</dt>
             <dd>
               <Button
                 type="button"
                 variant="link"
-                size="inlineText"
+                size="inlineInherit"
                 data-meeting-origin=""
                 onClick={() => useSidebarChatOpenConversation.getState().setOpenId(origin.id)}
               >
@@ -183,29 +196,34 @@ export function MeetingDetail({
   const tiles: HomeTile<TileId>[] = [
     {
       id: 'decisions',
+      icon: CircleCheck,
       label: t('meetings.minutes.decisions', 'Decisions'),
       value: meeting.minutes?.decisions.length ?? 0,
       sub: ''
     },
     {
       id: 'followUps',
+      icon: List,
       label: t('meetings.followUps.title', 'Follow-up tasks'),
       value: counts.total,
       sub:
         counts.open > 0
           ? t('meetings.tiles.notTasksYet', '{{count}} without an owner', { count: counts.open })
-          : t('meetings.tiles.allTasks', 'All have an owner')
+          : ''
     },
     {
       id: 'done',
+      icon: Check,
       label: t('meetings.tiles.done', 'Tasks done'),
       value: counts.done,
       sub: t('meetings.tiles.doneSub', 'Of {{total}} follow-up tasks', counts)
     },
     {
       id: 'mine',
+      icon: CircleAlert,
       label: t('meetings.followUps.mine', 'Mine'),
       value: mine.length,
+      tone: mineOpen.length > 0 ? 'alert' : undefined,
       sub:
         mineOpen.length > 0
           ? t('meetings.tiles.mineOpen', '{{count}} waiting for my answer', {
@@ -252,7 +270,7 @@ export function MeetingDetail({
                 ?.scrollIntoView({ block: 'nearest' })
             }}
           />
-          <div className="grid items-start gap-4 @min-[60rem]/rail-page:grid-cols-[minmax(0,5fr)_minmax(0,3fr)]">
+          <div className={HOME_BOARD_COLUMNS_CLASS}>
             <div className="flex min-w-0 flex-col gap-4">
               <MeetingMinutes meeting={meeting} minutes={meeting.minutes} />
             </div>
@@ -265,10 +283,7 @@ export function MeetingDetail({
           <MeetingFollowUps meeting={meeting} />
         </>
       ) : (
-        <div
-          className="grid items-start gap-4 @min-[60rem]/rail-page:grid-cols-[minmax(0,5fr)_minmax(0,3fr)]"
-          data-meeting-state={state}
-        >
+        <div className={HOME_BOARD_COLUMNS_CLASS} data-meeting-state={state}>
           <div className="flex min-w-0 flex-col gap-4">
             <MeetingPrep meeting={meeting} isHost={isHost} />
           </div>

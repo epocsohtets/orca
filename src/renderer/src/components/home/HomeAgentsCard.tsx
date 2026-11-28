@@ -12,9 +12,8 @@ import {
 } from './HomeCard'
 import type { HomeAgent, HomeAgentState } from './home-board'
 
-const HEAD_CLASS =
-  'px-4 py-2 text-left text-2xs font-medium whitespace-nowrap uppercase tracking-wider'
-const CELL_CLASS = 'px-4 py-2 align-middle'
+const HEAD_CLASS = 'h-8 px-4 py-0 text-left text-xs leading-4 font-normal whitespace-nowrap'
+const CELL_CLASS = 'h-10 px-4 py-0 align-middle'
 
 /** One line per agent or bot: what it is doing, its state, how far along it is. Waiting on me comes first. */
 export function HomeAgentsCard({
@@ -46,7 +45,7 @@ export function HomeAgentsCard({
   return (
     <HomeCard title={t('home.agents.title', 'Agents')} data-home-card="agents">
       <div className="scrollbar-sleek overflow-x-auto border-t border-border">
-        <table className="w-full min-w-[40rem] border-collapse text-[13px]">
+        <table className="w-full min-w-[40rem] border-collapse text-[13px] leading-5">
           <thead>
             <tr className="border-b border-border text-muted-foreground">
               <th scope="col" className={HEAD_CLASS}>
@@ -76,7 +75,7 @@ export function HomeAgentsCard({
                     className="cursor-pointer transition-colors motion-reduce:transition-none hover:bg-accent"
                     onClick={() => onOpen(agent.id)}
                   >
-                    <th scope="row" className={`${CELL_CLASS} text-left font-medium`}>
+                    <th scope="row" className={`${CELL_CLASS} text-left font-normal`}>
                       <button
                         type="button"
                         className={`${HOME_FOCUS_RING_CLASS} -mx-2 flex min-h-6 items-center gap-2 rounded-md px-2 text-left text-foreground`}
@@ -89,8 +88,10 @@ export function HomeAgentsCard({
                         <span className="whitespace-nowrap">{agent.name}</span>
                       </button>
                     </th>
-                    <td className={`${CELL_CLASS} text-foreground`}>
-                      <span className="line-clamp-2">{agent.doing}</span>
+                    <td className={`${CELL_CLASS} max-w-0 text-foreground`}>
+                      <span className="block truncate" title={agent.doing}>
+                        {agent.doing}
+                      </span>
                     </td>
                     <td className={`${CELL_CLASS} whitespace-nowrap`}>
                       <HomeWhoMarker
@@ -124,7 +125,7 @@ export function HomeAgentsCard({
                           <ul className="flex flex-col gap-1">
                             {agent.lines.map((line) => (
                               <li key={line} className="text-xs text-foreground">
-                                <span className="font-medium">{agent.name}</span>
+                                {agent.name}
                                 {' · '}
                                 {line}
                               </li>

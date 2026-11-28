@@ -1,8 +1,8 @@
 import React from 'react'
 import { useTranslate } from '@/i18n/use-translate'
-import { Button } from '@/components/ui/button'
-import { InaxStatusBadge } from '@/components/task-page/inax/inax-status-badge'
-import { HOME_META_CLASS, HOME_ROW_BUTTON_CLASS } from './HomeCard'
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
+import { HOME_GROUP_CLASS, HomeRow, HomeRowMenu, HomeStateIcon } from './HomeCard'
+import { inaxStatusLabels } from './home-task-loop-script'
 import type { InaxStatus } from './home-task-loop'
 import type { HomeProjectId, HomeTask } from './home-board'
 import type { HomeProject } from './home-board-mock'
@@ -84,39 +84,35 @@ export function HomeDayEndResult({
   rows: readonly HomeDayEndResultRow[]
 }): React.JSX.Element {
   const t = useTranslate()
+  const statusLabels = inaxStatusLabels(t)
   return (
-    <section data-home-day-end-result="" className="border-t border-border pt-2">
-      <h3 className="px-4 text-xs font-medium text-foreground">
+    <section data-home-day-end-result="" className="mt-3">
+      <h3 className={`mx-4 border-t border-border px-0 ${HOME_GROUP_CLASS}`}>
         {t('home.dayEnd.resultTitle', 'What the team sees today · {{count}}', {
           count: rows.length
         })}
       </h3>
-      <ul>
+      <ul className="mx-4">
         {rows.map((row) => (
-          <li key={row.id} className="flex items-center gap-2 pr-4">
-            <button
-              type="button"
-              data-home-day-end-row=""
-              className={`${HOME_ROW_BUTTON_CLASS} flex flex-1 flex-col gap-1`}
-              onClick={row.open}
-            >
-              <span className="text-xs font-medium text-foreground">{row.title}</span>
-              <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                {row.what ? <span className="text-xs text-foreground">{row.what}</span> : null}
-                {row.status ? <InaxStatusBadge status={row.status} /> : null}
-                <span className={HOME_META_CLASS}>{row.viewers}</span>
-              </span>
-            </button>
-            <Button
-              type="button"
-              variant="ghost-muted"
-              size="xs"
-              data-home-day-end-undo=""
-              onClick={row.undo}
-            >
-              {t('home.day.undo', 'Undo')}
-            </Button>
-          </li>
+          <HomeRow
+            key={row.id}
+            button={{ 'data-home-day-end-row': '' }}
+            icon={<HomeStateIcon state="done" />}
+            title={row.title}
+            tip={[row.what, row.status ? statusLabels[row.status] : null, row.viewers]
+              .filter(Boolean)
+              .join(' · ')}
+            onClick={row.open}
+            action={
+              <HomeRowMenu
+                label={t('meetings.followUps.more', 'Menu for “{{text}}”', { text: row.title })}
+              >
+                <DropdownMenuItem data-home-day-end-undo="" onSelect={row.undo}>
+                  {t('home.day.undo', 'Undo')}
+                </DropdownMenuItem>
+              </HomeRowMenu>
+            }
+          />
         ))}
       </ul>
     </section>

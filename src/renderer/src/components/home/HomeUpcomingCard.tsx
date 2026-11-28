@@ -1,8 +1,8 @@
 import React from 'react'
-import { CalendarDays } from 'lucide-react'
+import { CalendarDays, Flag, Mic, Users } from 'lucide-react'
 import { useTranslate } from '@/i18n/use-translate'
 import { Button } from '@/components/ui/button'
-import { HOME_META_CLASS, HOME_ROW_BUTTON_CLASS, HomeCard, HomeProjectDot } from './HomeCard'
+import { HOME_GROUP_CLASS, HomeCard, HomeRow } from './HomeCard'
 import type { HomeProjectId } from './home-board'
 import type { HomeProject } from './home-board-mock'
 import type { HomeUpcoming, HomeUpcomingGroup } from './home-board-day-mock'
@@ -49,62 +49,59 @@ export function HomeUpcomingCard({
         </Button>
       }
     >
-      <div className="flex flex-col gap-2">
-        {GROUPS.map((group) => {
-          const rows = items.filter((item) => item.group === group)
-          if (rows.length === 0) {
-            return null
-          }
-          return (
-            <section key={group} aria-label={groupLabels[group]}>
-              <h3 className="flex items-baseline gap-2 px-4 py-1 text-xs font-medium text-muted-foreground">
-                {groupLabels[group]}
-                <span className="tabular-nums">{rows.length}</span>
-              </h3>
-              <ul>
-                {rows.map((item) => {
-                  return (
-                    <li key={item.id} data-home-upcoming={item.id}>
-                      <button
-                        type="button"
-                        className={`${HOME_ROW_BUTTON_CLASS} flex items-start gap-3`}
-                        onClick={() => {
-                          if (item.taskId) {
-                            onRevealTask(item.taskId)
-                          } else if (item.meetingId) {
-                            onOpenMeeting(item.meetingId)
-                          }
-                        }}
-                      >
-                        <span className="flex min-w-0 flex-1 flex-col gap-1">
-                          <span className="line-clamp-2 text-[13px] text-foreground">
-                            {item.title}
-                          </span>
-                          <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-                            <HomeProjectDot project={projects[item.project]} />
-                            {item.meeting ? (
-                              <span className="text-xs font-medium text-foreground">
-                                {item.meeting.note}
-                              </span>
-                            ) : (
-                              <span className={HOME_META_CLASS}>
-                                {t('home.upcoming.deadline', 'Deadline')}
-                              </span>
-                            )}
-                          </span>
-                        </span>
-                        <span className={`shrink-0 pt-px tabular-nums ${HOME_META_CLASS}`}>
-                          {item.when}
-                        </span>
-                      </button>
-                    </li>
-                  )
-                })}
-              </ul>
-            </section>
-          )
-        })}
-      </div>
+      {GROUPS.map((group) => {
+        const rows = items.filter((item) => item.group === group)
+        if (rows.length === 0) {
+          return null
+        }
+        return (
+          <section key={group} aria-label={groupLabels[group]}>
+            <h3 className={HOME_GROUP_CLASS}>
+              {groupLabels[group]}
+              <span className="tabular-nums">{rows.length}</span>
+            </h3>
+            <ul className="mx-4">
+              {rows.map((item) => (
+                <HomeRow
+                  key={item.id}
+                  data-home-upcoming={item.id}
+                  icon={
+                    item.meeting?.recording ? (
+                      <Mic aria-hidden className="text-destructive" />
+                    ) : item.meeting ? (
+                      <Users aria-hidden />
+                    ) : (
+                      <Flag aria-hidden />
+                    )
+                  }
+                  title={item.title}
+                  tip={[
+                    item.title,
+                    projects[item.project].name,
+                    item.meeting?.recording
+                      ? t('home.upcoming.recording', 'Recording now')
+                      : item.meeting
+                        ? item.meeting.note
+                        : t('home.upcoming.deadline', 'Deadline')
+                  ]
+                    .filter(Boolean)
+                    .join(' · ')}
+                  chip={item.meeting?.note || undefined}
+                  project={projects[item.project]}
+                  date={item.when}
+                  onClick={() => {
+                    if (item.taskId) {
+                      onRevealTask(item.taskId)
+                    } else if (item.meetingId) {
+                      onOpenMeeting(item.meetingId)
+                    }
+                  }}
+                />
+              ))}
+            </ul>
+          </section>
+        )
+      })}
     </HomeCard>
   )
 }

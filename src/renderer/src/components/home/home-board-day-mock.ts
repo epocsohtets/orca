@@ -17,8 +17,8 @@ export type HomeUpcoming = {
   when: string
   title: string
   project: HomeProjectId
-  /** A meeting row; `note` says what is ready. */
-  meeting?: { note: string }
+  /** A meeting row; `note` is its state chip, empty when it has none. */
+  meeting?: { note: string; recording?: boolean }
   meetingId?: string
   taskId?: string
   /** Its moment, for ordering meetings among deadlines. */
